@@ -14,12 +14,12 @@ As it presently stands, the website is divided into 2 main sections within the "
 
 The "editing panes" div currently contains three elements:
 1. A div "single-image-container" for working with set of images corresponding to a fragment as defined by the institution that provides the images (the IAA)
-2. A div "signs-container" for working with text and the definition of signs marked in the images of the "single-image-container"
-3. A div "combination-container" in which multiple fragment artefacts and text reconstructions can be visually arranged
+1. A div "signs-container" for working with text and the definition of signs marked in the images of the "single-image-container"
+1. A div "combination-container" in which multiple fragment artefacts and text reconstructions can be visually arranged
 
 Other specialized types of editors may be devised in the course of the project, and they should likely be designed with this modular type of format in mind.
 
-## Development
+## Setting up a development environment
 Most development on this repository will require a local LAMP/MAMP/WAMP setup.  The SQE website is currently hosted on an Apache server and makese heavy use of Perl CGI scripts to transport data to and from our MariaDB database.  I assume that those who will want to assist in development already have or know how to set up the relevant Apache + Perl CGI server and a MariaDB server on their local host.
 
 Developers must configure their Apache server settings to enable the running of perl CGI scripts in the resources/cgi-bin of their local instance of this repository.  All Perl CGI files that access the database should acquire their DBH via the method get_dbh in a helper module file installed in /home/perl_libs.  That helper file should be named "SQE_database.pm" and have the following contents:
