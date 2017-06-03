@@ -63,7 +63,7 @@ sub getManuscriptData {
 }
 sub getFragmentData {
 	my $fragID = $cgi->param('fragID');
-	$sql = $dbh->prepare('SELECT * FROM SQE_image') or die
+	$sql = $dbh->prepare('CALL getMasterImageListings()') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute();
 	readResults();
