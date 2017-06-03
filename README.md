@@ -8,9 +8,16 @@ At this stage we prefer small and narrowly targeted javascript files to large mu
 
 This website will make intensive use of graphics capabilities, and at this point we do not aim to support severly outdated browsers.  Our current compatability target is IE 10 or higher, which should also cover most relatively up to date versions of Firefox, Chrome (desktop and Android), and Safari (desktop and iOS).  We do utilize both HTML5 and CSS3 routines, but would like to avoid heavy usage of browser prefixes in CSS.
 
-As it presently stands, the website is divided into 4 main sections within the "site" div:
+As it presently stands, the website is divided into 2 main sections within the "site" div:
 1. A main side menu bar in the "main-menu" div
-2. 
+1. A div container "editing panes" which houses the various specialized editing panes
+
+The "editing panes" div currently contains three elements:
+1. A div "single-image-container" for working with set of images corresponding to a fragment as defined by the institution that provides the images (the IAA)
+2. A div "signs-container" for working with text and the definition of signs marked in the images of the "single-image-container"
+3. A div "combination-container" in which multiple fragment artefacts and text reconstructions can be visually arranged
+
+Other specialized types of editors may be devised in the course of the project, and they should likely be designed with this modular type of format in mind.
 
 ## Development
 Most development on this repository will require a local LAMP/MAMP/WAMP setup.  The SQE website is currently hosted on an Apache server and makese heavy use of Perl CGI scripts to transport data to and from our MariaDB database.  I assume that those who will want to assist in development already have or know how to set up the relevant Apache + Perl CGI server and a MariaDB server on their local host.
