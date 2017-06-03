@@ -6,6 +6,8 @@ use DBI;
 use CGI;
 use JSON::XS;
 use MIME::Base64;
+use lib qw(/home/perl_libs);
+use SQE_database;
 
 my $cgi = new CGI;
 my $transaction = $cgi->param('transaction');
@@ -23,15 +25,7 @@ my %action = (
 );
 		
 ##Connect to database
-my $dsn = "DBI:mysql:4Q51";
-my $username = "bronson";
-my $password = 'none';
- 
-# connect to MySQL database
-my %attr = ( PrintError=>0,  # turn off error reporting via warn()
-             RaiseError=>1);   # turn on error reporting via die()           
- 
-my $dbh = DBI->connect($dsn,$username,$password, \%attr);
+my $dbh = SQE_database::get_dbh;
 		
 
 if (defined $action{$transaction}) {
@@ -69,9 +63,9 @@ sub getManuscriptData {
 }
 sub getFragmentData {
 	my $fragID = $cgi->param('fragID');
-	$sql = $dbh->prepare('SELECT * FROM image WHERE fragmentID = ?') or die
+	$sql = $dbh->prepare('SELECT * FROM SQE_image') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute($fragID);
+	$sql->execute();
 	readResults();
 	return;
 }
