@@ -115,9 +115,19 @@ iframe {
 }
 
 #single-image-view {
+  position: absolute;
 	width: 100%;
 	height: 100%;
 	overflow: auto;
+  opacity: 1.0;
+}
+
+#single-image-view2 {
+  position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+  opacity: 0.25;
 }
 
 #signs-pane {

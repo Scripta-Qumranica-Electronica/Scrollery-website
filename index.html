@@ -3,7 +3,7 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 <script src="resources/js/layout-control.js"></script>
 <script src="resources/js/single-image-control.js"></script>
-<script src="vendors/openseadragon/openseadragon.min.js"></script>
+<script src="vendors/openseadragon/openseadragon.js"></script>
 
   <head>
   	<link rel="stylesheet" href="resources/css/index.css">
@@ -27,10 +27,10 @@
 
       <div id="single-image-container" class="main-container">
         <div id="single-image-pane" class="main-pane">
-          <!--<div id="single-image-view"></div>-->
-          <img src="http://134.76.19.179/cgi-bin/iipsrv.fcgi?IIIF=P1094-Fg001-R-C01-R01-D03122013-T111026-LR924__012.ptif/full/pct:9/!270/default.jpg">
+          <div id="single-image-view"></div>
+          <div id="single-image-view2"></div>
         </div>
-        <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
+        <div class="pane-menu"><button id="main-zoom-out" type="button">-</button><button id="main-zoom-in" type="button">+</button><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
       </div>
 
       <div id="signs-container" class="main-container">
