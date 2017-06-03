@@ -1,32 +1,28 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 <!-- <script src="resources/js/openseadragon.js"></script>
 <script src="resources/js/layout-control.js"></script>
 <script src="resources/js/single-image-control.js"></script> -->
 <script src="resources/js/openseadragon.min.js"></script>
 <script src="resources/js/layout-control-combined.min.js"></script>
 
-<head>
-  <link rel="stylesheet" href="resources/css/index.css">
-  <link href="resources/css/hamburgers.min.css" rel="stylesheet">
-  <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-  <title>SQE</title>
-</head>
+  <head>
+  	<link rel="stylesheet" href="resources/css/index.css">
+    <link href="resources/css/hamburgers.min.css" rel="stylesheet">
+		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+    <title>SQE</title>
+	</head>
 
-<body>
+	<body>
 
   <div id="site">
 
     <div id="main-menu" class='top-level'>
       <span>Menu stuff:</span>
-      <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input>
-      </li>
-      <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input>
-      </li>
-      <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input>
-      </li>
+      <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
+      <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
+      <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
     </div>
 
     <div id="editing-panes" class='top-level'>
@@ -39,17 +35,13 @@
       </div>
 
       <div id="signs-container" class="main-container">
-        <div id="signs-pane" class="main-pane">
-          <iframe src="http://134.76.19.179/comfyEditor/comfyEditor.html"></iframe>
-        </div>
+        <div id="signs-pane" class="main-pane"><iframe src="http://134.76.19.179/comfyEditor/comfyEditor.html"></iframe></div>
         <div id="horizontal-divider" class="pane-size"></div>
         <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
       </div>
 
       <div id="combination-container" class="main-container">
-        <div id="combination-pane" class="main-pane">
-          <iframe src="http://134.76.19.179/bronson/Scrollery-master/Scrollery.html"></iframe>
-        </div>
+        <div id="combination-pane" class="main-pane"><iframe src="http://134.76.19.179/bronson/Scrollery-master/Scrollery.html"></iframe></div>
         <div id="vertical-divider" class="pane-size"></div>
         <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
       </div>
@@ -68,6 +60,6 @@
 
   </div>
 
-</body>
+	</body>
 
 </html>
