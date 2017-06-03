@@ -10,7 +10,7 @@ jQuery.getJSON(infoJsonUrl).done(function (infoJson, status, jqXHR) {
 		sequenceMode: false,
 		tileSources: infoJson,
 		ajaxWithCredentials : true,
-		prefixUrl: 'resources/images/',
+		prefixUrl: '../../vendors/openseadragon/images/',
 		navigationControlAnchor: OpenSeadragon.ControlAnchor.BOTTOM_LEFT,
 		crossOriginPolicy: 'Anonymous'
 	});

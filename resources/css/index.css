@@ -36,7 +36,7 @@ html, body {
   height: 100vh;
 	margin-left: 300px;
   position: relative;
-  background-image: url(images/SQE.svg);
+  background-image: url(../../resources/images/SQE.svg);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
@@ -83,16 +83,14 @@ iframe {
 }
 
 #single-image-container {
-  /*background: #600000;*/
-	background: gray;
+  background: #600000;
 	width: 50%;
   height: 70%;
   float: left;
 }
 
 #signs-container {
-  /*background: #e69900;*/
-	background: gray;
+  background: #e69900;
   width: 50%;
   height: 70%;
   margin-left: 50%;
