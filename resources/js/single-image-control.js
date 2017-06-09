@@ -16,7 +16,6 @@ function load_images(id_type, id){
 				$new_image = $(document.createElement('div')).attr('id', 'single_image-' + entry['filename']);
 				$($new_image).attr('class', 'single-image-view');
 				$('#single-image-pane').append($new_image);
-				var infoJsonUrl = 'http://134.76.19.179/cgi-bin/iipsrv.fcgi?IIIF=P1096-Fg006-R-C01-R01-D25112012-T112913-LR445__ColorCalData_IAA_Both_CC110304_110702.tif/info.json';
 				var infoJsonUrl = 'http://134.76.19.179/cgi-bin/iipsrv.fcgi?IIIF=' + entry['filename'] + '/info.json';
 				jQuery.getJSON(infoJsonUrl).done(function (infoJson, status, jqXHR) {
 					var viewer = OpenSeadragon({
