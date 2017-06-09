@@ -1,9 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="vendors/vakata/themes/default/style.min.css" />
+<script src="vendors/vakata/jstree.min.js"></script>
 <script src="vendors/openseadragon/openseadragon.js"></script>
 <script src="resources/js/layout-control.js"></script>
 <script src="resources/js/single-image-control.js"></script>
+<script src="resources/js/main-menu.js"></script>
 
   <head>
   	<link rel="stylesheet" href="resources/css/index.css">
@@ -13,52 +16,57 @@
 	</head>
 
 	<body>
-
-  <div id="site">
-
-    <div id="main-menu" class='top-level'>
-      <span>Menu stuff:</span>
-      <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
-      <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
-      <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
-    </div>
-
-    <div id="editing-panes" class='top-level'>
-
-      <div id="single-image-container" class="main-container">
-        <div id="single-image-pane" class="main-pane">
-          <div id="single-image-view"></div>
-          <div id="single-image-view2"></div>
+    <div id="site">
+      <div id="main-menu" class='top-level'>
+        <div id="top-menu" class="main-menu-section">
+          <span>Menu stuff:</span>
+          <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
+          <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
+          <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
         </div>
-        <div class="pane-menu"><button id="main-zoom-out" type="button">-</button><button id="main-zoom-in" type="button">+</button><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
+
+        <div id="unused-fragments" class="main-menu-section">
+          <span>Available fragments:</span>
+          <div id="unused-fragments-listing" class="main-menu-listing"></div>
+        </div>
+
+        <div id="unused-artefacts" class="main-menu-section">
+          <span>Available artefacts:</span>
+          <div id="unused-artefacts-listing" class="main-menu-listing"></div>
+        </div>
+
+        <div id="unused-combinations" class="main-menu-section">
+          <span>Available combinations:</span>
+          <div id="unused-combinations-listing" class="main-menu-listing"></div>
+        </div>
       </div>
 
-      <div id="signs-container" class="main-container">
-        <div id="signs-pane" class="main-pane"></div>
-        <div id="horizontal-divider" class="pane-size"></div>
-        <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
+      <div id="editing-panes" class='top-level'>
+        <div id="single-image-container" class="main-container">
+          <div id="single-image-pane" class="main-pane"></div>
+          <div class="pane-menu"><button id="main-zoom-out" type="button">-</button><button id="main-zoom-in" type="button">+</button><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
+        </div>
+
+        <div id="signs-container" class="main-container">
+          <div id="signs-pane" class="main-pane"></div>
+          <div id="horizontal-divider" class="pane-size"></div>
+          <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
+        </div>
+
+        <div id="combination-container" class="main-container">
+          <div id="combination-pane" class="main-pane"></div>
+          <div id="vertical-divider" class="pane-size"></div>
+          <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
+        </div>
+
+        <div id="main-osd">
+          <button id="show-menu" class="hamburger hamburger--arrow toggle-nav" type="button">
+            <span class="hamburger-box">
+              <span class="hamburger-inner"></span>
+            </span>
+          </button>
+        </div>
       </div>
-
-      <div id="combination-container" class="main-container">
-        <div id="combination-pane" class="main-pane"></div>
-        <div id="vertical-divider" class="pane-size"></div>
-        <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
-      </div>
-
-      <div id="main-osd">
-
-        <button id="show-menu" class="hamburger hamburger--arrow toggle-nav" type="button">
-          <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-          </span>
-        </button>
-
-      </div>
-
     </div>
-
-  </div>
-
 	</body>
-
 </html>
