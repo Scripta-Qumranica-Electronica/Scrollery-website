@@ -15,7 +15,7 @@ my @fetchedResults = ();
 my $dbh;
 my $sql;
 my %action = (
-	## Start-Old functions, to be replaced
+	## Start-Old functions, to be replaced later
 	'readFragmentData' => \&getFragmentData,
 	'readFragmentPosition' => \&getFragmentPos,
 	'readFragmentPicture' => \&getFragmentPicture,
@@ -23,7 +23,7 @@ my %action = (
 	'writeMask' => \&setMask,
 	'writeFragLocation' => \&setFragmentLocation,
 	'writeFragRotation' => \&setFragmentRotation,
-	## End-Old functions, to be replaced
+	## End-Old functions, to be replaced later
 
 	'imagesOfFragment' => \&getImagesOfFragment,
 	'allFragments' => \&getAllFragments,
