@@ -18,11 +18,16 @@
 	<body>
     <div id="site">
       <div id="main-menu" class='top-level'>
-        <div id="top-menu" class="main-menu-section">
-          <span>Menu stuff:</span>
-          <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
-          <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
-          <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
+        <div id="login" class="main-menu-section">
+          <span>Login buttons here:</span>
+        </div>
+
+        <div id="unused-combinations" class="main-menu-section">
+          <div>
+            <span>Available combinations:</span>
+            <button id="new-combination" type="button">add new</button>
+          </div>
+          <div id="unused-combinations-listing" class="main-menu-listing"></div>
         </div>
 
         <div id="unused-fragments" class="main-menu-section">
@@ -35,16 +40,20 @@
           <div id="unused-artefacts-listing" class="main-menu-listing"></div>
         </div>
 
-        <div id="unused-combinations" class="main-menu-section">
-          <span>Available combinations:</span>
-          <div id="unused-combinations-listing" class="main-menu-listing"></div>
+        <div id="gui-controls" class="main-menu-section">
+          <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
+          <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
+          <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
         </div>
       </div>
 
       <div id="editing-panes" class='top-level'>
         <div id="single-image-container" class="main-container">
           <div id="single-image-pane" class="main-pane"></div>
-          <div class="pane-menu"><button id="main-zoom-out" type="button">-</button><button id="main-zoom-in" type="button">+</button><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
+          <div class="pane-menu">
+            <button id="main-zoom-out" type="button">-</button>
+            <button id="main-zoom-in" type="button">+</button>
+            <img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
         </div>
 
         <div id="signs-container" class="main-container">

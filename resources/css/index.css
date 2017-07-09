@@ -30,6 +30,7 @@ html, body {
   -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .main-menu-section {
@@ -55,8 +56,9 @@ html, body {
   -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
--webkit-transition: none;
-transition: none;
+  backface-visibility: hidden;
+  -webkit-transition: none;
+  transition: none;
 }
 
 #main-osd {
@@ -90,6 +92,7 @@ iframe {
   overflow: hidden;
   position: relative;
 	-webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
   -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
 }
