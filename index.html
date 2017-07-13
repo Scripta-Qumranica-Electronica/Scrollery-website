@@ -10,6 +10,7 @@
 
   <head>
   	<link rel="stylesheet" href="resources/css/index.css">
+  	<link rel="stylesheet" href="resources/css/menu.css">
     <link href="vendors/jonsuh/hamburgers.min.css" rel="stylesheet">
 		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
     <title>SQE-Scrollery</title>
@@ -18,39 +19,58 @@
 	<body>
     <div id="site">
       <div id="main-menu" class='top-level'>
-        <div id="login" class="main-menu-section">
-          <span>Login buttons here:</span>
+        <div class="accordion-panel open_first">
+            <div id="login-title" class="accordion-title collapsible">Login</div>
+            <div id="login" class="accordion-content">
+              <input type="text" name="username" value="Username">
+              <input type="text" name="password" value="Password">
+              <button id="login-button" type="button" onclick="login()">Login</button>
+            </div>
         </div>
-
-        <div id="unused-combinations" class="main-menu-section">
-          <div>
-            <span>Available combinations:</span>
-            <button id="new-combination" type="button">add new</button>
-          </div>
-          <div id="unused-combinations-listing" class="main-menu-listing"></div>
+        <div class="accordion-panel">
+            <div class="accordion-title">
+              Combinations
+              <button id="new-combination" type="button">add new</button>
+            </div>
+            <div id="combinations" class="accordion-content">
+              <div id="user-combinations" class="main-menu-listing"></div>
+              <div id="default-combinations" class="main-menu-listing">
+                <div id="user-combinations">
+                  <span>User combinations</span>
+                </div>
+                <div id="default-combinations">
+                  <span>Default combinations</span>
+                </div>
+              </div>
+            </div>
         </div>
-
-        <div id="unused-fragments" class="main-menu-section">
-          <span>Available fragments:</span>
-          <div id="unused-fragments-listing" class="main-menu-listing"></div>
+        <div class="accordion-panel">
+            <div class="accordion-title collapsible">Fragments</div>
+            <div id="fragments" class="accordion-content">
+              <div id="unused-fragments-listing" class="main-menu-listing"></div>
+            </div>
         </div>
-
-        <div id="unused-artefacts" class="main-menu-section">
-          <span>Available artefacts:</span>
-          <div id="unused-artefacts-listing" class="main-menu-listing"></div>
+        <div class="accordion-panel">
+            <div class="accordion-title collapsible">Artefacts</div>
+            <div id="artefacts" class="accordion-content">
+            </div>
         </div>
-
-        <div id="gui-controls" class="main-menu-section">
-          <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
-          <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
-          <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
+        <div class="accordion-panel">
+            <div class="accordion-title collapsible">GUI</div>
+            <div id="gui" class="accordion-content">
+              <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
+              <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
+              <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
+            </div>
         </div>
       </div>
 
       <div id="editing-panes" class='top-level'>
         <div id="single-image-container" class="main-container">
           <div id="single-image-pane" class="main-pane"></div>
+          <div id="single-image-control"></div>
           <div class="pane-menu">
+            <button id="image-control" type="button" onclick="toggle_image_control()">=</button>
             <button id="main-zoom-out" type="button">-</button>
             <button id="main-zoom-in" type="button">+</button>
             <img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>

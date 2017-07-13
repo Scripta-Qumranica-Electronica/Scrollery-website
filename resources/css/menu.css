@@ -1,0 +1,37 @@
+.accordion-title {
+    visibility: hidden;
+}
+
+.open_first .accordion-title {
+    visibility: visible;
+}
+
+.accordion-panel .accordion-content {
+  visibility: hidden;
+  max-height: 0vh;
+}
+
+.open_first .accordion-content {
+  visibility: visible;
+  max-height: 25vh;
+}
+
+#combinations {
+  overflow-y: auto;
+}
+
+#new-combination {
+  visibility: hidden;
+}
+
+#fragments {
+  overflow-y: auto;
+}
+
+#artefacts {
+  overflow-y: auto;
+}
+
+#gui {
+  overflow-y: auto;
+}

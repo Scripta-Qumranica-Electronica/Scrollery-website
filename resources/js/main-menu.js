@@ -1,3 +1,32 @@
+var login = function(){
+    $(".collapsible").click(function(){show_item(this);});
+    $("#new-combination").css("visibility", "visible");
+    $(".accordion-title").css("visibility", "visible");
+    $("#login").css("max-height", "0vh");
+    $("#login").css("visibility", "hidden");
+    $("#login-title").html("Logged in as: " + $("input[name=\"username\"]").val());
+    $("#combinations").css("max-height", "50vh");
+    $("#combinations").css("height", "50vh");
+    $("#combinations").css("visibility", "visible");
+
+    populate_fragments();
+}
+
+var show_item = function(item){
+    $(".collapsible").next().css("visibility", "hidden");
+    $(".collapsible").next().css("max-height", "0vh");
+    $(item).next().css("max-height", "25vh");
+    $(item).next().css("visibility", "visible");
+}
+
+function toggle_image_control(){
+    if ($("#single-image-control").css("visibility") == "visible"){
+        $("#single-image-control").css("visibility", "hidden");
+    } else {
+        $("#single-image-control").css("visibility", "visible");
+    }
+}
+
 var listing_type = {'lv_1': 'composition',
                     'lv_2': 'edition_location_1',
                     'lv_3': 'edition_location_2',
@@ -5,11 +34,10 @@ var listing_type = {'lv_1': 'composition',
                 };
 var current_lvl;
 
-$(function () {
+var populate_fragments = function () {
     $('#unused-fragments-listing').on('changed.jstree', function (e, data) {
     if (data.selected[0].startsWith('lvl_3-')) {
         load_images(listing_type.lv_1, data.selected[0].split('lvl_3-')[1]);
-        console.log(data.selected[0].split('lvl_3-')[1]);
     }
   }).jstree({
         "core" : {
@@ -79,4 +107,4 @@ $(function () {
 		  	}
 	    }
     });
-});
+}
