@@ -33,6 +33,7 @@ my %action = (
 	'institutions' => \&getInstitutions,
 	'institutionPlates' => \&getInstitutionPlates,
 	'institutionFragments' => \&getInstitutionFragments,
+	'getPolygon' => \&getPolygon,
 );
 		
 print $cgi->header(
@@ -174,6 +175,15 @@ sub getInstitutionFragments {
 	$sql = $dbh->prepare('SELECT catalog_number_2, image_catalog_id FROM image_catalog WHERE institution = ? AND catalog_number_1 = ? AND catalog_side = 0 ORDER BY CAST(catalog_number_2 as unsigned)') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($institution, $catalog_number_1);
+	readResults();
+	return;
+}
+
+sub getPolygon {
+	my $artefact_id = $cgi->param('artefact_id');
+	$sql = $dbh->prepare('select ST_AsText(region_in_master_image) from artefact where artefact_id=?') 
+		or die "Couldn't prepare statement: " . $dbh->errstr;
+	$sql->execute($artefact_id);
 	readResults();
 	return;
 }
