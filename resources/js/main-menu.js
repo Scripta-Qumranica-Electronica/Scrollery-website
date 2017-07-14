@@ -1,10 +1,10 @@
-var login = function(){
+function login(){
     $(".collapsible").click(function(){show_item(this);});
     $("#new-combination").css("visibility", "visible");
     $(".accordion-title").css("visibility", "visible");
     $("#login").css("max-height", "0vh");
     $("#login").css("visibility", "hidden");
-    $("#login-title").html("Logged in as: " + $("input[name=\"username\"]").val());
+    $("#login-title").html("Logged in as: " + Spider.user);
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
     $("#combinations").css("visibility", "visible");

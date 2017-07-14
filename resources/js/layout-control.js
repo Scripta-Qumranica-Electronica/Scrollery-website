@@ -21,7 +21,7 @@ function whichTransitionEvent() {
 }
 var transitionEvent = whichTransitionEvent();
 
-$(function () {
+$(document).ready(function () {
   // Read initial vertical and horizontal divider position from CSS
   verticalDivide = getCssHeight('#single-image-container');
   horizontalDivide = getCssWidth('#single-image-container');
@@ -31,10 +31,11 @@ $(function () {
     toggleNav();
   });
 
-  $('.pane-button').prop('checked', true); //Each pane has a button to show/hide
+  $('.pane-button').prop('checked', false); //Each pane has a button to show/hide
   $('.pane-button').click(function () {
     togglePane();
   });
+  togglePane();
 
   $('.pane-menu img').click(function (event) { //Each pane has a fullscreen toggle
     fullScreenToggle(event);

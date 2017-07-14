@@ -8,6 +8,12 @@ html, body {
 
 @-webkit-keyframes bugfix { from {padding:0;} to {padding:0;} }
 
+#login {
+	padding: 10px;
+  border: 1px solid lightgray;
+	text-align: center;
+}
+
 #site {
   position: relative;
   overflow: hidden;
@@ -34,6 +40,7 @@ html, body {
 }
 
 #editing-panes {
+  visibility: hidden;
   height: 100vh;
 	margin-left: 300px;
   position: relative;

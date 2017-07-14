@@ -1,9 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="vendors/vakata/themes/default/style.min.css" />
+<script src="vendors/jQuery/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="resources/js/login.js"></script>
 <script src="vendors/vakata/jstree.min.js"></script>
 <script src="vendors/openseadragon/openseadragon.js"></script>
+<script src="resources/js/messageSpider.js"></script>
 <script src="resources/js/layout-control.js"></script>
 <script src="resources/js/single-image-control.js"></script>
 <script src="resources/js/main-menu.js"></script>
@@ -12,19 +13,36 @@
   	<link rel="stylesheet" href="resources/css/index.css">
   	<link rel="stylesheet" href="resources/css/menu.css">
     <link href="vendors/jonsuh/hamburgers.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="vendors/vakata/themes/default/style.min.css" />
 		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
     <title>SQE-Scrollery</title>
 	</head>
 
 	<body>
+    <div id="login">
+      <div id="inputFields">
+        <div id="userNameDiv">
+          User name<br>
+          <input id="userNameInput" placeholder="Your login name">
+        </div>
+        <div id="passwordDiv">
+          Password<br>
+          <input id="passwordInput" type="password" placeholder="Your password">
+        </div>
+      </div>
+      <br>
+      <div id="buttons">
+        <button id="confirm">Confirm</button>
+        <a href="mailto:martin.schroeter@theologie.uni-goettingen.de?subject=Forgot%20password">Forgot my login</a>
+      </div>
+      <span id="notification"></span>
+    </div>
+
     <div id="site">
       <div id="main-menu" class='top-level'>
         <div class="accordion-panel open_first">
             <div id="login-title" class="accordion-title collapsible">Login</div>
-            <div id="login" class="accordion-content">
-              <input type="text" name="username" value="Username">
-              <input type="text" name="password" value="Password">
-              <button id="login-button" type="button" onclick="login()">Login</button>
+            <div id="login-menu" class="accordion-content">
             </div>
         </div>
         <div class="accordion-panel">
@@ -36,10 +54,10 @@
               <div id="user-combinations" class="main-menu-listing"></div>
               <div id="default-combinations" class="main-menu-listing">
                 <div id="user-combinations">
-                  <span>User combinations</span>
+                  <span>&emsp;-User combinations</span>
                 </div>
                 <div id="default-combinations">
-                  <span>Default combinations</span>
+                  <span>&emsp;-Default combinations</span>
                 </div>
               </div>
             </div>
@@ -97,5 +115,5 @@
         </div>
       </div>
     </div>
-	</body>
+  </body>
 </html>

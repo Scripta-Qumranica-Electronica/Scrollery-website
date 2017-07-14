@@ -59,6 +59,7 @@ function load_images(id_type, id){
 				table.appendChild(row);
 
 				if (entry['is_master'] == 1) {
+					table.prepend(row);
 					toggle_image(filename, eye);
 				}
 			});
