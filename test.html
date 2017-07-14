@@ -21,7 +21,7 @@
         
         var post_data = new FormData();
         post_data.append('transaction', 'getPolygon');
-        post_data.append('artefact_id', 1);
+        post_data.append('master_image_id', 4993);
         jQuery.ajax({
     	url: 'resources/cgi-bin/GetImageData.pl',
     	data: post_data,
@@ -32,7 +32,6 @@
     	success: function(results){
 			results['results'].forEach(function(entry) {
 				var data = entry['ST_AsText(region_in_master_image)'];
-                console.log(data);
                 var polygons = data.split("\),\(");
                 var new_polygons = '';
                 polygons.forEach(function(polygon, index) {

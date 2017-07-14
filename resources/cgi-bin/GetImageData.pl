@@ -180,10 +180,10 @@ sub getInstitutionFragments {
 }
 
 sub getPolygon {
-	my $artefact_id = $cgi->param('artefact_id');
-	$sql = $dbh->prepare('select ST_AsText(region_in_master_image) from artefact where artefact_id=?') 
+	my $master_image_id = $cgi->param('master_image_id');
+	$sql = $dbh->prepare('select ST_AsText(region_in_master_image) from artefact where master_image_id=?') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute($artefact_id);
+	$sql->execute($master_image_id);
 	readResults();
 	return;
 }
