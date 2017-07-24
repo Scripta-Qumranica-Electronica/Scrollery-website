@@ -90,7 +90,7 @@ function display_image(file){
 	$new_image = $(document.createElement('div')).attr('id', 'single_image-' + file);
 	$($new_image).attr('class', 'single-image-view');
 	$('#single-image-pane').append($new_image);
-	var infoJsonUrl = 'http://134.76.19.179/cgi-bin/iipsrv.fcgi?IIIF=' +file + '/info.json';
+	var infoJsonUrl = 'https://134.76.19.179/cgi-bin/iipsrv.fcgi?IIIF=' +file + '/info.json';
 	jQuery.getJSON(infoJsonUrl).done(function (infoJson, status, jqXHR) {
 		var viewer = OpenSeadragon({
 			id: 'single_image-' + file,
