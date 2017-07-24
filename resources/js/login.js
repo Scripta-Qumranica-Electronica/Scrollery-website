@@ -28,15 +28,13 @@ $(document).ready(function()
 			(
 				function(response)
 				{
-					console.log(response);
-					
-					if (response == 0)
+					if (response == 0 || response == null)
 					{
 						$('#notification')
 						.text('Invalid user and / or password.')
 						.show();
 					}
-					else if (response > 0)
+					else
 					{
 						Spider.session_id = response;
 						Spider.user = $('#userNameInput').val();

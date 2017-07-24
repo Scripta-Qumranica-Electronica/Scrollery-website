@@ -25,6 +25,12 @@ my %action = (
 	'writeFragRotation' => \&setFragmentRotation,
 	## End-Old functions, to be replaced later
 
+	'getCombs' => \&getCombs,
+	'getColOfComb' => \&getColOfComb,
+	'getFragsOfCol' => \&getFragsOfCol,
+	'getIAAEdIDandColOfScrollID' => \&getIAAEdIDandColOfScrollID,
+	'getColOfScrollID' => \&getColOfScrollID,
+	'getIAAEdID' => \&getIAAEdID,
 	'imagesOfFragment' => \&getImagesOfFragment,
 	'allFragments' => \&getAllFragments,
 	'canonicalCompositions' => \&getCanonicalCompositions,
@@ -65,6 +71,59 @@ sub readResults (){
  	} else {
     	print 'No results found.';
  	}
+}
+
+sub getCombs {
+	$sql = $dbh->prepare('SELECT * FROM scroll') or die
+			"Couldn't prepare statement: " . $dbh->errstr;
+	$sql->execute();
+	readResults();
+	return;
+}
+
+sub getColOfComb {
+	my $combID = $cgi->param('combID');
+	$sql = $dbh->prepare('select distinct column_of_scroll.name, column_of_scroll.column_of_scroll_id from column_of_scroll inner join discrete_canonical_references on discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id where discrete_canonical_references.discrete_canonical_name_id = ?') or die
+			"Couldn't prepare statement: " . $dbh->errstr;
+	$sql->execute($combID);
+	readResults();
+	return;
+}
+
+sub getFragsOfCol {
+	my $colID = $cgi->param('colID');
+	$sql = $dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side from column_of_scroll inner join  discrete_canonical_references on  discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id where column_of_scroll.column_of_scroll_id = ?') or die
+			"Couldn't prepare statement: " . $dbh->errstr;
+	$sql->execute($colID);
+	readResults();
+	return;
+}
+
+sub getIAAEdIDandColOfScrollID {
+	my $discCanRef = $cgi->param('discCanRef');
+	$sql = $dbh->prepare('select scroll.name as scroll_name, edition_catalog_to_discrete_reference.edition_id, column_of_scroll.name as col_name from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join edition_catalog_to_discrete_reference on edition_catalog_to_discrete_reference.disc_can_ref_id = discrete_canonical_references.discrete_canonical_reference_id inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id inner join column_of_scroll on column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id where edition_catalog.edition_side=0 and discrete_canonical_references.discrete_canonical_reference_id = ?') or die
+			"Couldn't prepare statement: " . $dbh->errstr;
+	$sql->execute($discCanRef);
+	readResults();
+	return;
+}
+
+sub getColOfScrollID {
+	my $discCanRef = $cgi->param('discCanRef');
+	$sql = $dbh->prepare('select scroll.name as scroll_name, column_of_scroll.name as col_name from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join column_of_scroll on column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id where discrete_canonical_references.discrete_canonical_reference_id = ?') or die
+			"Couldn't prepare statement: " . $dbh->errstr;
+	$sql->execute($discCanRef);
+	readResults();
+	return;
+}
+
+sub getIAAEdID {
+	my $discCanRef = $cgi->param('discCanRef');
+	$sql = $dbh->prepare('select edition_catalog_to_discrete_reference.edition_id from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join edition_catalog_to_discrete_reference on edition_catalog_to_discrete_reference.disc_can_ref_id = discrete_canonical_references.discrete_canonical_reference_id inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id where edition_catalog.edition_side=0 and discrete_canonical_references.discrete_canonical_reference_id = ?') or die
+			"Couldn't prepare statement: " . $dbh->errstr;
+	$sql->execute($discCanRef);
+	readResults();
+	return;
 }
 
 sub getManuscriptData {

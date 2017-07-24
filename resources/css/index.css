@@ -169,3 +169,22 @@ iframe {
 	height: 4px;
 	cursor: ns-resize;
 }
+
+/* CSS for QWB HTML Text--Remove after Martin integrates text editor */
+.QWB_SCROLL
+{
+    color: white;
+    font-size: 16pt;
+    direction: rtl;
+    padding: 5pt;    
+}
+
+.QWB_RECONSTRUCTED
+{
+    color: #e69900;
+    text-shadow:
+    -1px -1px 0 white,
+    1px -1px 0 white,
+    -1px 1px 0 white,
+    1px 1px 0 white;
+}

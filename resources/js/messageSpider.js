@@ -6,7 +6,7 @@ function Spider() // singleton central component communication system
 	}
 	this.session_id = 'none';
 	this.user = 'none';
-    this.doShowServerErrors = true;
+	this.doShowServerErrors = true;
 }
 
 Spider.prototype.requestFromServer = function(parameters, onSuccess)

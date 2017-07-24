@@ -1,5 +1,6 @@
 function load_images(id_type, id){
 	$('#single-image-pane').empty();
+	$('#single-image-control').empty();
 	var image_data = new FormData();
 	image_data.append('transaction', 'imagesOfFragment');
 	image_data.append('idType', id_type);

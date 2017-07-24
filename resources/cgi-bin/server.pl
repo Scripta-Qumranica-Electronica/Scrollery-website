@@ -151,7 +151,7 @@ sub login()
 		my $session_id = lastInsertedId();
 		
 		# build random session key (needs session id first)
-		my $session_key = int(rand(10000)).$session_id.int(rand(10000));
+		my $session_key = int(rand(100)).$session_id.int(rand(100));
 		# TODO improve security of key generation
 		
 		query
