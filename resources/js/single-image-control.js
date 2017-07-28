@@ -122,6 +122,9 @@ var SingleImageController = (function () {
 			$.ajax({
 				dataType: "json",
 				url: infoJsonUrl,
+				xhrFields: {
+					withCredentials: true
+				},
 				username: "sqe_project",
 				password: "restricted_password"
 				}).done(function (infoJson, status, jqXHR) {
