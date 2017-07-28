@@ -4,14 +4,16 @@ var listing_type = {'lv_1': 'composition',
                     'ref': 'edition_catalog_id'
                 };
 var current_lvl;
+var single_image_1;
 
 function login(){
+    single_image_1 = new SingleImageController($("#single-image-container"), 1);
     $(".collapsible").click(function(){show_item(this);});
     $("#new-combination").css("visibility", "visible");
     $(".accordion-title").css("visibility", "visible");
     $("#login-menu").css("max-height", "0vh");
     $("#login-menu").css("visibility", "hidden");
-    $("#login-title").html("Logged in as: " + Spider.user);
+    $("#login-title").html("Logged in as: " + Spider.getInstance().user);
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
     $("#combinations").css("visibility", "visible");
@@ -24,14 +26,6 @@ function show_item(item){
     $(".collapsible").next().css("max-height", "0vh");
     $(item).next().css("max-height", "25vh");
     $(item).next().css("visibility", "visible");
-}
-
-function toggle_image_control() {
-    if ($("#single-image-control").css("visibility") == "visible"){
-        $("#single-image-control").css("visibility", "hidden");
-    } else {
-        $("#single-image-control").css("visibility", "visible");
-    }
 }
 
 function populate_combinations() {
@@ -53,7 +47,7 @@ function populate_combinations() {
             get_database_data(data_form, function(results){
                 var default_comps = document.getElementById("default-combinations");
                 results['results'].forEach(function(result) {
-                    load_images('composition', result.edition_id);
+                    single_image_1.display_fragment('composition', result.edition_id);
                 });
             });
         }
@@ -191,11 +185,8 @@ function load_text(scroll, fragment){
     data_form.append('USER_NAME', 'sqe_api');
     data_form.append('PASSWORD', '512JE8ehM3UW');
     data_form.append('SCROLL', scroll);
-    data_form.append('FRAGMENT', fragment);
+    data_form.append('FRAGMENT', fragment.replace("+", "\\+"));
     data_form.append('FORMAT', 'QWB_HTML');
-    // get_database_data(data_form, function(response){
-    //     $("#signs-pane").html(response.VALUE);
-    // });
     jQuery.ajax({
         url: 'https://134.76.19.179/sqe_api/run_api.cgi',
         data: data_form,
@@ -241,5 +232,5 @@ function toRoman(num) {
       // remove the decimal value of the roman number from our number
     }
   }
-  return result;
+  return result.toLowerCase();
 }

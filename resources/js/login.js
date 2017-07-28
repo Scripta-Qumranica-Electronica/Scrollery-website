@@ -36,8 +36,9 @@ $(document).ready(function()
 					}
 					else
 					{
-						Spider.session_id = response;
-						Spider.user = $('#userNameInput').val();
+						spider = Spider.getInstance();
+						spider.session_id = response;
+						spider.user = $('#userNameInput').val();
 						$('#login').css('visibility', 'hidden');
 						$('#login').css('height', '0');
 						$('#login').css('padding', '0');

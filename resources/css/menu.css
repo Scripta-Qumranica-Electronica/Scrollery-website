@@ -1,9 +1,15 @@
+.accordion-panel {
+  border-bottom-width:2px;
+  border-bottom-color:lightblue;
+  border-bottom-style: solid;
+}
+
 .accordion-title {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .open_first .accordion-title {
-    visibility: visible;
+  visibility: visible;
 }
 
 .accordion-panel .accordion-content {
