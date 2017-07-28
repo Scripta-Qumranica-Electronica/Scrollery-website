@@ -119,7 +119,12 @@ var SingleImageController = (function () {
 			$($new_image).attr('class', 'single-image-view');
 			$(pane).append($new_image);
 			var infoJsonUrl = 'https://134.76.19.179/cgi-bin/iipsrv.fcgi?IIIF=' +file + '/info.json';
-			jQuery.getJSON(infoJsonUrl).done(function (infoJson, status, jqXHR) {
+			$.ajax({
+				dataType: "json",
+				url: infoJsonUrl,
+				username: "sqe_project",
+				password: "restricted_password"
+				}).done(function (infoJson, status, jqXHR) {
 				var viewer = OpenSeadragon({
 					id: 'single_image-' + file,
 					preserveViewport: true,
