@@ -41,7 +41,6 @@ function populate_combinations() {
                     if (data == 0) {
                         return;
                     }
-                    console.log(JSON.parse(data));
                     Spider.notifyChangedText(JSON.parse(data));
                 }
             );
