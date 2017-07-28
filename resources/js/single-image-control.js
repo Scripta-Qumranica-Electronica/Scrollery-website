@@ -3,6 +3,7 @@ var SingleImageController = (function () {
     // Constructor
     function SingleImageController ($cont, idx) {
 		this.info = "stuff";
+		var current_images = {};
 		var notes = "other things";
 		var $full_screen = $('<img>')
 			.attr("src", "resources/images/Fullscreen.png")

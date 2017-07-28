@@ -153,7 +153,7 @@ sub getFragmentPicture {
 	my $fragID = $cgi->param('fragID');
 	my $side = $cgi->param('side');
 	my $type = $cgi->param('type');
-	$sql = $dbh->prepare('SELECT * FROM image WHERE side = ?
+	$sql = $dbh->prepare('SELECT image.filename as filename, image.is_master as is_master FROM image WHERE side = ?
 				AND type = ? AND fragmentID = ?') or die "Couldn't prepare statement: " . 
 				$dbh->errstr;
 	$sql->execute($side, $type, $fragID);
