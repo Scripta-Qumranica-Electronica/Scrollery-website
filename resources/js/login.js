@@ -36,9 +36,8 @@ $(document).ready(function()
 					}
 					else
 					{
-						spider = Spider.getInstance();
-						spider.session_id = response;
-						spider.user = $('#userNameInput').val();
+						Spider.session_id = response;
+						Spider.user = $('#userNameInput').val();
 						$('#login').css('visibility', 'hidden');
 						$('#login').css('height', '0');
 						$('#login').css('padding', '0');
@@ -48,6 +47,7 @@ $(document).ready(function()
 						$('.pane-button').prop('checked', true); //Set each pane to visible
 						togglePane(); //Refresh panes so they appear
 						login();
+						initEditor();
 						//window.location = 'index.html?session=' + response + '&user=' + $('#userNameInput').val();
 					}
 				}

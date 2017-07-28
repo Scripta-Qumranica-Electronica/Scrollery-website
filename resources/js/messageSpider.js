@@ -1,82 +1,66 @@
-var Spider = (function() // singleton central component communication system
+function Spider() // singleton central component communication system
+{  
+    if (typeof Spider.instance === 'object') // instance already exists
+    {
+        return Spider.instance;
+    }
+    
+    this.doShowServerErrors = true;
+}
+
+Spider.prototype.requestFromServer = function(parameters, onReturn)
 {
-	// Instance stores a reference to the Singleton
-	var instance;
-
-	function init() { // Private methods and variables
-		function message(){
-			console.log("sent message");
-		}
-		var doShowServerErrors = true;
-
-		return { // Public methods and variables
-			session_id: 'none',
-			user: 'none',
-
-			requestFromServer: function(parameters, onSuccess)
-			{
-				parameters['timeStamp'] = Date.now(); // TODO replace now() entries in DB bei this time, retry connection regularly
-				$.post
-				(
-					'cgi/server.pl', // connection to perl works only if same server ('same origin')
-					parameters
-				)
-				.done
-				(
-					function(data)
-					{
-						console.log('success at ' + parameters['request'] + ':');
-						console.log(data);
-						
-						if (onSuccess != null)
-						{
-							onSuccess(data);
-						}
-					}
-				)
-				.fail
-				(
-					function(data)
-					{
-						if (this.doShowServerErrors)
-						{
-							console.log('failure:');
-							console.log(data);
-						}
-					}
-				);
-			},
-
-			getShowServerErrors: function()
-			{
-				return this.doShowServerErrors;
-			},
-
-			setShowServerErrors: function(doShowServerErrors)
-			{
-				this.doShowServerErrors = doShowServerErrors;
-			},
-
-			getParameterByName: function(name, url) //What is this here for???
-			{
-				if (!url) url = window.location.href;
-				name = name.replace(/[\[\]]/g, "\\$&");
-				var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-					results = regex.exec(url);
-				if (!results) return null;
-				if (!results[2]) return '';
-				return decodeURIComponent(results[2].replace(/\+/g, " "));
-			}
-		};
-	};
-
-	return { // Get the Singleton instance if one exists, otherwise create it
-		getInstance: function() 
+	console.log('before request ' + new Date().getTime());
+	parameters['timeStamp'] = Date.now(); // TODO replace now() entries in DB bei this time, retry connection regularly
+	
+	$.post
+	(
+		'resources/cgi-bin/server.pl', // connection to perl works only if same server ('same origin')
+		parameters
+	)
+	.done
+	(
+		function(data)
 		{
-			if (!instance) {
-				instance = init();
+			console.log('response on ' + parameters['request'] + ':');
+			console.log(data);
+			
+			if (onReturn != null)
+			{
+				onReturn(data);
 			}
-			return instance;
+			
+			console.log('after request ' + new Date().getTime());
 		}
-	};
-})();
+	)
+	.fail
+	(
+		function(data)
+		{
+			if (this.doShowServerErrors)
+			{
+				console.log('failure:');
+				console.log(data);
+			}
+		}
+	);
+}
+
+Spider.prototype.getShowServerErrors = function()
+{
+	return this.doShowServerErrors;
+}
+
+Spider.prototype.setShowServerErrors = function(doShowServerErrors)
+{
+	this.doShowServerErrors = doShowServerErrors;
+}
+
+Spider.prototype.notifyChangedText = function(textObject)
+{
+	this.textObject = textObject;
+	
+	displayModel2(textObject);
+}
+
+var Spider = new Spider();

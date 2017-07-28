@@ -1,17 +1,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<script src="vendors/jQuery/jquery-3.2.1.min.js"></script>
-<script type="text/javascript" src="resources/js/login.js"></script>
-<script src="vendors/vakata/jstree.min.js"></script>
-<script src="vendors/openseadragon/openseadragon.js"></script>
-<script src="resources/js/messageSpider.js"></script>
-<script src="resources/js/layout-control.js"></script>
-<script src="resources/js/single-image-control.js"></script>
-<script src="resources/js/main-menu.js"></script>
 
   <head>
+    <script type="text/javascript" src="vendors/jQuery/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="resources/js/login.js"></script>
+    <script type="text/javascript" src="vendors/vakata/jstree.min.js"></script>
+    <script type="text/javascript" src="vendors/openseadragon/openseadragon.js"></script>
+    <script type="text/javascript" src="resources/js/messageSpider.js"></script>
+    <script type="text/javascript" src="resources/js/server.js"></script>
+    <script type="text/javascript" src="resources/js/layout-control.js"></script>
+    <script type="text/javascript" src="resources/js/editor/richTextEditor.js"></script>
+    <script type="text/javascript" src="resources/js/editor/singleSignEditor.js"></script>
+    <script type="text/javascript" src="resources/js/editor/editor.js"></script>
+    <script type="text/javascript" src="resources/js/single-image-control.js"></script>
+    <script type="text/javascript" src="resources/js/main-menu.js"></script>
   	<link rel="stylesheet" href="resources/css/index.css">
   	<link rel="stylesheet" href="resources/css/menu.css">
+  	<link rel="stylesheet" href="resources/css/editor.css">
     <link href="vendors/jonsuh/hamburgers.min.css" rel="stylesheet">
     <link rel="stylesheet" href="vendors/vakata/themes/default/style.min.css" />
 		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
@@ -93,7 +98,30 @@
         </div>
 
         <div id="signs-container" class="main-container">
-          <div id="signs-pane" class="main-pane"></div>
+          <div id="signs-pane" class="main-pane">
+            <div id="singleSignContainer"
+                class="hidden scrollable fillingMostHeight contentField">
+              
+              <div id="signAndAlternatives"></div>
+              
+              <button id="closeSingleSignViewButton">Done</button>
+              
+            </div>
+            <div id="hidePanel">
+
+              <div id="RichTextPanel"
+                  class="frame">
+                  
+                <div class="bordered padded headline">Virtual scroll text editor</div>
+                
+                <div id="richTextContainer"
+                    class="scrollable protectedLineBreaks fillingMostHeight contentField"
+                    dir="rtl"></div>
+                
+              </div>
+              
+            </div>
+          </div>
           <div id="horizontal-divider" class="pane-size"></div>
           <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
         </div>

@@ -13,7 +13,7 @@ function login(){
     $(".accordion-title").css("visibility", "visible");
     $("#login-menu").css("max-height", "0vh");
     $("#login-menu").css("visibility", "hidden");
-    $("#login-title").html("Logged in as: " + Spider.getInstance().user);
+    $("#login-title").html("Logged in as: " + Spider.user);
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
     $("#combinations").css("visibility", "visible");
@@ -32,15 +32,19 @@ function populate_combinations() {
     $('#default-combination-listings').on('changed.jstree', function (e, data) {
         if (data.selected[0].startsWith('lvl_3-')) {
             var selected_frag = data.selected[0].split('lvl_3-')[1];
-            var data_form = new FormData();
-            data_form.append('transaction', 'getColOfScrollID');
-            data_form.append('discCanRef', selected_frag);
-            get_database_data(data_form, function(results){
-                var default_comps = document.getElementById("default-combinations");
-                results['results'].forEach(function(result) {
-                    load_text(result.scroll_name, result.col_name);
-                });
-            });
+            Spider.requestFromServer(
+                {
+                    'request': 'load',
+                    'disc_can_ref_id': selected_frag
+                },
+                function(data){
+                    if (data == 0) {
+                        return;
+                    }
+                    console.log(JSON.parse(data));
+                    Spider.notifyChangedText(JSON.parse(data));
+                }
+            );
             data_form = new FormData();
             data_form.append('transaction', 'getIAAEdID');
             data_form.append('discCanRef', selected_frag);

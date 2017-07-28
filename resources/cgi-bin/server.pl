@@ -1,5 +1,5 @@
 #! /usr/bin/perl -w
-# "c:\xampp\perl\bin\perl.exe"
+# c:\xampp\perl\bin\perl.exe -w
 
 use strict;
 use warnings;
@@ -11,11 +11,12 @@ use LWP::Simple;
 
 use JSON;
 use Data::Dumper;
+use feature qw(say);
 use Encode;
 
 use DBI;
 use lib qw(/home/perl_libs);
-use SQE_database; # ignore the error, former: require '/etc/access.pm';
+use SQE_database; # former: require '/etc/access.pm';
 
 
 # global variables
@@ -31,7 +32,7 @@ sub query($)
 	my $sql_command = shift;
 	if (index($sql_command, 'user_sessions') == -1)
 	{
-		print '$sql_command '.$sql_command.'\n';	
+#		say '$sql_command '.$sql_command;	
 	}
 	
 	my $query = $DBH->prepare($sql_command) or die DBI->errstr;
@@ -42,6 +43,8 @@ sub query($)
 sub queryResult($)
 {
 	my $sql_command = shift;
+	
+#	say '$sql_command '.$sql_command;
 	
 	my $query = $DBH->prepare($sql_command) or die DBI->errstr;
 	$query->execute() or die DBI->errstr;
@@ -122,18 +125,27 @@ sub login()
 	my $user_name = $CGI->param('user');
 	my $pw        = $CGI->param('password');
 	
-	my ($actual_pw, $user_id) = queryAll
+	my $user_id = userId($user_name);
+	if (!defined $user_id) # couldn't find user for this name
+	{
+		print 0;
+		
+		return;
+	}
+	
+	my $actual_pw_sha2 = queryResult
 	(
-		'SELECT pw, user_id FROM user'
+		'SELECT pw FROM user'
 		.' WHERE user_name = "'.$user_name.'"'
+	);
+	my $entered_pw_sha2 = queryResult
+	(
+		'SELECT sha2("'.$pw.'", 224)'
 	);
 	
 	# compare provided & actual password
-	
-	if ($actual_pw eq $pw)
+	if ($actual_pw_sha2 eq $entered_pw_sha2)
 	{
-		my $query;
-		
 		# end previous session
 		query
 		(
@@ -150,14 +162,15 @@ sub login()
 		);
 		my $session_id = lastInsertedId();
 		
-		# build random session key (needs session id first)
-		my $session_key = int(rand(100)).$session_id.int(rand(100));
-		# TODO improve security of key generation
-		
+		# create & save random session key (makes guessing sessions difficult)
+		my $session_key = queryResult
+		(
+			'SELECT sha2(concat('.$user_id.', now()), 224)'
+		);
 		query
 		(
 			'UPDATE user_sessions'
-			.' SET session_key = '.$session_key
+			.' SET session_key = "'.$session_key.'"'
 			.' WHERE session_id = '.$session_id 
 		);
 		
@@ -195,13 +208,602 @@ sub getManifest()
 	print $sou;
 }
 
+sub load() # TODO combine queries where possible, for better performance
+{
+	my $disc_can_ref_id = $CGI->param('disc_can_ref_id');
+	
+	my %id2SignType;
+	my @sign_types = queryAll
+	(
+		'SELECT sign_type_id, type FROM sign_type'
+	);
+	for (my $i = 0; $i < scalar @sign_types; $i += 2)
+	{
+		$id2SignType{$sign_types[$i]} = $sign_types[$i + 1];
+	}
+	
+	my $column_start_sign_id = queryResult # TODO scroll owner relevant?
+	(
+		'SELECT sign_id'
+		.' FROM sign'
+		
+		.' JOIN real_area'
+		.' ON real_area.real_area_id = sign.real_areas_id'
+		
+		.' JOIN line_of_column_of_scroll'
+		.' ON line_of_column_of_scroll.line_id = real_area.line_of_scroll_id'
+		
+		.' JOIN column_of_scroll'
+		.' ON column_of_scroll.column_of_scroll_id = line_of_column_of_scroll.column_id'
+		
+		.' JOIN discrete_canonical_references'
+		.' ON discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id'
+		
+		.' JOIN scroll'
+		.' ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id'
+		
+		.' WHERE FIND_IN_SET("COLUMN_START", sign.break_type) > 0'
+		.' AND discrete_canonical_references.discrete_canonical_reference_id ='.$disc_can_ref_id
+	);
+	if (!defined $column_start_sign_id)
+	{
+		print 0;
+		return;
+	}
+	my $next_sign_id = $column_start_sign_id;
+	
+	my $json_string = '[';
+	
+	my $previous_line_id = -1;
+	my $i_area_in_line;
+	
+	# build json till first column end is encountered (capped to the signs of 100,000 real areas)
+	for (my $i_area = 0; $i_area < 100000; $i_area++)
+	{
+		# move along the position stream
+		$next_sign_id = queryResult
+		(
+			'SELECT next_sign_id'
+			.' FROM position_in_stream'
+			.' WHERE sign_id = '.$next_sign_id
+		);
+		
+		# get main sign from position stream
+		my @main_sign = queryAll
+		(
+			'SELECT *, FIND_IN_SET("COLUMN_END", sign.break_type)'
+			.' FROM sign'
+			.' WHERE sign_id = '.$next_sign_id
+		);
+		if (defined $main_sign[17]
+		&&  $main_sign[17] > 0) # column end # TODO expects column end as main sign
+		{
+			last;
+		}
+		pop @main_sign; # remove column end detection to get same array length as for alternative signs
+		
+		# add new line, if needed
+		my @current_line = queryAll
+		(
+			'SELECT line_id, name'
+			.' FROM line_of_column_of_scroll'
+			
+			.' JOIN real_area'
+			.' ON real_area.line_of_scroll_id = line_of_column_of_scroll.line_id'
+			
+			.' JOIN sign'
+			.' ON sign.real_areas_id = real_area.real_area_id'
+			
+			.' WHERE sign.sign_id = '.$main_sign[0]
+		);
+		if ($current_line[0] != $previous_line_id) # new line started
+		{
+			if (length $json_string > 1) # 1+ line was already added
+			{
+				$json_string .= ']},'; # end previous line
+			}
+			$json_string .= '{"lineName":"'.$current_line[1].'","signs":[';
+			
+			$previous_line_id = $current_line[0];
+		}
+		
+		# save main sign & its alternatives
+		if (substr($json_string, -1) eq ']') # second or later area within line
+		{
+			$json_string .= ',['; # start area
+		}
+		else # first area
+		{
+			$json_string .= '[';	
+		}
+		my @sign_data = (@main_sign, queryAll
+		(
+			'SELECT *'
+			.' FROM sign'
+			
+			.' JOIN is_variant_sign_of' 
+			.' ON main_sign_id = '.$next_sign_id
+		));
+		for (my $i_sign_data = 0; $i_sign_data < scalar @sign_data; $i_sign_data += 17)
+		{
+			if ($i_sign_data == 0) # first possible sign (and main sign) of area
+			{
+				$json_string .= '{';				
+			}
+			else # later sign
+			{
+				$json_string .= ',{';
+			}
+			
+			$json_string .= '"id":'.$sign_data[$i_sign_data];
+			
+			# skip date_of_adding
+			
+			my $a = $sign_data[$i_sign_data + 2];
+			if (!($a eq '?'))
+			{
+				$json_string .= ',"sign":"'.$a.'"';	
+			}
+			
+			$a = $sign_data[$i_sign_data + 3];
+			if ($a != 1) # not a letter
+			{
+				$json_string .= ',"signType":"'.$id2SignType{$a}.'"';
+			}
+			
+			$a = $sign_data[$i_sign_data + 4];
+			if ($a != 0
+			&&  $a != 1) # width other than 0.0 (not a letter) and 1.0 (standard letter)
+			{
+				$json_string .= ',"width":'.$a;
+			}
+			
+			if ($sign_data[$i_sign_data + 5] != 0) # might be wider
+			{
+				$json_string .= ',"mightBeWider":1';
+			}
+			
+			# skip vocalization_id
+			
+			$a = $sign_data[$i_sign_data + 7];
+			if (defined $a
+			&&  !($a eq 'COMPLETE')) # readability impaired
+			{
+				$json_string .= ',"damaged":"'.$a.'"';
+			}
+			
+			$a = $sign_data[$i_sign_data + 8];
+			if (defined $a) # readable areas are declared
+			{
+				$json_string .= ',"readableAreas":"'.$a.'"';
+			}
+			
+			if ($sign_data[$i_sign_data + 9] == 1) # is reconstructed
+			{
+				$json_string .= ',"reconstructed":1';
+			}
+			
+			if ($sign_data[$i_sign_data + 10] == 1) # is retraced
+			{
+				$json_string .= ',"retraced":1';
+			}
+			
+			# skip form_of_writing_id
+			
+			$a = $sign_data[$i_sign_data + 12];
+			if (defined $a
+			&&  !($a eq 'NO')) # editorial flag is set
+			{
+				$json_string .= ',"suggested":"'.$a.'"';
+			}
+			
+			$a = $sign_data[$i_sign_data + 13];
+			if (defined $a) # commentary exists
+			{
+				$json_string .= ',"comment":"'.$a.'"';
+			}
+			
+			# skip real_areas_id
+			
+			$a = $sign_data[$i_sign_data + 15];
+			if (defined $a) # break type(s)
+			{
+				$json_string .= ',"break":"'.$a.'"';
+			}
+			
+			$a = $sign_data[$i_sign_data + 16];
+			if (defined $a
+			&&  !($a eq '')) # there is 1+ correction
+			{
+				$json_string .= ',"corrected":"'.$a.'"';
+			}
+			
+			my @sign_position = queryAll
+			(
+				'SELECT type'
+				.' FROM sign_relative_position'
+				.' WHERE sign_relative_position_id = '.$sign_data[$i_sign_data]
+				.' ORDER by level'
+			);
+			if (@sign_position) # TODO level 2 positions etc.
+			{
+				$json_string .= ',"position":"'.$sign_position[0].'"';
+			}
+			
+			$json_string .= '}';
+		}
+		$json_string .= ']'; # end area
+	}
+	
+	if (length $json_string > 1) # 1+ line was added
+	{
+		$json_string .= ']}'; # close signs array and line
+	}
+	$json_string .= ']'; # end json
+	
+	print $json_string;
+}
+
+sub save()
+{
+	my $user_id = userId($CGI->param('user')); # TODO replace by session check
+	if (!defined $user_id)
+	{
+		say 'error: not logged in when saving signs';
+		return;
+	}
+	
+	my $decoded = decode_json $CGI->param('signs');
+	
+	my %signType2Id =
+	(
+		'space'				=> 2,
+		'possibleVacat'		=> 3,
+		'vacat'				=> 4,
+		'damage'			=> 5,
+		'blankLine'			=> 6,
+		'paragraphMarker'	=> 7,
+		'lacuna'			=> 8
+	);
+	my %signType2Char =
+	(
+		'space'			=> '" "',
+		'possibleVacat'	=> '" "',
+		'vacat'			=> '" "'
+	);
+	my %vocalization2Id =
+	(
+		'Tiberian'		=> 1,
+		'Babylonian'	=> 2,
+		'Palestinian'	=> 3
+	);
+	my %position2Enum =
+	(
+		'aboveLine'		=> 'ABOVE_LINE',
+		'belowLine'		=> 'BELOW_LINE',
+		'leftMargin'	=> 'LEFT_MARGIN',
+		'rightMargin'	=> 'RIGHT_MARGIN'
+	);
+	my %correction2Enum =
+	(
+		'overwritten'		=> 'OVERWRITTEN',
+		'horizontalLine'	=> 'HORIZONTAL_LINE',
+		'diagonalLeftLine'	=> 'DIAGONAL_LEFT_LINE',
+		'diagonalRightLine'	=> 'DIAGONAL_RIGHT_LINE',
+		'dotBelow'			=> 'DOT_BELOW',
+		'dotAbove'			=> 'DOT_ABOVE',
+		'lineBelow'			=> 'LINE_BELOW',
+		'lineAbove'			=> 'LINE_ABOVE',
+		'boxed'				=> 'BOXED',
+		'erased'			=> 'ERASED'
+	);
+	
+	my @lines = @{$decoded};
+	my $a;
+	my $main_sign_id;
+	my $position_level;
+	my $scroll_id;
+	
+	# TODO break for scroll start, if fitting
+	
+	# TODO begin of input is probably not begin of column => check line tag first
+	my ($previous_sign_id, $previous_stream_position_id)
+	= saveBreak('COLUMN_START', $user_id, undef);
+	
+	foreach my $line (@lines) # TODO combine queries for all signs
+	{
+		# assume that line always starts with first sign
+		($previous_sign_id, $previous_stream_position_id)
+		= saveBreak('LINE_START', $user_id, $previous_stream_position_id);
+		
+		my @alternatives = @{$line};
+		
+		# no signs in this line => insert 'blank line' sign
+		if (scalar @alternatives == 0)
+		{
+			@alternatives = ([{'sign' => 'blankLine'}]);
+		}
+		
+		foreach my $alternative (@alternatives)
+		{
+			my $is_variant_sign = 0; # set to main sign
+			
+			my @signs = @{$alternative};
+			foreach my $sign (@signs)
+			{
+				my %sign_entries = ();
+				# assumed default values set by DB:
+				# sign_type_id = 1, width = 1, might_be_wider = 0, vocalization_id = null
+				# readability = null, readable_areas = (NW,NE,MW,ME,SW,SE)
+				# is_reconstructed = 0, is_retraced = 0, deletion = null (not deleted)
+				# form_of_writing_id = 0
+				# editorial_flag = null
+				# no commentary at sign_comment
+				
+				# transform from JSON to DB
+				# TODO prohibit code injection
+				
+				my %attributes = %{$sign};
+				
+				if ($a = $attributes{'sign'})
+				{
+					if ($signType2Id{$a})
+					{
+						$sign_entries{'sign_type_id'} = $signType2Id{$a};
+						
+						if (my $char = $signType2Char{$a}) # space, vacat, possibleVacat -> single whitespace sign
+						{
+							$sign_entries{'sign'} = $char;
+						}
+					}
+					elsif ($a =~ /[\x{05d0}-\x{05ea}]/) # Hebrew letter (context or final, but nothing special else)
+					{
+						# sign_type_id is already 1 (letter) by default
+						$sign_entries{'sign'} = '\''.$a.'\''; # will remain empty string otherwise
+					}
+				}
+				if ($a = $attributes{'width'})
+				{
+					if ($a =~ /[0-9]*(.[0-9]*)?/
+					and $a > 0) # positive float
+					{
+						$sign_entries{'width'} = $a;
+					}
+				}
+				if ($a = $attributes{'atLeast'})
+				{
+					if ($a eq 'true')
+					{
+						$sign_entries{'might_be_wider'} = 1;
+					}
+				}
+				if ($a = $attributes{'vocalization'})
+				{
+					# TODO needs separate table, then usage of vocalization_id
+					
+					if ($vocalization2Id{$a})
+					{
+						# $sign_entries{'vocalization'} = $vocalization2Id{$a};
+					}
+				}
+				
+				if ($a = $attributes{'manuscript'})
+				{
+					$scroll_id = queryResult
+					(
+						'SELECT scroll_id FROM scroll WHERE name = "'
+						.$a
+						.'"'
+					);
+					# if null, connection to scroll will be ignored
+					 
+					# TODO restrict to scrolls the user has access to
+					# TODO there might be multiple scrolls with the same name the user has access to
+				}
+				if ($a = $attributes{'fragment'}) # TODO evaluate, assume 1 otherwise?
+				{
+					$sign_entries{'fragment'} = $a;
+				}
+				if ($a = $attributes{'line'}) # TODO evaluate, assume 1 (and increasing) otherwise?
+				{
+					$sign_entries{'line'} = $a;
+				}
+				if ($a = $attributes{'scribe_id'})
+				{
+					if ($a =~ /[0-9]+/
+					and $a > 0) # positive integer
+					{
+						# TODO add later
+						# $sign_entries{'scribe_id'} = $a;
+					}
+				}
+				
+				if ($a = $attributes{'readability'}) # COMPLETE / INCOMPLETE_BUT_CLEAR / INCOMPLETE_AND_NOT_CLEAR
+				{
+					# TODO damaged: clear / unclear
+				}
+				if ($a = $attributes{'readable_areas'}) # set 'NW,NE,MW,ME,SW,SE'
+				{
+					# TODO
+				}
+				if ($a = $attributes{'reconstructed'})
+				{
+					if ($a eq 'true')
+					{
+						$sign_entries{'is_reconstructed'} = 1;	
+					}
+				}
+				if ($a = $attributes{'retraced'})
+				{
+					if ($a eq 'true')
+					{
+						$sign_entries{'is_retraced'} = 1;	
+					}
+				}
+				
+				if ($a = $attributes{'suggested'})
+				{
+					if ($a eq '')
+					{
+						$sign_entries{'editorial_flag'} = '"SHOULD_BE_DELETED"';
+					}
+					elsif ($attributes{'sign'} eq '') # no sign to be read, but one suggested
+					{
+						$sign_entries{'sign'} = $a;
+						$sign_entries{'editorial_flag'} = '"SHOULD_BE_ADDED"';
+					}
+					else
+					{
+						# TODO to alternative sign, link main sign and it
+						$sign_entries{'editorial_flag'} = '"CONJECTURE"';
+					}
+				}
+				
+				say Dumper(%sign_entries);
+				
+				# TODO check whether sign already exists (then only add it to the new user)
+				
+				# save sign itself
+				my $sql_query = 'INSERT INTO sign SET ';
+				while (my ($key, $value) = each %sign_entries)
+				{
+					$sql_query .= $key.'='.$value.','
+				}
+				$sql_query = substr($sql_query, 0, (length $sql_query) - 1); # remove final ,
+				query
+				(
+					$sql_query
+				);
+				
+				# get id for current sign, relevant for follow-up queries
+				my $sign_id = lastInsertedId();
+				
+				# save sign owner
+				query
+				(
+					'INSERT INTO sign_owner VALUES ('
+					.$sign_id
+					.','
+					.$user_id
+					.',now())'
+				);
+				
+				# save position
+				if ($a = $attributes{'position'})
+				{
+					$position_level = 1;
+					
+					while (my ($key, $value) = each %position2Enum)
+					{
+						if (index($a, $key) != -1)
+						{
+							query
+							(
+								'INSERT sign_relative_position SET sign_relative_position_id = '
+								.$sign_id
+								.', type = \''
+								.$value
+								.'\', level = '
+								.$position_level
+							);
+							
+							$position_level++;
+						}
+					}
+				}
+				
+				# save correction
+				if ($a = $attributes{'corrected'})
+				{
+					while (my ($key, $value) = each %correction2Enum)
+					{
+						if (index($a, $key) != -1)
+						{
+							query
+							(
+								'INSERT INTO sign_correction (sign_id, correction) VALUES ('
+								.$sign_id
+								.', \''
+								.$value.'\')'
+							); 
+						}
+					}
+				}
+				
+				# save alternatives and stream position
+				if ($is_variant_sign)
+				{
+					query
+					(
+						'INSERT INTO is_variant_sign_of VALUES ('
+						.$main_sign_id
+						.','
+						.$sign_id
+						.',1)'
+					);
+					
+					# no direct link to sign stream, but indirectly via is_variant_sign_of
+				}
+				else # first sign of alternative (maybe the only one)
+				{
+					$previous_stream_position_id = saveToStream
+					(
+						$sign_id,
+						$previous_stream_position_id
+					);
+					
+					$main_sign_id = $sign_id;
+					$is_variant_sign = 1; # for next signs of alternative (if existing)	
+				}
+				
+				# save user's comment
+				if ($a = $attributes{'comment'})
+				{
+					query # TODO later save in 1..n sign_comment table
+					(
+						'UPDATE sign'
+						.' SET commentary = "'.$a.'"'
+						.' WHERE sign_id = '.$sign_id
+					);
+				}
+				
+				# save connection to scroll
+				if ($scroll_id != undef)
+				{
+					query
+					(
+						'INSERT real_area'
+						.' SET scroll_id = '.$scroll_id
+					);
+					
+					query
+					(
+						'UPDATE sign'
+						.' SET real_areas_id = '.lastInsertedId()
+						.' WHERE sign_id = '.$sign_id
+					);
+				}
+				
+				say 'saved to DB';
+			}
+		}
+		
+		($previous_sign_id, $previous_stream_position_id)
+		= saveBreak('LINE_END', $user_id, $previous_stream_position_id);
+	}
+	
+	saveBreak('COLUMN_END', $user_id, $previous_stream_position_id);
+	
+	# TODO break for scroll end, if fitting
+}
+
 sub saveMarkup()
 {
 	my $markup = $CGI->param('markup');
 	my $user_name = $CGI->param('user');
 	
 	my $user_id = userId($user_name);
-	if ($user_id == undef)
+	if (!defined $user_id)
 	{
 		print 0;
 	}
@@ -273,14 +875,14 @@ sub saveSigns()
 {
 	my $user_name = $CGI->param('user');
 	my $user_id = userId($user_name);
-	if ($user_id == undef)
+	if (!defined $user_id)
 	{
-		print 'error: not logged in when saving signs';
+		say 'error: not logged in when saving signs';
 		return;
 	}
 	
 	my $input = $CGI->param('signs');
-	print 'JSON: '.$input."\n";
+	say 'JSON: '.$input."\n";
 	
 	my $decoded = decode_json $input;
 	
@@ -488,8 +1090,7 @@ sub saveSigns()
 					}
 				}
 				
-				print Dumper(%sign_entries);
-				print '';
+				say Dumper(%sign_entries);
 				
 				# TODO check whether sign already exists (then only add it to the new user)
 				
@@ -614,7 +1215,7 @@ sub saveSigns()
 					);
 				}
 				
-				print 'saved to DB';
+				say 'saved to DB';
 			}
 		}
 		
@@ -676,7 +1277,7 @@ sub saveComment()
 		'SELECT user_id FROM user '
 		.'WHERE user_name = "'.$user_name.'"'
 	);
-	print '$user_id '."$user_id";
+	say '$user_id '."$user_id";
 	
 	# add comment to db
 	query
@@ -831,7 +1432,7 @@ sub getAllResults()
 	}
 	
 	$json_string .= ']';
-	print $json_string;
+	say '$json_string '.$json_string;
 }
 
 # fetch request
@@ -839,7 +1440,7 @@ $CGI = CGI->new;
 my $request = $CGI->param('request');
 if (!defined $request)
 {
-	print 'Undefined request (running from command line?)';
+	say 'Undefined request (running from command line?)';
 	$DBH = SQE_database::get_dbh;
 	getAllComments();
 	exit;
@@ -861,6 +1462,10 @@ elsif ($request eq 'logout')
 elsif ($request eq 'getManifest')
 {
 	getManifest();
+}
+elsif ($request eq 'load')
+{
+	load();
 }
 elsif ($request eq 'saveMarkup')
 {

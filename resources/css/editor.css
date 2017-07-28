@@ -1,0 +1,460 @@
+/** general */
+
+.bordered
+{
+	border: 1px solid black;
+}
+
+.borderedButTop
+{
+	border-top: 0px;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+	border-left: 1px solid black;
+}
+
+.greyBordered
+{
+	border: 1px solid darkgrey;
+}
+
+.scrollable
+{
+	overflow: auto;
+}
+
+.bold
+{
+	font-weight: bold; 
+}
+
+.hidden
+{
+	display: none;
+}
+
+.warning
+{
+	font-weight: bold;
+	color: red;
+}
+
+.padded
+{
+	padding: 5px;
+}
+
+.protectedLineBreaks
+{
+	white-space: pre;
+}
+
+.discreetLine
+{
+	border: 0;
+	border-bottom: 1px dotted gray;
+}
+
+.fillingMostHeight
+{
+	height: calc(100vh - 110px);
+}
+
+.fillingMostHeightNoHeadline
+{
+	height: calc(100vh - 69px); /** fillingMostHeight +20 removed headline's height +2*5 its padding +1 border +10 ??? */
+}
+
+.contentField
+{
+	width: calc(100% - 12px); /* -2*5 padding -2*1 border */
+	
+	border-top: 0px;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+	border-left: 1px solid black;
+	
+	margin: 0px;
+	padding: 5px;
+}
+
+
+/** high level elements */
+
+#controlPanel
+{
+	float: left;
+}
+
+.mainPanel
+{
+	max-width: 40%;
+	min-width: 40%;
+	
+	float: left;
+	margin-left: 1%;
+}
+
+.headline
+{
+	width: calc(100% - 12px); /* -2*5 padding -2*1 border */
+	height: 20px;
+	
+	line-height: 20px; /* vertically centered text */
+}
+
+.frame
+{
+	width: inherit;
+}
+
+
+/** control panel */
+
+#userPanel
+{
+	font-size: small;
+}
+
+.toggleButton
+{
+	width: 35px;
+	height: 20px;
+	
+	font-size: 10px;
+}
+
+
+/** tabs */
+
+.tabs
+{
+	display: table;
+	
+	border-collapse: collapse;
+}
+
+.tab
+{
+	display: table-cell;
+	min-width: 0px;
+	
+	padding: 3px;
+	
+	cursor: pointer;
+	
+	font-size: small;
+}
+
+.active
+{
+	font-weight: bold;
+	
+	border-top: 2px solid black;
+}
+
+
+/** image */
+
+.indented
+{
+	margin-left: 10px;
+}
+
+.centered
+{
+	display: block;
+	margin: auto;
+}
+
+/** text input */
+
+.textField
+{
+	width: calc(100% - 12px); /* -2*5 padding -2*1 border */
+	resize: none;
+	
+	float: left;
+	margin: 0px;
+	padding: 5px;
+	
+	font-size: 16px;
+	
+	/* unicode-bidi: bidi-override; */
+}
+
+#textPosition
+{
+	float: right;
+	
+	padding: 2px;
+	
+	font-size: small;
+	text-align: right;
+}
+
+
+/** preview */
+
+.textLinesWrapper
+{
+	width: calc(100% - 12px); /* -2*1 border -2*5 padding */
+}
+
+.textLine
+{
+	width: 100%;
+	
+	display: table;
+}
+
+.textLineNumber
+{
+	width: 40px;
+	
+	float: right;
+	display: table-cell;
+}
+
+.textLineContent
+{
+	width: calc(100% - 51px); /* -40 number -2*5 padding -1 border */
+	min-height: 20px; /* ensures border */
+	
+	float: right;
+	display: table-cell;
+	
+	border-bottom: 1px solid lightgrey;
+	padding-right: 5px;
+	
+	line-height: 20px;
+	text-align: start;
+	vertical-align: middle;
+	
+	font-family: 'Courier';
+	font-size: 14px;
+}
+
+.lineNumbers
+{
+	float: left;
+	
+	width: 30px;
+	
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+	
+	margin: 0px;
+	
+	text-align: center;
+}
+
+.alternative
+{
+	opacity: 0.5;
+	margin-left: -3px;
+	margin-right: -3px;
+}
+
+.unobstrusive
+{
+	opacity: 0.3;
+}
+
+
+/** markup description */
+
+.clickableText
+{
+	color: blue;
+	text-decoration-line: underline;
+	
+	cursor: pointer;
+}
+
+.markupSearch
+{
+	min-height: 10px;
+	
+	padding: 2px;
+	margin-bottom: 5px;
+}
+
+.explanationSwitch
+{
+	display: inline-block; /* allows to adjust width */
+	
+	cursor: pointer;
+	
+	text-align: center;
+}
+
+.explanation
+{
+	/** margin-top: 10px; */
+	
+	font-family: 'Arial';
+	font-size: 14px;
+}
+
+
+/** text preview */
+
+
+/** markup discussion */
+
+#commentBox
+{
+	width: calc(100% - 10px); /* -2*5 padding */ 
+	height: 100px;
+	resize: none;
+}
+
+
+/** contributions */
+
+.contribution
+{
+	width: calc(100% - 10px); /* -2*5 padding */
+	max-height: 100px;
+	
+	padding: 2px;
+	
+	text-align: start;
+}
+
+
+/** rich text editor */
+
+.manuscriptName
+{
+	font-family: fantasy;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.fragmentName
+{
+	font-family: fantasy;
+	font-size: 14px;
+	font-weight: bold;	
+}
+
+.column
+{
+	width: 100%;
+	table-layout: auto;
+}
+
+.line
+{
+}
+
+.lineSection
+{
+	border-left: 3px solid white;
+	
+	line-height: 20px;
+}
+
+.coyBottomBorder
+{
+	border-bottom: 1px solid lightgrey;
+}
+
+.normalBottomBorder
+{
+	border-bottom: 1px solid darkgrey;
+}
+
+#richTextContainer
+{
+	table-layout: auto;
+	
+	font-family: monospace;
+	font-size: 14px;
+}
+
+
+/** different annotations */
+
+.retraced
+{
+	font-weight: bold;
+}
+
+.reconstructed
+{
+	color: darkblue;
+}
+
+.corrected
+{
+	text-decoration: line-through; 
+}
+
+.suggested
+{
+	color: darkred;
+}
+
+
+/** single sign editor */
+
+.chosenSign
+{
+	font-size: 48px;
+}
+
+.otherSign
+{
+	font-size: 28px;
+	
+	cursor: pointer;
+}
+
+.signDescription
+{
+	font-size: 10px;
+}
+
+.someSpaceBelow
+{
+	margin-bottom: 10px;
+}
+
+.attributesContainer
+{
+	float: left;
+	
+	width: 45%;
+	
+	border: 1px solid black;
+	
+	margin-right: calc(4%);
+}
+
+.attributesList
+{
+	height: 200px;
+	
+	padding: 4px;
+}
+
+.attributesListHeadline
+{
+	border-bottom: 1px solid black;
+	
+	line-height: 20px;
+	padding: 4px;
+}
+
+.attribute
+{
+	cursor: pointer;
+}
+
+.chosenAttribute
+{
+	color: lightgrey;
+}
