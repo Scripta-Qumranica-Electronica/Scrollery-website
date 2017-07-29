@@ -128,7 +128,7 @@ var SingleImageController = (function () {
 				contentType: false,
 				processData: false,
 				crossDomain: true,
-        		type: 'POST',
+        		type: 'GET',
 				dataType: "json",
 				url: infoJsonUrl
 			}).done(function (infoJson, status, jqXHR) {
