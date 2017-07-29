@@ -116,20 +116,26 @@ var SingleImageController = (function () {
 		}
 
 		function display_image(file, url){
+			//This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
+			sqe_query = false;
+			if (url.includes("134.76.19.179")){
+				sqe_query = true;
+			}
 			var $new_image = $(document.createElement('div')).attr('id', 'single_image-' + file);
 			$($new_image).attr('class', 'single-image-view');
 			$(pane).append($new_image);
-			//This if formdata is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 			var infoJsonUrl = url + file + '/info.json';
-			var data = new FormData();
-			data.append('user', Spider.user);
+			//This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
+			if (sqe_query){
+				var data = new FormData();
+				data.append('user', Spider.user);
+			}
 			$.ajax({
-				data: data,
+				data: sqe_query ? data : undefined, //This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 				cache: false,
 				contentType: false,
 				processData: false,
-				crossDomain: true,
-        		type: 'POST',
+        		type: sqe_query ? 'POST' : 'GET', //This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 				dataType: "json",
 				url: infoJsonUrl
 			}).done(function (infoJson, status, jqXHR) {
