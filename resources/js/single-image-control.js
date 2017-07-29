@@ -133,7 +133,7 @@ var SingleImageController = (function () {
 				url: infoJsonUrl
 			}).done(function (infoJson, status, jqXHR) {
 				if (infoJson["@id"].includes("134.76.19.179")){
-					infoJson["@id"] = infoJson["@id"].replace("cgi-bin/iipsrv.fcgi?", "bronson/Scrollery-dev/cgi-bin/get_web.pl?user=" + Spider.user + "&");
+					infoJson["@id"] = infoJson["@id"].replace("iipsrv.fcgi?", "sqe-iiif.pl?user=" + Spider.user + "&");
 				}
 				var viewer = OpenSeadragon({
 					id: 'single_image-' + file,
