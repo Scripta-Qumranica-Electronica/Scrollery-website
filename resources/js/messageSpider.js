@@ -22,8 +22,8 @@ Spider.prototype.requestFromServer = function(parameters, onReturn)
 	(
 		function(data)
 		{
-			console.log('response on ' + parameters['request'] + ':');
-			console.log(data);
+			// console.log('response on ' + parameters['request'] + ':');
+			// console.log(data);
 			
 			if (onReturn != null)
 			{

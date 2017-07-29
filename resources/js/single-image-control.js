@@ -58,8 +58,7 @@ var SingleImageController = (function () {
 				type: 'POST',
 				success: function(selected_images){
 					selected_images['results'].forEach(function(entry) {
-						var image_type = entry['filename'].split("-")[7];
-						image_type = image_type.split("_")[0];
+						var image_type = entry['wavelength'];
 						var filename = entry['filename'];
 
 						var row = document.createElement("tr");
@@ -81,6 +80,7 @@ var SingleImageController = (function () {
 						//eye.setAttribute("id", "eye-" + entry['filename']);
 						eye.setAttribute("src", "resources/images/eye-closed.png");
 						eye.setAttribute("alt", "not visible");
+						eye.dataset.url = entry['url'];
 						eye.setAttribute("width", "20");
 						eye.setAttribute("height", "20");
 						eye.setAttribute("onclick",  "single_image_" + idx + ".toggle_image(\"" + filename + "\", this);");
@@ -115,20 +115,23 @@ var SingleImageController = (function () {
 			}
 		}
 
-		function display_image(file){
+		function display_image(file, url){
 			var $new_image = $(document.createElement('div')).attr('id', 'single_image-' + file);
 			$($new_image).attr('class', 'single-image-view');
 			$(pane).append($new_image);
-			var infoJsonUrl = 'https://134.76.19.179/cgi-bin/iipsrv.fcgi?IIIF=' +file + '/info.json';
+			var infoJsonUrl = url + file + '/info.json';
+			var data = new FormData();
+			data.append('session', Spider.session_id);
 			$.ajax({
+				data: data,
+				cache: false,
+				contentType: false,
+				processData: false,
+				crossDomain: true,
+        		type: 'POST',
 				dataType: "json",
-				url: infoJsonUrl,
-				xhrFields: {
-					withCredentials: true
-				},
-				username: "sqe_project",
-				password: "restricted_password"
-				}).done(function (infoJson, status, jqXHR) {
+				url: infoJsonUrl
+			}).done(function (infoJson, status, jqXHR) {
 				var viewer = OpenSeadragon({
 					id: 'single_image-' + file,
 					preserveViewport: true,
@@ -157,7 +160,7 @@ var SingleImageController = (function () {
 		}
 		SingleImageController.prototype.toggle_image = function(file, eye_icon){
 			if ($('#single_image-' + $.escapeSelector(file)).length == 0){
-				display_image(file);
+				display_image(file, eye_icon.dataset.url);
 				eye_icon.setAttribute("src", "resources/images/eye-open.png");
 				eye_icon.setAttribute("alt", "visible");
 			} else {
