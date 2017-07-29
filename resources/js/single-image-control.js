@@ -121,7 +121,7 @@ var SingleImageController = (function () {
 			$(pane).append($new_image);
 			var infoJsonUrl = url + file + '/info.json';
 			var data = new FormData();
-			data.append('session', Spider.session_id);
+			data.append('user', Spider.user);
 			$.ajax({
 				data: data,
 				cache: false,
@@ -132,6 +132,9 @@ var SingleImageController = (function () {
 				dataType: "json",
 				url: infoJsonUrl
 			}).done(function (infoJson, status, jqXHR) {
+				if (infoJson["@id"].includes("134.76.19.179")){
+					infoJson["@id"] = infoJson["@id"].replace("cgi-bin/iipsrv.fcgi?", "bronson/Scrollery-dev/cgi-bin/get_web.pl?user=" + Spider.user + "&");
+				}
 				var viewer = OpenSeadragon({
 					id: 'single_image-' + file,
 					preserveViewport: true,
