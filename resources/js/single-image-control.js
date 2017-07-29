@@ -119,6 +119,7 @@ var SingleImageController = (function () {
 			var $new_image = $(document.createElement('div')).attr('id', 'single_image-' + file);
 			$($new_image).attr('class', 'single-image-view');
 			$(pane).append($new_image);
+			//This if formdata is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 			var infoJsonUrl = url + file + '/info.json';
 			var data = new FormData();
 			data.append('user', Spider.user);
@@ -132,6 +133,7 @@ var SingleImageController = (function () {
 				dataType: "json",
 				url: infoJsonUrl
 			}).done(function (infoJson, status, jqXHR) {
+				//This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 				if (infoJson["@id"].includes("134.76.19.179")){
 					infoJson["@id"] = infoJson["@id"].replace("iipsrv.fcgi?", "sqe-iiif.pl?user=" + Spider.user + "&");
 				}
