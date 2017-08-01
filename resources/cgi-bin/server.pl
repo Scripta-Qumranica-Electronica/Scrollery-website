@@ -1,5 +1,5 @@
-#! c:\xampp\perl\bin\perl.exe -w
-# /usr/bin/perl -w
+#! /usr/bin/perl -w
+# c:\xampp\perl\bin\perl.exe -w
 
 use strict;
 use warnings;
