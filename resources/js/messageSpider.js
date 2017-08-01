@@ -15,15 +15,15 @@ Spider.prototype.requestFromServer = function(parameters, onReturn)
 	
 	$.post
 	(
-		'resources/cgi-bin/server.pl', // connection to perl works only if same server ('same origin')
+		'cgi/server.pl', // connection to perl works only if same server ('same origin')
 		parameters
 	)
 	.done
 	(
 		function(data)
 		{
-			// console.log('response on ' + parameters['request'] + ':');
-			// console.log(data);
+			console.log('response on ' + parameters['request'] + ':');
+			console.log(data);
 			
 			if (onReturn != null)
 			{
@@ -60,7 +60,7 @@ Spider.prototype.notifyChangedText = function(textObject)
 {
 	this.textObject = textObject;
 	
-	displayModel2(textObject);
+	displayModel(textObject);
 }
 
 var Spider = new Spider();

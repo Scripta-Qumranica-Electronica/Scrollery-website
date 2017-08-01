@@ -1,7 +1,24 @@
-function switchAlternative(index)
+function switchAlternative(alternativeSignId)
 {
+	const index = alternativeSignId.replace('alternativeSign', '');
+	
 	$('.attributesDiv:visible').hide();
 	$('#attributesDiv' + index).show();
+	
+	$('.alternativeSign')
+	.removeClass('chosenSign')
+	.addClass('otherSign');
+	
+	$('#' + alternativeSignId)
+	.removeClass('otherSign')
+	.addClass('chosenSign');
+}
+
+function notifySignChange(index)
+{
+	console.log('change index ' + index);
+	
+	$('#alternativeSign' + index).addClass('modifiedSign');
 }
 
 function addAttribute(potentialAttributeId)
@@ -12,17 +29,16 @@ function addAttribute(potentialAttributeId)
 		return;
 	}
 	
-	const name = pa.text();
-	const attributeAndValue = potentialAttributeId.replace('possibleAttribute_', '');
-	const attribute = attributeAndValue.substr(0, attributeAndValue.indexOf('_'));
-	const value = attributeAndValue.substr(attributeAndValue.indexOf('_') + 1);
+	const attribute = pa.attr('attribute');
+	const value = pa.attr('value');
+	const iSign = pa.attr('iSign');
 	
-	$('.attribute_' + attribute)
+	$('.attribute_' + attribute + '_' + iSign)
 	.removeClass('attribute')
 	.addClass('chosenAttribute')
 	.off('click');
 	
-	$('#currentAttribute_' + attribute + '_' + value).show();
+	$('#currentAttribute_' + attribute + '_' + value + '_' + iSign).show();
 }
 
 function removeAttribute(currentAttributeId)
@@ -33,12 +49,11 @@ function removeAttribute(currentAttributeId)
 		return;
 	}
 	
-	const name = ca.text();
-	const attributeAndValue = currentAttributeId.replace('currentAttribute_', '');
-	const attribute = attributeAndValue.substr(0, attributeAndValue.indexOf('_'));
-	const value = attributeAndValue.substr(attributeAndValue.indexOf('_') + 1);
+	const attribute = ca.attr('attribute');
+	const value = ca.attr('value');
+	const iSign = ca.attr('iSign');
 	
-	$('.attribute_' + attribute)
+	$('.attribute_' + attribute + '_' + iSign)
 	.addClass('attribute')
 	.removeClass('chosenAttribute')
 	.click(function(event)
@@ -46,53 +61,55 @@ function removeAttribute(currentAttributeId)
 		addAttribute(event.target['id'])
 	})
 
-	$('#currentAttribute_' + attribute + '_' + value).hide();
+	$('#currentAttribute_' + attribute + '_' + value + '_' + iSign).hide();
 }
 
-function displaySingleSignSpan(span, model)
+function displaySingleSignSpan(model, spanId)
 {
-	var spanId = $('#' + span).attr('id');
-	if (spanId == null)
+	const span = $('#' + spanId);
+	if (span == null)
 	{
 		return;
 	}
 	
-	spanId = spanId.replace('span','').split('_');
-	if (spanId.length != 2)
-	{
-		return;
-	}
+	const iLine = span.attr('iLine');
+	const iAlternative = span.attr('iAlternative');
+//	const iSign = span.attr('iSign'); // not needed & name collision with loop variable 
+	const signId = span.attr('signId');
 	
-	const potentialAttributes = // for each: name to display, modification, value
+	const potentialAttributes = // for each: name to display, modification, value, json name, json value
 	[
-	 	['width',			'width', 			'1'        ],
-	 	['might be wider',	'atLeast',			'true'       ],
-	 	['on left margin',	'position',			'leftMargin' ],
-	 	['on right margin',	'position',			'rightMargin'],
-	 	['above line',		'position',			'aboveLine'  ],
-	 	['below line',		'position',			'belowLine'  ],
-	 	['reconstructed',	'reconstructed',	'true'       ],
-	 	['corrected',		'corrected',		'overwritten'],
-	 	['retraced',		'retraced',			'true'       ]
+	 	['might be wider',	'atLeast',			'true',			'mightBeWider',		1				],
+	 	['on left margin',	'position',			'leftMargin',	'position',			'LEFT_MARGIN'	],
+	 	['on right margin',	'position',			'rightMargin',	'position',			'RIGHT_MARGIN'	],
+	 	['above line',		'position',			'aboveLine',	'position',			'ABOVE_LINE'	],
+	 	['below line',		'position',			'belowLine',	'position',			'BELOW_LINE'	],
+	 	['reconstructed',	'reconstructed',	'true',			'reconstructed',	1				],
+	 	['corrected',		'corrected',		'overwritten',	'corrected',		'OVERWRITTEN'	],
+	 	['retraced',		'retraced',			'true',			'retraced',			1				]
 	];
 	
-	var signData;
-	var signElement, signDescription;
+	// TODO smoothen reset code
 	
-	const signsDiv = $('#signAndAlternatives');
-	signsDiv.empty();
+	const hidePanel = $('#hidePanel');
+	$('#signAndAlternatives').appendTo(hidePanel);
+	$('#signContext').appendTo(hidePanel);
+	$('#confirmSingleSignChangesButton').appendTo(hidePanel);
+	$('#cancelSingleSignChangesButton').appendTo(hidePanel);
 	
-	var attributesDiv;
-	var authorsDiv, ownersDiv, commentsDiv, commentInput;
+	const container = $('#singleSignContainer').empty();
+	$('#signAndAlternatives').appendTo(container);
+	$('#signContext').appendTo(container);
+	$('#confirmSingleSignChangesButton').appendTo(container);
+	$('#cancelSingleSignChangesButton').appendTo(container);
 	
-	var attributeChoiceContainer;
-	var currentAttributesContainer, currentAttributesDiv;
-	var potentialAttributesContainer, potentialAttributesDiv;
-	var potentialAttribute, pa;
+	const signsDiv = 
+	$('#signAndAlternatives')
+	.empty(); // reset displayed main sign & variants
 	
-	for (var iSign in model[spanId[0]])
+	for (var iSign in model[iLine]['signs'][iAlternative])
 	{
-		signData = model[spanId[0]][iSign];
+		const signData = model[iLine]['signs'][iAlternative][iSign];
 		
 		if (signData['sign'] == null)
 		{
@@ -100,19 +117,40 @@ function displaySingleSignSpan(span, model)
 		}
 		
 		
-		/** main sign and alternative ones */
+		/** main sign & variants */
 		
-		signElement =
+		const signElement =
 		$('<span></span>')
 		.attr('id', 'alternativeSign' + iSign)
-		.text(signData['sign'])
-		.click(function()
+		.attr('mainSignId', signId) // TODO first sign of alternative is not necessarily the main sign 
+		.addClass('alternativeSign')
+		.click(function(event)
 		{
-			switchAlternative(iSign); // TODO declaration this way saves current state of iSign?
+			switchAlternative(event.target['id']);
 		})
 		.appendTo(signsDiv);
 		
-		signDescription =
+		if (signData['signType'] == null) // letter
+		{
+			signElement.text(signData['sign']);
+		}
+		else
+		{
+			const signPresentation = _signType2Visualisation[signData['signType']];
+			
+			if (signPresentation == null) // unknown sign type
+			{
+				signElement.text('?');
+			}
+			else
+			{
+				signElement
+				.text(signPresentation)
+				.attr('title', signData['signType']);
+			}
+		}
+		
+		const signDescription =
 		$('<span></span>')
 		.addClass('signDescription')
 		.appendTo(signsDiv);
@@ -131,130 +169,181 @@ function displaySingleSignSpan(span, model)
 		
 		/** owners, comments, attribute lists */
 		
-		attributesDiv = $('#attributesDiv' + iSign);
+		var attributesDiv = $('#attributesDiv' + iSign);
 		if (!attributesDiv.length) // div for this sign doesn't exist yet
 		{
 			attributesDiv =
 			$('<div></div>')
 			.attr('id', 'attributesDiv' + iSign)
 			.addClass('attributesDiv')
-			.insertBefore('#closeSingleSignViewButton');
+			.insertBefore('#signContext');
+		}
+		else
+		{
+			attributesDiv.empty();
+		}
 			
-			
-			/** owners, comments */		// TODO remove div variable references where not necessary
-			
-			authorsDiv =
+		if (iSign != 0) // show main sign first
+		{
+			attributesDiv.hide();
+		}
+		
+		
+		/** owners, comments */
+		
+		const authorsDiv =
+		$('<div></div>')
+		.attr('id', 'authorsDiv' + iSign)
+		.addClass('someSpaceBelow')
+		.appendTo(attributesDiv);
+		
+			const ownersDiv =	// TODO
 			$('<div></div>')
 			.attr('id', 'authorsDiv' + iSign)
 			.addClass('someSpaceBelow')
-			.appendTo(attributesDiv);
-			
-				ownersDiv =	// TODO
-				$('<div></div>')
-				.attr('id', 'authorsDiv' + iSign)
-				.addClass('someSpaceBelow')
-				.text('These people agree on this reading: You')
-				.appendTo(authorsDiv);
-			
-				commentsDiv =
-				$('<div></div>')
-				.attr('id', 'authorsDiv' + iSign)
-				.appendTo(authorsDiv);
-			
-					$('<span></span>')
-					.text('Your comment: ')
-					.appendTo(commentsDiv);
-					
-					commentInput =
-					$('<input></input>')
-					.appendTo(commentsDiv);
-					
-					if (signData['comment'] != null)
-					{
-						commentInput.val(signData['comment']);
-					}
-			
-			
-			/** attribute lists */
-			
-			attributeChoiceContainer =
+			.text('Reading accepted by: You')
+			.appendTo(authorsDiv);
+		
+			const commentsDiv =
 			$('<div></div>')
-			.attr('id', 'attributeChoiceDiv' + iSign)
-			.appendTo(attributesDiv);
+			.attr('id', 'authorsDiv' + iSign)
+			.appendTo(authorsDiv);
+		
+				$('<span></span>')
+				.text('Your comment: ')
+				.appendTo(commentsDiv);
+				
+				var commentary = '';
+				if (signData['comment'] != null)
+				{
+					commentary = signData['comment'];
+				}
+				
+				const commentInput =
+				$('<input></input>')
+				.attr('id', 'commentInput' + iSign)
+				.val(commentary)
+				.change(function(event)
+				{
+					notifySignChange(event.target['id'].replace('commentInput', ''));
+				})
+				.appendTo(commentsDiv);
+				
+		
+		
+		/** attribute lists */
+		
+		const attributeChoiceContainer =
+		$('<div></div>')
+		.attr('id', 'attributeChoiceDiv' + iSign)
+		.appendTo(attributesDiv);
 			
-				currentAttributesContainer =
-				$('<div></div>')
-				.addClass('attributesContainer')
-				.addClass('someSpaceBelow')
-				.appendTo(attributeChoiceContainer);
-				
-					$('<div></div>')
-					.addClass('attributesListHeadline')
-					.text('Current attributes')
-					.appendTo(currentAttributesContainer);
-					
-					currentAttributesDiv =
-					$('<div></div>')
-					.attr('id', 'currentAttributesDiv' + iSign)	
-					.addClass('scrollable')
-					.addClass('attributesList')
-					.appendTo(currentAttributesContainer);
-				
-				potentialAttributesContainer =
-				$('<div></div>')
-				.attr('id', 'potentialAttributesDiv' + iSign)
-				.addClass('attributesContainer')
-				.addClass('someSpaceBelow')
-				.appendTo(attributeChoiceContainer);
-				
-					$('<div></div>')
-					.addClass('attributesListHeadline')
-					.text('Possible attributes')
-					.appendTo(potentialAttributesContainer);
-					
-					potentialAttributesDiv =
-					$('<div></div>')
-					.attr('id', 'potentialAttributesDiv' + iSign)	
-					.addClass('scrollable')
-					.addClass('attributesList')
-					.appendTo(potentialAttributesContainer);
-					
-			for (var iPa in potentialAttributes)
+			$('<span></span>')
+			.text('Width: ')
+			.appendTo(attributeChoiceContainer);
+			
+			var width = '';
+			if (signData['width'] != null)
 			{
-				pa = potentialAttributes[iPa];
-				
-				$('<div></div>')
-				.attr('id', 'currentAttribute_' + pa[1] + '_' + pa[2].replace('.', 'ß'))
-				.addClass('attribute')
-				.text(pa[0])
-				.click(function(event)
-				{
-					removeAttribute(event.target['id'])
-				})
-				.hide()
-				.appendTo(currentAttributesDiv);
-
-				$('<div></div>')
-				.attr('id', 'possibleAttribute_' + pa[1] + '_' + pa[2].replace('.', 'ß'))
-				.addClass('attribute')
-				.addClass('attribute_' + pa[1]) // allows groups of attributes
-				.text(pa[0])
-				.click(function(event)
-				{
-					addAttribute(event.target['id'])
-				})
-				.appendTo(potentialAttributesDiv);
+				width = signData['width'];
 			}
 			
-			// TODO use addAttribute() to insert existing attributes
-		}
-		else // fill elements with current data
+			const widthInput =
+			$('<input></input>')
+			.attr('id', 'widthInput' + iSign)
+			.attr('placeholder', 'Leave empty for 1.0')
+			.val(width)
+			.change(function(event)
+			{
+				notifySignChange(event.target['id'].replace('widthInput', ''));
+			})
+			.appendTo(attributeChoiceContainer);
+			
+			
+			$('<br>')
+			.appendTo(attributeChoiceContainer);
+			
+			$('<br>')
+			.appendTo(attributeChoiceContainer);
+
+			const currentAttributesContainer =
+			$('<div></div>')
+			.addClass('attributesContainer')
+			.addClass('someSpaceBelow')
+			.appendTo(attributeChoiceContainer);
+			
+				$('<div></div>')
+				.addClass('attributesListHeadline')
+				.text('Current attributes')
+				.appendTo(currentAttributesContainer);
+				
+				const currentAttributesDiv =
+				$('<div></div>')
+				.attr('id', 'currentAttributesDiv' + iSign)	
+				.addClass('scrollable')
+				.addClass('attributesList')
+				.appendTo(currentAttributesContainer);
+			
+			const potentialAttributesContainer =
+			$('<div></div>')
+			.attr('id', 'potentialAttributesDiv' + iSign)
+			.addClass('attributesContainer')
+			.addClass('someSpaceBelow')
+			.appendTo(attributeChoiceContainer);
+			
+				$('<div></div>')
+				.addClass('attributesListHeadline')
+				.text('Possible attributes')
+				.appendTo(potentialAttributesContainer);
+				
+				const potentialAttributesDiv =
+				$('<div></div>')
+				.attr('id', 'potentialAttributesDiv' + iSign)	
+				.addClass('scrollable')
+				.addClass('attributesList')
+				.appendTo(potentialAttributesContainer);
+				
+		for (var iPa in potentialAttributes)
 		{
-			// TODO for relevant elements
+			const pa = potentialAttributes[iPa];
+			
+			$('<div></div>')
+			.attr('id', 'currentAttribute_' + pa[1] + '_' + pa[2].replace('.', 'ß') + '_' + iSign)
+			.attr('attribute', pa[1])
+			.attr('value', pa[2])
+			.attr('iSign', iSign)
+			.addClass('attribute')
+			.text(pa[0])
+			.click(function(event)
+			{
+				removeAttribute(event.target['id']);
+				notifySignChange($('#' + event.target['id']).attr('iSign'));
+			})
+			.hide()
+			.appendTo(currentAttributesDiv);
+			
+			removeAttribute('currentAttribute_' + pa[1] + '_' + pa[2].replace('.', 'ß') + '_' + iSign);
+			
+			$('<div></div>')
+			.attr('id', 'possibleAttribute_' + pa[1] + '_' + pa[2].replace('.', 'ß') + '_' + iSign)
+			.attr('attribute', pa[1])
+			.attr('value', pa[2])
+			.attr('iSign', iSign)
+			.addClass('attribute')
+			.addClass('attribute_' + pa[1] + '_' + iSign) // allows groups of attributes
+			.text(pa[0])
+			.click(function(event)
+			{
+				addAttribute(event.target['id']);
+				notifySignChange($('#' + event.target['id']).attr('iSign'));
+			})
+			.appendTo(potentialAttributesDiv);
+			
+			if (signData[pa[3]] == pa[4]) // according to JSON attribute is set
+			{
+				addAttribute('possibleAttribute_' + pa[1] + '_' + pa[2].replace('.', 'ß') + '_' + iSign);
+			}
 		}
-		
-		
-		
 		
 		
 		/** sign owners and comments */
@@ -270,14 +359,129 @@ function displaySingleSignSpan(span, model)
 //		{
 ////			commentButton.text('Add comment');
 //		}
+		
+		
+		
+		/** line context */
+		
+		$('#singleSignContainer > .someSpaceBelow').remove(); // remove previous line context
+		
+		const line = $('#line' + iLine);
+		if (line.length > 0) // line exists (it should)
+		{
+			line
+			.clone() // deep copy without event handlers or data
+			.attr('dir', 'rtl')
+			.addClass('someSpaceBelow')
+			.insertAfter('#signContext');
+		}
+	}
+}
+
+function potentiallySaveChanges()
+{
+	var index = 0;
+	var alternativeSign = $('#alternativeSign0');
+	
+	while (alternativeSign.length > 0)
+	{
+		if (alternativeSign.hasClass('modifiedSign'))
+		{
+			var json = '{"mainSignId":';
+			json += alternativeSign.attr('mainSignId');
+			
+			// TODO saubere transformation bei nichtbuchstaben
+			json += ',"sign":"' + $('#alternativeSign0').text() + '"';
+			
+			const width = $('#widthInput' + index).val();
+			if (width != null
+			&&  width != ''
+			&&  width == 1 * width) // width is a number
+			{
+				json += ',"width":' + width;
+			}
+			else // user might remove the previous width entry
+			{
+				json += ',"width":1';
+			}
+			
+			const commentary = $('#commentInput' + index).val();
+			if (commentary != null
+			&&  commentary != '')
+			{
+				json += ',"commentary":"' + commentary + '"';
+			}
+			else // user can remove commentary
+			{
+				json += ',"commentary":""';
+			}
+			
+			// TODO streamline based on big array (which might belong to spider)
+			if ($('#currentAttribute_atLeast_true_' + index).css('display') != 'none')
+			{
+				json += ',"mightBeWider":1';
+			}
+			if ($('#currentAttribute_position_leftMargin_' + index).css('display') != 'none')
+			{
+				json += ',"position":"LEFT_MARGIN"';
+			}
+			if ($('#currentAttribute_position_rightMargin_' + index).css('display') != 'none')
+			{
+				json += ',"position":"RIGHT_MARGIN"';
+			}
+			if ($('#currentAttribute_position_aboveLine_' + index).css('display') != 'none')
+			{
+				json += ',"position":"ABOVE_LINE"';
+			}
+			if ($('#currentAttribute_position_belowLine_' + index).css('display') != 'none')
+			{
+				json += ',"position":"BELOW_LINE"';
+			}
+			if ($('#currentAttribute_reconstructed_true_' + index).css('display') != 'none')
+			{
+				json += ',"reconstructed":1';
+			}
+			if ($('#currentAttribute_corrected_overwritten_' + index).css('display') != 'none')
+			{
+				json += ',"corrected":"OVERWRITTEN"';
+			}
+			if ($('#currentAttribute_retraced_true_' + index).css('display') != 'none')
+			{
+				json += ',"retraced":1';
+			}
+			
+			json += '}';
+			
+			console.log('json to save ' + json);
+			
+			Spider.requestFromServer
+			(
+				{
+					'request': 'potentiallySaveNewVariant',
+					'variant': json,
+					'user': _user
+				}
+			);
+		}
+		
+		index++;
+		alternativeSign = $('#alternativeSign' + index);
 	}
 }
 
 function initSingleSignEditor()
 {
-	$('#closeSingleSignViewButton').click(function()
+	$('#confirmSingleSignChangesButton').click(function()
 	{
-		$('#wysiwygContainer').appendTo('#WysiwygPanel');
+		$('#richTextContainer').appendTo('#RichTextPanel');
+		$('#singleSignContainer').appendTo('#hidePanel');
+		
+		potentiallySaveChanges();
+	});
+	
+	$('#cancelSingleSignChangesButton').click(function()
+	{
+		$('#richTextContainer').appendTo('#RichTextPanel');
 		$('#singleSignContainer').appendTo('#hidePanel');
 	});
 }

@@ -97,23 +97,26 @@
               
               <div id="signAndAlternatives"></div>
               
-              <button id="closeSingleSignViewButton">Done</button>
+              <span id="signContext"
+                  dir="rtl">Context</span>
+              
+              <button id="confirmSingleSignChangesButton"
+                  class="someSpaceAbove">Ok</button>
+              
+              <button id="cancelSingleSignChangesButton"
+                  class="someSpaceAbove">Cancel</button>
               
             </div>
-            <div id="hidePanel">
 
-              <div id="RichTextPanel"
-                  class="frame">
-                  
-                <div class="bordered padded headline">Virtual scroll text editor</div>
-                
-                <div id="richTextContainer"
-                    class="scrollable protectedLineBreaks fillingMostHeight contentField"
-                    dir="rtl"></div>
-                
-              </div>
+            <div id="RichTextPanel"
+                class="frame">
+              
+              <div id="richTextContainer"
+                  class="scrollable protectedLineBreaks fillingMostHeight contentField"
+                  dir="rtl"></div>
               
             </div>
+            <div id="hidePanel" class="hidden"></div>
           </div>
           <div id="horizontal-divider" class="pane-size"></div>
           <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>

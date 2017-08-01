@@ -13,7 +13,6 @@ var CombinationController = (function () {
 		// 	.addClass("main-pane");
 		// var control = $('<div></div>')
         // 	.attr("id", "single-image-control");
-        console.log('I am running');
         var $comb_scroll = $('<div></div>');
         $comb_scroll.attr('id','combination-viewport');
         $comb_scroll.css('width', '10000px');
@@ -70,9 +69,17 @@ var CombinationController = (function () {
                             }, this);
                         }, this);
 
+                        var image_cont_xy = document.createElement('div');
+                        image_cont_xy.setAttribute('id', 'image-cont-xy-' + artefact['id']);
+                        image_cont_xy.style.top = "0px";
+                        image_cont_xy.style.left = "0px";
+                        image_cont_xy.setAttribute('class', 'fragment');
+
+                        var image_cont_rotate = document.createElement('div');
+                        image_cont_rotate.setAttribute('id', 'image-cont-rotate-' + artefact['id']);
+
                         var image = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                         image.setAttribute('id', 'SVG-' + artefact['id']);
-                        image.setAttribute('class', 'fragment');
                         image.setAttribute('pointer-events', 'none');
                         image.setAttribute('draggable', 'false');
                         
@@ -133,11 +140,117 @@ var CombinationController = (function () {
                         image.setAttribute('width', img_width * scale);
                         image.setAttribute('height', img_height * scale);
 
-                        $comb_scroll.append($(image));
+                        image_cont_rotate.appendChild(image);
+                        image_cont_xy.appendChild(image_cont_rotate);
+                        $comb_scroll.append($(image_cont_xy));
 					}, this);
 				}
 			});
-		}
+        }
+        
+        //Event handling
+        $comb_scroll.on('mousedown', mouseDown);
+        var mouseOrigin = {x: 0, y: 0};
+        var selected_artefact;
+        function mouseDown(evt) {
+            if (evt.target !== evt.currentTarget) {
+                if($(evt.target).attr("class") == 'clippedImg'){
+                    selected_artefact = evt.target;
+                    evt.preventDefault();
+                    // clickTime = 0;
+                    // timer = setInterval(function(){
+                    //     clickTime += 1;
+                    // }, 10);
+                    $comb_scroll.on('mousemove', mouseMove);
+                    $comb_scroll.on('mouseup', mouseUp);
+                    $comb_scroll.append($(evt.target).parent().parent().parent().parent());
+                    mouseOrigin.x = evt.clientX;
+                    mouseOrigin.y = evt.clientY;
+                    // if(selectedFragDIV != fragDiv[0].id){
+                    //     selectedFragDIV = fragDiv[0].id;
+                    //     fragOSDVisible = false;
+                    // }
+
+                    evt.stopPropagation();
+                }
+            }
+        }
+
+        function mouseMove(evt){
+            // if (!mouseMoved){
+            //     mouseMoved = true;
+            // };
+            // if (document.getElementById("rotate-handle")){
+            //     document.getElementById("rotate-handle").parentNode.removeChild(document.getElementById("rotate-handle"));
+            // }
+            // if (document.getElementById("slide-handle")){
+            //     document.getElementById("slide-handle").parentNode.removeChild(document.getElementById("slide-handle"));
+            // }
+            var x = evt.clientX;
+            var y = evt.clientY;
+            var viewport = {t: $comb_scroll.offsetTop + 10,
+                            b: $comb_scroll.offsetTop +  $comb_scroll.clientHeight - 10,
+                            l: $comb_scroll.offsetLeft + 10,
+                            r: $comb_scroll.offsetLeft + $comb_scroll.clientWidth - 10,
+            };
+            // switch (true){
+            //     case (y < viewport.t):
+            //         scroll.scrollTop = parseInt(scroll.scrollTop, 10) - 5;
+            //         y += 5;
+            //         break;
+            //     case (y > viewport.b):
+            //         scroll.scrollTop = parseInt(scroll.scrollTop, 10) + 5;
+            //         y -= 5;
+            //         break;
+            //     case (x < viewport.l):
+            //         scroll.scrollLeft = parseInt(scroll.scrollLeft, 10) - 5;
+            //         x += 5;
+            //         break;
+            //     case (x > viewport.r):
+            //         scroll.scrollLeft = parseInt(scroll.scrollLeft, 10) + 5;
+            //         x -= 5;
+            //         break;
+            // }
+
+            var moveXY = {
+                x: evt.x - mouseOrigin.x,
+                y: evt.y - mouseOrigin.y,
+            };
+            var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
+            console.log((parseInt($frag_cont.css('top') + moveXY.y)) + 'px');
+            $frag_cont.css('top', (parseInt($frag_cont.css('top') + moveXY.y)) + 'px');
+            $frag_cont.css('left', (parseInt($frag_cont.css('left') + moveXY.x)) + 'px');
+        }
+
+        function mouseUp(evt) {
+            evt.preventDefault();
+            // if(clickTime > 25){
+            //     click = false;
+            //     window.clearInterval(timer);
+            // }
+            $comb_scroll.off('mousemove', mouseMove);
+            $comb_scroll.off('mouseup', mouseUp);
+            // if(!click){
+            //     if(mouseMoved){
+            //         saveMove(evt);
+            //     }
+            //     click = true;
+            // } else {
+            //     window.clearInterval(timer);
+            //     if(fragOSDVisible){
+            //         hideFragOSD();
+            //         fragOSDVisible = false;
+            //     } else {
+            //         showFragOSD(selectedFragDIV.split("DIV-")[1]);
+            //         fragOSDVisible = true;
+            //     }
+            // }
+            var moveXY = {
+                x: evt.x - mouseOrigin.x,
+                y: evt.y - mouseOrigin.y,
+            };
+            $(selected_artefact).parent().parent().parent().parent().css('top', 'translate3d(' + moveXY.x + 'px, ' + moveXY.y + 'px, 0px)');
+        }
 
 		//Public methods are created via the prototype
 		CombinationController.prototype.display_scroll = function (id) {

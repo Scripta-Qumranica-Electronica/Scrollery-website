@@ -1,50 +1,58 @@
 function addFragmentName(name)
 {
 	$('<span></span>') // TODO id?
-	.attr('contentEditable', 'true') // TODO worth the trouble?
 	.addClass('fragmentName')
 	.text(name)
 	.appendTo('#richTextContainer');
 }
 
-function addTextLine(number)
+function addTextLine(number, name)
 {
 	const line =
 	$('<tr></tr>')
+	.attr('id', 'line' + number)
 	.addClass('line')
 	.appendTo('#richTextContainer');
 	
 	$('<td></td>')
-	.attr('id', 'lineNumber' + number)
-	.text(number)
+	.attr('id', 'lineName' + number)
+	.text(name)
 	.appendTo(line);
 
 	$('<td></td>')
 	.attr('id', 'rightMargin' + number)
-	.attr('contentEditable', 'true')
+//	.attr('contentEditable', 'true') // TODO reactivate later
 	.addClass('lineSection')
 	.addClass('coyBottomBorder')
 	.appendTo(line);
 
 	$('<td></td>')
 	.attr('id', 'regularLinePart' + number)
-	.attr('contentEditable', 'true')
+//	.attr('contentEditable', 'true') // TODO reactivate later
 	.addClass('lineSection')
 	.addClass('normalBottomBorder')
 	.appendTo(line);
 	
 	$('<td></td>')
 	.attr('id', 'leftMargin' + number)
-	.attr('contentEditable', 'true')
+//	.attr('contentEditable', 'true') // TODO reactivate later
 	.addClass('lineSection')
 	.addClass('coyBottomBorder')
 	.appendTo(line);
 }
 
-function addSign(sign, attributes, lineNumber, iAlternative, iSign)
+function addSign(model, iLine, iAlternative, iSign)
 {
-	var span = $('<span></span');
-	span.attr('id', 'span' + iAlternative + '_' + iSign);
+	const attributes = model[iLine]['signs'][iAlternative][iSign];
+	var sign = attributes['sign'];
+	
+	var span =
+	$('<span></span')
+	.attr('id', 'span_' + iLine + '_' + iAlternative + '_' + iSign) // only for identification, not for data transport
+	.attr('iLine', iLine)
+	.attr('iAlternative', iAlternative)
+	.attr('iSign', iSign)
+	.attr('signId', attributes['id']);
 	
 	const classList = [];
 	
@@ -115,7 +123,7 @@ function addSign(sign, attributes, lineNumber, iAlternative, iSign)
 	var destination;
 	if (attributes['position'] == null) // chapter 5
 	{
-		destination = $('#regularLinePart' + lineNumber);
+		destination = $('#regularLinePart' + iLine);
 	}
 	else // TODO stacking positions
 	{
@@ -124,26 +132,26 @@ function addSign(sign, attributes, lineNumber, iAlternative, iSign)
 			case 'ABOVE_LINE':
 			{
 				span.html('<sup>' + span.html() + '</sup>');
-				destination = $('#regularLinePart' + lineNumber);
+				destination = $('#regularLinePart' + iLine);
 			}
 			break;
 			
 			case 'BELOW_LINE':
 			{
 				span.html('<sub>' + span.html() + '</sub>');
-				destination = $('#regularLinePart' + lineNumber);
+				destination = $('#regularLinePart' + iLine);
 			}
 			break;
 			
 			case 'LEFT_MARGIN':
 			{
-				destination = $('#leftMargin' + lineNumber);
+				destination = $('#leftMargin' + iLine);
 			}
 			break;
 			
 			case 'RIGHT_MARGIN':
 			{
-				destination = $('#rightMargin' + lineNumber);
+				destination = $('#rightMargin' + iLine);
 			}
 			break;
 		}
@@ -196,88 +204,29 @@ function addSign(sign, attributes, lineNumber, iAlternative, iSign)
 	span.dblclick(function(event)
 	{
 		$('#richTextContainer').appendTo('#hidePanel');
-		$('#singleSignContainer').appendTo('#richTextPanel');
+		$('#singleSignContainer').appendTo('#RichTextPanel');
 		
-		displaySingleSignSpan(event.target['id'], Spider.textObject);
+		displaySingleSignSpan(Spider.textObject, event.target['id']);
 	});
 }
 
 function displayModel(model)
 {
-	var sign;
-	var attributes;
-	var lineNumber;
-	
-	var highestLineIndex = 0;
-	
-	for (var iAlternative in model)
-	{
-		for (var iSign in model[iAlternative]) // TODO dont display alternatives in a row
-		{
-			sign = model[iAlternative][iSign]['sign'];
-			if (sign == null)
-			{
-				sign = '?';
-			}
-			
-			attributes = {};
-			for (var a in model[iAlternative][iSign])
-			{
-				if (a != 'sign'
-				&&  a != 'line')
-				{
-					attributes[a] = model[iAlternative][iSign][a];
-				}
-			}
-			
-			lineNumber = model[iAlternative][iSign]['line'];
-			if (lineNumber == null)
-			{
-				lineNumber = 1;
-			}
-			while (lineNumber > highestLineIndex)
-			{
-				addTextLine(highestLineIndex + 1);
-				highestLineIndex++;
-			}
-
-			addSign
-			(
-				sign,
-				attributes,
-				lineNumber,
-				iAlternative,
-				iSign
-			);
-		}
-	}
-}
-
-function displayModel2(model)
-{
 	$('#richTextContainer').empty();
-	
-	// TODO add fragment name?
 	
 	for (var iLine in model)
 	{
-		addTextLine(model[iLine]['lineName']);
+		addTextLine(iLine, model[iLine]['lineName']);
 		
 		for (var iAlternative in model[iLine]['signs'])
 		{
-			var a = model[iLine]['signs'][iAlternative];
-			
-			for (var iSign in a)
-			{
-				addSign
-				(
-					a[iSign]['sign'],
-					a[iSign],
-					model[iLine]['lineName'],
-					iAlternative,
-					iSign
-				);
-			}
+			addSign
+			(
+				model,
+				iLine,
+				iAlternative,
+				0
+			);
 		}
 	}
 }

@@ -413,9 +413,19 @@
 	cursor: pointer;
 }
 
+.modifiedSign
+{
+	color: darkorange;
+}
+
 .signDescription
 {
 	font-size: 10px;
+}
+
+.someSpaceAbove
+{
+	margin-top: 10px;
 }
 
 .someSpaceBelow

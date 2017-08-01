@@ -157,7 +157,7 @@ var SingleImageController = (function () {
 					showHomeControl: false,
 					zoomInButton:   "main-zoom-in",
 					zoomOutButton:  "main-zoom-out",
-					mouseNavEnabled: false,
+					mouseNavEnabled: true,
 				});
 			});
 		}
