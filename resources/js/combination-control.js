@@ -38,11 +38,18 @@ var CombinationController = (function () {
 					selected_artefacts['results'].forEach(function(artefact) {
 						var data = artefact['poly'];
                         var polygons = data.split("\),\(");
-                        var rect = JSON.parse(artefact.rect).coordinates;
-                        var img_x = rect[0][0][0];
-                        var img_y = rect[0][0][1];
-                        var img_width = rect[0][2][0] - img_x;
-                        var img_height = rect[0][2][1] - img_y;
+                        // var rect = JSON.parse(artefact.rect).coordinates;
+                        // var img_x = rect[0][0][0];
+                        // var img_y = rect[0][0][1];
+                        // var img_width = rect[0][2][0] - img_x;
+                        // var img_height = rect[0][2][1] - img_y;
+                        var rect = artefact.rect;
+                        rect = rect.replace('POLYGON((', '');
+                        var coords = rect.split(',');
+                        var img_x = coords[0].split(' ')[0];
+                        var img_y = coords[0].split(' ')[1];
+                        var img_width = coords[2].split(' ')[0] - img_x;
+                        var img_height = coords[2].split(' ')[1] - img_y;
                         var new_polygons = '';
                         polygons.forEach(function(polygon, index) {
                             new_polygons += 'M';
