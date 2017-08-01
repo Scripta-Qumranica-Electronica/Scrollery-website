@@ -372,7 +372,7 @@
 	table-layout: auto;
 	
 	/* font-family: monospace; */
-	font-size: 14px;
+	font-size: 18px;
 }
 
 
@@ -390,7 +390,9 @@
     -1px -1px 0 black,
     1px -1px 0 black,
     -1px 1px 0 black,
-    1px 1px 0 black;
+	1px 1px 0 black;
+	padding-left: 2px;
+	padding-right: 2px;
 }
 
 .corrected
