@@ -101,7 +101,7 @@ html, body {
 }
 
 #combination-container {
-  background: #0047b3;
+  background: white;
   width: 100%;
   height: 30%;
 }
@@ -142,6 +142,28 @@ html, body {
 #combination-pane {
   min-height: 200px;
   left: 0;
+  overflow: scroll;
+}
+
+.fragment {
+  position: absolute;
+}
+
+.fragment g {
+	transition: opacity 0.1s ease;
+	opacity: 1.0;
+}
+
+.fragment g:hover {
+	opacity: 0.85;
+}
+
+.fragOutline {
+	visibility: hidden;
+}
+
+.fragment g:hover + .fragOutline {
+	visibility: visible;
 }
 
 .pane-size {

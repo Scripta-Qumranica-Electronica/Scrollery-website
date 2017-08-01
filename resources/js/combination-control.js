@@ -13,7 +13,12 @@ var CombinationController = (function () {
 		// 	.addClass("main-pane");
 		// var control = $('<div></div>')
         // 	.attr("id", "single-image-control");
-        var pane = document.getElementById('combination-pane');
+        console.log('I am running');
+        var $comb_scroll = $('<div></div>');
+        $comb_scroll.attr('id','combination-viewport');
+        $comb_scroll.css('width', '10000px');
+        $comb_scroll.css('height', '500');
+        $('#combination-pane').append($comb_scroll);
         var $container = $cont;
 		// $container.append(pane)
 		// 	.append(control)
@@ -22,7 +27,7 @@ var CombinationController = (function () {
 
 		// Private functions, will be invoked by name.call(this, ...input vars)
 		function load_scroll(id){
-			$(pane).empty();
+			$comb_scroll.empty();
 			var scroll_data = new FormData();
 			scroll_data.append('transaction', 'getScrollArtefacts');
 			scroll_data.append('scroll_id', id);
@@ -124,10 +129,11 @@ var CombinationController = (function () {
                         svgImage.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', artefact['url'] + file_name + '/' + img_x + ',' + img_y + ',' + img_width + ',' + img_height + '/pct:' + (scale * 100) + '/0/' + file_extension + 'native.jpg');
                         svgImage.setAttribute('width', img_width * scale);
                         svgImage.setAttribute('height', img_height * scale);
+                        svgImage.setAttribute('draggable', 'false');
                         image.setAttribute('width', img_width * scale);
                         image.setAttribute('height', img_height * scale);
 
-                        pane.appendChild(image);
+                        $comb_scroll.append($(image));
 					}, this);
 				}
 			});
