@@ -71,16 +71,15 @@ var CombinationController = (function () {
 
                         var image_cont_xy = document.createElement('div');
                         image_cont_xy.setAttribute('id', 'image-cont-xy-' + artefact['id']);
-                        image_cont_xy.setAttribute('top', '20');
-                        image_cont_xy.setAttribute('left', '40');
-                        image_cont_xy.setAttribute('class', 'fragment');
+                        image_cont_xy.setAttribute('class', 'fragment fragment-cont-xy');
+                        $(image_cont_xy).css({top: '0px', left: '0px', transform: 'initial'});
 
                         var image_cont_rotate = document.createElement('div');
                         image_cont_rotate.setAttribute('id', 'image-cont-rotate-' + artefact['id']);
+                        image_cont_rotate.setAttribute('class', 'fragment fragment-cont-rot');
 
                         var image = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                         image.setAttribute('id', 'SVG-' + artefact['id']);
-                        // image.setAttribute('pointer-events', 'none');
                         
                         var pathDefs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
                         path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -101,7 +100,7 @@ var CombinationController = (function () {
                         imgContainer.setAttribute('pointer-events', 'visiblePainted');
                         var svgImage = document.createElementNS("http://www.w3.org/2000/svg", "image");
                         svgImage.setAttribute('id', 'ClippedImg-' + artefact['id']);
-                        svgImage.setAttribute('class', 'clippedImg');
+                        // svgImage.setAttribute('class', 'clippedImg');
                         svgImage.setAttribute('draggable', 'false');
                         
                         var outline = document.createElementNS("http://www.w3.org/2000/svg", "use");
@@ -125,14 +124,8 @@ var CombinationController = (function () {
                         var scale = 0.4;
                         path.setAttribute('d', new_polygons);
                         path.setAttribute('transform', 'scale(' + scale + ')');
-                        var file_name = artefact['filename'];
-                        var file_extension = "";
-                        if (file_name.includes("134.76.19.179")) {
-                            file_extension = "default.jpg&user=test";
-                        } else if (file_name.includes("gallica")) {
-                            file_extension = "native.jpg";
-                        }
-                        svgImage.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', artefact['url'] + file_name + '/' + img_x + ',' + img_y + ',' + img_width + ',' + img_height + '/pct:' + (scale * 100) + '/0/' + file_extension + 'native.jpg');
+                        svgImage.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', artefact.url + artefact.filename + '/' + img_x + ',' + img_y + ',' + img_width + ',' + img_height + '/pct:' + (scale * 100) + '/0/' + artefact.suffix);
+                        svgImage.setAttribute('class', 'clippedImg');
                         svgImage.setAttribute('width', img_width * scale);
                         svgImage.setAttribute('height', img_height * scale);
                         svgImage.setAttribute('draggable', 'false');
@@ -152,8 +145,11 @@ var CombinationController = (function () {
         var mouseOrigin = {x: 0, y: 0};
         var selected_artefact;
         function mouseDown(evt) {
+            console.log(evt.target);
             if (evt.target !== evt.currentTarget) {
                 if($(evt.target).attr("class") == 'clippedImg'){
+            console.log(evt.target);
+            console.log($(evt.target).parent().parent().parent().parent());
                     selected_artefact = evt.target;
                     evt.preventDefault();
                     // clickTime = 0;
@@ -250,9 +246,10 @@ var CombinationController = (function () {
             var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
             console.log($frag_cont.css('top'));
             console.log((parseInt($frag_cont.css('top'), 10) + moveXY.y) + 'px');
-            $(selected_artefact).parent().parent().parent().parent().css('transform', 'initial');
-            $frag_cont.attr('top', (parseInt($frag_cont.css('top'), 10) + moveXY.y) + 'px');
-            $frag_cont.attr('left', (parseInt($frag_cont.css('left'), 10) + moveXY.y) + 'px');
+            $frag_cont.css({
+                top: (parseInt($frag_cont.css('top'), 10) + moveXY.y) + 'px',
+                left: (parseInt($frag_cont.css('left'), 10) + moveXY.x) + 'px',
+                transform: 'initial'});
             selected_artefact = undefined;
         }
 

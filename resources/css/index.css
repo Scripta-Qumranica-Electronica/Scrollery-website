@@ -144,15 +144,27 @@ html, body {
 }
 
 .fragment {
+  pointer-events: none;
+}
+
+.fragment-cont-xy {
   position: absolute;
 }
 
-.fragment g {
+.fragment-cont-rot {
+  position: relative;
+}
+
+svg {
+  pointer-events: none;
+}
+
+svg g {
 	transition: opacity 0.1s ease;
 	opacity: 1.0;
 }
 
-.fragment g:hover {
+svg g:hover {
 	opacity: 0.85;
 }
 
@@ -160,8 +172,12 @@ html, body {
 	visibility: hidden;
 }
 
-.fragment g:hover + .fragOutline {
+svg g:hover + .fragOutline {
 	visibility: visible;
+}
+
+.clippedImg {
+  pointer-events: all;
 }
 
 .pane-size {
