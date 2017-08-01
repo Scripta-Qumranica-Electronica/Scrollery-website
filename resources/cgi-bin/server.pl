@@ -230,11 +230,11 @@ sub load() # TODO combine queries where possible, for better performance
 		.' JOIN real_area'
 		.' ON real_area.real_area_id = sign.real_areas_id'
 		
-		.' JOIN line'
-		.' ON line.line_id = real_area.line_of_scroll_id'
+		.' JOIN line_of_column_of_scroll'
+		.' ON line_of_column_of_scroll.line_id = real_area.line_of_scroll_id'
 		
 		.' JOIN column_of_scroll'
-		.' ON column_of_scroll.column_of_scroll_id = line.column_id'
+		.' ON column_of_scroll.column_of_scroll_id = line_of_column_of_scroll.column_id'
 		
 		.' JOIN discrete_canonical_references'
 		.' ON discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id'
@@ -286,10 +286,10 @@ sub load() # TODO combine queries where possible, for better performance
 		my @current_line = queryAll
 		(
 			'SELECT line_id, name'
-			.' FROM line'
+			.' FROM line_of_column_of_scroll'
 			
 			.' JOIN real_area'
-			.' ON real_area.line_of_scroll_id = line.line_id'
+			.' ON real_area.line_of_scroll_id = line_of_column_of_scroll.line_id'
 			
 			.' JOIN sign'
 			.' ON sign.real_areas_id = real_area.real_area_id'

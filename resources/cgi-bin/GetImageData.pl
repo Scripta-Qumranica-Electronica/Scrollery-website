@@ -40,6 +40,7 @@ my %action = (
 	'institutionPlates' => \&getInstitutionPlates,
 	'institutionFragments' => \&getInstitutionFragments,
 	'getPolygon' => \&getPolygon,
+	'getScrollArtefacts' => \&getScrollArtefacts,
 );
 		
 print $cgi->header(
@@ -243,6 +244,15 @@ sub getPolygon {
 	$sql = $dbh->prepare('select ST_AsText(region_in_master_image) from artefact where master_image_id=?') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($master_image_id);
+	readResults();
+	return;
+}
+
+sub getScrollArtefacts {
+	my $scroll_id = $cgi->param('scroll_id');
+	$sql = $dbh->prepare('	CALL getScrollArtefacts(?)') 
+		or die "Couldn't prepare statement: " . $dbh->errstr;
+	$sql->execute($scroll_id);
 	readResults();
 	return;
 }

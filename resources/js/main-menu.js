@@ -5,9 +5,12 @@ var listing_type = {'lv_1': 'composition',
                 };
 var current_lvl;
 var single_image_1;
+var combination;
 
 function login(){
     single_image_1 = new SingleImageController($("#single-image-container"), 1);
+    combination = new CombinationController($("#combination-container"), 1);
+    combination.display_scroll(808); //testing
     $(".collapsible").click(function(){show_item(this);});
     $("#new-combination").css("visibility", "visible");
     $(".accordion-title").css("visibility", "visible");
@@ -28,31 +31,39 @@ function show_item(item){
     $(item).next().css("visibility", "visible");
 }
 
+function load_fragment_text(selected_frag){
+    Spider.requestFromServer(
+        {
+            'request': 'load',
+            'disc_can_ref_id': selected_frag
+        },
+        function(data){
+            if (data == 0) {
+                return;
+            }
+            Spider.notifyChangedText(JSON.parse(data));
+        }
+    );
+}
+
+function load_fragment_image(selected_frag){
+    data_form = new FormData();
+    data_form.append('transaction', 'getIAAEdID');
+    data_form.append('discCanRef', selected_frag);
+    get_database_data(data_form, function(results){
+        var default_comps = document.getElementById("default-combinations");
+        results['results'].forEach(function(result) {
+            single_image_1.display_fragment('composition', result.edition_id);
+        });
+    });
+}
+
 function populate_combinations() {
     $('#default-combination-listings').on('changed.jstree', function (e, data) {
         if (data.selected[0].startsWith('lvl_3-')) {
             var selected_frag = data.selected[0].split('lvl_3-')[1];
-            Spider.requestFromServer(
-                {
-                    'request': 'load',
-                    'disc_can_ref_id': selected_frag
-                },
-                function(data){
-                    if (data == 0) {
-                        return;
-                    }
-                    Spider.notifyChangedText(JSON.parse(data));
-                }
-            );
-            data_form = new FormData();
-            data_form.append('transaction', 'getIAAEdID');
-            data_form.append('discCanRef', selected_frag);
-            get_database_data(data_form, function(results){
-                var default_comps = document.getElementById("default-combinations");
-                results['results'].forEach(function(result) {
-                    single_image_1.display_fragment('composition', result.edition_id);
-                });
-            });
+            load_fragment_text(selected_frag);
+            load_fragment_image(selected_frag);
         }
     }).jstree({
         "core" : {
@@ -183,28 +194,28 @@ function populate_fragments() {
     });
 }
 
-function load_text(scroll, fragment){
-    var data_form = new FormData();
-    data_form.append('USER_NAME', 'sqe_api');
-    data_form.append('PASSWORD', '512JE8ehM3UW');
-    data_form.append('SCROLL', scroll);
-    data_form.append('FRAGMENT', fragment.replace("+", "\\+"));
-    data_form.append('FORMAT', 'QWB_HTML');
-    jQuery.ajax({
-        url: 'https://134.76.19.179/sqe_api/run_api.cgi',
-        data: data_form,
-        cache: false,
-        contentType: false,
-        processData: false,
-        type: 'POST',
-        success: function(response){
-            $("#signs-pane").html(response.VALUE);
-        },
-        error: function(){
-            alert("Error retrieving data from database.");
-        }
-    });
-}
+// function load_text(scroll, fragment){
+//     var data_form = new FormData();
+//     data_form.append('USER_NAME', 'sqe_api');
+//     data_form.append('PASSWORD', '512JE8ehM3UW');
+//     data_form.append('SCROLL', scroll);
+//     data_form.append('FRAGMENT', fragment.replace("+", "\\+"));
+//     data_form.append('FORMAT', 'QWB_HTML');
+//     jQuery.ajax({
+//         url: 'https://134.76.19.179/sqe_api/run_api.cgi',
+//         data: data_form,
+//         cache: false,
+//         contentType: false,
+//         processData: false,
+//         type: 'POST',
+//         success: function(response){
+//             $("#signs-pane").html(response.VALUE);
+//         },
+//         error: function(){
+//             alert("Error retrieving data from database.");
+//         }
+//     });
+// }
 
 function get_database_data(data_form, callback) {
     jQuery.ajax({
