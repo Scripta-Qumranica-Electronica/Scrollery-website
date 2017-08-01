@@ -15,7 +15,7 @@ Spider.prototype.requestFromServer = function(parameters, onReturn)
 	
 	$.post
 	(
-		'cgi-bin/server.pl', // connection to perl works only if same server ('same origin')
+		'resources/cgi-bin/server.pl', // connection to perl works only if same server ('same origin')
 		parameters
 	)
 	.done
