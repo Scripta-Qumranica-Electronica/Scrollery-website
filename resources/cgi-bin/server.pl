@@ -698,7 +698,8 @@ sub save_single_sign_change()
 	my @idsArray;
 	for my $sign (@signs) # collect ids of main sign & its variants
 	{
-		my $a = %{ $sign }{'sign_id'};
+		my %hash =  %{ $sign };
+		my $a = $hash{'sign_id'};
 		if (!defined $a)
 		{
 			next;
