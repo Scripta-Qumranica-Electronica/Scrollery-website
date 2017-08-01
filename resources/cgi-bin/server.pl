@@ -275,7 +275,7 @@ sub load() # TODO combine queries where possible, for better performance
 		.' ON column_of_scroll.column_of_scroll_id = line.column_id'
 
 		.' JOIN discrete_canonical_references'		
- -		.' ON discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id'
+		.' ON discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id'
 		
 		.' JOIN scroll'
 		.' ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id'
