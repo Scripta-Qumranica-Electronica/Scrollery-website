@@ -1,6 +1,5 @@
 html, body {
 	background-color: white;
-	color: white;
 	margin: 0;
 	padding: 0;
 	-webkit-animation: bugfix infinite 1s;
@@ -33,6 +32,7 @@ html, body {
   top: 0;
   left: 0;
   background: #428bca;
+  color: white;
   -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
 	-webkit-backface-visibility: hidden;
@@ -94,8 +94,6 @@ html, body {
 }
 
 #signs-container {
-  background: white;
-  color: black;
   width: 50%;
   height: 70%;
   margin-left: 50%;
