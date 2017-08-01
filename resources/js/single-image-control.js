@@ -117,32 +117,32 @@ var SingleImageController = (function () {
 
 		function display_image(file, url){
 			//This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
-			sqe_query = false;
-			if (url.includes("134.76.19.179")){
-				sqe_query = true;
-			}
+			
 			var $new_image = $(document.createElement('div')).attr('id', 'single_image-' + file);
 			$($new_image).attr('class', 'single-image-view');
 			$(pane).append($new_image);
-			var infoJsonUrl = url + file + '/info.json';
-			//This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
-			if (sqe_query){
-				var data = new FormData();
-				data.append('user', Spider.user);
-			}
+			
+			var data = new FormData();
+			data.append('user', Spider.user);
+			data.append('url', url);
+			data.append('file', file + '/info.json');
 			$.ajax({
-				data: sqe_query ? data : undefined, //This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
+				data: data, //This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 				cache: false,
 				contentType: false,
 				processData: false,
-        		type: sqe_query ? 'POST' : 'GET', //This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
+        		type: 'POST', //This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 				dataType: "json",
-				url: infoJsonUrl
+				context: this,
+				url: "https://134.76.19.179/cgi-bin/sqe-iiif.pl"
 			}).done(function (infoJson, status, jqXHR) {
 				//This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 				if (infoJson["@id"].includes("134.76.19.179")){
-					infoJson["@id"] = infoJson["@id"].replace("iipsrv.fcgi?", "sqe-iiif.pl?user=" + Spider.user + "&");
+					infoJson["@id"] = infoJson["@id"].replace("iipsrv.fcgi?IIIF=", "sqe-iiif.pl?user=" + Spider.user + "&url=" + url + "&file=");
+				} else if (infoJson["@id"].includes("gallica")){
+					infoJson["@id"] = infoJson["@id"].replace("http://gallica.bnf.fr/iiif/ark%3A%2F", "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + url + "&file=");
 				}
+				console.log(infoJson["@id"]);
 				var viewer = OpenSeadragon({
 					id: 'single_image-' + file,
 					preserveViewport: true,
