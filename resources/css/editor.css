@@ -231,7 +231,7 @@
 	text-align: start;
 	vertical-align: middle;
 	
-	font-family: 'Courier';
+	/* font-family: 'Courier'; */
 	font-size: 14px;
 }
 
@@ -371,7 +371,7 @@
 {
 	table-layout: auto;
 	
-	font-family: monospace;
+	/* font-family: monospace; */
 	font-size: 14px;
 }
 
