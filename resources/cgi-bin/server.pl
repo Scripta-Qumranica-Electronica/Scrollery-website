@@ -285,7 +285,7 @@ sub load() # TODO combine queries where possible, for better performance
 		# add new line, if needed
 		my @current_line = queryAll
 		(
-			'SELECT line_id, name'
+			'SELECT line.line_id, name'
 			.' FROM line'
 			
 			.' JOIN real_area'
