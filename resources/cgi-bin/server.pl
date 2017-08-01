@@ -248,8 +248,7 @@ sub getManifest()
 
 sub load() # TODO combine queries where possible, for better performance
 {
-	my $scroll_name = $CGI->param('scroll');
-	my $column_name = $CGI->param('column'); # could be a fragment also
+	my $disc_can_ref_id = $CGI->param('disc_can_ref_id'); # could be a fragment also
 	
 	my %id2SignType;
 	my @sign_types = queryAll
@@ -274,13 +273,15 @@ sub load() # TODO combine queries where possible, for better performance
 		
 		.' JOIN column_of_scroll'
 		.' ON column_of_scroll.column_of_scroll_id = line.column_id'
+
+		.' JOIN discrete_canonical_references'		
+ -		.' ON discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id'
 		
 		.' JOIN scroll'
-		.' ON scroll.scroll_id = column_of_scroll.scroll_id'
+		.' ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id'
 		
 		.' WHERE FIND_IN_SET("COLUMN_START", sign.break_type) > 0'
-		.' AND scroll.name = "'.$scroll_name.'"'
-		.' AND column_of_scroll.name = "'.$column_name.'"'
+		.' AND discrete_canonical_references.discrete_canonical_reference_id ='.$disc_can_ref_id
 	);
 	if (!defined $column_start_sign_id)
 	{
