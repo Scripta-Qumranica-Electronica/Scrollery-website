@@ -10,7 +10,6 @@ var combination;
 function login(){
     single_image_1 = new SingleImageController($("#single-image-container"), 1);
     combination = new CombinationController($("#combination-container"), 1);
-    combination.display_scroll(808); //testing
     $(".collapsible").click(function(){show_item(this);});
     $("#new-combination").css("visibility", "visible");
     $(".accordion-title").css("visibility", "visible");
@@ -64,6 +63,10 @@ function populate_combinations() {
             var selected_frag = data.selected[0].split('lvl_3-')[1];
             load_fragment_text(selected_frag);
             load_fragment_image(selected_frag);
+        }
+        if (data.selected[0].startsWith('lvl_1-')) {
+            var scroll_id = data.selected[0].split('lvl_1-')[1];
+            combination.display_scroll(scroll_id);
         }
     }).jstree({
         "core" : {

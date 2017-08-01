@@ -71,8 +71,8 @@ var CombinationController = (function () {
 
                         var image_cont_xy = document.createElement('div');
                         image_cont_xy.setAttribute('id', 'image-cont-xy-' + artefact['id']);
-                        image_cont_xy.style.top = "0px";
-                        image_cont_xy.style.left = "0px";
+                        image_cont_xy.setAttribute('top', '20');
+                        image_cont_xy.setAttribute('left', '40');
                         image_cont_xy.setAttribute('class', 'fragment');
 
                         var image_cont_rotate = document.createElement('div');
@@ -80,8 +80,7 @@ var CombinationController = (function () {
 
                         var image = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                         image.setAttribute('id', 'SVG-' + artefact['id']);
-                        image.setAttribute('pointer-events', 'none');
-                        image.setAttribute('draggable', 'false');
+                        // image.setAttribute('pointer-events', 'none');
                         
                         var pathDefs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
                         path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -213,13 +212,10 @@ var CombinationController = (function () {
             // }
 
             var moveXY = {
-                x: evt.x - mouseOrigin.x,
-                y: evt.y - mouseOrigin.y,
+                x: x - mouseOrigin.x,
+                y: y - mouseOrigin.y,
             };
-            var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
-            console.log((parseInt($frag_cont.css('top') + moveXY.y)) + 'px');
-            $frag_cont.css('top', (parseInt($frag_cont.css('top') + moveXY.y)) + 'px');
-            $frag_cont.css('left', (parseInt($frag_cont.css('left') + moveXY.x)) + 'px');
+            $(selected_artefact).parent().parent().parent().parent().css('transform', 'translate3d(' + moveXY.x + 'px, ' + moveXY.y + 'px, 0px)');
         }
 
         function mouseUp(evt) {
@@ -245,11 +241,19 @@ var CombinationController = (function () {
             //         fragOSDVisible = true;
             //     }
             // }
+            var x = evt.clientX;
+            var y = evt.clientY;
             var moveXY = {
-                x: evt.x - mouseOrigin.x,
-                y: evt.y - mouseOrigin.y,
+                x: x - mouseOrigin.x,
+                y: y - mouseOrigin.y,
             };
-            $(selected_artefact).parent().parent().parent().parent().css('top', 'translate3d(' + moveXY.x + 'px, ' + moveXY.y + 'px, 0px)');
+            var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
+            console.log($frag_cont.css('top'));
+            console.log((parseInt($frag_cont.css('top'), 10) + moveXY.y) + 'px');
+            $(selected_artefact).parent().parent().parent().parent().css('transform', 'initial');
+            $frag_cont.attr('top', (parseInt($frag_cont.css('top'), 10) + moveXY.y) + 'px');
+            $frag_cont.attr('left', (parseInt($frag_cont.css('left'), 10) + moveXY.y) + 'px');
+            selected_artefact = undefined;
         }
 
 		//Public methods are created via the prototype
