@@ -94,10 +94,11 @@ html, body {
 }
 
 #signs-container {
-  background: #e69900;
+  background: white;
   width: 50%;
   height: 70%;
   margin-left: 50%;
+  overflow: auto;
 }
 
 #combination-container {
