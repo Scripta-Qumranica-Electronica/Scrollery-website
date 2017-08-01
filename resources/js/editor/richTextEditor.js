@@ -205,6 +205,7 @@ function addSign(model, iLine, iAlternative, iSign)
 	{
 		$('#richTextContainer').appendTo('#hidePanel');
 		$('#singleSignContainer').appendTo('#RichTextPanel');
+		$('#singleSignContainer').show();
 		
 		displaySingleSignSpan(Spider.textObject, event.target['id']);
 	});
