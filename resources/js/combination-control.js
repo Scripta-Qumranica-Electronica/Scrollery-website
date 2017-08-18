@@ -2,27 +2,22 @@ var CombinationController = (function () {
 
     // Constructor
     function CombinationController ($cont, idx) {
-		// var $full_screen = $('<img>')
-		// 	.attr("src", "resources/images/Fullscreen.png")
-		// 	.attr("alt", "Full Screen")
-		// 	.attr("height", "15")
-		// 	.click(function(event){fullScreenToggle(event);});
-		
-		// var pane = $('<div></div>')
-		// 	.attr("id", "single-image-pane")
-		// 	.addClass("main-pane");
-		// var control = $('<div></div>')
-        // 	.attr("id", "single-image-control");
+		function group (members, x_move, y_move) {
+            this.members = members;
+            this.x_move = x_move;
+            this.y_move = y_move;
+        }
+        var artefacts = [];
+        var zoom_factor = 0.1;
+        var max_zoom = 0.1;
+        var scroll_dpi = 1215;
         var $comb_scroll = $('<div></div>');
         $comb_scroll.attr('id','combination-viewport');
         $comb_scroll.css('width', '10000px');
         $comb_scroll.css('height', '500');
         $('#combination-pane').append($comb_scroll);
         var $container = $cont;
-		// $container.append(pane)
-		// 	.append(control)
-		// 	.append($pane_menu);
-		var that = this;
+		var self = this;
 
 		// Private functions, will be invoked by name.call(this, ...input vars)
 		function load_scroll(id){
@@ -40,13 +35,10 @@ var CombinationController = (function () {
 				type: 'POST',
 				success: function(selected_artefacts){
 					selected_artefacts['results'].forEach(function(artefact) {
+                        var x_loc = parseFloat(artefact.pos.split(' ')[0].replace('POINT(', ''));
+                        var y_loc = parseFloat(artefact.pos.split(' ')[1]);
 						var data = artefact['poly'];
                         var polygons = data.split("\),\(");
-                        // var rect = JSON.parse(artefact.rect).coordinates;
-                        // var img_x = rect[0][0][0];
-                        // var img_y = rect[0][0][1];
-                        // var img_width = rect[0][2][0] - img_x;
-                        // var img_height = rect[0][2][1] - img_y;
                         var rect = artefact.rect;
                         rect = rect.replace('POLYGON((', '');
                         var coords = rect.split(',');
@@ -121,7 +113,8 @@ var CombinationController = (function () {
                         image.appendChild(imgContainer);
                         image.appendChild(outline);
 
-                        var scale = 0.4;
+                        var artefact_dpi = artefact.dpi;
+                        var scale = (scroll_dpi / artefact_dpi) * zoom_factor;
                         path.setAttribute('d', new_polygons);
                         path.setAttribute('transform', 'scale(' + scale + ')');
                         svgImage.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + artefact.url + "&file="
@@ -132,13 +125,44 @@ var CombinationController = (function () {
                         svgImage.setAttribute('draggable', 'false');
                         image.setAttribute('width', img_width * scale);
                         image.setAttribute('height', img_height * scale);
+                        artefacts.push({'path': path, 'image':svgImage, 'container': image, 'width': img_width, 'height': img_height, 'dpi': artefact_dpi, 'url': artefact.url, 'filename': artefact.filename, 'crop_x': img_x, 'crop_y': img_y, 'crop_width': img_width, 'crop_height': img_height, 'suffix': artefact.suffix});
 
                         image_cont_rotate.appendChild(image);
                         image_cont_xy.appendChild(image_cont_rotate);
+                        image_cont_xy.dataset.x_loc = x_loc;
+                        image_cont_xy.dataset.y_loc = y_loc;
+                        $(image_cont_xy).css({
+                            top: y_loc * zoom_factor,
+                            left: x_loc * zoom_factor});
                         $comb_scroll.append($(image_cont_xy));
 					}, this);
 				}
 			});
+        }
+
+        function zoom(new_zoom, dynamic){
+            zoom_factor = new_zoom;
+            
+            artefacts.forEach(function(artefact){
+                var scale = (scroll_dpi / artefact.dpi) * zoom_factor;
+                artefact.path.setAttribute('transform', 'scale(' + scale + ')');
+                if (!dynamic){
+                    if (max_zoom < zoom_factor) {
+                        max_zoom = zoom_factor;
+                        artefact.image.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + artefact.url + "&file="
+                        + artefact.filename + '/' + artefact.crop_x + ',' + artefact.crop_y + ',' + artefact.crop_width + ',' + artefact.crop_height + '/pct:' + (scale * 100) + '/0/' + artefact.suffix);
+                    }
+                }
+                artefact.image.setAttribute('width', artefact.width * scale);
+                artefact.image.setAttribute('height', artefact.height * scale);
+                artefact.image.setAttribute('draggable', 'false');
+                artefact.container.setAttribute('width', artefact.width * scale);
+                artefact.container.setAttribute('height', artefact.height * scale);
+                var $frag_cont = $(artefact.container).parent().parent();
+                $frag_cont.css({
+                    top: (parseFloat($frag_cont.data('y_loc')) * zoom_factor) + 'px',
+                    left: (parseFloat($frag_cont.data('x_loc')) * zoom_factor) + 'px'});
+            });
         }
         
         //Event handling
@@ -146,11 +170,8 @@ var CombinationController = (function () {
         var mouseOrigin = {x: 0, y: 0};
         var selected_artefact;
         function mouseDown(evt) {
-            console.log(evt.target);
             if (evt.target !== evt.currentTarget) {
                 if($(evt.target).attr("class") == 'clippedImg'){
-            console.log(evt.target);
-            console.log($(evt.target).parent().parent().parent().parent());
                     selected_artefact = evt.target;
                     evt.preventDefault();
                     // clickTime = 0;
@@ -245,18 +266,21 @@ var CombinationController = (function () {
                 y: y - mouseOrigin.y,
             };
             var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
-            console.log($frag_cont.css('top'));
-            console.log((parseInt($frag_cont.css('top'), 10) + moveXY.y) + 'px');
             $frag_cont.css({
-                top: (parseInt($frag_cont.css('top'), 10) + moveXY.y) + 'px',
-                left: (parseInt($frag_cont.css('left'), 10) + moveXY.x) + 'px',
+                top: (parseInt($frag_cont.css('top')) + moveXY.y) + 'px',
+                left: (parseInt($frag_cont.css('left')) + moveXY.x) + 'px',
                 transform: 'initial'});
+            $frag_cont.data('y_loc', parseInt($frag_cont.css('top')) / zoom_factor);
+            $frag_cont.data('x_loc', parseInt($frag_cont.css('left')) / zoom_factor);
             selected_artefact = undefined;
         }
 
 		//Public methods are created via the prototype
 		CombinationController.prototype.display_scroll = function (id) {
 			return load_scroll.call(this, id);
+        }
+        CombinationController.prototype.change_zoom = function (new_zoom, dynamic) {
+			return zoom.call(this, new_zoom, dynamic);
 		}
 		// CombinationController.prototype.setOpacity = function(value, filename) {
 		// 	$('#single_image-' + $.escapeSelector(filename)).css("opacity", value / 100);
@@ -277,7 +301,15 @@ var CombinationController = (function () {
 		// 			eye_icon.setAttribute("alt", "visible");
 		// 		}
 		// 	}
-		// }
+        // }
+
+        //register responders with messageSpider
+        Spider.register_object([
+			{type: 'load_scroll', execute_function: function(data){
+				self.display_scroll(data.id);
+				}
+			}
+		]);
 	}
     return CombinationController;
 })();

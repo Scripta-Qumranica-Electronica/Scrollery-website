@@ -5,7 +5,13 @@ function Spider() // singleton central component communication system
         return Spider.instance;
     }
     
-    this.doShowServerErrors = true;
+	this.doShowServerErrors = true;
+	this.session_id = "";
+	this.user = "";
+	this.registered_objects = {
+		load_scroll: [],
+		load_fragment: []
+	};
 }
 
 Spider.prototype.requestFromServer = function(parameters, onReturn)
@@ -22,9 +28,6 @@ Spider.prototype.requestFromServer = function(parameters, onReturn)
 	(
 		function(data)
 		{
-			// console.log('response on ' + parameters['request'] + ':');
-			// console.log(data);
-			
 			if (onReturn != null)
 			{
 				onReturn(data);
@@ -61,6 +64,25 @@ Spider.prototype.notifyChangedText = function(textObject)
 	this.textObject = textObject;
 	
 	displayModel(textObject);
+}
+
+//Register objects for message notification (add message titles to the this.registered_objects object here).
+//The message variable is an object with two variables: "type" is the type of message to respond to 
+//(corresponding to the variable in this.registered_objects object), "execute_function" is essentially
+//a callback for the function to be executed (make sure to maintain context by using var self = this in the
+//calling object and then referring to functions in the callback with "self.")
+Spider.prototype.register_object = function(messages)
+{
+	messages.forEach(function(message){
+		this.registered_objects[message.type].push({'execute_function': message.execute_function});
+	}, this);
+}
+
+Spider.prototype.propagate_command = function(command, data)
+{
+	this.registered_objects[command].forEach(function(listening_object){
+		listening_object.execute_function(data);
+	});
 }
 
 var Spider = new Spider();

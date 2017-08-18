@@ -4,12 +4,14 @@ var listing_type = {'lv_1': 'composition',
                     'ref': 'edition_catalog_id'
                 };
 var current_lvl;
-var single_image_1;
-var combination;
 
 function login(){
-    single_image_1 = new SingleImageController($("#single-image-container"), 1);
-    combination = new CombinationController($("#combination-container"), 1);
+    $("#combination-zoom-slider").on("input", function(){
+        combination.change_zoom(this.value, true);
+    });
+    $("#combination-zoom-slider").on("change", function(){
+        combination.change_zoom(this.value, false);
+    });
     $(".collapsible").click(function(){show_item(this);});
     $("#new-combination").css("visibility", "visible");
     $(".accordion-title").css("visibility", "visible");
@@ -50,9 +52,8 @@ function load_fragment_image(selected_frag){
     data_form.append('transaction', 'getIAAEdID');
     data_form.append('discCanRef', selected_frag);
     get_database_data(data_form, function(results){
-        var default_comps = document.getElementById("default-combinations");
         results['results'].forEach(function(result) {
-            single_image_1.display_fragment('composition', result.edition_id);
+            Spider.propagate_command('load_fragment', {id_type: 'composition', id: result.edition_id});
         });
     });
 }
@@ -66,7 +67,8 @@ function populate_combinations() {
         }
         if (data.selected[0].startsWith('lvl_1-')) {
             var scroll_id = data.selected[0].split('lvl_1-')[1];
-            combination.display_scroll(scroll_id);
+            Spider.propagate_command('load_scroll', {id: scroll_id});
+            // combination.display_scroll(scroll_id);
         }
     }).jstree({
         "core" : {

@@ -7,6 +7,7 @@
     <script type="text/javascript" src="resources/js/login.js"></script>
     <script type="text/javascript" src="vendors/vakata/jstree.min.js"></script>
     <script type="text/javascript" src="vendors/openseadragon/openseadragon.js"></script>
+    <script type="text/javascript" src="vendors/RubaXa/Sortable.min.js"></script>
     <script type="text/javascript" src="resources/js/messageSpider.js"></script>
     <script type="text/javascript" src="resources/js/server.js"></script>
     <script type="text/javascript" src="resources/js/layout-control.js"></script>
@@ -21,6 +22,9 @@
   	<link rel="stylesheet" href="resources/css/editor.css">
     <link href="vendors/jonsuh/hamburgers.min.css" rel="stylesheet">
     <link rel="stylesheet" href="vendors/vakata/themes/default/style.min.css" />
+
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/> -->
+
     <title>SQE-Scrollery</title>
 	</head>
 
@@ -83,6 +87,7 @@
               <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
               <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
               <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
+              <li><input type="range" id="combination-zoom-slider" min="0.01" max="0.75" step="0.005"></li>
             </div>
         </div>
       </div>

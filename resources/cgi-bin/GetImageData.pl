@@ -166,7 +166,7 @@ sub getImagesOfFragment {
 	my $idType = $cgi->param('idType');
 	my $id = $cgi->param('id');
 	if ($idType eq 'composition') {
-		$sql = $dbh->prepare('SELECT SQE_image.filename as filename, SQE_image.wavelength_start as wavelength, SQE_image.is_master, image_urls.url as url FROM SQE_image INNER JOIN image_urls on image_urls.id = SQE_image.url_code INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id WHERE image_to_edition_catalog.edition_id = ?') 
+		$sql = $dbh->prepare('SELECT SQE_image.filename as filename, SQE_image.wavelength_start as start, SQE_image.wavelength_end as end, SQE_image.is_master, image_urls.url as url FROM SQE_image INNER JOIN image_urls on image_urls.id = SQE_image.url_code INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id WHERE image_to_edition_catalog.edition_id = ?') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
 	} elsif ($idType eq 'institution') {
 		$sql = $dbh->prepare('SELECT * FROM SQE_image WHERE image_catalog_id = ?') 
@@ -250,7 +250,7 @@ sub getPolygon {
 
 sub getScrollArtefacts {
 	my $scroll_id = $cgi->param('scroll_id');
-	$sql = $dbh->prepare('	CALL getScrollArtefacts(?)') 
+	$sql = $dbh->prepare('CALL getScrollArtefacts(?)') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($scroll_id);
 	readResults();

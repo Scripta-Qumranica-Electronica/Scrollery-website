@@ -43,6 +43,8 @@ $(document).ready(function()
 						$('#login').css('padding', '0');
 						$('#login').css('border', 'none');
 						$('#editing-panes').css('visibility', 'visible');
+						new SingleImageController($("#single-image-container"), 1);
+						new CombinationController($("#combination-container"), 1);
 						toggleNav(); //Show side menu
 						$('.pane-button').prop('checked', true); //Set each pane to visible
 						togglePane(); //Refresh panes so they appear
