@@ -8,6 +8,8 @@ function Spider() // singleton central component communication system
 	this.doShowServerErrors = true;
 	this.session_id = "";
 	this.user = "";
+	this.current_combination;
+	this.current_version;
 	this.registered_objects = {
 		load_scroll: [],
 		load_fragment: []

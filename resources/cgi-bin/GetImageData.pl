@@ -75,25 +75,30 @@ sub readResults (){
 }
 
 sub getCombs {
-	$sql = $dbh->prepare('SELECT * FROM scroll') or die
+	my $userID = $cgi->param('user');
+	$sql = $dbh->prepare('select scroll_data.scroll_id as scroll_id, scroll_data.name as name, scroll_data_owner.version as version from scroll_data inner join scroll_data_owner on scroll_data_owner.scroll_data_id = scroll_data.scroll_data_id where scroll_data_owner.user_id = ? order by scroll_data.name, scroll_data_owner.version') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute();
+	$sql->execute($userID);
 	readResults();
 	return;
 }
 
 sub getColOfComb {
+	my $userID = $cgi->param('user');
+	my $version = $cgi->param('version');
 	my $combID = $cgi->param('combID');
-	$sql = $dbh->prepare('select distinct column_of_scroll.name, column_of_scroll.column_of_scroll_id from column_of_scroll inner join discrete_canonical_references on discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id where discrete_canonical_references.discrete_canonical_name_id = ?') or die
+	$sql = $dbh->prepare('select col_data_owner.version as version, col_data.name as name, col_data.col_id as col_id from col_data inner join col_data_owner on col_data_owner.col_data_id = col_data.col_data_id inner join scroll_to_col on scroll_to_col.col_id = col_data.col_id where col_data_owner.user_id = ? and col_data_owner.version = ? and scroll_to_col.scroll_id = ?') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute($combID);
+	$sql->execute($userID, $version, $combID);
 	readResults();
 	return;
 }
 
 sub getFragsOfCol {
+	my $userID = $cgi->param('user');
+	my $version = $cgi->param('version');
 	my $colID = $cgi->param('colID');
-	$sql = $dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side from column_of_scroll inner join  discrete_canonical_references on  discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id where column_of_scroll.column_of_scroll_id = ?') or die
+	$sql = $dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side from discrete_canonical_references where discrete_canonical_references.col_data_id = ?') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($colID);
 	readResults();

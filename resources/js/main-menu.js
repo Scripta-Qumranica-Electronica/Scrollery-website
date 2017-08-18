@@ -60,9 +60,8 @@ function populate_combinations() {
             load_fragment_image(selected_frag);
         }
         if (data.selected[0].startsWith('lvl_1-')) {
-            var scroll_id = data.selected[0].split('lvl_1-')[1];
+            var scroll_id = data.selected[0].split('-')[1];
             Spider.propagate_command('load_scroll', {id: scroll_id});
-            // combination.display_scroll(scroll_id);
         }
     }).jstree({
         "core" : {
@@ -78,17 +77,19 @@ function populate_combinations() {
                     var trans_data;
                     // var transaction_lvl;
                     if (node.id === "#") {
-                        trans_data = {'transaction' : 'getCombs'};
+                        trans_data = {'transaction' : 'getCombs', 'user' : 0};
                         current_lvl = 0;
                     }
                     else if (node.id.startsWith('lvl_1-')) {
-                        var combination = node.id.split('lvl_1-')[1];
-                        trans_data = {'transaction' : 'getColOfComb', 'combID' : combination};
+                        var combination = node.id.split('-')[1];
+                        var version = node.id.split('-')[2];
+                        trans_data = {'transaction' : 'getColOfComb', 'combID' : combination, 'user' : 0, 'version': version};
                         current_lvl = 1;
                     }
                     else if (node.id.startsWith('lvl_2-')) {
-                        var column = node.id.split('lvl_2-')[1];
-                        trans_data = {'transaction' : 'getFragsOfCol', 'colID' : column};
+                        var column = node.id.split('-')[1];
+                        var version = node.id.split('-')[2];
+                        trans_data = {'transaction' : 'getFragsOfCol', 'colID' : column, 'user' : 0, 'version': version};
                         current_lvl = 2;
                     }
 		            return trans_data;
@@ -98,11 +99,11 @@ function populate_combinations() {
                     var menu_list = [];
                     for (var i = 0; i < entries['results'].length; i++){
                         if (current_lvl == 0){
-                            var listing = {"text": entries['results'][i]["name"], "id" : 'lvl_1-' + entries['results'][i]["scroll_id"], "children" : true};
+                            var listing = {"text": entries['results'][i]["name"] + ' - ' + entries['results'][i]["version"], "id" : 'lvl_1-' + entries['results'][i]["scroll_id"] + '-' + entries['results'][i]["version"], "children" : true};
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 1){
-                            var listing = {"text": entries['results'][i]["name"], "id" : 'lvl_2-' + entries['results'][i]["column_of_scroll_id"], "children" : true};
+                            var listing = {"text": entries['results'][i]["name"], "id" : 'lvl_2-' + entries['results'][i]["col_id"] + '-' + entries['results'][i]["version"], "children" : true};
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 2){
