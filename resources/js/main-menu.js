@@ -6,12 +6,6 @@ var listing_type = {'lv_1': 'composition',
 var current_lvl;
 
 function login(){
-    $("#combination-zoom-slider").on("input", function(){
-        combination.change_zoom(this.value, true);
-    });
-    $("#combination-zoom-slider").on("change", function(){
-        combination.change_zoom(this.value, false);
-    });
     $(".collapsible").click(function(){show_item(this);});
     $("#new-combination").css("visibility", "visible");
     $(".accordion-title").css("visibility", "visible");

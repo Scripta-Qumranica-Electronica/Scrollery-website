@@ -93,7 +93,9 @@ var SingleImageController = (function () {
 						slider.setAttribute("value", "100"); 
 						slider.setAttribute("min", "0");
 						slider.setAttribute("max", "100");
-						slider.setAttribute("oninput", "single_image_" + idx + ".setOpacity(this.value, \"" + filename + "\")");
+						slider.addEventListener("input", function(){
+							setOpacity(this.value, filename);
+						});
 						
 						var visible = document.createElement("td");
 						var eye = document.createElement("img");
@@ -103,7 +105,9 @@ var SingleImageController = (function () {
 						eye.dataset.url = entry['url'];
 						eye.setAttribute("width", "20");
 						eye.setAttribute("height", "20");
-						eye.setAttribute("onclick",  "single_image_" + idx + ".toggle_image(\"" + filename + "\", this);");
+						eye.addEventListener("click", function(){
+							toggle_image(filename, this);
+						});
 						
 						var mask = document.createElement("td");
 						mask.setAttribute("onclick", "mask(" + filename + ");");
@@ -121,7 +125,7 @@ var SingleImageController = (function () {
 
 						if (entry['is_master'] == 1) {
 							$(control).prepend(row);
-							this.toggle_image(filename, eye);
+							toggle_image(filename, eye);
 						}
 
 						if (index == (selected_images['results'].length - 1)) {
@@ -203,14 +207,11 @@ var SingleImageController = (function () {
 			});
 		}
 
-		//Public methods are created via the prototype
-		SingleImageController.prototype.display_fragment = function (data) {
-			return load_images.call(this, data.id_type, data.id);
-		}
-		SingleImageController.prototype.setOpacity = function(value, filename) {
+		function setOpacity(value, filename) {
 			$('#single_image-' + $.escapeSelector(filename)).css("opacity", value / 100);
 		}
-		SingleImageController.prototype.toggle_image = function(file, eye_icon){
+
+		function toggle_image(file, eye_icon){
 			if ($('#single_image-' + $.escapeSelector(file)).length == 0){
 				display_image.call(this, file, eye_icon.dataset.url);
 				eye_icon.setAttribute("src", "resources/images/eye-open.png");
@@ -226,6 +227,11 @@ var SingleImageController = (function () {
 					eye_icon.setAttribute("alt", "visible");
 				}
 			}
+		}
+
+		//Public methods are created via the prototype
+		SingleImageController.prototype.display_fragment = function (data) {
+			return load_images.call(this, data.id_type, data.id);
 		}
 
 		//register responders with messageSpider

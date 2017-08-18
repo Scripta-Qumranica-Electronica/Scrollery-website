@@ -17,6 +17,19 @@ var CombinationController = (function () {
         $comb_scroll.css('height', '500');
         $('#combination-pane').append($comb_scroll);
         var $container = $cont;
+        var $zoom_control = $('<input>')
+        $zoom_control.attr('type', "range")
+        .attr('id', "combination-zoom-slider")
+        .attr('min', '0.01')
+        .attr('max', '0.75')
+        .attr('step', '0.005')
+        .on("input", function(){
+            zoom(this.value, true);
+        })
+        .on("change", function(){
+            zoom(this.value, false);
+        });
+        $container.append($zoom_control);
 		var self = this;
 
 		// Private functions, will be invoked by name.call(this, ...input vars)
@@ -118,7 +131,7 @@ var CombinationController = (function () {
                         path.setAttribute('d', new_polygons);
                         path.setAttribute('transform', 'scale(' + scale + ')');
                         svgImage.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + artefact.url + "&file="
-                          + artefact.filename + '/' + img_x + ',' + img_y + ',' + img_width + ',' + img_height + '/pct:' + (scale * 100) + '/0/' + artefact.suffix);
+                          + artefact.filename + '/' + img_x + ',' + img_y + ',' + img_width + ',' + img_height + '/pct:' + (scale * 100 < 100 ? scale * 100 : 100) + '/0/' + artefact.suffix);
                         svgImage.setAttribute('class', 'clippedImg');
                         svgImage.setAttribute('width', img_width * scale);
                         svgImage.setAttribute('height', img_height * scale);
@@ -142,15 +155,16 @@ var CombinationController = (function () {
 
         function zoom(new_zoom, dynamic){
             zoom_factor = new_zoom;
-            
-            artefacts.forEach(function(artefact){
+            artefacts.forEach(function(artefact, index){
                 var scale = (scroll_dpi / artefact.dpi) * zoom_factor;
                 artefact.path.setAttribute('transform', 'scale(' + scale + ')');
                 if (!dynamic){
                     if (max_zoom < zoom_factor) {
-                        max_zoom = zoom_factor;
                         artefact.image.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + artefact.url + "&file="
-                        + artefact.filename + '/' + artefact.crop_x + ',' + artefact.crop_y + ',' + artefact.crop_width + ',' + artefact.crop_height + '/pct:' + (scale * 100) + '/0/' + artefact.suffix);
+                        + artefact.filename + '/' + artefact.crop_x + ',' + artefact.crop_y + ',' + artefact.crop_width + ',' + artefact.crop_height + '/pct:' + (scale * 100 < 100 ? scale * 100 : 100) + '/0/' + artefact.suffix);
+                        if (index == artefact.length -1){
+                            max_zoom = zoom_factor;
+                        }
                     }
                 }
                 artefact.image.setAttribute('width', artefact.width * scale);

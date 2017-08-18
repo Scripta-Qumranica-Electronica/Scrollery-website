@@ -158,6 +158,12 @@ html, body {
   overflow: scroll;
 }
 
+#combination-zoom-slider {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
 .fragment {
   pointer-events: none;
 }
