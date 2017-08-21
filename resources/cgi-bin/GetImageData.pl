@@ -41,6 +41,7 @@ my %action = (
 	'institutionFragments' => \&getInstitutionFragments,
 	'getPolygon' => \&getPolygon,
 	'getScrollArtefacts' => \&getScrollArtefacts,
+	'newCombination' => \&newCombination,
 );
 		
 print $cgi->header(
@@ -125,7 +126,7 @@ sub getColOfScrollID {
 
 sub getIAAEdID {
 	my $discCanRef = $cgi->param('discCanRef');
-	$sql = $dbh->prepare('select edition_catalog_to_discrete_reference.edition_id from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join edition_catalog_to_discrete_reference on edition_catalog_to_discrete_reference.disc_can_ref_id = discrete_canonical_references.discrete_canonical_reference_id inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id where edition_catalog.edition_side=0 and discrete_canonical_references.discrete_canonical_reference_id = ?') or die
+	$sql = $dbh->prepare('select edition_catalog_to_discrete_reference.edition_id from edition_catalog_to_discrete_reference inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id where edition_catalog.edition_side=0 and edition_catalog_to_discrete_reference.disc_can_ref_id = ?') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($discCanRef);
 	readResults();
@@ -258,6 +259,15 @@ sub getScrollArtefacts {
 	$sql = $dbh->prepare('CALL getScrollArtefacts(?)') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($scroll_id);
+	readResults();
+	return;
+}
+
+sub newCombination {
+	my $user_id = $cgi->param('user_id');
+	$sql = $dbh->prepare('CALL getScrollArtefacts(?)') 
+		or die "Couldn't prepare statement: " . $dbh->errstr;
+	$sql->execute($user_id);
 	readResults();
 	return;
 }

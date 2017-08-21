@@ -16,7 +16,7 @@ use Encode;
 
 use DBI;
 use lib qw(/home/perl_libs);
-use SQE_database; # former: require '/etc/access.pm';
+use SQE_database_new; # former: require '/etc/access.pm';
 
 
 # global variables
@@ -212,7 +212,7 @@ sub login()
 			.' WHERE session_id = '.$session_id 
 		);
 		
-		print $session_key;
+		print "{\"key\": \"" . $session_key . "\", \"user_id\": \"" . $user_id . "\"}";
 	}
 	else
 	{

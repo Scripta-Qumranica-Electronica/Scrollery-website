@@ -15,7 +15,8 @@ function login(){
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
     $("#combinations").css("visibility", "visible");
-    populate_combinations()
+    populate_combinations(0); //Default user is 0
+    populate_combinations(Spider.user_id);
     populate_fragments();
 }
 
@@ -52,8 +53,15 @@ function load_fragment_image(selected_frag){
     });
 }
 
-function populate_combinations() {
-    $('#default-combination-listings').on('changed.jstree', function (e, data) {
+function new_combination(){
+    get_database_data({'transaction' : 'newCombination', 'user_id' : Spider.user_id}, function(result){
+        Spider.current_combination = result.id;
+    });
+}
+
+function populate_combinations(user) {
+    var menu = user == 0 ? '#default-combination-listings' : '#user-combination-listings';
+    $(menu).on('changed.jstree', function (e, data) {
         if (data.selected[0].startsWith('lvl_3-')) {
             var selected_frag = data.selected[0].split('lvl_3-')[1];
             load_fragment_text(selected_frag);
@@ -61,7 +69,10 @@ function populate_combinations() {
         }
         if (data.selected[0].startsWith('lvl_1-')) {
             var scroll_id = data.selected[0].split('-')[1];
+            var version = data.selected[0].split('-')[2];
             Spider.propagate_command('load_scroll', {id: scroll_id});
+            Spider.current_combination = scroll_id;
+            Spider.current_version = version;
         }
     }).jstree({
         "core" : {
@@ -77,19 +88,19 @@ function populate_combinations() {
                     var trans_data;
                     // var transaction_lvl;
                     if (node.id === "#") {
-                        trans_data = {'transaction' : 'getCombs', 'user' : 0};
+                        trans_data = {'transaction' : 'getCombs', 'user' : user};
                         current_lvl = 0;
                     }
                     else if (node.id.startsWith('lvl_1-')) {
                         var combination = node.id.split('-')[1];
                         var version = node.id.split('-')[2];
-                        trans_data = {'transaction' : 'getColOfComb', 'combID' : combination, 'user' : 0, 'version': version};
+                        trans_data = {'transaction' : 'getColOfComb', 'combID' : combination, 'user' : user, 'version': version};
                         current_lvl = 1;
                     }
                     else if (node.id.startsWith('lvl_2-')) {
                         var column = node.id.split('-')[1];
                         var version = node.id.split('-')[2];
-                        trans_data = {'transaction' : 'getFragsOfCol', 'colID' : column, 'user' : 0, 'version': version};
+                        trans_data = {'transaction' : 'getFragsOfCol', 'colID' : column, 'user' : user, 'version': version};
                         current_lvl = 2;
                     }
 		            return trans_data;
