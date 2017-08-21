@@ -23,6 +23,7 @@ var CombinationController = (function () {
         .attr('min', '0.01')
         .attr('max', '0.75')
         .attr('step', '0.005')
+        .attr('value', '0.1')
         .on("input", function(){
             zoom(this.value, true);
         })
