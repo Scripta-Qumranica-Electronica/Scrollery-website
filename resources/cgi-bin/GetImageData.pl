@@ -77,7 +77,7 @@ sub readResults (){
 
 sub getCombs {
 	my $userID = $cgi->param('user');
-	$sql = $dbh->prepare('select scroll_data.scroll_id as scroll_id, scroll_data.name as name, scroll_data_owner.version as version from scroll_data inner join scroll_data_owner on scroll_data_owner.scroll_data_id = scroll_data.scroll_data_id where scroll_data_owner.user_id = ? order by scroll_data.name, scroll_data_owner.version') or die
+	$sql = $dbh->prepare('select scroll_version.scroll_id as scroll_id, scroll_data.name as name, scroll_version.version as version from scroll_version inner join scroll_data on scroll_data.scroll_id = scroll_version.scroll_id where scroll_version.user_id = ? order by scroll_data.name, scroll_version.version') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($userID);
 	readResults();
