@@ -99,7 +99,7 @@ sub getFragsOfCol {
 	my $userID = $cgi->param('user');
 	my $version = $cgi->param('version');
 	my $colID = $cgi->param('colID');
-	$sql = $dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side from discrete_canonical_references where discrete_canonical_references.col_data_id = ?') or die
+	$sql = $dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side from discrete_canonical_references where discrete_canonical_references.column_of_scroll_id = ?') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($colID);
 	readResults();
