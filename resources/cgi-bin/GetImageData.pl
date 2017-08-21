@@ -88,7 +88,7 @@ sub getColOfComb {
 	my $userID = $cgi->param('user');
 	my $version = $cgi->param('version');
 	my $combID = $cgi->param('combID');
-	$sql = $dbh->prepare('select col_data_owner.version as version, col_data.name as name, col_data.col_id as col_id from col_data inner join col_data_owner on col_data_owner.col_data_id = col_data.col_data_id inner join scroll_to_col on scroll_to_col.col_id = col_data.col_id where col_data_owner.user_id = ? and col_data_owner.version = ? and scroll_to_col.scroll_id = ?') or die
+	$sql = $dbh->prepare('select col_data_owner.scroll_version_id as version, col_data.name as name, col_data.col_id as col_id from col_data inner join col_data_owner on col_data_owner.col_data_id = col_data.col_data_id inner join scroll_to_col on scroll_to_col.col_id = col_data.col_id inner join scroll_version on scroll_version.scroll_version_id = col_data_owner.scroll_version_id where scroll_version.user_id = ? and scroll_version.version = ? and scroll_to_col.scroll_id = ?') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($userID, $version, $combID);
 	readResults();
