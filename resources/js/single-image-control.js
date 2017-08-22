@@ -33,12 +33,15 @@ var SingleImageController = (function () {
 			.attr("id", "single-image-pane")
 			.addClass("main-pane");
 		var control = $('<div></div>')
-			.attr("id", "single-image-control");
+			.attr("id", "single-image-control")
+			.addClass("list-group")
+			.addClass("noselect")
+			.css("visibility", "hidden");
 		var $container = $cont;
 		$container.append(pane)
 			.append(control)
 			.append($pane_menu);
-		var that = this;
+		var self = this;
 
 		// Private functions, will be invoked by name.call(this, ...input vars)
 		function load_images(id_type, id){
@@ -57,11 +60,28 @@ var SingleImageController = (function () {
 				processData: false,
 				type: 'POST',
 				success: function(selected_images){
-					selected_images['results'].forEach(function(entry) {
-						var image_type = entry['wavelength'];
+					selected_images['results'].forEach(function(entry, index) {
+						var image_type;
+						if (entry.start == entry.end) {
+							image_type = entry.start;
+						} else {
+							image_type = entry.start + '-' + entry.end;
+						}
+						image_type += 'nm';
 						var filename = entry['filename'];
+						if (filename.includes('RRIR')) {
+							image_type += ' RR';
+						} else if (filename.includes('RLIR')) {
+							image_type += ' RL';
+						}
 
 						var row = document.createElement("tr");
+						row.className = "list-group-item";
+						row.dataset.filename = filename;
+
+						var handle = document.createElement("span");
+						handle.className = "drag-handle";
+						handle.innerHTML = '&#9776;';
 						
 						var type = document.createElement("td");
 						type.innerHTML = image_type;
@@ -73,7 +93,9 @@ var SingleImageController = (function () {
 						slider.setAttribute("value", "100"); 
 						slider.setAttribute("min", "0");
 						slider.setAttribute("max", "100");
-						slider.setAttribute("oninput", "single_image_" + idx + ".setOpacity(this.value, \"" + filename + "\")");
+						slider.addEventListener("input", function(){
+							setOpacity(this.value, filename);
+						});
 						
 						var visible = document.createElement("td");
 						var eye = document.createElement("img");
@@ -83,12 +105,15 @@ var SingleImageController = (function () {
 						eye.dataset.url = entry['url'];
 						eye.setAttribute("width", "20");
 						eye.setAttribute("height", "20");
-						eye.setAttribute("onclick",  "single_image_" + idx + ".toggle_image(\"" + filename + "\", this);");
+						eye.addEventListener("click", function(){
+							toggle_image(filename, this);
+						});
 						
 						var mask = document.createElement("td");
 						mask.setAttribute("onclick", "mask(" + filename + ");");
 						mask.innerHTML = "Mask";
 						
+						row.appendChild(handle);
 						row.appendChild(type);
 						row.appendChild(opacity);
 						row.appendChild(visible);
@@ -100,7 +125,17 @@ var SingleImageController = (function () {
 
 						if (entry['is_master'] == 1) {
 							$(control).prepend(row);
-							this.toggle_image(filename, eye);
+							toggle_image(filename, eye);
+						}
+
+						if (index == (selected_images['results'].length - 1)) {
+							Sortable.create(document.getElementById('single-image-control'), 
+								{handle: ".drag-handle",
+								animation: 150,
+								draggable: ".list-group-item",
+								onEnd: function (/**Event*/evt) {
+									reorder_images();
+							}});
 						}
 					}, this);
 				}
@@ -116,11 +151,11 @@ var SingleImageController = (function () {
 		}
 
 		function display_image(file, url){
-			//This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
-			
 			var $new_image = $(document.createElement('div')).attr('id', 'single_image-' + file);
 			$($new_image).attr('class', 'single-image-view');
+			$($new_image).data('file', file);
 			$(pane).append($new_image);
+			reorder_images();
 			
 			var data = new FormData();
 			data.append('user', Spider.user);
@@ -142,7 +177,6 @@ var SingleImageController = (function () {
 				} else if (infoJson["@id"].includes("gallica")){
 					infoJson["@id"] = infoJson["@id"].replace("http://gallica.bnf.fr/iiif/ark%3A%2F", "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + url + "&file=");
 				}
-				console.log(infoJson["@id"]);
 				var viewer = OpenSeadragon({
 					id: 'single_image-' + file,
 					preserveViewport: true,
@@ -162,16 +196,24 @@ var SingleImageController = (function () {
 			});
 		}
 
-		//Public methods are created via the prototype
-		SingleImageController.prototype.display_fragment = function (id_type, id) {
-			return load_images.call(this, id_type, id);
+		function reorder_images() {
+			var filelist = [];
+			$(control).find("> tr").each(function (index){
+				filelist.push(this.dataset.filename);
+			});
+			filelist.reverse();
+			filelist.forEach(function(file){
+				$(pane).append($(document.getElementById('single_image-' + file)));
+			});
 		}
-		SingleImageController.prototype.setOpacity = function(value, filename) {
+
+		function setOpacity(value, filename) {
 			$('#single_image-' + $.escapeSelector(filename)).css("opacity", value / 100);
 		}
-		SingleImageController.prototype.toggle_image = function(file, eye_icon){
+
+		function toggle_image(file, eye_icon){
 			if ($('#single_image-' + $.escapeSelector(file)).length == 0){
-				display_image(file, eye_icon.dataset.url);
+				display_image.call(this, file, eye_icon.dataset.url);
 				eye_icon.setAttribute("src", "resources/images/eye-open.png");
 				eye_icon.setAttribute("alt", "visible");
 			} else {
@@ -186,6 +228,19 @@ var SingleImageController = (function () {
 				}
 			}
 		}
+
+		//Public methods are created via the prototype
+		SingleImageController.prototype.display_fragment = function (data) {
+			return load_images.call(this, data.id_type, data.id);
+		}
+
+		//register responders with messageSpider
+		Spider.register_object([
+			{type: 'load_fragment', execute_function: function(data){
+				self.display_fragment(data);
+				}
+			}
+		]);
 	}
     return SingleImageController;
 })();
