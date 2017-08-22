@@ -1,5 +1,6 @@
-#! c:\xampp\perl\bin\perl.exe -w
-# /usr/bin/perl -w
+#! /usr/bin/perl -w
+# c:\xampp\perl\bin\perl.exe -w
+
 
 use strict;
 use warnings;
@@ -16,7 +17,7 @@ use Encode;
 
 use DBI;
 use lib qw(/home/perl_libs);
-use SQE_database; # former: require '/etc/access.pm';
+use SQE_database_new; # former: require '/etc/access.pm';
 
 
 # global variables
@@ -30,10 +31,10 @@ my $CGI; # web (common gateway interface)
 sub query($)
 {
 	my $sql_command = shift;
-	if (index($sql_command, 'user_sessions') == -1)
-	{
-		say '$sql_command '.$sql_command;	
-	}
+	# if (index($sql_command, 'user_sessions') == -1)
+	# {
+	# 	say '$sql_command '.$sql_command;	
+	# }
 	
 	my $query = $DBH->prepare($sql_command) or die DBI->errstr;
 	$query->execute() or die DBI->errstr;
@@ -44,7 +45,7 @@ sub queryResult($)
 {
 	my $sql_command = shift;
 	
-	say '$sql_command '.$sql_command;
+	# say '$sql_command '.$sql_command;
 	
 	my $query = $DBH->prepare($sql_command) or die DBI->errstr;
 	$query->execute() or die DBI->errstr;
@@ -96,8 +97,6 @@ sub queryAllPrepared
 sub queryAll($)
 {
 	my $sql_command = shift;
-	
-#	say $sql_command;
 	
 	my $query = $DBH->prepare($sql_command);
 	$query->execute();
@@ -212,7 +211,7 @@ sub login()
 			.' WHERE session_id = '.$session_id 
 		);
 		
-		print $session_key;
+		print "{\"key\": \"" . $session_key . "\", \"user_id\": \"" . $user_id . "\"}";
 	}
 	else
 	{

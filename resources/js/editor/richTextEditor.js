@@ -433,10 +433,10 @@ function RichTextEditor()
 	
 	this.displayModel = function(model)
 	{
-		console.log('first line signs:');
+		// console.log('first line signs:');
 		for (var iSign in model[0]['SIGNS'])
 		{
-			console.log(model[0]['SIGNS'][iSign]['SIGN'].charCodeAt(0));
+			// console.log(model[0]['SIGNS'][iSign]['SIGN'].charCodeAt(0));
 		}
 		
 		$('#richTextContainer').empty();

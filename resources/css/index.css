@@ -132,6 +132,21 @@ html, body {
   opacity: 1.0;
 }
 
+.list-group {
+  border-radius: 15px;
+  background: #E1E1D0;
+  padding: 10px;
+}
+
+.drag-handle {
+	margin-right: 10px;
+	font: bold 20px Sans-Serif;
+	color: #5F9EDF;
+	display: inline-block;
+	cursor: move;
+	cursor: -webkit-grabbing;  /* overrides 'move' */
+}
+
 #signs-pane {
   min-width: 200px;
   left: 0;
@@ -140,7 +155,13 @@ html, body {
 #combination-pane {
   min-height: 200px;
   left: 0;
-  overflow: scroll;
+  overflow: auto;
+}
+
+#combination-zoom-slider {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 .fragment {
@@ -198,6 +219,16 @@ svg g:hover + .fragOutline {
 	width: 100%;
 	height: 4px;
 	cursor: ns-resize;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
 }
 
 /* CSS for QWB HTML Text--Remove after Martin integrates text editor */

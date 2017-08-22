@@ -29,24 +29,33 @@ function show_item(item){
 
 function load_fragment_text(selected_frag)
 {
-    Spider.requestTextFromAPI // TODO use actual variables, use session instead of user & pw
-    (
-    	{
-    		'user': 'sqe_api',
-			'pw': '512JE8ehM3UW',
-			'scroll': '1QS',
-			'fragment': '1'
-    	},
-    	function(data)
-    	{
-    		if (data == 0)
-    		{
-    			return;
-    		}
-    		
-    		Spider.notifyChangedText(data);
-    	}
-    );
+    data_form = new FormData();
+    data_form.append('transaction', 'getScrollColNameFromDiscCanRef');
+    data_form.append('frag_id', selected_frag);
+
+    
+    get_database_data(data_form, function(results){
+        results['results'].forEach(function(result) {
+            Spider.requestTextFromAPI // TODO use actual variables, use session instead of user & pw
+            (
+                {
+                    'user': 'sqe_api',
+                    'pw': '512JE8ehM3UW',
+                    'scroll': result.scroll,
+                    'fragment': result.col
+                },
+                function(data)
+                {
+                    if (data == 0)
+                    {
+                        return;
+                    }
+                    
+                    Spider.notifyChangedText(data);
+                }
+            );
+        });
+    });
 }
 
 function load_fragment_image(selected_frag){
