@@ -9,6 +9,15 @@ function Spider() // singleton central component communication system
 	    }
 	    
 	    this.doShowServerErrors = true;
+	    this.session_id = "";
+	    this.user_id = "";
+	    this.user = "";
+	    this.current_combination;
+	    this.current_version;
+	    this.registered_objects = {
+	    	load_scroll: [],
+		load_fragment: []
+	    };
 	    
 		$(document).ajaxError // log server connection errors to console
 		(
@@ -137,6 +146,25 @@ function Spider() // singleton central component communication system
 	this.addRichTextEditor = function()
 	{
 		this.richTextEditor = new RichTextEditor();
+	}
+	
+	//Register objects for message notification (add message titles to the this.registered_objects object here).
+	//The message variable is an object with two variables: "type" is the type of message to respond to 
+	//(corresponding to the variable in this.registered_objects object), "execute_function" is essentially
+	//a callback for the function to be executed (make sure to maintain context by using var self = this in the
+	//calling object and then referring to functions in the callback with "self.")
+	this.register_object = function(messages)
+	{
+		messages.forEach(function(message){
+			this.registered_objects[message.type].push({'execute_function': message.execute_function});
+		}, this);
+	}
+
+	this.propagate_command = function(command, data)
+	{
+		this.registered_objects[command].forEach(function(listening_object){
+			listening_object.execute_function(data);
+		});
 	}
 }
 
