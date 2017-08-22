@@ -1,5 +1,5 @@
-#! /usr/bin/perl -w
-# c:\xampp\perl\bin\perl.exe -w
+#! c:\xampp\perl\bin\perl.exe -w
+# /usr/bin/perl -w
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use Encode;
 
 use DBI;
 use lib qw(/home/perl_libs);
-use SQE_database_new; # former: require '/etc/access.pm';
+use SQE_database; # former: require '/etc/access.pm';
 
 
 # global variables
@@ -44,7 +44,7 @@ sub queryResult($)
 {
 	my $sql_command = shift;
 	
-#	say '$sql_command '.$sql_command;
+	say '$sql_command '.$sql_command;
 	
 	my $query = $DBH->prepare($sql_command) or die DBI->errstr;
 	$query->execute() or die DBI->errstr;
@@ -212,7 +212,7 @@ sub login()
 			.' WHERE session_id = '.$session_id 
 		);
 		
-		print "{\"key\": \"" . $session_key . "\", \"user_id\": \"" . $user_id . "\"}";
+		print $session_key;
 	}
 	else
 	{
@@ -262,7 +262,7 @@ sub load() # TODO combine queries where possible, for better performance
 	
 	my $column_start_sign_id = queryResult # TODO scroll owner relevant?
 	(
-		'SELECT sign_id'
+		'SELECT sign.sign_id'
 		.' FROM sign'
 		
 		.' JOIN real_area'
@@ -295,13 +295,13 @@ sub load() # TODO combine queries where possible, for better performance
 	(
 		'SELECT next_sign_id'
 		.' FROM position_in_stream'
-		.' WHERE sign_id = ?'
+		.' WHERE position_in_stream.sign_id = ?'
 	);
 	my $get_main_sign_query = $DBH->prepare
 	(
 		'SELECT *, FIND_IN_SET("COLUMN_END", sign.break_type)'
 		.' FROM sign'
-		.' WHERE sign_id = ?'
+		.' WHERE sign.sign_id = ?'
 	);
 #	my $get_line_id_and_name_query = $DBH->prepare
 #	(

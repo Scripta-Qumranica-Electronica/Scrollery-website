@@ -1,3 +1,5 @@
+// OUTDATED, content moved to messageSpider.js
+
 function initServerConnection()
 {
 	$(document).ajaxError // log server connection errors to console

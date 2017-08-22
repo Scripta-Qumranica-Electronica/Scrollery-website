@@ -7,13 +7,12 @@
     <script type="text/javascript" src="resources/js/login.js"></script>
     <script type="text/javascript" src="vendors/vakata/jstree.min.js"></script>
     <script type="text/javascript" src="vendors/openseadragon/openseadragon.js"></script>
-    <script type="text/javascript" src="vendors/RubaXa/Sortable.min.js"></script>
     <script type="text/javascript" src="resources/js/messageSpider.js"></script>
-    <script type="text/javascript" src="resources/js/server.js"></script>
+<!--<script type="text/javascript" src="resources/js/server.js"></script>-->
     <script type="text/javascript" src="resources/js/layout-control.js"></script>
-    <script type="text/javascript" src="resources/js/editor/richTextEditor.js"></script>
     <script type="text/javascript" src="resources/js/editor/singleSignEditor.js"></script>
-    <script type="text/javascript" src="resources/js/editor/editor.js"></script>
+    <script type="text/javascript" src="resources/js/editor/richTextEditor.js"></script>
+<!--<script type="text/javascript" src="resources/js/editor/editor.js"></script>-->
     <script type="text/javascript" src="resources/js/single-image-control.js"></script>
     <script type="text/javascript" src="resources/js/combination-control.js"></script>
     <script type="text/javascript" src="resources/js/main-menu.js"></script>
@@ -22,9 +21,6 @@
   	<link rel="stylesheet" href="resources/css/editor.css">
     <link href="vendors/jonsuh/hamburgers.min.css" rel="stylesheet">
     <link rel="stylesheet" href="vendors/vakata/themes/default/style.min.css" />
-
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/> -->
-
     <title>SQE-Scrollery</title>
 	</head>
 
@@ -63,7 +59,6 @@
             <div id="combinations" class="accordion-content">
               <div id="user-combinations" class="main-menu-listing">
                 <span>&emsp;-User combinations</span>
-                <div id="user-combination-listings"></div>
               </div>
               <div id="default-combinations" class="main-menu-listing">
                 <span>&emsp;-Default combinations</span>
@@ -117,8 +112,8 @@
                 class="frame">
               
               <div id="richTextContainer"
-                  class="scrollable protectedLineBreaks fillingMostHeight contentField"
-                  dir="rtl"></div>
+                  class="protectedLineBreaks contentField"
+                  dir="rtl"></div> <!-- fillingMostHeight -->
               
             </div>
             <div id="hidePanel" class="hidden"></div>

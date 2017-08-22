@@ -4,8 +4,12 @@ var listing_type = {'lv_1': 'composition',
                     'ref': 'edition_catalog_id'
                 };
 var current_lvl;
+var single_image_1;
+var combination;
 
 function login(){
+    single_image_1 = new SingleImageController($("#single-image-container"), 1);
+    combination = new CombinationController($("#combination-container"), 1);
     $(".collapsible").click(function(){show_item(this);});
     $("#new-combination").css("visibility", "visible");
     $(".accordion-title").css("visibility", "visible");
@@ -15,8 +19,7 @@ function login(){
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
     $("#combinations").css("visibility", "visible");
-    populate_combinations(0); //Default user is 0
-    populate_combinations(Spider.user_id);
+    populate_combinations()
     populate_fragments();
 }
 
@@ -27,18 +30,25 @@ function show_item(item){
     $(item).next().css("visibility", "visible");
 }
 
-function load_fragment_text(selected_frag){
-    Spider.requestFromServer(
-        {
-            'request': 'load',
-            'disc_can_ref_id': selected_frag
-        },
-        function(data){
-            if (data == 0) {
-                return;
-            }
-            Spider.notifyChangedText(JSON.parse(data));
-        }
+function load_fragment_text(selected_frag)
+{
+    Spider.requestTextFromAPI // TODO use actual variables, use session instead of user & pw
+    (
+    	{
+    		'user': 'sqe_api',
+			'pw': '512JE8ehM3UW',
+			'scroll': '1QS',
+			'fragment': '1'
+    	},
+    	function(data)
+    	{
+    		if (data == 0)
+    		{
+    			return;
+    		}
+    		
+    		Spider.notifyChangedText(data);
+    	}
     );
 }
 
@@ -47,32 +57,23 @@ function load_fragment_image(selected_frag){
     data_form.append('transaction', 'getIAAEdID');
     data_form.append('discCanRef', selected_frag);
     get_database_data(data_form, function(results){
+        var default_comps = document.getElementById("default-combinations");
         results['results'].forEach(function(result) {
-            Spider.propagate_command('load_fragment', {id_type: 'composition', id: result.edition_id});
+            single_image_1.display_fragment('composition', result.edition_id);
         });
     });
 }
 
-function new_combination(){
-    get_database_data({'transaction' : 'newCombination', 'user_id' : Spider.user_id}, function(result){
-        Spider.current_combination = result.id;
-    });
-}
-
-function populate_combinations(user) {
-    var menu = user == 0 ? '#default-combination-listings' : '#user-combination-listings';
-    $(menu).on('changed.jstree', function (e, data) {
+function populate_combinations() {
+    $('#default-combination-listings').on('changed.jstree', function (e, data) {
         if (data.selected[0].startsWith('lvl_3-')) {
             var selected_frag = data.selected[0].split('lvl_3-')[1];
             load_fragment_text(selected_frag);
             load_fragment_image(selected_frag);
         }
         if (data.selected[0].startsWith('lvl_1-')) {
-            var scroll_id = data.selected[0].split('-')[1];
-            var version = data.selected[0].split('-')[2];
-            Spider.propagate_command('load_scroll', {id: scroll_id});
-            Spider.current_combination = scroll_id;
-            Spider.current_version = version;
+            var scroll_id = data.selected[0].split('lvl_1-')[1];
+            combination.display_scroll(scroll_id);
         }
     }).jstree({
         "core" : {
@@ -88,19 +89,17 @@ function populate_combinations(user) {
                     var trans_data;
                     // var transaction_lvl;
                     if (node.id === "#") {
-                        trans_data = {'transaction' : 'getCombs', 'user' : user};
+                        trans_data = {'transaction' : 'getCombs'};
                         current_lvl = 0;
                     }
                     else if (node.id.startsWith('lvl_1-')) {
-                        var combination = node.id.split('-')[1];
-                        var version = node.id.split('-')[2];
-                        trans_data = {'transaction' : 'getColOfComb', 'combID' : combination, 'user' : user, 'version': version};
+                        var combination = node.id.split('lvl_1-')[1];
+                        trans_data = {'transaction' : 'getColOfComb', 'combID' : combination};
                         current_lvl = 1;
                     }
                     else if (node.id.startsWith('lvl_2-')) {
-                        var column = node.id.split('-')[1];
-                        var version = node.id.split('-')[2];
-                        trans_data = {'transaction' : 'getFragsOfCol', 'colID' : column, 'user' : user, 'version': version};
+                        var column = node.id.split('lvl_2-')[1];
+                        trans_data = {'transaction' : 'getFragsOfCol', 'colID' : column};
                         current_lvl = 2;
                     }
 		            return trans_data;
@@ -110,11 +109,11 @@ function populate_combinations(user) {
                     var menu_list = [];
                     for (var i = 0; i < entries['results'].length; i++){
                         if (current_lvl == 0){
-                            var listing = {"text": entries['results'][i]["name"] + ' - ' + entries['results'][i]["version"], "id" : 'lvl_1-' + entries['results'][i]["scroll_id"] + '-' + entries['results'][i]["version"], "children" : true};
+                            var listing = {"text": entries['results'][i]["name"], "id" : 'lvl_1-' + entries['results'][i]["scroll_id"], "children" : true};
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 1){
-                            var listing = {"text": entries['results'][i]["name"], "id" : 'lvl_2-' + entries['results'][i]["col_id"] + '-' + entries['results'][i]["version"], "children" : true};
+                            var listing = {"text": entries['results'][i]["name"], "id" : 'lvl_2-' + entries['results'][i]["column_of_scroll_id"], "children" : true};
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 2){

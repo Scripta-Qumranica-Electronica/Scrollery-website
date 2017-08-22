@@ -1,7 +1,6 @@
+// OUTDATED, content moved to login.js
+
 function initEditor()
 {
-	initServerConnection();
-	
-	initRichTextEditor();
-	initSingleSignEditor();
+	Spider.addRichTextEditor();
 }
