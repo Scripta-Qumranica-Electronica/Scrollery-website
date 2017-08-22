@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#! c:\xampp\perl\bin\perl.exe -w
+# /usr/bin/perl
 
 use strict;
 use warnings;
@@ -7,7 +8,7 @@ use CGI;
 use JSON::XS;
 use MIME::Base64;
 use lib qw(/home/perl_libs);
-use SQE_database_new;
+use SQE_database;
 
 my $cgi = new CGI;
 my $transaction = $cgi->param('transaction') || 'unspecified';
@@ -41,7 +42,6 @@ my %action = (
 	'institutionFragments' => \&getInstitutionFragments,
 	'getPolygon' => \&getPolygon,
 	'getScrollArtefacts' => \&getScrollArtefacts,
-	'newCombination' => \&newCombination,
 );
 		
 print $cgi->header(
@@ -76,30 +76,25 @@ sub readResults (){
 }
 
 sub getCombs {
-	my $userID = $cgi->param('user');
-	$sql = $dbh->prepare('select scroll_version.scroll_id as scroll_id, scroll_data.name as name, scroll_version.version as version from scroll_version inner join scroll_data on scroll_data.scroll_id = scroll_version.scroll_id where scroll_version.user_id = ? order by scroll_data.name, scroll_version.version') or die
+	$sql = $dbh->prepare('SELECT * FROM scroll') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute($userID);
+	$sql->execute();
 	readResults();
 	return;
 }
 
 sub getColOfComb {
-	my $userID = $cgi->param('user');
-	my $version = $cgi->param('version');
 	my $combID = $cgi->param('combID');
-	$sql = $dbh->prepare('select col_data_owner.scroll_version_id as version, col_data.name as name, col_data.col_id as col_id from col_data inner join col_data_owner on col_data_owner.col_data_id = col_data.col_data_id inner join scroll_to_col on scroll_to_col.col_id = col_data.col_id inner join scroll_version on scroll_version.scroll_version_id = col_data_owner.scroll_version_id where scroll_version.user_id = ? and scroll_version.version = ? and scroll_to_col.scroll_id = ?') or die
+	$sql = $dbh->prepare('select distinct column_of_scroll.name, column_of_scroll.column_of_scroll_id from column_of_scroll inner join discrete_canonical_references on discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id where discrete_canonical_references.discrete_canonical_name_id = ?') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute($userID, $version, $combID);
+	$sql->execute($combID);
 	readResults();
 	return;
 }
 
 sub getFragsOfCol {
-	my $userID = $cgi->param('user');
-	my $version = $cgi->param('version');
 	my $colID = $cgi->param('colID');
-	$sql = $dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side from discrete_canonical_references where discrete_canonical_references.column_of_scroll_id = ?') or die
+	$sql = $dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side from column_of_scroll inner join  discrete_canonical_references on  discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id where column_of_scroll.column_of_scroll_id = ?') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($colID);
 	readResults();
@@ -126,7 +121,7 @@ sub getColOfScrollID {
 
 sub getIAAEdID {
 	my $discCanRef = $cgi->param('discCanRef');
-	$sql = $dbh->prepare('select edition_catalog_to_discrete_reference.edition_id from edition_catalog_to_discrete_reference inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id where edition_catalog.edition_side=0 and edition_catalog_to_discrete_reference.disc_can_ref_id = ?') or die
+	$sql = $dbh->prepare('select edition_catalog_to_discrete_reference.edition_id from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join edition_catalog_to_discrete_reference on edition_catalog_to_discrete_reference.disc_can_ref_id = discrete_canonical_references.discrete_canonical_reference_id inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id where edition_catalog.edition_side=0 and discrete_canonical_references.discrete_canonical_reference_id = ?') or die
 			"Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($discCanRef);
 	readResults();
@@ -172,7 +167,7 @@ sub getImagesOfFragment {
 	my $idType = $cgi->param('idType');
 	my $id = $cgi->param('id');
 	if ($idType eq 'composition') {
-		$sql = $dbh->prepare('SELECT SQE_image.filename as filename, SQE_image.wavelength_start as start, SQE_image.wavelength_end as end, SQE_image.is_master, image_urls.url as url FROM SQE_image INNER JOIN image_urls on image_urls.id = SQE_image.url_code INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id WHERE image_to_edition_catalog.edition_id = ?') 
+		$sql = $dbh->prepare('SELECT SQE_image.filename as filename, SQE_image.wavelength_start as wavelength, SQE_image.is_master, image_urls.url as url FROM SQE_image INNER JOIN image_urls on image_urls.id = SQE_image.url_code INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id WHERE image_to_edition_catalog.edition_id = ?') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
 	} elsif ($idType eq 'institution') {
 		$sql = $dbh->prepare('SELECT * FROM SQE_image WHERE image_catalog_id = ?') 
@@ -256,18 +251,9 @@ sub getPolygon {
 
 sub getScrollArtefacts {
 	my $scroll_id = $cgi->param('scroll_id');
-	$sql = $dbh->prepare('CALL getScrollArtefacts(?)') 
+	$sql = $dbh->prepare('	CALL getScrollArtefacts(?)') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
 	$sql->execute($scroll_id);
-	readResults();
-	return;
-}
-
-sub newCombination {
-	my $user_id = $cgi->param('user_id');
-	$sql = $dbh->prepare('CALL getScrollArtefacts(?)') 
-		or die "Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute($user_id);
 	readResults();
 	return;
 }

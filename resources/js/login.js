@@ -36,22 +36,18 @@ $(document).ready(function()
 					}
 					else
 					{
-						parsed_response = JSON.parse(response);
-						Spider.session_id = parsed_response.key;
-						Spider.user_id = parsed_response.user_id;
+						Spider.session_id = response;
 						Spider.user = $('#userNameInput').val();
 						$('#login').css('visibility', 'hidden');
 						$('#login').css('height', '0');
 						$('#login').css('padding', '0');
 						$('#login').css('border', 'none');
 						$('#editing-panes').css('visibility', 'visible');
-						new SingleImageController($("#single-image-container"), 1);
-						new CombinationController($("#combination-container"), 1);
 						toggleNav(); //Show side menu
 						$('.pane-button').prop('checked', true); //Set each pane to visible
 						togglePane(); //Refresh panes so they appear
 						login();
-						initEditor();
+						Spider.addRichTextEditor();
 						//window.location = 'index.html?session=' + response + '&user=' + $('#userNameInput').val();
 					}
 				}
