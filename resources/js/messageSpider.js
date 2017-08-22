@@ -82,7 +82,7 @@ function Spider() // singleton central component communication system
 		const address = // TODO get rid of this check later
 		(
 			window.navigator.platform.indexOf('Win') == -1	
-			? 'https://134.76.19.179/sqe_api/run_api.cgi' // Linux (VM)
+			? '/sqe_api/run_api.cgi' // Linux (VM)
 //			: 'cgi-bin-ingo/run_api.cgi' // Windows (local testing)
 			: 'https://134.76.19.179/sqe_api/run_api.cgi'
 		);

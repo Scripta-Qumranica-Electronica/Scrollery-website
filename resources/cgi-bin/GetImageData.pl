@@ -7,7 +7,7 @@ use CGI;
 use JSON::XS;
 use MIME::Base64;
 use lib qw(/home/perl_libs);
-use SQE_database_new;
+use SQE_database_new; # Must switch to new class SQE_DBI
 
 my $cgi = new CGI;
 my $transaction = $cgi->param('transaction') || 'unspecified';

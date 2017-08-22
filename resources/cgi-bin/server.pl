@@ -17,7 +17,7 @@ use Encode;
 
 use DBI;
 use lib qw(/home/perl_libs);
-use SQE_database_new; # former: require '/etc/access.pm';
+use SQE_database_new; # former: require '/etc/access.pm';  Must switch to new class SQE_DBI
 
 
 # global variables
