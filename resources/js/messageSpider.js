@@ -8,6 +8,7 @@ function Spider() // singleton central component communication system
 	        return Spider.instance;
 	    }
 	    
+	    this.doShowRequests = true;
 	    this.doShowServerErrors = true;
 	    this.session_id = "";
 	    this.user_id = "";
@@ -23,13 +24,15 @@ function Spider() // singleton central component communication system
 		(
 			function(event, request, settings)
 			{
-				if (Spider.getShowServerErrors())
+				if (Spider.doShowServerErrors)
 				{
-					console.log('Connection error');
-					console.log('* target: ' + settings.url);
-					console.log('* parameters: ' + settings.data);
-					console.log('* error type: ' + event.type);
-					console.log('* request status: ' + request.status + ' (' + request.statusText + ')');
+					console.log('<CONNECTION ERROR>');
+					console.log('TARGET: ' + settings.url);
+					console.log('Parameters:');
+					console.log(settings.data);	// separate line makes check in debug tools easier 
+					console.log('Error type: ' + event.type);
+					console.log('Request status: ' + request.status + ' (' + request.statusText + ')');
+					console.log('</CONNECTION ERROR>');
 				}
 			}
 		);
@@ -37,13 +40,28 @@ function Spider() // singleton central component communication system
 	
 	/** functions */
 	
-	this.requestFromServer = function(parameters, onReturn)
+	this.requestFromServer = function(parameters, onSuccess, onFailure)
 	{
-		console.log('before request ' + new Date().getTime());
-		parameters['timeStamp'] = Date.now(); // TODO replace now() entries in DB bei this time, retry connection regularly
+//		console.log('before request ' + new Date().getTime());
+//		parameters['timeStamp'] = Date.now(); // TODO replace now() entries in DB bei this time, retry connection regularly
+		
+		if (this.session_id != '')
+		{
+			parameters['SESSION_ID'] = this.session_id;
+		}
+		
+		if (this.doShowRequests)
+		{
+			console.log('Request');
+			for (var key in parameters)
+			{
+				console.log('* ' + key + ': ' + parameters[key]);
+			}
+		}
 		
 		$.post
 		(
+//			'134.76.19.179/bronson/Scrollery-website/resources/cgi-bin/server.pl',
 			'resources/cgi-bin/server.pl', // connection to perl works only if same server ('same origin')
 			parameters
 		)
@@ -54,18 +72,23 @@ function Spider() // singleton central component communication system
 				// console.log('response on ' + parameters['request'] + ':');
 				// console.log(data);
 				
-				if (onReturn != null)
+				if (onSuccess != null)
 				{
-					onReturn(data);
+					onSuccess(data);
 				}
 				
-				console.log('after request ' + new Date().getTime());
+//				console.log('after request ' + new Date().getTime());
 			}
 		)
 		.fail
 		(
 			function(data)
 			{
+				if (onFailure != null)
+				{
+					onFailure(data);
+				}
+				
 				if (this.doShowServerErrors)
 				{
 					console.log('failure:');
@@ -75,69 +98,12 @@ function Spider() // singleton central component communication system
 		);
 	}
 	
-	this.requestTextFromAPI = function(parameters, onReturn)
+	this.notifyChangedText = function(data)
 	{
-		console.log('before request ' + new Date().getTime());
-		
-		const address = // TODO get rid of this check later
-		(
-			window.navigator.platform.indexOf('Win') == -1	
-			? '/sqe_api/run_api.cgi' // Linux (VM)
-//			: 'cgi-bin-ingo/run_api.cgi' // Windows (local testing)
-			: 'https://134.76.19.179/sqe_api/run_api.cgi'
-		);
-		$.post
-		(
-			address,
-			{
-				'USER_NAME': parameters['user'],
-				'PASSWORD' : parameters['pw'],
-				'GET'      : 'TEXT',
-				'SCROLL'   : parameters['scroll'],
-				'FRAGMENT' : parameters['fragment']
-			}
-		)
-		.done
-		(
-			function(data)
-			{
-				console.log('after request ' + new Date().getTime());
-				
-				console.log('response on GET TEXT:');
-				console.log(data);
-				
-				if (onReturn != null)
-				{
-					onReturn(data);
-				}
-			}
-		)
-		.fail
-		(
-			function(data)
-			{
-				if (this.doShowServerErrors)
-				{
-					console.log('failure:');
-					console.log(data);
-				}
-			}
-		);
-	}
-	
-	this.getShowServerErrors = function()
-	{
-		return this.doShowServerErrors;
-	}
-	
-	this.setShowServerErrors = function(doShowServerErrors)
-	{
-		this.doShowServerErrors = doShowServerErrors;
-	}
-	
-	this.notifyChangedText = function(json)
-	{
-		this.textObject = json['VALUE']['FRAGMENTS'][0]['LINES'];
+		console.log('text');
+		console.log(data);
+//		var json = JSON.parse(data);
+		this.textObject = data; // json['VALUE']['FRAGMENTS'][0]['LINES'];
 		
 		this.richTextEditor.displayModel(this.textObject);
 	}

@@ -51,6 +51,7 @@ var SingleImageController = (function () {
 			image_data.append('transaction', 'imagesOfFragment');
 			image_data.append('idType', id_type);
 			image_data.append('id', id);
+			image_data.append('SESSION_ID', Spider.session_id);
 			jQuery.ajax({
 				url: 'resources/cgi-bin/GetImageData.pl',
 				context: this,

@@ -42,6 +42,7 @@ var CombinationController = (function () {
                 var scroll_data = new FormData();
                 scroll_data.append('transaction', 'getScrollArtefacts');
                 scroll_data.append('scroll_id', id);
+		scroll_data.append('SESSION_ID', Spider.session_id);
                 jQuery.ajax({
                     url: 'resources/cgi-bin/GetImageData.pl',
                     context: this,

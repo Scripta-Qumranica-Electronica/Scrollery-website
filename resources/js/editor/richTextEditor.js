@@ -236,8 +236,8 @@ function RichTextEditor()
 	
 	this.addSign = function(model, iLine, iAlternative, iSign)
 	{
-		const attributes = model[iLine]['SIGNS'][iSign];
-		var sign = attributes['SIGN'];
+		const attributes = model[iLine]['signs'][iSign];
+		var sign = attributes['sign'];
 		
 		var span =
 		$('<span></span')
@@ -254,11 +254,11 @@ function RichTextEditor()
 		 */
 		
 		// chapter 2 & 3
-		if (attributes['SIGN_TYPE'] == null) // letter
+		if (attributes['type'] == null) // letter
 		{
 			span.text(sign);
 			
-			const w = attributes['WIDTH'];
+			const w = attributes['width'];
 			if (w != null
 			&&  w != 1)
 			{
@@ -270,7 +270,7 @@ function RichTextEditor()
 		}
 		else // not a letter
 		{
-			sign = this.signType2Visualisation[attributes['SIGN_TYPE']];
+			sign = this.signType2Visualisation[attributes['type']];
 			if (sign == null)
 			{
 				return; // skip breaks
@@ -282,9 +282,9 @@ function RichTextEditor()
 			}
 			else
 			{
-				span.attr('title', 'Sign type: ' + attributes['SIGN_TYPE']); // tooltip			
+				span.attr('title', 'Sign type: ' + attributes['type']); // tooltip			
 				
-				if (attributes['WIDTH'] == null)
+				if (attributes['width'] == null)
 				{
 					span
 					.text(sign)
@@ -296,7 +296,7 @@ function RichTextEditor()
 				else
 				{
 					var markers = sign;
-					for (var iSpace = 1; iSpace < Math.floor(attributes['WIDTH']); iSpace++)
+					for (var iSpace = 1; iSpace < Math.floor(attributes['width']); iSpace++)
 					{
 						markers += sign;
 					}
@@ -306,7 +306,7 @@ function RichTextEditor()
 					.text(markers)
 					.css
 					({
-						'font-size': Math.ceil((this.fontSize * attributes['WIDTH']) / markers.length) + 'px'
+						'font-size': Math.ceil((this.fontSize * attributes['width']) / markers.length) + 'px'
 					});
 				}
 			}
@@ -351,29 +351,29 @@ function RichTextEditor()
 		span.appendTo(destination);
 		
 		
-		if ((attributes['IS_RETRACED']) == 'true') // 6.2
+		if ((attributes['retraced']) == 1) // 6.2
 		{
 			classList.push('retraced');
 		}
 		
-		if ((attributes['READABILITY']) != null) // 9
+		if ((attributes['readability']) != null) // 9
 		{
-			if ((attributes['READABILITY']) == 'INCOMPLETE_AND_NOT_CLEAR')
+			if ((attributes['readability']) == 'INCOMPLETE_AND_NOT_CLEAR')
 			{
 				span.text(span.text() + '\u05af');
 			}
-			else if ((attributes['READABILITY']) == 'INCOMPLETE_BUT_CLEAR')
+			else if ((attributes['readability']) == 'INCOMPLETE_BUT_CLEAR')
 			{
 				span.text(span.text() + '\u05c4');
 			}
 		}
 		
-		if ((attributes['IS_RECONSTRUCTED']) == 'true') // 10
+		if ((attributes['reconstructed']) == 'true') // 10
 		{
 			classList.push('reconstructed');
 		}
 		
-		if ((attributes['CORRECTION']) != null) // 11
+		if ((attributes['corrected']) != null) // 11
 		{
 			classList.push('corrected'); // TODO differentiate by different corrections?
 		}
@@ -433,21 +433,13 @@ function RichTextEditor()
 	
 	this.displayModel = function(model)
 	{
-		// console.log('first line signs:');
-		for (var iSign in model[0]['SIGNS'])
-		{
-			// console.log(model[0]['SIGNS'][iSign]['SIGN'].charCodeAt(0));
-		}
-		
 		$('#richTextContainer').empty();
 		
 		for (var iLine in model)
 		{
-			this.addTextLine(iLine, model[iLine]['LINE']);
+			this.addTextLine(iLine, model[iLine]['lineName']);
 			
-//			for (var iAlternative in model[iLine]['SIGNS'])
-//			{
-			for (var iSign in model[iLine]['SIGNS'])
+			for (var iSign in model[iLine]['signs'])
 			{
 				this.addSign
 				(

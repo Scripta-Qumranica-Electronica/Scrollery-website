@@ -1,29 +1,26 @@
-#! /usr/bin/perl -w
-# c:\xampp\perl\bin\perl.exe -w
+#! C:\Strawberry\perl\bin\perl.exe
+# /usr/bin/perl
 
+$| = 1;
 
 use strict;
 use warnings;
 
-use CGI;
-use CGI::Carp qw(fatalsToBrowser);
-
-use LWP::Simple;
-
-use JSON;
-use Data::Dumper;
 use feature qw(say);
-use Encode;
+use Data::Dumper;
 
-use DBI;
 use lib qw(/home/perl_libs);
-use SQE_database_new; # former: require '/etc/access.pm';  Must switch to new class SQE_DBI
+use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
+use SQE_CGI;
+use SQE_DBI;
+use SQE_API::Queries;
 
 
 # global variables
 
 my $DBH; # database handler
 my $CGI; # web (common gateway interface)
+my $ERROR; # error handler from SQE_CGI
 
 
 # helper functions
@@ -141,85 +138,19 @@ sub lastInsertedId()
 	);
 }
 
-sub userId($)
-{
-	my $user_name = shift;
-	
-	my $user_id = queryResult
-	(
-		'SELECT user_id FROM user '
-		.'WHERE user_name = "'.$user_name.'"'
-	);
-	
-	return $user_id;
-}
-
 
 # functions related to client requests
 
-sub login()
+sub login
 {
-	my $user_name = $CGI->param('user');
-	my $pw        = $CGI->param('password');
+	my $session_id = $CGI->session_id;
+	my $user_id = $DBH->user_id;
 	
-	my $user_id = userId($user_name);
-	if (!defined $user_id) # couldn't find user for this name
-	{
-		print 0;
-		
-		return;
-	}
-	
-	my $actual_pw_sha2 = queryResult
-	(
-		'SELECT pw FROM user'
-		.' WHERE user_name = "'.$user_name.'"'
-	);
-	my $entered_pw_sha2 = queryResult
-	(
-		'SELECT sha2("'.$pw.'", 224)'
-	);
-	
-	# compare provided & actual password
-	if ($actual_pw_sha2 eq $entered_pw_sha2)
-	{
-		# end previous session
-		query
-		(
-			'UPDATE user_sessions'
-			.' SET session_end = NOW(), current = false'
-			.' WHERE user_id = '.$user_id.' AND current = true'
-		);
-		
-		# start new session
-		query
-		(
-			'INSERT INTO user_sessions (user_id, session_start, current)'
-			.' VALUES ('.$user_id.', NOW(), true)'
-		);
-		my $session_id = lastInsertedId();
-		
-		# create & save random session key (makes guessing sessions difficult)
-		my $session_key = queryResult
-		(
-			'SELECT sha2(concat('.$user_id.', now()), 224)'
-		);
-		query
-		(
-			'UPDATE user_sessions'
-			.' SET session_key = "'.$session_key.'"'
-			.' WHERE session_id = '.$session_id 
-		);
-		
-		print "{\"key\": \"" . $session_key . "\", \"user_id\": \"" . $user_id . "\"}";
-	}
-	else
-	{
-		print 0;
-	}
+#	$CGI->print('"USER_ID":'.$user_id.'}');
+	$CGI->print('{"SESSION_ID":"'.$session_id.'", "USER_ID":'.$user_id.'}');
 }
 
-sub logout()
+sub logout
 {
 	my $user_name = $CGI->param('user');
 	my $user_id = userId($user_name);
@@ -531,6 +462,140 @@ sub load() # TODO combine queries where possible, for better performance
 	print $json_string;
 }
 
+sub load_fragment_text
+{
+	my $fragment_id = $CGI->param('fragmentId');
+	
+	my $line_ids_query = $DBH->prepare_sqe # TODO sort order
+	(
+		'SELECT line_id FROM col_to_line'
+		.' WHERE col_id = ?'
+	);
+	$line_ids_query->execute($fragment_id);
+	
+	my $line_name_query = $DBH->prepare_sqe
+	(
+		'SELECT name FROM line_data'
+		.' WHERE line_id = ?'
+	);
+	
+#	my $get_start_query = $DBH->prepare_sqe(SQE_API::Queries::GET_LINE_BREAK);
+	my $get_start_query = $DBH->prepare_sqe(SQE_API::Queries::GET_FRAGMENT_BREAK);
+
+	my $sign_stream = $DBH->create_sign_stream_for_fragment_id($fragment_id);
+#	$CGI->print('$sign_stream'.Dumper($sign_stream));
+	$get_start_query->execute($fragment_id, 'COLUMN_START');
+	my $start_sign_id = ($get_start_query->fetchrow_array)[0];
+	$sign_stream->set_start_id($start_sign_id);
+	
+	my $line_end = 1;
+	
+	my $line_id = ($line_ids_query->fetchrow_array)[0];
+	$line_name_query->execute($line_id);
+	my $line_name = ($line_name_query->fetchrow_array)[0];
+	my $json_string = '[{"lineName":'.$line_name.',"signs":[';
+	
+	my $first_sign_of_line = 1;
+	
+	my $next_sign;
+	my @current_sign;
+#	$CGI->print('doh');
+	while ($next_sign = $sign_stream->next_sign)
+	{
+		@current_sign = @{ $next_sign };
+		
+#		$CGI->print('dah');
+#		$CGI->print('@current_sign '.Dumper(@current_sign).'; ');
+		
+		if ($current_sign[3] == 9) # line end / line start (might be column end / scroll end also, but not relevant here) 
+		{
+			if ($line_end)
+			{
+				$json_string .= ']}';
+			}
+			else
+			{
+				$line_id = ($line_ids_query->fetchrow_array)[0];
+				$line_name_query->execute($line_id);
+				$line_name = ($line_name_query->fetchrow_array)[0];
+				$json_string .= ',{"lineName":"'.$line_name.'","signs":[';
+				
+				$first_sign_of_line = 1;
+			}
+			
+			$line_end = !$line_end;
+			
+			next;
+		}
+		
+		if (!$first_sign_of_line)
+		{
+			$json_string .= ',';
+		}
+		$first_sign_of_line = 0;
+		
+		if ($current_sign[3] == 1) # letter
+		{
+			$json_string .= '{"sign":"'.$current_sign[2].'"';
+		}
+		else
+		{
+			$json_string .= '{"type":"'.$current_sign[3].'"';
+		}
+		
+		if ($current_sign[5] != 1)
+		{
+			$json_string .= ',"width":"'.$current_sign[5].'"';
+		}
+		if ($current_sign[6] == 1)
+		{
+			$json_string .= ',"mightBeWider":1';
+		}
+		if (!($current_sign[7] eq 'COMPLETE'))
+		{
+			$json_string .= ',"readability":"'.$current_sign[7].'"';
+		}
+		if ($current_sign[8] == 1)
+		{
+			$json_string .= ',"retraced":1';
+		}
+		if ($current_sign[9] == 1)
+		{
+			$json_string .= ',"reconstructed":1';
+		}
+		if (!($current_sign[10] eq ''))
+		{
+			$json_string .= ',"corrected":"'.$current_sign[10].'"';
+		}
+		if ($current_sign[11] != 0)
+		{
+			$json_string .= ',"is_variant":1';
+		}
+		
+		$json_string .= '}';
+	}
+	
+	$line_ids_query->finish;
+	$line_name_query->finish;
+	$get_start_query->finish;
+	
+	$json_string .= ']';
+	$CGI->print($json_string);
+}
+
+sub save
+{
+	# DBI add value
+	# relevant tables:
+	# 
+	
+	
+	
+	
+	
+	
+}
+
 sub potentially_save_new_variant()
 {
 	my %new_variant = %{ decode_json($CGI->param('variant')) };
@@ -819,28 +884,6 @@ sub save_single_sign_change()
 	# form_of_writing_id = 0
 	# editorial_flag = null
 	# commentary = null (later: no sign_comment entry)
-}
-
-sub saveMarkup()
-{
-	my $markup = $CGI->param('markup');
-	my $user_name = $CGI->param('user');
-	
-	my $user_id = userId($user_name);
-	if (!defined $user_id)
-	{
-		print 0;
-	}
-	else
-	{
-		query
-		(
-			'INSERT INTO user_contributions (user_id, contribution, entry_time) '
-			.'VALUES ('.$user_id.',"'.$markup.'", now())'
-		);
-		
-		print 1;
-	}
 }
 
 sub saveToStream($$)
@@ -1311,169 +1354,25 @@ sub saveComment()
 	);
 }
 
-sub getAllContributions()
-{
-	my $user_name = $CGI->param('user');
-	my ($actual_pw, $user_id) = queryAll
-	(
-		'SELECT pw, user_id FROM user '
-		.'WHERE user_name = "'.$user_name.'"'
-	);
-	
-	my @contributions = queryAll
-	(
-		'SELECT contribution_id, entry_time, contribution FROM user_contributions '
-		.'WHERE user_id = '.$user_id
-	);
-	
-	my $json_string = '[';
-	for (my $i = 0; $i < scalar @contributions - 2; $i += 3)
-	{
-		if ($i > 0)
-		{
-			$json_string .= ', ';
-		}
-		
-		$json_string .=
-		'["'
-		.$contributions[$i]
-		.'","'
-		.$contributions[$i + 1]
-		.'","'
-		.$contributions[$i + 2]
-		.'"]';
-	}
-	$json_string .= ']';
-	
-	print $json_string;
-}
 
-sub deleteContribution()
-{
-	my $contribution_id = $CGI->param('contributionId');
-	
-	query
-	(
-		'DELETE FROM user_contributions '
-		.'WHERE contribution_id = '.$contribution_id
-	);
-}
+# MAIN
 
-sub getAllResults()
+($CGI, $ERROR) = SQE_CGI->new; # includes processing of session id / (user name + pw)
+if (!defined $CGI)
 {
-	my $user_name = $CGI->param('user');
-	my $user_id   = userId($user_name);
-	
-	my %id2SignType =
-	(
-		1 => 'letter',
-		2 => 'space',
-		3 => 'possibleVacat',
-		4 => 'vacat',
-		5 => 'damage',
-		6 => 'blankLine',
-		7 => 'paragraphMarker',
-		8 => 'lacuna'
-	);
-	my %enum2position =
-	(
-		'ABOVE_LINE'	=> 'aboveLine',
-		'BELOW_LINE'	=> 'belowLine',
-		'LEFT_MARGIN'	=> 'leftMargin',
-		'RIGHT_MARGIN'	=> 'rightMargin'
-	);
-	my %enum2correction =
-	(
-		'OVERWRITTEN'			=> 'overwritten',
-		'HORIZONTAL_LINE'		=> 'horizontalLine',
-		'DIAGONAL_LEFT_LINE'	=> 'diagonalLeftLine',
-		'DIAGONAL_RIGHT_LINE'	=> 'diagonalRightLine',
-		'DOT_BELOW'				=> 'dotBelow',
-		'DOT_ABOVE'				=> 'dotAbove',
-		'LINE_BELOW'			=> 'lineBelow',
-		'LINE_ABOVE'			=> 'lineAbove',
-		'BOXED'					=> 'boxed',
-		'ERASED'				=> 'erased'
-	);
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	my %user_signs = queryAllRows # get all signs of this user
-	(
-		'SELECT * FROM sign '
-		.'INNER JOIN sign_owner ON sign.user_id = sign_owner.owner_id '
-		.'WHERE sign.user_id ='.$user_id
-	);
-	
-	my @row;
-	
-	my %sign; # probably not needed, save directly into json?
-	my @line; # same here
-	
-	my $json_string = '[';
-	
-	for (my $i = 0; $i < scalar %user_signs; $i++)
-	{
-		@row = @{$user_signs{$i}};
-		
-		%sign = {};
-		
-		if ($row[ 3] == 9
-		&&  $row[15] == 'LINE_START')
-		{
-			# save line
-			# 
-		}
-		
-		# TODO line, fragment, manuscript
-		# TODO use 'virtual scroll' tables
-		
-		# TODO extract if not default
-		# date_of_adding
-		# sign
-		# type
-		# width, might be wider
-		# vocalization
-		# readability & areas
-		# is reconstructed
-		# is retraced
-		# form of writing (?)
-		# editorial flag
-		# commentary
-		# break type (indirectly)
-		# link to alternative signs?
-		# corrections
-		# relative position
-		# owners 
-		
-		
-	}
-	
-	$json_string .= ']';
-	say '$json_string '.$json_string;
-}
-
-# fetch request
-$CGI = CGI->new;
-my $request = $CGI->param('request');
-if (!defined $request)
-{
-	say 'Undefined request (running from command line?)';
-	$DBH = SQE_database::get_dbh;
-	getAllComments();
+	print('{"error":"'.@{$ERROR}[1].'"}');
 	exit;
 }
-print $CGI->header('text/plain; charset=utf-8'); # support for Hebrew etc. characters
+
+$DBH = $CGI->dbh;
 
 
-# connect to database
-$DBH = SQE_database::get_dbh;
+my $request = $CGI->param('request');
+#print $CGI->header('text/plain; charset=utf-8'); # support for Hebrew etc. characters
+print $CGI->header(
+    		-type    => 'application/json',
+    		-charset =>  'utf-8',
+			);
 
 if ($request eq 'login')
 {
@@ -1491,6 +1390,10 @@ elsif ($request eq 'load')
 {
 	load;
 }
+elsif ($request eq 'loadFragmentText')
+{
+	load_fragment_text;
+}
 elsif ($request eq 'potentiallySaveNewVariant')
 {
 	potentially_save_new_variant;
@@ -1498,10 +1401,6 @@ elsif ($request eq 'potentiallySaveNewVariant')
 elsif ($request eq 'saveSingleSignChange')
 {
 	save_single_sign_change;
-}
-elsif ($request eq 'saveMarkup')
-{
-	saveMarkup;
 }
 elsif ($request eq 'saveSigns')
 {
@@ -1515,17 +1414,3 @@ elsif ($request eq 'saveComment')
 {
 	saveComment;
 }
-elsif ($request eq 'getAllContributions')
-{
-	getAllContributions;
-}
-elsif ($request eq 'deleteContribution')
-{
-	deleteContribution;
-}
-elsif ($request eq 'getAllResults')
-{
-	getAllResults;
-}
-
-$DBH->disconnect();

@@ -32,17 +32,19 @@ function load_fragment_text(selected_frag)
     data_form = new FormData();
     data_form.append('transaction', 'getScrollColNameFromDiscCanRef');
     data_form.append('frag_id', selected_frag);
+//	const data_form =
+//	{
+//		'transaction': 'getScrollColNameFromDiscCanRef',
+//		'frag_id': selected_frag
+//	};
 
-    
     get_database_data(data_form, function(results){
         results['results'].forEach(function(result) {
-            Spider.requestTextFromAPI // TODO use actual variables, use session instead of user & pw
+            Spider.requestFromServer
             (
                 {
-                    'user': 'sqe_api',
-                    'pw': '512JE8ehM3UW',
-                    'scroll': result.scroll,
-                    'fragment': result.col
+                	'request': 'loadFragmentText',
+                    'fragmentId': selected_frag // result.col
                 },
                 function(data)
                 {
@@ -51,7 +53,14 @@ function load_fragment_text(selected_frag)
                         return;
                     }
                     
+                    console.log('data');
+                    console.log(data);
+                    
                     Spider.notifyChangedText(data);
+                },
+                function()
+                {
+                	console.log('loadFragmentText() went wrong');
                 }
             );
         });
@@ -119,9 +128,17 @@ function populate_combinations(user) {
                         trans_data = {'transaction' : 'getFragsOfCol', 'colID' : column, 'user' : user, 'version': version};
                         current_lvl = 2;
                     }
+                    trans_data['SESSION_ID'] = Spider['session_id'];
+//                    console.log('trans_data (populate combinations)');
+//                    for (var td in trans_data)
+//                    {
+//                    	console.log('* ' + td + ': ' + trans_data[td]);
+//                    }
 		            return trans_data;
 		 	    },
                 'dataFilter' : function(data) {
+                	console.log('response data');
+                	console.log(data);
                     var entries = JSON.parse(data);
                     var menu_list = [];
                     for (var i = 0; i < entries['results'].length; i++){
@@ -195,9 +212,17 @@ function populate_fragments() {
                         }
                         current_lvl = 2;
                     }
+                    trans_data['SESSION_ID'] = Spider['session_id'];
+//                    console.log('trans_data (populate fragments)');
+//                    for (var td in trans_data)
+//                    {
+//                    	console.log('* ' + td + ': ' + trans_data[td]);
+//                    }
 		            return trans_data;
 		 	    },
                 'dataFilter' : function(data) {
+                	console.log('response data');
+                	console.log(data);
                     var entries = JSON.parse(data);
                     var menu_list = [];
                     for (var i = 0; i < entries['results'].length; i++){
@@ -224,7 +249,7 @@ function populate_fragments() {
 // function load_text(scroll, fragment){
 //     var data_form = new FormData();
 //     data_form.append('USER_NAME', 'sqe_api');
-//     data_form.append('PASSWORD', '512JE8ehM3UW');
+//     data_form.append('PASSWORD', ''); // PW removed for security
 //     data_form.append('SCROLL', scroll);
 //     data_form.append('FRAGMENT', fragment.replace("+", "\\+"));
 //     data_form.append('FORMAT', 'QWB_HTML');
@@ -245,6 +270,8 @@ function populate_fragments() {
 // }
 
 function get_database_data(data_form, callback) {
+	data_form.append('SESSION_ID', Spider['session_id']);
+//	data_form['SESSION_ID'] = Spider['session_id'];
     jQuery.ajax({
         url: 'resources/cgi-bin/GetImageData.pl',
         data: data_form,

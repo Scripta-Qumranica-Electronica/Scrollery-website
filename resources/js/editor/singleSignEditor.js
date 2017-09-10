@@ -131,12 +131,16 @@ function SingleSignEditor(richTextEditor)
 		$('#signAndAlternatives')
 		.empty(); // reset displayed main sign & variants
 		
-		for (var iSign in model[iLine]['signs'][iAlternative])
+		console.log("model");
+		console.log(model);
+		for (var iSign in model[iLine])
 		{
-			const signData = model[iLine]['signs'][iAlternative][iSign];
+			const signData = model[iLine][iSign];
 			
-			if (signData['sign'] == null)
+			if (signData['SIGN'] == null)
 			{
+				console.log("signData['SIGN'] == null");
+				
 				continue;
 			}
 			
@@ -157,7 +161,7 @@ function SingleSignEditor(richTextEditor)
 			})
 			.appendTo(signsDiv);
 			
-			if (signData['signType'] == null) // letter
+			if (signData['SIGN_TYPE'] == null) // letter
 			{
 				signElement.text(signData['sign']);
 			}
@@ -173,7 +177,7 @@ function SingleSignEditor(richTextEditor)
 				{
 					signElement
 					.text(signPresentation)
-					.attr('title', signData['signType']);
+					.attr('title', signData['SIGN_TYPE']);
 				}
 			}
 			
@@ -273,9 +277,9 @@ function SingleSignEditor(richTextEditor)
 				.appendTo(attributeChoiceContainer);
 				
 				var width = '';
-				if (signData['width'] != null)
+				if (signData['WIDTH'] != null)
 				{
-					width = signData['width'];
+					width = signData['WIDTH'];
 				}
 				
 				const widthInput =
@@ -389,7 +393,7 @@ function SingleSignEditor(richTextEditor)
 				})
 				.appendTo(potentialAttributesDiv);
 				
-				if (signData[pa[3]] == pa[4]) // according to JSON attribute is set
+				if (signData[pa[3]] == pa[4]) // according to JSON attribute is set // TODO
 				{
 					Spider
 					.richTextEditor

@@ -1,11 +1,3 @@
-/** TODO
- * enforce https via forward
- * 
- * on error show error message
- * on login forward to actual page, with session id
- * 
- */ 
-
 $(document).ready(function()
 {
 	$('#notification')
@@ -15,20 +7,19 @@ $(document).ready(function()
 	(
 		function()
 		{
-			$.post
+			Spider.requestFromServer
 			(
-				'resources/cgi-bin/server.pl', // connection to perl works only if same server ('same origin')
 				{
-					'request':	'login',
-					'user':		$('#userNameInput').val(),
-					'password': $('#passwordInput').val()
-				}
-			)
-			.done
-			(
-				function(response)
+					'request':		'login',
+					'USER_NAME':	$('#userNameInput').val(),
+					'PASSWORD':		$('#passwordInput').val(),
+					'SCROLLVERSION': 1
+				},
+				function(response) // on success
 				{
-					if (response == 0 || response == null)
+					if (response == 0
+					||  response == null
+					) //||  response.responseText.indexOf('Software error:') != -1)
 					{
 						$('#notification')
 						.text('Invalid user and / or password.')
@@ -36,9 +27,9 @@ $(document).ready(function()
 					}
 					else
 					{
-						parsed_response = JSON.parse(response);
-						Spider.session_id = parsed_response.key;
-						Spider.user_id = parsed_response.user_id;
+//						response = JSON.parse(response);
+						Spider.session_id = response['SESSION_ID'];
+						Spider.user_id = response['USER_ID'];
 						Spider.user = $('#userNameInput').val();
 						$('#login').css('visibility', 'hidden');
 						$('#login').css('height', '0');
@@ -54,17 +45,12 @@ $(document).ready(function()
 						Spider.addRichTextEditor();
 						//window.location = 'index.html?session=' + response + '&user=' + $('#userNameInput').val();
 					}
-				}
-			)
-			.fail
-			(
-				function(response)
+				},
+				function(response) // on failure
 				{
 					$('#notification')
 					.text('Could not connect to server.')
 					.show();
-					
-					console.log(response);
 				}
 			);
 		}
