@@ -41,3 +41,8 @@
 #gui {
   overflow-y: auto;
 }
+
+.menu {
+  color: white;
+  padding-right: 5px;
+}
