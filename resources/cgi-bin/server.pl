@@ -17,18 +17,12 @@ use SQE_DBI;
 use SQE_API::Queries;
 
 
-# global variables
-
-my $DBH; # database handler
-my $CGI; # web (common gateway interface)
-my $ERROR; # error handler from SQE_CGI
-
-
 # helper functions
 
-sub query($)
+sub query
 {
 	my $sql_command = shift;
+	my $DBH = shift;
 	# if (index($sql_command, 'user_sessions') == -1)
 	# {
 	# 	say '$sql_command '.$sql_command;	
@@ -39,9 +33,10 @@ sub query($)
 	$query->finish();
 }
 
-sub queryResult($)
+sub queryResult
 {
 	my $sql_command = shift;
+	my $DBH = shift;
 	
 	# say '$sql_command '.$sql_command;
 	
@@ -92,9 +87,10 @@ sub queryAllPrepared
 	return @returnValue;
 }
 
-sub queryAll($)
+sub queryAll
 {
 	my $sql_command = shift;
+	my $DBH = shift;
 	
 	my $query = $DBH->prepare($sql_command);
 	$query->execute();
@@ -110,9 +106,10 @@ sub queryAll($)
 	return @allResults;
 }
 
-sub queryAllRows($)
+sub queryAllRows
 {
 	my $sql_command = shift;
+	my $DBH = shift;
 	
 	my $query = $DBH->prepare($sql_command);
 	$query->execute();
@@ -144,6 +141,9 @@ sub lastInsertedId()
 
 sub login
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my $session_id = $CGI->session_id;
 	my $user_id = $DBH->user_id;
 	
@@ -153,6 +153,9 @@ sub login
 
 sub logout
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my $user_name = $CGI->param('user');
 	my $user_id = userId($user_name);
 	
@@ -163,28 +166,35 @@ sub logout
 		.'SET session_end = NOW()'
 		.', current = false '
 		.'WHERE user_id='.$user_id
-		.' AND current = true'
+		.' AND current = true',
+		$DBH
 	);
 		
 	print 1;
 }
 
-sub getManifest()
+sub getManifest
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my $url = $CGI->param('url');
 	my $sou = get($url) or die "cannot retrieve code\n";
 	
 	print $sou;
 }
 
-sub load() # TODO combine queries where possible, for better performance
+sub load # TODO combine queries where possible, for better performance
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my $disc_can_ref_id = $CGI->param('disc_can_ref_id'); # could be a fragment also
 	
 	my %id2SignType;
 	my @sign_types = queryAll
 	(
-		'SELECT sign_type_id, type FROM sign_type'
+		'SELECT sign_type_id, type FROM sign_type', $DBH
 	);
 	for (my $i = 0; $i < scalar @sign_types; $i += 2)
 	{
@@ -212,7 +222,8 @@ sub load() # TODO combine queries where possible, for better performance
 		.' ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id'
 		
 		.' WHERE FIND_IN_SET("COLUMN_START", sign.break_type) > 0'
-		.' AND discrete_canonical_references.discrete_canonical_reference_id ='.$disc_can_ref_id
+		.' AND discrete_canonical_references.discrete_canonical_reference_id ='.$disc_can_ref_id, 
+		$DBH
 	);
 	if (!defined $column_start_sign_id)
 	{
@@ -298,14 +309,16 @@ sub load() # TODO combine queries where possible, for better performance
 		$next_sign_id = queryResultPrepared
 		(
 			$get_next_sign_id_query,
-			$next_sign_id
+			$next_sign_id,
+			$DBH
 		);
 
 		# get main sign from position stream
 		my @main_sign = queryAllPrepared
 		(
 			$get_main_sign_query,
-			$next_sign_id
+			$next_sign_id,
+			$DBH
 		);
 		if (defined $main_sign[17]
 		&&  $main_sign[17] > 0) # column end # TODO expects column end as main sign
@@ -465,6 +478,9 @@ sub load() # TODO combine queries where possible, for better performance
 
 sub load_fragment_text
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my $fragment_id = $CGI->param('fragmentId');
 	
 	my $line_ids_query = $DBH->prepare_sqe # TODO sort order
@@ -597,8 +613,11 @@ sub save
 	
 }
 
-sub potentially_save_new_variant()
+sub potentially_save_new_variant
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my %new_variant = %{ decode_json($CGI->param('variant')) };
 	
 	# set dummy values for stringification
@@ -658,7 +677,8 @@ sub potentially_save_new_variant()
 		(
 			'SELECT type'
 			.' FROM sign_relative_position'
-			.' WHERE sign_relative_position_id = '.$existingSigns[$i_sign * 17]
+			.' WHERE sign_relative_position_id = '.$existingSigns[$i_sign * 17],
+			$DBH
 		);
 		
 		my $sign_string = ''
@@ -711,7 +731,8 @@ sub potentially_save_new_variant()
 	$sql_query = substr($sql_query, 0, (length $sql_query) - 1); # remove final ,
 	query
 	(
-		$sql_query
+		$sql_query, 
+		$DBH
 	);
 	
 	my $sign_id = lastInsertedId();
@@ -726,7 +747,8 @@ sub potentially_save_new_variant()
 	(
 		'INSERT INTO sign_owner'
 		.' SET sign_id = '.$sign_id
-		.' , user_id = '.$user_id
+		.' , user_id = '.$user_id,
+		$DBH
 	);
 	
 	# table sign_relative_position
@@ -736,7 +758,8 @@ sub potentially_save_new_variant()
 		(
 			'INSERT INTO sign_relative_position'
 			.' SET sign_relative_position_id = '.$sign_id
-			.' , type = '.$new_variant{'position'}
+			.' , type = '.$new_variant{'position'},
+			$DBH
 		);
 	}
 	
@@ -745,12 +768,16 @@ sub potentially_save_new_variant()
 	(
 		'INSERT INTO is_variant_sign_of'
 		.' SET main_sign_id = '.$new_variant{'mainSignId'}
-		.' , sign_id = '.$sign_id
+		.' , sign_id = '.$sign_id,
+		$DBH
 	);
 }
 
-sub save_single_sign_change()
+sub save_single_sign_change
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my $user_id = userId $CGI->param('user'); # TODO replace by session check
 	if (!defined $user_id)
 	{
@@ -785,7 +812,8 @@ sub save_single_sign_change()
 		'SELECT *'
 		.' FROM sign'
 		.' WHERE sign_id IN'
-		.' ('.$idsString.')'
+		.' ('.$idsString.')',
+		$DBH
 	);
 	
 	# say Dumper @signs_in_db;
@@ -887,14 +915,18 @@ sub save_single_sign_change()
 	# commentary = null (later: no sign_comment entry)
 }
 
-sub saveToStream($$)
+sub saveToStream
 {
 	my ($sign_id, $previous_pos_in_stream_id) = (shift, shift);
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	
 	query
 	(
 		'INSERT INTO position_in_stream '
-		.'SET sign_id = '.$sign_id
+		.'SET sign_id = '.$sign_id,
+		$DBH
 	);
 	my $current_pos_in_stream_id = lastInsertedId();
 	
@@ -904,30 +936,36 @@ sub saveToStream($$)
 		(
 			'INSERT INTO next_position_in_stream '
 			.'SET position_in_stream_id = '.$previous_pos_in_stream_id
-			.', next_position_in_stream_id = '.$current_pos_in_stream_id
+			.', next_position_in_stream_id = '.$current_pos_in_stream_id,
+			$DBH
 		);
 	}
 	
 	return $current_pos_in_stream_id;
 }
 
-sub saveBreak($$$)
+sub saveBreak
 {
 	my ($break_type, $user_id, $previous_position_id) = (shift, shift, shift);
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	
 	query
 	(
 		'INSERT INTO sign '
 		.'SET sign = "|"'
 		.', sign_type_id = 9'
-		.', break_type = "'.$break_type.'"'
+		.', break_type = "'.$break_type.'"',
+		$DBH
 	);
 	my $sign_id = lastInsertedId();
 		
 	query
 	(
 		'INSERT INTO sign_owner '
-		.'VALUES ('.$sign_id.', '.$user_id.', now())'
+		.'VALUES ('.$sign_id.', '.$user_id.', now())',
+		$DBH
 	);
 	
 	my $current_pos_in_stream_id = saveToStream
@@ -939,8 +977,11 @@ sub saveBreak($$$)
 	return ($sign_id, $current_pos_in_stream_id);
 }
 
-sub saveSigns()
+sub saveSigns
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my $user_name = $CGI->param('user');
 	my $user_id = userId($user_name);
 	if (!defined $user_id)
@@ -1092,7 +1133,8 @@ sub saveSigns()
 					(
 						'SELECT scroll_id FROM scroll WHERE name = "'
 						.$a
-						.'"'
+						.'"',
+						$DBH
 					);
 					# if null, connection to scroll will be ignored
 					 
@@ -1184,7 +1226,8 @@ sub saveSigns()
 					.$sign_id
 					.','
 					.$user_id
-					.',now())'
+					.',now())',
+					$DBH
 				);
 				
 				# save position
@@ -1203,7 +1246,8 @@ sub saveSigns()
 								.', type = \''
 								.$value
 								.'\', level = '
-								.$position_level
+								.$position_level,
+								$DBH
 							);
 							
 							$position_level++;
@@ -1223,7 +1267,8 @@ sub saveSigns()
 								'INSERT INTO sign_correction (sign_id, correction) VALUES ('
 								.$sign_id
 								.', \''
-								.$value.'\')'
+								.$value.'\')',
+								$DBH
 							); 
 						}
 					}
@@ -1238,7 +1283,8 @@ sub saveSigns()
 						.$main_sign_id
 						.','
 						.$sign_id
-						.',1)'
+						.',1)',
+						$DBH
 					);
 					
 					# no direct link to sign stream, but indirectly via is_variant_sign_of
@@ -1262,7 +1308,8 @@ sub saveSigns()
 					(
 						'UPDATE sign'
 						.' SET commentary = "'.$a.'"'
-						.' WHERE sign_id = '.$sign_id
+						.' WHERE sign_id = '.$sign_id,
+						$DBH
 					);
 				}
 				
@@ -1272,14 +1319,16 @@ sub saveSigns()
 					query
 					(
 						'INSERT real_area'
-						.' SET scroll_id = '.$scroll_id
+						.' SET scroll_id = '.$scroll_id,
+						$DBH
 					);
 					
 					query
 					(
 						'UPDATE sign'
 						.' SET real_areas_id = '.lastInsertedId()
-						.' WHERE sign_id = '.$sign_id
+						.' WHERE sign_id = '.$sign_id,
+						$DBH
 					);
 				}
 				
@@ -1296,11 +1345,15 @@ sub saveSigns()
 	# TODO break for scroll end, if fitting
 }
 
-sub getAllComments()
+sub getAllComments
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my @comments = queryAll
 	(
-		'SELECT user_id, comment_text, entry_time FROM user_comment'
+		'SELECT user_id, comment_text, entry_time FROM user_comment',
+		$DBH
 	);
 	
 	my $json_string = '[';
@@ -1315,7 +1368,8 @@ sub getAllComments()
 		$json_string .= queryResult
 		(
 			'SELECT user_name FROM user '
-			.'WHERE user_id = "'.$comments[$i].'"'
+			.'WHERE user_id = "'.$comments[$i].'"',
+			$DBH
 		);
 		$json_string .= '", ';
 		
@@ -1334,8 +1388,11 @@ sub getAllComments()
 	print $json_string;
 }
 
-sub saveComment()
+sub saveComment
 {
+	my $DBH = shift;
+	my $CGI = shift;
+	my $ERROR= shift;
 	my $user_name = $CGI->param('user'   );	
 	my $comment   = $CGI->param('comment');
 	
@@ -1343,7 +1400,8 @@ sub saveComment()
 	my $user_id = queryResult
 	(
 		'SELECT user_id FROM user '
-		.'WHERE user_name = "'.$user_name.'"'
+		.'WHERE user_name = "'.$user_name.'"',
+		$DBH
 	);
 	say '$user_id '."$user_id";
 	
@@ -1351,67 +1409,78 @@ sub saveComment()
 	query
 	(
 		'INSERT INTO user_comment (user_id, comment_text, entry_time) '
-		.'VALUES '.'('.$user_id.', '.'"'.$comment.'", '.'NOW())'
+		.'VALUES '.'('.$user_id.', '.'"'.$comment.'", '.'NOW())',
+		$DBH
 	);
 }
 
 
 # MAIN
 
-($CGI, $ERROR) = SQE_CGI->new; # includes processing of session id / (user name + pw)
-if (!defined $CGI)
-{
-	print('{"error":"'.@{$ERROR}[1].'"}');
-	exit;
+sub main {
+	# global variables
+
+	my $DBH; # database handler
+	my $CGI; # web (common gateway interface)
+	my $ERROR; # error handler from SQE_CGI
+
+	($CGI, $ERROR) = SQE_CGI->new; # includes processing of session id / (user name + pw)
+	if (!defined $CGI)
+	{
+		print('{"error":"'.@{$ERROR}[1].'"}');
+		exit;
+	}
+
+	$DBH = $CGI->dbh;
+
+
+	my $request = $CGI->param('request');
+	#print $CGI->header('text/plain; charset=utf-8'); # support for Hebrew etc. characters
+	print $CGI->header(
+				-type    => 'application/json',
+				-charset =>  'utf-8',
+				);
+
+	if ($request eq 'login')
+	{
+		login($DBH, $CGI, $ERROR);
+	}
+	elsif ($request eq 'logout')
+	{
+		logout($DBH, $CGI, $ERROR);
+	}
+	elsif ($request eq 'getManifest')
+	{
+		getManifest($DBH, $CGI, $ERROR);
+	}
+	elsif ($request eq 'load')
+	{
+		load($DBH, $CGI, $ERROR);
+	}
+	elsif ($request eq 'loadFragmentText')
+	{
+		load_fragment_text($DBH, $CGI, $ERROR);
+	}
+	elsif ($request eq 'potentiallySaveNewVariant')
+	{
+		potentially_save_new_variant($DBH, $CGI, $ERROR);
+	}
+	elsif ($request eq 'saveSingleSignChange')
+	{
+		save_single_sign_change($DBH, $CGI, $ERROR);
+	}
+	elsif ($request eq 'saveSigns')
+	{
+		saveSigns($DBH, $CGI, $ERROR);
+	}
+	elsif ($request eq 'getAllComments')
+	{
+		getAllComments($DBH, $CGI, $ERROR);
+	}
+	elsif ($request eq 'saveComment')
+	{
+		saveComment($DBH, $CGI, $ERROR);
+	}
 }
 
-$DBH = $CGI->dbh;
-
-
-my $request = $CGI->param('request');
-#print $CGI->header('text/plain; charset=utf-8'); # support for Hebrew etc. characters
-print $CGI->header(
-    		-type    => 'application/json',
-    		-charset =>  'utf-8',
-			);
-
-if ($request eq 'login')
-{
-	login;
-}
-elsif ($request eq 'logout')
-{
-	logout;
-}
-elsif ($request eq 'getManifest')
-{
-	getManifest;
-}
-elsif ($request eq 'load')
-{
-	load;
-}
-elsif ($request eq 'loadFragmentText')
-{
-	load_fragment_text;
-}
-elsif ($request eq 'potentiallySaveNewVariant')
-{
-	potentially_save_new_variant;
-}
-elsif ($request eq 'saveSingleSignChange')
-{
-	save_single_sign_change;
-}
-elsif ($request eq 'saveSigns')
-{
-	saveSigns;
-}
-elsif ($request eq 'getAllComments')
-{
-	getAllComments;
-}
-elsif ($request eq 'saveComment')
-{
-	saveComment;
-}
+main();
