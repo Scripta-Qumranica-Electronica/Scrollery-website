@@ -1,9 +1,6 @@
 #! /usr/bin/perl
 # C:\Strawberry\perl\bin\perl.exe
 
-
-$| = 1;
-
 use strict;
 use warnings;
 
@@ -1418,6 +1415,8 @@ sub saveComment
 # MAIN
 
 sub main {
+	$| = 1;
+	
 	# global variables
 
 	my $DBH; # database handler
