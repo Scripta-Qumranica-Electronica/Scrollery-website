@@ -317,9 +317,9 @@ sub getScrollArtefacts {
 	my $dbh = shift;
 	my $cgi = shift;
 	my $scroll_id = $cgi->param('scroll_id');
-	my $sql = $dbh->prepare('CALL getScrollArtefacts(?)') 
+	my $sql = $dbh->prepare('CALL getScrollArtefacts(?, ?)') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute($scroll_id);
+	$sql->execute($scroll_id, 0);
 	readResults($sql);
 	return;
 }
