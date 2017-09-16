@@ -14,15 +14,14 @@ function login(){
     $("#login-title").html("Logged in as: " + Spider.user);
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
-    $("#combinations").css("visibility", "visible");$("#main-menu").on("click", ".clone_combination", function(){
-        console.log($(this).prev().data("id"));
-        get_database_data({'transaction' : 'copyCombination', 'user_id' : Spider.user_id, 'password' : Spider.password, 'version' : 1, 'scrollID' : $(this).prev().data("id")}, function(result){
-            console.log('record written for scroll ID');
-        });
-    });
+    $("#combinations").css("visibility", "visible");
     $("#main-menu").on("click", ".clone_combination", function(){
         console.log($(this).prev().data("id"));
-        get_database_data({'transaction' : 'copyCombination', 'user_id' : Spider.user_id, 'password' : Spider.password, 'version' : 1, 'scrollID' : $(this).prev().data("id")}, function(result){
+        data_form = new FormData();
+        data_form.append('transaction', 'copyCombination');
+        data_form.append('SESSION_ID', Spider.session_id);
+        data_form.append('scroll_id', $(this).prev().data("id"));
+        get_database_data(data_form, function(result){
             console.log('record written for scroll ID');
         });
     });
@@ -324,7 +323,7 @@ function populate_fragments() {
 // }
 
 function get_database_data(data_form, callback) {
-	data_form.append('SESSION_ID', Spider['session_id']);
+	data_form.append('SESSION_ID', Spider.session_id);
     jQuery.ajax({
         url: 'resources/cgi-bin/GetImageData.pl',
         data: data_form,
