@@ -104,7 +104,7 @@ sub getCombs {
 	
 	my $cgi = shift;
 	my $userID = $cgi->param('user');
-	my $sql = $cgi->dbh->prepare('select scroll_version.scroll_id as scroll_id, scroll_data.name as name, scroll_version.version as version from scroll_version inner join scroll_data on scroll_data.scroll_id = scroll_version.scroll_id where scroll_version.user_id = ? order by scroll_data.name, scroll_version.version') or die
+	my $sql = $cgi->dbh->prepare('select scroll_version.scroll_id as scroll_id, scroll_data.name as name, scroll_version.version as version from scroll_version inner join scroll_data on scroll_data.scroll_id = scroll_version.scroll_id where scroll_version.user_id = ? order by LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"), LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"), scroll_version.version') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($userID);
 	readResults($sql);
@@ -355,14 +355,8 @@ sub copyCombination {
 	
 	my $cgi = shift;
 	my $scroll_id = $cgi->param('scroll_id');
-	# my $user_id = $cgi->param('user_id');
-	# my $session_id = $cgi->param('SESSION_ID');
 	$cgi->dbh->add_owner_to_scroll($scroll_id);
-	# my $sql = $cgi->dbh->prepare('CALL getScrollArtefacts(?)') 
-	# 	or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	# $sql->execute($user_id);
-	# readResults($sql);
-	print '{"added": "added"}';
+	print '{"scroll_clone": "success"}';
 	return;
 }
 
