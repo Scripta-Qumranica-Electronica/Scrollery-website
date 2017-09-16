@@ -61,23 +61,6 @@ sub processCGI {
 		print encode_json({'error', "No transaction requested."});
 	} else {
 		if (defined $action{$transaction}) {
-			##Connect to database
-			# my $user_id = $cgi->param('user_id');
-			# my $password = $cgi->param('password');
-			# my $version = $cgi->param('version');
-			# my $cgi->dbh;
-			# my $error;
-			# if (defined $user_id) {
-			# 	# print '{"tried": "DBH login' . $password . '"}';
-			# 	$cgi->dbh = $cgi->get_login_sqe($user_id, $password, $version);
-			# 	if (defined $cgi->dbh) {
-			# 		print '{"DBH": "success"}';
-			# 	} else {
-			# 		print '{"DBH": "failure"}';
-			# 	}
-			# } else {
-			# 	$cgi->dbh = $cgi->dbh;
-			# }
 			$action{$transaction}->($cgi);
 		} else {
 			print encode_json({'error', "Transaction type '" . $transaction . "' not understood."});

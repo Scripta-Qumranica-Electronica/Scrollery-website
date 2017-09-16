@@ -157,6 +157,7 @@ function new_combination(){
 }
 
 function populate_combinations(user) {
+    console.log("Populate combinations for " + user);
     var menu = user == 0 ? '#default-combination-listings' : '#user-combination-listings';
     var username = user == 0 ? "default" : Spider.user;
     $(menu).jstree({
