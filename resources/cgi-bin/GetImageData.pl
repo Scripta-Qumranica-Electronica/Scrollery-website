@@ -50,6 +50,7 @@ sub processCGI {
 		'getScrollArtefacts' => \&getScrollArtefacts,
 		'newCombination' => \&newCombination,
 		'copyCombination' => \&copyCombination,
+		'setArtPosition' => \&setArtPosition,
 	);
 
 	print $cgi->header(
@@ -340,6 +341,24 @@ sub copyCombination {
 	my $scroll_id = $cgi->param('scroll_id');
 	$cgi->dbh->add_owner_to_scroll($scroll_id);
 	print '{"scroll_clone": "success"}';
+	return;
+}
+
+sub setArtPosition {
+	my $cgi = shift;
+	my $art_id = $cgi->param('art_id');
+	my $x = $cgi->param('x');
+	my $y = $cgi->param('y');
+	my ($new_id, $error) = $cgi->dbh->add_value("artefact", $art_id, "position_in_scroll", ['POINT', $x, $y]);
+	if (defined $error) {
+		print '{"error": "';
+		foreach (@$error){
+			print $_ . ' ';
+		}
+		print '"}';
+	} else {
+		print '{"new_id": ' . $new_id . '}';
+	}
 	return;
 }
 

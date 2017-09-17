@@ -23,6 +23,8 @@ function login(){
         data_form.append('scroll_id', $(this).prev().data("id"));
         get_database_data(data_form, function(result){
             console.log('record written for scroll ID');
+            $('#user-combination-listings').jstree(true).refresh();
+            tree.refresh();
         });
     });
     $("#main-menu").on("click", ".scroll_select", function(){

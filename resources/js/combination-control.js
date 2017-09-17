@@ -42,7 +42,7 @@ var CombinationController = (function () {
                 var scroll_data = new FormData();
                 scroll_data.append('transaction', 'getScrollArtefacts');
                 scroll_data.append('scroll_id', id);
-		scroll_data.append('SESSION_ID', Spider.session_id);
+                scroll_data.append('SESSION_ID', Spider.session_id);
                 jQuery.ajax({
                     url: 'resources/cgi-bin/GetImageData.pl',
                     context: this,
@@ -211,6 +211,7 @@ var CombinationController = (function () {
                         // }
     
                         evt.stopPropagation();
+                        $comb_scroll.off('mousedown', mouseDown);
                     }
                 }
             }
@@ -294,7 +295,26 @@ var CombinationController = (function () {
                     transform: 'initial'});
                 $frag_cont.data('y_loc', parseInt($frag_cont.css('top')) / zoom_factor);
                 $frag_cont.data('x_loc', ((scroll_width * zoom_factor) - parseInt($frag_cont.css('left')) - $frag_cont.width()) / zoom_factor);
-                selected_artefact = undefined;
+                var scroll_data = new FormData();
+                console.log($frag_cont.attr("id").split("image-cont-xy-")[1]);
+                scroll_data.append('transaction', 'setArtPosition');
+                scroll_data.append('art_id', $frag_cont.attr("id").split("image-cont-xy-")[1]);
+                scroll_data.append('x', ((scroll_width * zoom_factor) - parseInt($frag_cont.css('left')) - $frag_cont.width()) / zoom_factor);
+                scroll_data.append('y', parseInt($frag_cont.css('top')) / zoom_factor);
+                scroll_data.append("SESSION_ID", Spider.session_id);
+                jQuery.ajax({
+                    url: 'resources/cgi-bin/GetImageData.pl',
+                    context: this,
+                    data: scroll_data,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    type: 'POST',
+                    success: function(selected_artefacts){
+                        console.log("successful move");
+                    }
+                });
+                $comb_scroll.on('mousedown', mouseDown);
             }
     
             //Public methods are created via the prototype
