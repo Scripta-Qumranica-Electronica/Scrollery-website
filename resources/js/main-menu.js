@@ -92,6 +92,7 @@ function show_item(item){
 
 function load_fragment_text(selected_frag)
 {
+	console.log('selected_frag ' + selected_frag);
     data_form = new FormData();
     data_form.append('transaction', 'getScrollColNameFromDiscCanRef');
     data_form.append('frag_id', selected_frag);

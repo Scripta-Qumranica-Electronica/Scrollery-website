@@ -62,7 +62,6 @@ function Spider() // singleton central component communication system
 		
 		$.post
 		(
-//			'134.76.19.179/bronson/Scrollery-website/resources/cgi-bin/server.pl',
 			'resources/cgi-bin/server.pl', // connection to perl works only if same server ('same origin')
 			parameters
 		)
@@ -103,8 +102,7 @@ function Spider() // singleton central component communication system
 	{
 		console.log('text');
 		console.log(data);
-//		var json = JSON.parse(data);
-		this.textObject = data; // json['VALUE']['FRAGMENTS'][0]['LINES'];
+		this.textObject = data;
 		
 		this.richTextEditor.displayModel(this.textObject);
 	}
