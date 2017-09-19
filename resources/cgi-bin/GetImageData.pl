@@ -1,12 +1,12 @@
-#! /usr/bin/perl
-# C:\Strawberry\perl\bin\perl.exe
+#! C:\Strawberry\perl\bin\perl.exe
+# /usr/bin/perl
 
 use strict;
 use warnings;
 use JSON::XS;
 use MIME::Base64;
 use lib qw(/home/perl_libs);
-#use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
+use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
 use SQE_CGI;
 
 sub processCGI {
@@ -48,6 +48,7 @@ sub processCGI {
 		'institutionFragments' => \&getInstitutionFragments,
 		'getPolygon' => \&getPolygon,
 		'getScrollArtefacts' => \&getScrollArtefacts,
+		'cloneCombination' => \&cloneCombination,
 		'newCombination' => \&newCombination,
 	);
 
@@ -317,22 +318,59 @@ sub getScrollArtefacts {
 	my $dbh = shift;
 	my $cgi = shift;
 	my $scroll_id = $cgi->param('scroll_id');
-	my $sql = $dbh->prepare('CALL getScrollArtefacts(?, ?)') 
+	my $sql = $dbh->prepare('CALL getScrollArtefacts(?)') 
 		or die "Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute($scroll_id, 0);
+	$sql->execute($scroll_id);
 	readResults($sql);
 	return;
+}
+
+sub cloneCombination {
+	my $dbh = shift;
+	my $cgi = shift;
+	
+	$dbh->create_new_scrollversion($cgi->param('scrollID'));
+	# TODO always clones QWB scroll?
+	
+	
 }
 
 sub newCombination {
 	my $dbh = shift;
 	my $cgi = shift;
-	my $user_id = $cgi->param('user_id');
-	my $sql = $dbh->prepare('CALL getScrollArtefacts(?)') 
-		or die "Couldn't prepare statement: " . $dbh->errstr;
-	$sql->execute($user_id);
-	readResults($sql);
-	return;
+	my $user_id = $dbh->user_id; # TODO make them the owner
+	my $scroll_name = $cgi->param('scrollName');
+	
+	$dbh->start_logged_action();
+	
+	my $sql = $dbh->prepare('INSERT INTO scroll () VALUES ()'); # create scroll id
+	$sql->execute();
+	$sql->finish();
+	$sql = $dbh->prepare('SELECT LAST_INSERT_ID()');
+	my $scroll_id = $sql->execute();
+	$sql->finish();
+	
+	
+	
+	
+	
+	
+	
+	$dbh->stop_logged_action();
+	
+	
+	# TODO
+	# relevant tables
+	#   scroll: get an id & keep it
+	#   scroll_data: get name from parameter,
+	#   scroll_version: 
+	#   scroll_data_owner: connection scroll_data -> scroll_version
+	# no cols etc. 
+	
+#	my $sql = $dbh->prepare('CALL getScrollArtefacts(?)') 
+#		or die "Couldn't prepare statement: " . $dbh->errstr;
+#	$sql->execute($user_id);
+#	readResults($sql);
 }
 
 sub setMask {

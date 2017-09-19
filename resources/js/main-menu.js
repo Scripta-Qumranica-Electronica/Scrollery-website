@@ -14,15 +14,10 @@ function login(){
     $("#login-title").html("Logged in as: " + Spider.user);
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
-    $("#combinations").css("visibility", "visible");$("#main-menu").on("click", ".clone_combination", function(){
-        console.log($(this).prev().data("id"));
-        get_database_data({'transaction' : 'copyCombination', 'user_id' : Spider.user_id, 'password' : Spider.password, 'version' : 1, 'scrollID' : $(this).prev().data("id")}, function(result){
-            console.log('record written for scroll ID');
-        });
-    });
+    $("#combinations").css("visibility", "visible");
     $("#main-menu").on("click", ".clone_combination", function(){
         console.log($(this).prev().data("id"));
-        get_database_data({'transaction' : 'copyCombination', 'user_id' : Spider.user_id, 'password' : Spider.password, 'version' : 1, 'scrollID' : $(this).prev().data("id")}, function(result){
+        get_database_data({'transaction' : 'cloneCombination', 'version' : 1, 'scrollID' : $(this).prev().data("id")}, function(result){
             console.log('record written for scroll ID');
         });
     });
@@ -41,58 +36,6 @@ function login(){
     populate_fragments();
 }
 
-function load_fragment_text(selected_frag)
-{
-    data_form = new FormData();
-    data_form.append('transaction', 'getScrollColNameFromDiscCanRef');
-    data_form.append('frag_id', selected_frag);
-
-    get_database_data(data_form, function(results){
-        results['results'].forEach(function(result) {
-            Spider.requestFromServer
-            (
-                {
-                	'request': 'loadFragmentText',
-                    'fragmentId': selected_frag // result.col
-                },
-                function(data)
-                {
-                    if (data == 0)
-                    {
-                        return;
-                    }
-                    
-                    console.log('data');
-                    console.log(data);
-                    
-                    Spider.notifyChangedText(data);
-                },
-                function()
-                {
-                	console.log('loadFragmentText() went wrong');
-                }
-            );
-        });
-    });
-}
-
-function load_fragment_image(selected_frag){
-    data_form = new FormData();
-    data_form.append('transaction', 'getIAAEdID');
-    data_form.append('discCanRef', selected_frag);
-    get_database_data(data_form, function(results){
-        results['results'].forEach(function(result) {
-            Spider.propagate_command('load_fragment', {id_type: 'composition', id: result.edition_id});
-        });
-    });
-}
-
-function new_combination(){
-    get_database_data({'transaction' : 'newCombination', 'user_id' : Spider.user_id}, function(result){
-        Spider.current_combination = result.id;
-    });
-}
-
 function show_item(item){
     $(".collapsible").next().css("visibility", "hidden");
     $(".collapsible").next().css("max-height", "0vh");
@@ -102,6 +45,7 @@ function show_item(item){
 
 function load_fragment_text(selected_frag)
 {
+	console.log('selected_frag ' + selected_frag);
     data_form = new FormData();
     data_form.append('transaction', 'getScrollColNameFromDiscCanRef');
     data_form.append('frag_id', selected_frag);

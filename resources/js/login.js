@@ -3,7 +3,17 @@ $(document).ready(function()
 	$('#notification')
 	.hide();
 	
-	$('#confirm').click
+	const triggerButtonAtReturn = function(e)
+	{
+	    if (e.keyCode == 13)
+	    {
+	    	$('#confirmLogin').click();
+	    }
+	}
+	$("#userNameInput").on('keyup', triggerButtonAtReturn);
+	$("#passwordInput").on('keyup', triggerButtonAtReturn);
+
+	$('#confirmLogin').click
 	(
 		function()
 		{
@@ -17,9 +27,7 @@ $(document).ready(function()
 				},
 				function(response) // on success
 				{
-					if (response == 0
-					||  response == null
-					) //||  response.responseText.indexOf('Software error:') != -1)
+					if (response['errorCode'] == 2)
 					{
 						$('#notification')
 						.text('Invalid user and / or password.')
@@ -27,7 +35,6 @@ $(document).ready(function()
 					}
 					else
 					{
-//						response = JSON.parse(response);
 						Spider.session_id = response['SESSION_ID'];
 						Spider.user_id = response['USER_ID'];
 						Spider.user = $('#userNameInput').val();
