@@ -42,7 +42,7 @@ var CombinationController = (function () {
                 var scroll_data = new FormData();
                 scroll_data.append('transaction', 'getScrollArtefacts');
                 scroll_data.append('scroll_id', id);
-		scroll_data.append('SESSION_ID', Spider.session_id);
+                scroll_data.append('SESSION_ID', Spider.session_id);
                 jQuery.ajax({
                     url: 'resources/cgi-bin/GetImageData.pl',
                     context: this,
@@ -110,7 +110,7 @@ var CombinationController = (function () {
                             imgContainer.setAttribute('pointer-events', 'visiblePainted');
                             var svgImage = document.createElementNS("http://www.w3.org/2000/svg", "image");
                             svgImage.setAttribute('id', 'ClippedImg-' + artefact['id']);
-                            // svgImage.setAttribute('class', 'clippedImg');
+                            svgImage.setAttribute('class', 'clippedImg');
                             svgImage.setAttribute('draggable', 'false');
                             
                             var outline = document.createElementNS("http://www.w3.org/2000/svg", "use");
@@ -140,7 +140,6 @@ var CombinationController = (function () {
                             svgImage.setAttribute('class', 'clippedImg');
                             svgImage.setAttribute('width', img_width * scale);
                             svgImage.setAttribute('height', img_height * scale);
-                            svgImage.setAttribute('draggable', 'false');
                             image.setAttribute('width', img_width * scale);
                             image.setAttribute('height', img_height * scale);
                             artefacts.push({'path': path, 'image':svgImage, 'container': image, 'width': img_width, 'height': img_height, 'dpi': artefact_dpi, 'url': artefact.url, 'filename': artefact.filename, 'crop_x': img_x, 'crop_y': img_y, 'crop_width': img_width, 'crop_height': img_height, 'suffix': artefact.suffix});
@@ -156,6 +155,102 @@ var CombinationController = (function () {
                         }, this);
                     }
                 });
+
+                //Event handling
+                $comb_scroll.off('mousedown');
+                $comb_scroll.on('mousedown', mouseDown);
+                var mouseOrigin = {x: 0, y: 0};
+                var selected_artefact;
+                function mouseDown(evt) {
+                    if (evt.target !== evt.currentTarget) {
+                        if($(evt.target).attr("class") == 'clippedImg'){
+                            evt.preventDefault();
+                            $comb_scroll.off('mousedown', mouseDown);
+                            if (Spider.unlocked){
+                                selected_artefact = evt.target;
+                                $comb_scroll.on('mousemove', mouseMove);
+                                $comb_scroll.on('mouseup', mouseUp);
+                                $comb_scroll.append($(evt.target).parent().parent().parent().parent());
+                                mouseOrigin.x = evt.clientX;
+                                mouseOrigin.y = evt.clientY;
+                                evt.stopPropagation();
+                            }
+                        }
+                    }
+                }
+        
+                function mouseMove(evt){
+                    var x = evt.clientX;
+                    var y = evt.clientY;
+                    var viewport = {t: $comb_scroll.offsetTop + 10,
+                                    b: $comb_scroll.offsetTop +  $comb_scroll.clientHeight - 10,
+                                    l: $comb_scroll.offsetLeft + 10,
+                                    r: $comb_scroll.offsetLeft + $comb_scroll.clientWidth - 10,
+                    };
+                    // switch (true){
+                    //     case (y < viewport.t):
+                    //         scroll.scrollTop = parseInt(scroll.scrollTop, 10) - 5;
+                    //         y += 5;
+                    //         break;
+                    //     case (y > viewport.b):
+                    //         scroll.scrollTop = parseInt(scroll.scrollTop, 10) + 5;
+                    //         y -= 5;
+                    //         break;
+                    //     case (x < viewport.l):
+                    //         scroll.scrollLeft = parseInt(scroll.scrollLeft, 10) - 5;
+                    //         x += 5;
+                    //         break;
+                    //     case (x > viewport.r):
+                    //         scroll.scrollLeft = parseInt(scroll.scrollLeft, 10) + 5;
+                    //         x -= 5;
+                    //         break;
+                    // }
+        
+                    var moveXY = {
+                        x: x - mouseOrigin.x,
+                        y: y - mouseOrigin.y,
+                    };
+                    $(selected_artefact).parent().parent().parent().parent().css('transform', 'translate3d(' + moveXY.x + 'px, ' + moveXY.y + 'px, 0px)');
+                }
+        
+                function mouseUp(evt) {
+                    evt.preventDefault();
+                    $comb_scroll.off('mousemove', mouseMove);
+                    $comb_scroll.off('mouseup', mouseUp);
+                    var x = evt.clientX;
+                    var y = evt.clientY;
+                    var moveXY = {
+                        x: x - mouseOrigin.x,
+                        y: y - mouseOrigin.y,
+                    };
+                    var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
+                    $frag_cont.css({
+                        top: (parseInt($frag_cont.css('top')) + moveXY.y) + 'px',
+                        left: (parseInt($frag_cont.css('left')) + moveXY.x) + 'px',
+                        transform: 'initial'});
+                    $frag_cont.data('y_loc', parseInt($frag_cont.css('top')) / zoom_factor);
+                    $frag_cont.data('x_loc', ((scroll_width * zoom_factor) - parseInt($frag_cont.css('left')) - $frag_cont.width()) / zoom_factor);
+                    var scroll_data = new FormData();
+                    console.log($frag_cont.attr("id").split("image-cont-xy-")[1]);
+                    scroll_data.append('transaction', 'setArtPosition');
+                    scroll_data.append('art_id', $frag_cont.attr("id").split("image-cont-xy-")[1]);
+                    scroll_data.append('x', ((scroll_width * zoom_factor) - parseInt($frag_cont.css('left')) - $frag_cont.width()) / zoom_factor);
+                    scroll_data.append('y', parseInt($frag_cont.css('top')) / zoom_factor);
+                    scroll_data.append("SESSION_ID", Spider.session_id);
+                    jQuery.ajax({
+                        url: 'resources/cgi-bin/GetImageData.pl',
+                        context: this,
+                        data: scroll_data,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        type: 'POST',
+                        success: function(selected_artefacts){
+                            console.log("successful move");
+                        }
+                    });
+                    $comb_scroll.on('mousedown', mouseDown);
+                }
             }
     
             function zoom(new_zoom, dynamic){
@@ -177,7 +272,6 @@ var CombinationController = (function () {
                     }
                     artefact.image.setAttribute('width', artefact.width * scale);
                     artefact.image.setAttribute('height', artefact.height * scale);
-                    artefact.image.setAttribute('draggable', 'false');
                     artefact.container.setAttribute('width', artefact.width * scale);
                     artefact.container.setAttribute('height', artefact.height * scale);
                     var $frag_cont = $(artefact.container).parent().parent();
@@ -185,116 +279,6 @@ var CombinationController = (function () {
                         top: (parseFloat($frag_cont.data('y_loc')) * zoom_factor) + 'px',
                         left: (scroll_width * zoom_factor) - (parseFloat($frag_cont.data('x_loc')) * zoom_factor) - (artefact.width * scale) + 'px'});
                 });
-            }
-            
-            //Event handling
-            $comb_scroll.on('mousedown', mouseDown);
-            var mouseOrigin = {x: 0, y: 0};
-            var selected_artefact;
-            function mouseDown(evt) {
-                if (evt.target !== evt.currentTarget) {
-                    if($(evt.target).attr("class") == 'clippedImg'){
-                        selected_artefact = evt.target;
-                        evt.preventDefault();
-                        // clickTime = 0;
-                        // timer = setInterval(function(){
-                        //     clickTime += 1;
-                        // }, 10);
-                        $comb_scroll.on('mousemove', mouseMove);
-                        $comb_scroll.on('mouseup', mouseUp);
-                        $comb_scroll.append($(evt.target).parent().parent().parent().parent());
-                        mouseOrigin.x = evt.clientX;
-                        mouseOrigin.y = evt.clientY;
-                        // if(selectedFragDIV != fragDiv[0].id){
-                        //     selectedFragDIV = fragDiv[0].id;
-                        //     fragOSDVisible = false;
-                        // }
-    
-                        evt.stopPropagation();
-                    }
-                }
-            }
-    
-            function mouseMove(evt){
-                // if (!mouseMoved){
-                //     mouseMoved = true;
-                // };
-                // if (document.getElementById("rotate-handle")){
-                //     document.getElementById("rotate-handle").parentNode.removeChild(document.getElementById("rotate-handle"));
-                // }
-                // if (document.getElementById("slide-handle")){
-                //     document.getElementById("slide-handle").parentNode.removeChild(document.getElementById("slide-handle"));
-                // }
-                var x = evt.clientX;
-                var y = evt.clientY;
-                var viewport = {t: $comb_scroll.offsetTop + 10,
-                                b: $comb_scroll.offsetTop +  $comb_scroll.clientHeight - 10,
-                                l: $comb_scroll.offsetLeft + 10,
-                                r: $comb_scroll.offsetLeft + $comb_scroll.clientWidth - 10,
-                };
-                // switch (true){
-                //     case (y < viewport.t):
-                //         scroll.scrollTop = parseInt(scroll.scrollTop, 10) - 5;
-                //         y += 5;
-                //         break;
-                //     case (y > viewport.b):
-                //         scroll.scrollTop = parseInt(scroll.scrollTop, 10) + 5;
-                //         y -= 5;
-                //         break;
-                //     case (x < viewport.l):
-                //         scroll.scrollLeft = parseInt(scroll.scrollLeft, 10) - 5;
-                //         x += 5;
-                //         break;
-                //     case (x > viewport.r):
-                //         scroll.scrollLeft = parseInt(scroll.scrollLeft, 10) + 5;
-                //         x -= 5;
-                //         break;
-                // }
-    
-                var moveXY = {
-                    x: x - mouseOrigin.x,
-                    y: y - mouseOrigin.y,
-                };
-                $(selected_artefact).parent().parent().parent().parent().css('transform', 'translate3d(' + moveXY.x + 'px, ' + moveXY.y + 'px, 0px)');
-            }
-    
-            function mouseUp(evt) {
-                evt.preventDefault();
-                // if(clickTime > 25){
-                //     click = false;
-                //     window.clearInterval(timer);
-                // }
-                $comb_scroll.off('mousemove', mouseMove);
-                $comb_scroll.off('mouseup', mouseUp);
-                // if(!click){
-                //     if(mouseMoved){
-                //         saveMove(evt);
-                //     }
-                //     click = true;
-                // } else {
-                //     window.clearInterval(timer);
-                //     if(fragOSDVisible){
-                //         hideFragOSD();
-                //         fragOSDVisible = false;
-                //     } else {
-                //         showFragOSD(selectedFragDIV.split("DIV-")[1]);
-                //         fragOSDVisible = true;
-                //     }
-                // }
-                var x = evt.clientX;
-                var y = evt.clientY;
-                var moveXY = {
-                    x: x - mouseOrigin.x,
-                    y: y - mouseOrigin.y,
-                };
-                var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
-                $frag_cont.css({
-                    top: (parseInt($frag_cont.css('top')) + moveXY.y) + 'px',
-                    left: (parseInt($frag_cont.css('left')) + moveXY.x) + 'px',
-                    transform: 'initial'});
-                $frag_cont.data('y_loc', parseInt($frag_cont.css('top')) / zoom_factor);
-                $frag_cont.data('x_loc', ((scroll_width * zoom_factor) - parseInt($frag_cont.css('left')) - $frag_cont.width()) / zoom_factor);
-                selected_artefact = undefined;
             }
     
             //Public methods are created via the prototype
