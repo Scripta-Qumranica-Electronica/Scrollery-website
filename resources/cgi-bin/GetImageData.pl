@@ -114,7 +114,7 @@ sub getFragsOfCol {
 	my $userID = $cgi->param('user');
 	my $version = $cgi->param('version');
 	my $colID = $cgi->param('colID');
-	my $sql = $cgi->dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side from discrete_canonical_references where discrete_canonical_references.column_of_scroll_id = ?') or die
+	my $sql = $cgi->dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side, discrete_canonical_references.column_of_scroll_id from discrete_canonical_references where discrete_canonical_references.column_of_scroll_id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($colID);
 	readResults($sql);
@@ -325,7 +325,6 @@ sub getScrollArtefacts {
 }
 
 sub newCombination {
-	
 	my $cgi = shift;
 	my $user_id = $cgi->param('user_id');
 	my $sql = $cgi->dbh->prepare('CALL getScrollArtefacts(?)') 
@@ -336,11 +335,43 @@ sub newCombination {
 }
 
 sub copyCombination {
-	
 	my $cgi = shift;
 	my $scroll_id = $cgi->param('scroll_id');
 	$cgi->dbh->add_owner_to_scroll($scroll_id);
 	print '{"scroll_clone": "success"}';
+	return;
+}
+
+sub nameCombination {
+	my $cgi = shift;
+	my $scroll_id = $cgi->param('scroll_id');
+	my $version_id = $cgi->param('version_id');
+	my $user_id = $cgi->param('user_id');
+	my $scroll_name = $cgi->param('name');
+	my $scroll_data_id;
+	my $sql = $cgi->dbh->prepare('select scroll_data_owner.scroll_data_id from scroll_data_owner inner join scroll_version on scroll_version.scroll_version_id=scroll_data_owner.scroll_version_id where scroll_version.scroll_id=? and scroll_version.user_id=? and scroll_version.version=?;') 
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($scroll_id, $user_id, $version_id);
+	my @fetchedResults = ();
+	while (my $result = $sql->fetchrow_hashref){
+       	push @fetchedResults, $result;
+    }
+    if (scalar(@fetchedResults) > 0) {
+		$scroll_data_id = $fetchedResults[0];
+ 	} else {
+    	print 'No results found.';
+ 	}
+	$sql->finish;
+	my ($new_scroll_data_id, $error) = $cgi->dbh->change_value("scroll_data", $scroll_data_id, "name", $scroll_name);
+	if (defined $error){
+		print '{"error": "';
+		foreach (@$error){
+			print $_ . ' ';
+		}
+		print '"}';
+	} else {
+		print '{"name_change": "success"}';
+	}
 	return;
 }
 
