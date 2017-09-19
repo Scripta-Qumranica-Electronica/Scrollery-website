@@ -38,7 +38,6 @@ $(document).ready(function()
 						Spider.session_id = response['SESSION_ID'];
 						Spider.user_id = response['USER_ID'];
 						Spider.user = $('#userNameInput').val();
-						Spider.password = $('#passwordInput').val();
 						$('#login').css('visibility', 'hidden');
 						$('#login').css('height', '0');
 						$('#login').css('padding', '0');
