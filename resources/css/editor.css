@@ -67,13 +67,6 @@
 
 .contentField
 {
-	/*width: calc(100% - 12px);*/ /* -2*5 padding -2*1 border */
-	/*
-	border-top: 0px;
-	border-right: 1px solid black;
-	border-bottom: 1px solid black;
-	border-left: 1px solid black;
-	*/
 	margin: 0px;
 	padding: 5px;
 }
@@ -346,10 +339,6 @@
 	table-layout: auto;
 }
 
-.line
-{
-}
-
 .lineSection
 {
 	border-left: 3px solid white;
@@ -367,14 +356,40 @@
 	border-bottom: 1px solid darkgrey;
 }
 
+.richTextLine
+{
+}
+
 #richTextContainer
 {
 	table-layout: auto;
 	
 	/* font-family: monospace; */
-	font-size: 18px;
 }
 
+.richTextButtons
+{
+	float: right;
+	white-space: normal; /* overwrites value pre of parent */
+}
+
+.addLineByUser
+{
+	padding-right: 4px;
+	padding-left: 4px;
+	
+	cursor: pointer;
+	color: darkgreen;
+}
+
+.removeLineByUser
+{
+	padding-right: 4px;
+	padding-left: 4px;
+	
+	cursor: pointer;
+	color: darkred;
+}
 
 /** different annotations */
 

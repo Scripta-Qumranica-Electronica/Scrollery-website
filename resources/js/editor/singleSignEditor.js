@@ -454,6 +454,10 @@ function SingleSignEditor(richTextEditor)
 			.addClass('someSpaceBelow')
 			.insertAfter('#signContext');
 		}
+		
+		$('#leftMargin'      + iLine).attr('contentEditable', 'false');
+		$('#regularLinePart' + iLine).attr('contentEditable', 'false');
+		$('#rightMargin'     + iLine).attr('contentEditable', 'false');
 	}
 	
 	this.potentiallySaveChanges = function()

@@ -14,8 +14,48 @@ function RichTextEditor()
 	}
 	
 	this.fontSize = 20;
+	$('#RichTextPanel').css({ 'font-size': this.fontSize + 'px' });
 	
 	this.singleSignEditor = new SingleSignEditor(this);
+	
+	
+	/* button listeners */
+	
+	$('#richTextUndoAll').click(function()
+	{
+		self.displayModel(Spider.textObject); // model isn't changed after loading => simply reload it
+	});
+	
+	$('#richTextLineManager').click(function()
+	{
+		const manager = $('#richTextLineManager');
+		
+		if (manager.attr('activated') != 1) // null or 0 => activate line management
+		{
+			$('.addLineByUser').show();
+			$('.removeLineByUser').show();
+			$('.lineName').attr('contentEditable', 'true');
+			
+			manager.attr('activated', 1);
+		}
+		else // deactivate line management
+		{
+			$('.addLineByUser').hide();
+			$('.removeLineByUser').hide();
+			$('.lineName').attr('contentEditable', 'false');
+			
+			manager.attr('activated', 0);
+		}
+	});
+	
+	$('#richTextSave').click(function()
+	{
+	
+	
+	}); // TODO
+	
+	
+	/* methods */
 	
 	this.addFragmentName = function(name) // TODO currently not used
 	{
@@ -24,17 +64,112 @@ function RichTextEditor()
 		.text(name)
 		.appendTo('#richTextContainer');
 	}
+	
+	removeTextLineByUser = function(event)
+	{
+		const lineNumber = 1 * event.target.id.replace('removeLine', '');
+		$('#line' + lineNumber).remove();
+		
+		for (var iLineNumber = lineNumber + 1; $('#line' + iLineNumber).length > 0; iLineNumber++) // decrement the indexes of each line behind the removed one
+		{
+			const newNumber = iLineNumber - 1;
+			
+			$('#line'            + iLineNumber).attr('id', 'line'            + newNumber);
+			$('#lineName'        + iLineNumber).attr('id', 'lineName'        + newNumber);
+			$('#rightMargin'     + iLineNumber).attr('id', 'rightMargin'     + newNumber);
+			$('#regularLinePart' + iLineNumber).attr('id', 'regularLinePart' + newNumber);
+			$('#leftMargin'      + iLineNumber).attr('id', 'leftMargin'      + newNumber);
+			$('#removeLine'      + iLineNumber).attr('id', 'removeLine'      + newNumber);
+			$('#addLineAfter'    + iLineNumber).attr('id', 'addLineAfter'    + newNumber);
+		}
+	}
+
+	addTextLineByUser = function(event)
+	{
+		const previousLineNumber = 1 * event.target.id.replace('addLineAfter', '');
+		
+		
+		/** move lines after the upcoming new one by 1 index */
+		
+		var lineNumber = previousLineNumber + 1;
+		var followingLine = $('#line' + lineNumber);
+		var maxNumber = -1;
+		while (followingLine.length > 0) // find last line (going backwards avoids index collision)
+		{
+			maxNumber = lineNumber;
+			console.log('maxNumber ' + maxNumber);
+			
+			lineNumber++;
+			followingLine = $('#line' + lineNumber);
+		}
+		
+		if (maxNumber != -1)
+		{
+			for (var iLineNumber = maxNumber; iLineNumber > previousLineNumber; iLineNumber--) // increment the indexes of each line behind the upcoming new one
+			{
+				const newNumber = iLineNumber + 1;
+				
+				$('#line'            + iLineNumber).attr('id', 'line'            + newNumber);
+				$('#lineName'        + iLineNumber).attr('id', 'lineName'        + newNumber);
+				$('#rightMargin'     + iLineNumber).attr('id', 'rightMargin'     + newNumber);
+				$('#regularLinePart' + iLineNumber).attr('id', 'regularLinePart' + newNumber);
+				$('#leftMargin'      + iLineNumber).attr('id', 'leftMargin'      + newNumber);
+				$('#removeLine'      + iLineNumber).attr('id', 'removeLine'      + newNumber);
+				$('#addLineAfter'    + iLineNumber).attr('id', 'addLineAfter'    + newNumber);
+			}
+		}
+		
+		
+		/** try to determine line name automatically */
+		
+		const previousName = $('#lineName' + previousLineNumber).text();
+		
+		var name = '?';
+		if (previousName * 1 == previousName) // name is number
+		{
+			name = (previousName * 1) + 1; // increment the number (might collide with following line, scholar must handle that)
+		}
+		else
+		{
+			const lastCharCode = previousName.substr(previousName.length() - 1).charCodeAt(0);
+			
+			if ((lastCharCode > 96 && lastCharCode < 123)
+			||  (lastCharCode > 64 && lastCharCode <  91)) // previous name ends with a to y OR A .. Y 
+			{
+				name = previousName.substr(0, previousName.length() - 1) + String.fromCharCode(lastCharCode + 1);
+			}
+		}
+		
+		
+		/** add new line */
+		
+		const number = previousLineNumber + 1;
+		
+		$('#line' + previousLineNumber)
+		.after
+		(
+			self.addTextLine
+			(
+				number,
+				name
+			)
+		);
+		
+		$('#removeLine'   + number).show();
+		$('#addLineAfter' + number).show();
+	}
 
 	this.addTextLine = function(number, name)
 	{
 		const line =
 		$('<tr></tr>')
 		.attr('id', 'line' + number)
-		.addClass('line')
+		.addClass('richTextLine')
 		.appendTo('#richTextContainer');
 		
 		$('<td></td>')
 		.attr('id', 'lineName' + number)
+		.addClass('lineName')
 		.text(name)
 		.appendTo(line);
 
@@ -58,6 +193,32 @@ function RichTextEditor()
 		.addClass('lineSection')
 		.addClass('coyBottomBorder')
 		.appendTo(line);
+		
+		$('<td></td>')
+		.text('–')
+		.attr('id', 'removeLine' + number)
+		.attr('title', 'Remove this line')
+		.addClass('removeLineByUser')
+		.hide()
+		.click(function(event)
+		{
+			removeTextLineByUser(event)
+		})
+		.appendTo(line);
+		
+		$('<td></td>')
+		.text('+')
+		.attr('id', 'addLineAfter' + number)
+		.attr('title', 'Add a line after this one')
+		.addClass('addLineByUser')
+		.hide()
+		.click(function(event)
+		{
+			addTextLineByUser(event)
+		})
+		.appendTo(line);
+		
+		return line;
 	}
 
 	this.addSign = function(model, iLine, iSign)
@@ -234,6 +395,7 @@ function RichTextEditor()
 	
 	this.displayModel = function(model)
 	{
+		$('#richTextButtons').appendTo('#hidePanel');
 		$('#richTextContainer').empty();
 		
 		var lastMainSign;
@@ -271,6 +433,8 @@ function RichTextEditor()
 				);
 			}
 		}
+		
+		$('#richTextButtons').appendTo('#richTextContainer');
 	}
 }
 
