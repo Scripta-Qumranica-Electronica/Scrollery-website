@@ -37,11 +37,17 @@ var CombinationController = (function () {
             var self = this;
     
             // Private functions, will be invoked by name.call(this, ...input vars)
-            function load_scroll(id){
+            function load_scroll(id, default_combination){
                 $comb_scroll.empty();
                 var scroll_data = new FormData();
                 scroll_data.append('transaction', 'getScrollArtefacts');
                 scroll_data.append('scroll_id', id);
+                if (default_combination) {
+                    scroll_data.append('user_id',0);
+                } else {
+                    scroll_data.append('user_id', Spider.user_id);
+                }
+                scroll_data.append('version', Spider.current_version);
                 scroll_data.append('SESSION_ID', Spider.session_id);
                 jQuery.ajax({
                     url: 'resources/cgi-bin/GetImageData.pl',
@@ -233,6 +239,10 @@ var CombinationController = (function () {
                     var scroll_data = new FormData();
                     console.log($frag_cont.attr("id").split("image-cont-xy-")[1]);
                     scroll_data.append('transaction', 'setArtPosition');
+                    scroll_data.append('scroll_id', Spider.current_combination);
+                    scroll_data.append('version', Spider.current_version);
+                    console.log("Scroll id " + Spider.current_combination);
+                    console.log("Current version " + Spider.current_version);
                     scroll_data.append('art_id', $frag_cont.attr("id").split("image-cont-xy-")[1]);
                     scroll_data.append('x', ((scroll_width * zoom_factor) - parseInt($frag_cont.css('left')) - $frag_cont.width()) / zoom_factor);
                     scroll_data.append('y', parseInt($frag_cont.css('top')) / zoom_factor);
@@ -282,8 +292,8 @@ var CombinationController = (function () {
             }
     
             //Public methods are created via the prototype
-            CombinationController.prototype.display_scroll = function (id) {
-                return load_scroll.call(this, id);
+            CombinationController.prototype.display_scroll = function (id, default_combination) {
+                return load_scroll.call(this, id, default_combination);
             }
             CombinationController.prototype.change_zoom = function (new_zoom, dynamic) {
                 return zoom.call(this, new_zoom, dynamic);
@@ -312,7 +322,7 @@ var CombinationController = (function () {
             //register responders with messageSpider
             Spider.register_object([
                 {type: 'load_scroll', execute_function: function(data){
-                    self.display_scroll(data.id);
+                    self.display_scroll(data.id, data.default);
                     }
                 }
             ]);

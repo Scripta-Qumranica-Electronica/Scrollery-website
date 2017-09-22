@@ -317,9 +317,11 @@ sub getScrollArtefacts {
 	
 	my $cgi = shift;
 	my $scroll_id = $cgi->param('scroll_id');
-	my $sql = $cgi->dbh->prepare('CALL getScrollArtefacts(?, ?)') 
+	my $user_id = $cgi->param('user_id');
+	my $version = $cgi->param('version');
+	my $sql = $cgi->dbh->prepare('CALL getScrollVersionArtefacts(?, ?, ?)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($scroll_id, 0);
+	$sql->execute($user_id, $scroll_id, $version);
 	readResults($sql);
 	return;
 }
@@ -377,10 +379,17 @@ sub nameCombination {
 
 sub setArtPosition {
 	my $cgi = shift;
+	my $user_id = $cgi->dbh->user_id;
+	my $scroll_id = $cgi->param('scroll_id');
+	my $version = $cgi->param('version');
+	my $sql = $cgi->dbh->prepare('select scroll_version.scroll_version_id from scroll_version where scroll_version.scroll_id=? and scroll_version.user_id = ? and scroll_version.version = ?') or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($scroll_id, $user_id, $version);
+	my $version_id = ($sql->fetchrow_array)[0];
+	$cgi->dbh->set_scrollversion($version_id);
 	my $art_id = $cgi->param('art_id');
 	my $x = $cgi->param('x');
 	my $y = $cgi->param('y');
-	my ($new_id, $error) = $cgi->dbh->add_value("artefact", $art_id, "position_in_scroll", ['POINT', $x, $y]);
+	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $art_id, "position_in_scroll", ['POINT', $x, $y]);
 	if (defined $error) {
 		print '{"error": "';
 		foreach (@$error){

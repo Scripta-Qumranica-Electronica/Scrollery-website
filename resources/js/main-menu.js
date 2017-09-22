@@ -33,10 +33,11 @@ function login(){
     });
     $("#main-menu").on("click", ".scroll_select", function(){
         if (Spider.current_combination != $(this).data("id")) {
-            Spider.unlocked = $(this).data("user") == "default" ? false : true;
-            Spider.propagate_command('load_scroll', {id: $(this).data("id")});
+            var default_combination = $(this).data("user") == "default" ? true : false;
+            Spider.unlocked = !default_combination;
             Spider.current_combination = $(this).data("id");
             Spider.current_version = $(this).data("version");
+            Spider.propagate_command('load_scroll', {id: $(this).data("id"), "default" : default_combination});
         }
     });
     // var longpress = 300;
