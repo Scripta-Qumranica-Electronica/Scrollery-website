@@ -102,7 +102,7 @@ sub getCombs {
 	
 	my $cgi = shift;
 	my $userID = $cgi->param('user');
-	my $sql = $cgi->dbh->prepare_cached('select scroll_data.scroll_id as scroll_id, scroll_data.name as name, scroll_version.version as version, scroll_version.scroll_version_id as version_id, scroll_data.scroll_data_id as scroll_data_id from scroll_version join scroll_data_owner using(scroll_version_id) join scroll_data using(scroll_data_id) where scroll_version.user_id = ? order by LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"), LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"), scroll_version.version') or die
+	my $sql = $cgi->dbh->prepare_cached('select scroll_data.scroll_id as scroll_id, scroll_data.name as name, scroll_version.version as version, scroll_version.scroll_version_id as version_id, scroll_data.scroll_data_id as scroll_data_id, (SELECT COUNT(*) FROM scroll_to_col_owner WHERE scroll_to_col_owner.scroll_version_id = version_id) as count from scroll_version join scroll_data_owner using(scroll_version_id) join scroll_data using(scroll_data_id) where scroll_version.user_id = ? order by LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"), LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"), scroll_version.version') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($userID);
 	readResults($sql);
@@ -115,7 +115,7 @@ sub getColOfComb {
 	my $userID = $cgi->param('user');
 	my $version_id = $cgi->param('version_id');
 	my $combID = $cgi->param('combID');
-	my $sql = $cgi->dbh->prepare_cached('select col_data.name as name, col_data.col_id as col_id from col_data join col_data_owner using(col_data_id) join scroll_to_col using(col_id) join scroll_version using(scroll_version_id) where col_data_owner.scroll_version_id = ? and scroll_to_col.scroll_id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('select col_data.name as name, col_data.col_id as col_id, (select count(*) from discrete_canonical_references where discrete_canonical_references.column_of_scroll_id = col_id) as count from col_data join col_data_owner using(col_data_id) join scroll_to_col using(col_id) join scroll_version using(scroll_version_id) where col_data_owner.scroll_version_id = ? and scroll_to_col.scroll_id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($version_id, $combID);
 	readResults($sql);
@@ -343,18 +343,37 @@ sub getScrollArtefacts {
 
 sub newCombination {
 	my $cgi = shift;
-	my $user_id = $cgi->param('user_id');
-	my $sql = $cgi->dbh->prepare_cached('CALL getScrollArtefacts(?)') 
+	my $user_id = $cgi->dbh->user_id;
+	my $name = $cgi->param('name'); 
+
+	my $sql = $cgi->dbh->prepare_cached('INSERT INTO scroll () VALUES()') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($user_id);
-	readResults($sql);
+	$sql->execute();
+	my $scroll_id = $cgi->dbh->last_insert_id(undef, undef, undef, undef);
+
+	$sql = $cgi->dbh->prepare_cached('INSERT INTO scroll_version (user_id, scroll_id, version) VALUES(?, ?, 0)') 
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($user_id, $scroll_id);
+	my $scroll_version_id = $cgi->dbh->last_insert_id(undef, undef, undef, undef);
+
+	$sql = $cgi->dbh->prepare_cached('INSERT INTO scroll_data (name, scroll_id) VALUES(?, ?)') 
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($name, $scroll_id);
+	my $scroll_data_id = $cgi->dbh->last_insert_id(undef, undef, undef, undef);
+
+	$sql = $cgi->dbh->prepare_cached('INSERT INTO scroll_data_owner (scroll_data_id, scroll_version_id) VALUES(?, ?)') 
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($scroll_data_id, $scroll_version_id);
+
+	print '{"created": {"scroll_data": ' . $scroll_data_id . ', "scroll_version":' . $scroll_version_id . '}}';
 	return;
 }
 
 sub copyCombination {
 	my $cgi = shift;
 	my $scroll_id = $cgi->param('scroll_id');
-	$cgi->dbh->add_owner_to_scroll($scroll_id);
+	my $scroll_version_id = $cgi->param('scroll_version_id');
+	$cgi->dbh->add_owner_to_scroll($scroll_id, $scroll_version_id);
 	print '{"scroll_clone": "success"}';
 	return;
 }
@@ -364,9 +383,9 @@ sub nameCombination {
 	my $scroll_id = $cgi->param('scroll_id');
 	my $scroll_data_id = $cgi->param('scroll_data_id');
 	my $version_id = $cgi->param('version_id');
-	my $user_id = $cgi->dbh->user_id;
 	my $scroll_name = $cgi->param('name');
 	$cgi->dbh->set_scrollversion($version_id);
+	my $user_id = $cgi->dbh->user_id;
 	my ($new_scroll_data_id, $error) = $cgi->dbh->change_value("scroll_data", $scroll_data_id, "name", $scroll_name);
 	handleDBError ($new_scroll_data_id, $error);
 	return;

@@ -25,7 +25,8 @@ function login(){
         data_form = new FormData();
         data_form.append('transaction', 'copyCombination');
         data_form.append('SESSION_ID', Spider.session_id);
-        data_form.append('scroll_id', $(this).prev().data("id"));
+        data_form.append('scroll_id', $(this).prev().prev().prev().data("id"));
+        data_form.append('scroll_version_id', $(this).prev().prev().prev().data("scroll-version"));
         get_database_data(data_form, function(result){
             $('#user-combination-listings').jstree(true).refresh();
             tree.refresh();
@@ -139,11 +140,15 @@ function load_fragment_image(selected_frag){
 }
 
 function new_combination(){
-    console.log("Must implement creation of combination");
     data_form = new FormData();
     data_form.append('transaction', 'newCombination');
+    data_form.append("SESSION_ID", Spider.session_id);
+    var d = new Date();
+    data_form.append("name", "Scroll-" + d.getTime());
     get_database_data(data_form, function(result){
-        Spider.current_combination = result.id;
+        Spider.current_combination = result.created.scroll_version;
+        console.log("New scroll " + result.created.scroll_version);
+        populate_combinations(Spider.user_id);
     });
 }
 
@@ -202,15 +207,14 @@ function populate_combinations(user) {
                     var menu_list = [];
                     for (var i = 0; i < entries['results'].length; i++){
                         if (current_lvl == 0){
-                            if (username == "default"){
-                                var listing = {"text": "<span class=\"menu scroll_select\" data-id=\"" + entries['results'][i]["scroll_id"] + "\" data-version=\"" + entries['results'][i]["version"] + "\" data-user=\"" + username + "\" data-scroll-version=\"1" + "\" data-scroll-data-id=\"" + entries['results'][i]["scroll_data_id"] + "\">" + entries['results'][i]["name"] + ' – ' + username + ' – v. ' + entries['results'][i]["version"] + "</span><span class=\"menu clone_combination\">clone</span>", "id" : 'lvl_1-' + entries['results'][i]["scroll_id"] + '-' + entries['results'][i]["name"] + '-1', "children" : true, state : {disabled  : true}};
-                            } else {
-                                var listing = {"text": "<span class=\"menu scroll_select editable_name\" data-id=\"" + entries['results'][i]["scroll_id"] + "\" data-version=\"" + entries['results'][i]["version"] + "\" data-user=\"" + username + "\" data-scroll-version=\"" + entries['results'][i]["version_id"] + "\" data-scroll-data-id=\"" + entries['results'][i]["scroll_data_id"] + "\">" + entries['results'][i]["name"] + '</span><input type=\"text\" class=\"edited_name\" hidden/><span class=\"menu\"> – ' + username + ' – v. ' + entries['results'][i]["version"] + ' ' + "</span><span class=\"menu clone_combination\">clone</span>", "id" : 'lvl_1-' + entries['results'][i]["scroll_id"] + '-' + entries['results'][i]["name"] + '-' + entries['results'][i]["version_id"], "children" : true, state : {disabled  : true}};
-                            }
+                            var scroll_version_id = username == "default" ? 1 : entries['results'][i]["version_id"];
+                            var children = entries['results'][i]["count"] > 0 ? true :false;
+                            var listing = {"text": "<span class=\"menu scroll_select editable_name\" data-id=\"" + entries['results'][i]["scroll_id"] + "\" data-version=\"" + entries['results'][i]["version"] + "\" data-user=\"" + username + "\" data-scroll-version=\"" + scroll_version_id + "\" data-scroll-data-id=\"" + entries['results'][i]["scroll_data_id"] + "\">" + entries['results'][i]["name"] + '</span><input type=\"text\" class=\"edited_name\" hidden/><span class=\"menu\"> – ' + username + ' – v. ' + entries['results'][i]["version"] + ' ' + "</span><span class=\"menu clone_combination\">clone</span>", "id" : 'lvl_1-' + entries['results'][i]["scroll_id"] + '-' + entries['results'][i]["name"] + '-' + entries['results'][i]["version_id"], "children" : children, state : {disabled  : true}};
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 1){
-                            var listing = {"text": entries['results'][i]["name"], "id" : 'lvl_2-' + entries['results'][i]["col_id"] + '-' + entries['results'][i]["version"], "children" : true, state : {disabled  : true}};
+                            var children = entries['results'][i]["count"] > 0 ? true :false;
+                            var listing = {"text": entries['results'][i]["name"], "id" : 'lvl_2-' + entries['results'][i]["col_id"] + '-' + entries['results'][i]["version"], "children" : children, state : {disabled  : true}};
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 2){
