@@ -50,6 +50,7 @@ sub processCGI {
 		'getScrollArtefacts' => \&getScrollArtefacts,
 		'newCombination' => \&newCombination,
 		'copyCombination' => \&copyCombination,
+		'nameCombination' => \&nameCombination,
 		'setArtPosition' => \&setArtPosition,
 	);
 
@@ -84,11 +85,24 @@ sub readResults {
 	$sql->finish;
 }
 
+sub handleDBError {
+	my ($info, $error) = @_;
+	if (defined $error) {
+		print '{"error": "';
+		foreach (@$error){
+			print $_ . ' ';
+		}
+		print '"}';
+	} else {
+		print '{"returned_info": ' . $info . '}';
+	}
+}
+
 sub getCombs {
 	
 	my $cgi = shift;
 	my $userID = $cgi->param('user');
-	my $sql = $cgi->dbh->prepare('select scroll_version.scroll_id as scroll_id, scroll_data.name as name, scroll_version.version as version from scroll_version inner join scroll_data on scroll_data.scroll_id = scroll_version.scroll_id where scroll_version.user_id = ? order by LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"), LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"), scroll_version.version') or die
+	my $sql = $cgi->dbh->prepare_cached('select scroll_data.scroll_id as scroll_id, scroll_data.name as name, scroll_version.version as version, scroll_version.scroll_version_id as version_id, scroll_data.scroll_data_id as scroll_data_id from scroll_version join scroll_data_owner using(scroll_version_id) join scroll_data using(scroll_data_id) where scroll_version.user_id = ? order by LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"), LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"), scroll_version.version') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($userID);
 	readResults($sql);
@@ -99,11 +113,11 @@ sub getColOfComb {
 	
 	my $cgi = shift;
 	my $userID = $cgi->param('user');
-	my $version = $cgi->param('version');
+	my $version_id = $cgi->param('version_id');
 	my $combID = $cgi->param('combID');
-	my $sql = $cgi->dbh->prepare('select col_data_owner.scroll_version_id as version, col_data.name as name, col_data.col_id as col_id from col_data inner join col_data_owner on col_data_owner.col_data_id = col_data.col_data_id inner join scroll_to_col on scroll_to_col.col_id = col_data.col_id inner join scroll_version on scroll_version.scroll_version_id = col_data_owner.scroll_version_id where scroll_version.user_id = ? and scroll_version.version = ? and scroll_to_col.scroll_id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('select col_data.name as name, col_data.col_id as col_id from col_data join col_data_owner using(col_data_id) join scroll_to_col using(col_id) join scroll_version using(scroll_version_id) where col_data_owner.scroll_version_id = ? and scroll_to_col.scroll_id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($userID, $version, $combID);
+	$sql->execute($version_id, $combID);
 	readResults($sql);
 	return;
 }
@@ -114,7 +128,7 @@ sub getFragsOfCol {
 	my $userID = $cgi->param('user');
 	my $version = $cgi->param('version');
 	my $colID = $cgi->param('colID');
-	my $sql = $cgi->dbh->prepare('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side, discrete_canonical_references.column_of_scroll_id from discrete_canonical_references where discrete_canonical_references.column_of_scroll_id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('SELECT discrete_canonical_references.discrete_canonical_reference_id, discrete_canonical_references.column_name, discrete_canonical_references.fragment_name, discrete_canonical_references.sub_fragment_name, discrete_canonical_references.fragment_column, discrete_canonical_references.side, discrete_canonical_references.column_of_scroll_id from discrete_canonical_references where discrete_canonical_references.column_of_scroll_id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($colID);
 	readResults($sql);
@@ -125,7 +139,7 @@ sub getIAAEdIDandColOfScrollID {
 	
 	my $cgi = shift;
 	my $discCanRef = $cgi->param('discCanRef');
-	my $sql = $cgi->dbh->prepare('select scroll.name as scroll_name, edition_catalog_to_discrete_reference.edition_id, column_of_scroll.name as col_name from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join edition_catalog_to_discrete_reference on edition_catalog_to_discrete_reference.disc_can_ref_id = discrete_canonical_references.discrete_canonical_reference_id inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id inner join column_of_scroll on column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id where edition_catalog.edition_side=0 and discrete_canonical_references.discrete_canonical_reference_id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('select scroll.name as scroll_name, edition_catalog_to_discrete_reference.edition_id, column_of_scroll.name as col_name from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join edition_catalog_to_discrete_reference on edition_catalog_to_discrete_reference.disc_can_ref_id = discrete_canonical_references.discrete_canonical_reference_id inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id inner join column_of_scroll on column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id where edition_catalog.edition_side=0 and discrete_canonical_references.discrete_canonical_reference_id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($discCanRef);
 	readResults($sql);
@@ -136,7 +150,7 @@ sub getColOfScrollID {
 	
 	my $cgi = shift;
 	my $discCanRef = $cgi->param('discCanRef');
-	my $sql = $cgi->dbh->prepare('select scroll.name as scroll_name, column_of_scroll.name as col_name from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join column_of_scroll on column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id where discrete_canonical_references.discrete_canonical_reference_id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('select scroll.name as scroll_name, column_of_scroll.name as col_name from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join column_of_scroll on column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id where discrete_canonical_references.discrete_canonical_reference_id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($discCanRef);
 	readResults($sql);
@@ -147,7 +161,7 @@ sub getIAAEdID {
 	
 	my $cgi = shift;
 	my $discCanRef = $cgi->param('discCanRef');
-	my $sql = $cgi->dbh->prepare('select edition_catalog_to_discrete_reference.edition_id from edition_catalog_to_discrete_reference inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id where edition_catalog.edition_side=0 and edition_catalog_to_discrete_reference.disc_can_ref_id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('select edition_catalog_to_discrete_reference.edition_id from edition_catalog_to_discrete_reference inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id where edition_catalog.edition_side=0 and edition_catalog_to_discrete_reference.disc_can_ref_id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($discCanRef);
 	readResults($sql);
@@ -157,7 +171,7 @@ sub getIAAEdID {
 sub getManuscriptData {
 	
 	my $cgi = shift;
-	my $sql = $cgi->dbh->prepare('SELECT * FROM fragment') or die
+	my $sql = $cgi->dbh->prepare_cached('SELECT * FROM fragment') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute();
 	readResults($sql);
@@ -167,7 +181,7 @@ sub getFragmentData {
 	
 	my $cgi = shift;
 	my $fragID = $cgi->param('fragID');
-	my $sql = $cgi->dbh->prepare('CALL getMasterImageListings()') or die
+	my $sql = $cgi->dbh->prepare_cached('CALL getMasterImageListings()') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute();
 	readResults($sql);
@@ -177,7 +191,7 @@ sub getFragmentPos {
 	
 	my $cgi = shift;
 	my $fragID = $cgi->param('fragID');
-	my $sql = $cgi->dbh->prepare('SELECT x_pos, y_pos, rotation FROM fragment WHERE id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('SELECT x_pos, y_pos, rotation FROM fragment WHERE id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($fragID);
 	readResults($sql);
@@ -189,7 +203,7 @@ sub getFragmentPicture {
 	my $fragID = $cgi->param('fragID');
 	my $side = $cgi->param('side');
 	my $type = $cgi->param('type');
-	my $sql = $cgi->dbh->prepare('SELECT image.filename as filename, image.is_master as is_master FROM image WHERE side = ?
+	my $sql = $cgi->dbh->prepare_cached('SELECT image.filename as filename, image.is_master as is_master FROM image WHERE side = ?
 				AND type = ? AND fragmentID = ?') or die "Couldn't prepare statement: " . 
 				$cgi->dbh->errstr;
 	$sql->execute($side, $type, $fragID);
@@ -204,10 +218,10 @@ sub getImagesOfFragment {
 	my $idType = $cgi->param('idType');
 	my $id = $cgi->param('id');
 	if ($idType eq 'composition') {
-		$sql = $cgi->dbh->prepare('SELECT SQE_image.filename as filename, SQE_image.wavelength_start as start, SQE_image.wavelength_end as end, SQE_image.is_master, image_urls.url as url FROM SQE_image INNER JOIN image_urls on image_urls.id = SQE_image.url_code INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id WHERE image_to_edition_catalog.edition_id = ?') 
+		$sql = $cgi->dbh->prepare_cached('SELECT SQE_image.filename as filename, SQE_image.wavelength_start as start, SQE_image.wavelength_end as end, SQE_image.is_master, image_urls.url as url FROM SQE_image INNER JOIN image_urls on image_urls.id = SQE_image.url_code INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id WHERE image_to_edition_catalog.edition_id = ?') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	} elsif ($idType eq 'institution') {
-		$sql = $cgi->dbh->prepare('SELECT * FROM SQE_image WHERE image_catalog_id = ?') 
+		$sql = $cgi->dbh->prepare_cached('SELECT * FROM SQE_image WHERE image_catalog_id = ?') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	}
 	$sql->execute($id);
@@ -218,7 +232,7 @@ sub getImagesOfFragment {
 sub getAllFragments {
 	
 	my $cgi = shift;
-	my $sql = $cgi->dbh->prepare('CALL getAllFragments()') 
+	my $sql = $cgi->dbh->prepare_cached('CALL getAllFragments()') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute();
 	readResults($sql);
@@ -228,7 +242,7 @@ sub getAllFragments {
 sub getCanonicalCompositions {
 	
 	my $cgi = shift;
-	my $sql = $cgi->dbh->prepare('SELECT DISTINCT composition FROM edition_catalog ORDER BY BIN(composition) ASC, composition ASC') 
+	my $sql = $cgi->dbh->prepare_cached('SELECT DISTINCT composition FROM edition_catalog ORDER BY BIN(composition) ASC, composition ASC') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute();
 	readResults($sql);
@@ -239,7 +253,7 @@ sub getCanonicalID1 {
 	
 	my $cgi = shift;
 	my $composition = $cgi->param('composition');
-	my $sql = $cgi->dbh->prepare('SELECT DISTINCT composition, edition_location_1 FROM edition_catalog WHERE composition = ? ORDER BY BIN(edition_location_1) ASC, edition_location_1 ASC') 
+	my $sql = $cgi->dbh->prepare_cached('SELECT DISTINCT composition, edition_location_1 FROM edition_catalog WHERE composition = ? ORDER BY BIN(edition_location_1) ASC, edition_location_1 ASC') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($composition);
 	readResults($sql);
@@ -251,7 +265,7 @@ sub getCanonicalID2 {
 	my $cgi = shift;
 	my $composition = $cgi->param('composition');
 	my $edition_location_1 = $cgi->param('edition_location_1');
-	my $sql = $cgi->dbh->prepare('SELECT edition_location_2, edition_catalog_id FROM edition_catalog WHERE composition = ? AND edition_location_1 = ? AND edition_side = 0 ORDER BY CAST(edition_location_2 as unsigned)') 
+	my $sql = $cgi->dbh->prepare_cached('SELECT edition_location_2, edition_catalog_id FROM edition_catalog WHERE composition = ? AND edition_location_1 = ? AND edition_side = 0 ORDER BY CAST(edition_location_2 as unsigned)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($composition, $edition_location_1);
 	readResults($sql);
@@ -262,7 +276,7 @@ sub getScrollColNameFromDiscCanRef {
 	
 	my $cgi = shift;
 	my $frag_id = $cgi->param('frag_id');
-	my $sql = $cgi->dbh->prepare('SELECT scroll_data.name as scroll, col_data.name as col from scroll_to_col inner join scroll_data on scroll_data.scroll_id = scroll_to_col.scroll_id inner join col_data on col_data.col_id = scroll_to_col.col_id inner join discrete_canonical_references on discrete_canonical_references.column_of_scroll_id = scroll_to_col.col_id where discrete_canonical_references.discrete_canonical_reference_id = ?') 
+	my $sql = $cgi->dbh->prepare_cached('SELECT scroll_data.name as scroll, col_data.name as col from scroll_to_col inner join scroll_data on scroll_data.scroll_id = scroll_to_col.scroll_id inner join col_data on col_data.col_id = scroll_to_col.col_id inner join discrete_canonical_references on discrete_canonical_references.column_of_scroll_id = scroll_to_col.col_id where discrete_canonical_references.discrete_canonical_reference_id = ?') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($frag_id);
 	readResults($sql);
@@ -272,7 +286,7 @@ sub getScrollColNameFromDiscCanRef {
 sub getInstitutions {
 	
 	my $cgi = shift;
-	my $sql = $cgi->dbh->prepare('SELECT DISTINCT institution FROM image_catalog') 
+	my $sql = $cgi->dbh->prepare_cached('SELECT DISTINCT institution FROM image_catalog') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute();
 	readResults($sql);
@@ -283,7 +297,7 @@ sub getInstitutionPlates {
 	
 	my $cgi = shift;
 	my $institution = $cgi->param('institution');
-	my $sql = $cgi->dbh->prepare('SELECT DISTINCT institution, catalog_number_1 FROM image_catalog WHERE institution = ? ORDER BY CAST(catalog_number_1 as unsigned)') 
+	my $sql = $cgi->dbh->prepare_cached('SELECT DISTINCT institution, catalog_number_1 FROM image_catalog WHERE institution = ? ORDER BY CAST(catalog_number_1 as unsigned)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($institution);
 	readResults($sql);
@@ -295,7 +309,7 @@ sub getInstitutionFragments {
 	my $cgi = shift;
 	my $institution = $cgi->param('institution');
 	my $catalog_number_1 = $cgi->param('catalog_number_1');
-	my $sql = $cgi->dbh->prepare('SELECT catalog_number_2, image_catalog_id FROM image_catalog WHERE institution = ? AND catalog_number_1 = ? AND catalog_side = 0 ORDER BY CAST(catalog_number_2 as unsigned)') 
+	my $sql = $cgi->dbh->prepare_cached('SELECT catalog_number_2, image_catalog_id FROM image_catalog WHERE institution = ? AND catalog_number_1 = ? AND catalog_side = 0 ORDER BY CAST(catalog_number_2 as unsigned)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($institution, $catalog_number_1);
 	readResults($sql);
@@ -306,7 +320,7 @@ sub getPolygon {
 	
 	my $cgi = shift;
 	my $master_image_id = $cgi->param('master_image_id');
-	my $sql = $cgi->dbh->prepare('select ST_AsText(region_in_master_image) from artefact where master_image_id=?') 
+	my $sql = $cgi->dbh->prepare_cached('select ST_AsText(region_in_master_image) from artefact where master_image_id=?') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($master_image_id);
 	readResults($sql);
@@ -319,9 +333,10 @@ sub getScrollArtefacts {
 	my $scroll_id = $cgi->param('scroll_id');
 	my $user_id = $cgi->param('user_id');
 	my $version = $cgi->param('version');
-	my $sql = $cgi->dbh->prepare('CALL getScrollVersionArtefacts(?, ?, ?)') 
+	my $version_id = $cgi->param('scroll_version_id');
+	my $sql = $cgi->dbh->prepare_cached('CALL getScrollVersionArtefacts(?, ?)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($user_id, $scroll_id, $version);
+	$sql->execute($scroll_id, $version_id);
 	readResults($sql);
 	return;
 }
@@ -329,7 +344,7 @@ sub getScrollArtefacts {
 sub newCombination {
 	my $cgi = shift;
 	my $user_id = $cgi->param('user_id');
-	my $sql = $cgi->dbh->prepare('CALL getScrollArtefacts(?)') 
+	my $sql = $cgi->dbh->prepare_cached('CALL getScrollArtefacts(?)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($user_id);
 	readResults($sql);
@@ -347,33 +362,13 @@ sub copyCombination {
 sub nameCombination {
 	my $cgi = shift;
 	my $scroll_id = $cgi->param('scroll_id');
+	my $scroll_data_id = $cgi->param('scroll_data_id');
 	my $version_id = $cgi->param('version_id');
-	my $user_id = $cgi->param('user_id');
+	my $user_id = $cgi->dbh->user_id;
 	my $scroll_name = $cgi->param('name');
-	my $scroll_data_id;
-	my $sql = $cgi->dbh->prepare('select scroll_data_owner.scroll_data_id from scroll_data_owner inner join scroll_version on scroll_version.scroll_version_id=scroll_data_owner.scroll_version_id where scroll_version.scroll_id=? and scroll_version.user_id=? and scroll_version.version=?;') 
-		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($scroll_id, $user_id, $version_id);
-	my @fetchedResults = ();
-	while (my $result = $sql->fetchrow_hashref){
-       	push @fetchedResults, $result;
-    }
-    if (scalar(@fetchedResults) > 0) {
-		$scroll_data_id = $fetchedResults[0];
- 	} else {
-    	print 'No results found.';
- 	}
-	$sql->finish;
+	$cgi->dbh->set_scrollversion($version_id);
 	my ($new_scroll_data_id, $error) = $cgi->dbh->change_value("scroll_data", $scroll_data_id, "name", $scroll_name);
-	if (defined $error){
-		print '{"error": "';
-		foreach (@$error){
-			print $_ . ' ';
-		}
-		print '"}';
-	} else {
-		print '{"name_change": "success"}';
-	}
+	handleDBError ($new_scroll_data_id, $error);
 	return;
 }
 
@@ -381,24 +376,13 @@ sub setArtPosition {
 	my $cgi = shift;
 	my $user_id = $cgi->dbh->user_id;
 	my $scroll_id = $cgi->param('scroll_id');
-	my $version = $cgi->param('version');
-	my $sql = $cgi->dbh->prepare('select scroll_version.scroll_version_id from scroll_version where scroll_version.scroll_id=? and scroll_version.user_id = ? and scroll_version.version = ?') or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($scroll_id, $user_id, $version);
-	my $version_id = ($sql->fetchrow_array)[0];
+	my $version_id = $cgi->param('version_id');
 	$cgi->dbh->set_scrollversion($version_id);
 	my $art_id = $cgi->param('art_id');
 	my $x = $cgi->param('x');
 	my $y = $cgi->param('y');
 	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $art_id, "position_in_scroll", ['POINT', $x, $y]);
-	if (defined $error) {
-		print '{"error": "';
-		foreach (@$error){
-			print $_ . ' ';
-		}
-		print '"}';
-	} else {
-		print '{"new_id": ' . $new_id . '}';
-	}
+	handleDBError ($new_id, $error);
 	return;
 }
 
@@ -420,7 +404,7 @@ sub setMask {
  	print $fh $decodedMask;
  	close $fh;
 	
-	my $sql = $cgi->dbh->prepare('UPDATE image SET mask = ?, mask_path = ?, center_x = ?, center_y = ? WHERE id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('UPDATE image SET mask = ?, mask_path = ?, center_x = ?, center_y = ? WHERE id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($filename, $maskSVG, $centerX, $centerY, $imageID);
 	
@@ -434,7 +418,7 @@ sub setFragmentLocation {
 	my $fragID = $cgi->param('fragID');
 	my $x = $cgi->param('x');
 	my $y = $cgi->param('y');
-	my $sql = $cgi->dbh->prepare('UPDATE fragment SET x_pos = ?, y_pos = ? WHERE id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('UPDATE fragment SET x_pos = ?, y_pos = ? WHERE id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($x, $y, $fragID);
 	
@@ -446,7 +430,7 @@ sub setFragmentRotation {
 	my $cgi = shift;
 	my $fragID = $cgi->param('fragID');
 	my $rotation = $cgi->param('rotation');
-	my $sql = $cgi->dbh->prepare('UPDATE fragment SET rotation = ? WHERE id = ?') or die
+	my $sql = $cgi->dbh->prepare_cached('UPDATE fragment SET rotation = ? WHERE id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($rotation, $fragID);
 	

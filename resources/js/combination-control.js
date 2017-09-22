@@ -7,6 +7,7 @@ var CombinationController = (function () {
                 this.x_move = x_move;
                 this.y_move = y_move;
             }
+            var scroll_version_id;
             var artefacts = [];
             var zoom_factor = 0.1;
             var max_zoom = 0.1;
@@ -37,17 +38,15 @@ var CombinationController = (function () {
             var self = this;
     
             // Private functions, will be invoked by name.call(this, ...input vars)
-            function load_scroll(id, default_combination){
+            function load_scroll(id, scroll_version){
                 $comb_scroll.empty();
+                scroll_version_id = scroll_version;
                 var scroll_data = new FormData();
                 scroll_data.append('transaction', 'getScrollArtefacts');
                 scroll_data.append('scroll_id', id);
-                if (default_combination) {
-                    scroll_data.append('user_id',0);
-                } else {
-                    scroll_data.append('user_id', Spider.user_id);
-                }
+                scroll_data.append('user_id', Spider.user_id);
                 scroll_data.append('version', Spider.current_version);
+                scroll_data.append('scroll_version_id', scroll_version_id);
                 scroll_data.append('SESSION_ID', Spider.session_id);
                 jQuery.ajax({
                     url: 'resources/cgi-bin/GetImageData.pl',
@@ -241,6 +240,7 @@ var CombinationController = (function () {
                     scroll_data.append('transaction', 'setArtPosition');
                     scroll_data.append('scroll_id', Spider.current_combination);
                     scroll_data.append('version', Spider.current_version);
+                    scroll_data.append('version_id',scroll_version_id);
                     console.log("Scroll id " + Spider.current_combination);
                     console.log("Current version " + Spider.current_version);
                     scroll_data.append('art_id', $frag_cont.attr("id").split("image-cont-xy-")[1]);
@@ -292,8 +292,8 @@ var CombinationController = (function () {
             }
     
             //Public methods are created via the prototype
-            CombinationController.prototype.display_scroll = function (id, default_combination) {
-                return load_scroll.call(this, id, default_combination);
+            CombinationController.prototype.display_scroll = function (id, scroll_version) {
+                return load_scroll.call(this, id, scroll_version);
             }
             CombinationController.prototype.change_zoom = function (new_zoom, dynamic) {
                 return zoom.call(this, new_zoom, dynamic);
@@ -322,7 +322,7 @@ var CombinationController = (function () {
             //register responders with messageSpider
             Spider.register_object([
                 {type: 'load_scroll', execute_function: function(data){
-                    self.display_scroll(data.id, data.default);
+                    self.display_scroll(data.id, data.scroll_version);
                     }
                 }
             ]);
