@@ -21,7 +21,7 @@ var CombinationController = (function () {
             $comb_scroll.css('overflow', 'hidden');
             $('#combination-pane').append($comb_scroll);
             var $container = $cont;
-            var $zoom_control = $('<input>')
+            var $zoom_control = $('<input>');
             $zoom_control.attr('type', "range")
             .attr('id', "combination-zoom-slider")
             .attr('min', '0.01')
@@ -168,7 +168,7 @@ var CombinationController = (function () {
                 var selected_artefact;
                 function mouseDown(evt) {
                     if (evt.target !== evt.currentTarget) {
-                        if($(evt.target).attr("class") == 'clippedImg'){
+                        if($(evt.target).attr("class") === 'clippedImg'){
                             evt.preventDefault();
                             $comb_scroll.off('mousedown', mouseDown);
                             if (Spider.unlocked){
@@ -187,11 +187,11 @@ var CombinationController = (function () {
                 function mouseMove(evt){
                     var x = evt.clientX;
                     var y = evt.clientY;
-                    var viewport = {t: $comb_scroll.offsetTop + 10,
-                                    b: $comb_scroll.offsetTop +  $comb_scroll.clientHeight - 10,
-                                    l: $comb_scroll.offsetLeft + 10,
-                                    r: $comb_scroll.offsetLeft + $comb_scroll.clientWidth - 10,
-                    };
+                    // var viewport = {t: $comb_scroll.offsetTop + 10,
+                    //                 b: $comb_scroll.offsetTop +  $comb_scroll.clientHeight - 10,
+                    //                 l: $comb_scroll.offsetLeft + 10,
+                    //                 r: $comb_scroll.offsetLeft + $comb_scroll.clientWidth - 10,
+                    // };
                     // switch (true){
                     //     case (y < viewport.t):
                     //         scroll.scrollTop = parseInt(scroll.scrollTop, 10) - 5;
@@ -213,7 +213,7 @@ var CombinationController = (function () {
         
                     var moveXY = {
                         x: x - mouseOrigin.x,
-                        y: y - mouseOrigin.y,
+                        y: y - mouseOrigin.y
                     };
                     $(selected_artefact).parent().parent().parent().parent().css('transform', 'translate3d(' + moveXY.x + 'px, ' + moveXY.y + 'px, 0px)');
                 }
@@ -226,7 +226,7 @@ var CombinationController = (function () {
                     var y = evt.clientY;
                     var moveXY = {
                         x: x - mouseOrigin.x,
-                        y: y - mouseOrigin.y,
+                        y: y - mouseOrigin.y
                     };
                     var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
                     $frag_cont.css({
@@ -275,7 +275,7 @@ var CombinationController = (function () {
                         if (max_zoom < zoom_factor) {
                             artefact.image.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + artefact.url + "&file="
                             + artefact.filename + '/' + artefact.crop_x + ',' + artefact.crop_y + ',' + artefact.crop_width + ',' + artefact.crop_height + '/pct:' + (scale * 100 < 100 ? scale * 100 : 100) + '/0/' + artefact.suffix);
-                            if (index == artefact.length -1){
+                            if (index === artefact.length -1){
                                 max_zoom = zoom_factor;
                             }
                         }
@@ -294,10 +294,10 @@ var CombinationController = (function () {
             //Public methods are created via the prototype
             CombinationController.prototype.display_scroll = function (id, scroll_version) {
                 return load_scroll.call(this, id, scroll_version);
-            }
+            };
             CombinationController.prototype.change_zoom = function (new_zoom, dynamic) {
                 return zoom.call(this, new_zoom, dynamic);
-            }
+            };
             // CombinationController.prototype.setOpacity = function(value, filename) {
             // 	$('#single_image-' + $.escapeSelector(filename)).css("opacity", value / 100);
             // }
