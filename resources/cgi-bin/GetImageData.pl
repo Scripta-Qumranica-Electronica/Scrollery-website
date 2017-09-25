@@ -330,6 +330,8 @@ sub getInstitutionArtefacts {
 	return;
 }
 
+# First I copy the artefect to a new artefact owner with the currect scroll_version_id
+# Then I change the scroll_id of the artefact to match the current scroll_id
 sub addArtToComb {
 	my $cgi = shift;
 	my $art_id =  $cgi->param('art_id');
@@ -337,12 +339,14 @@ sub addArtToComb {
 	my $scroll_version_id =  $cgi->param('version_id');
 	$cgi->dbh->set_scrollversion($scroll_version_id);
 	my $user_id = $cgi->dbh->user_id;
+	
 	$cgi->dbh->start_logged_action;
 	my $sql = $cgi->dbh->prepare_sqe('INSERT IGNORE INTO artefact_owner (artefact_id, scroll_version_id) VALUES(?,?)');
 	$sql->set_action( 'ADD', "artefact_owner" );
     my $result = $sql->logged_execute($art_id, $scroll_version_id);
     $sql->finish; 
 	$cgi->dbh->stop_logged_action;
+
 	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $art_id, "scroll_id", $scroll_id);
 	handleDBError ($new_scroll_data_id, $error);
 }
