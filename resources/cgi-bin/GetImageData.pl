@@ -343,7 +343,8 @@ sub addArtToComb {
     my $result = $sql->logged_execute($art_id, $scroll_version_id);
     $sql->finish; 
 	$cgi->dbh->stop_logged_action;
-	print '{"returned_info": "OK"}';
+	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $art_id, "scroll_id", $scroll_id);
+	handleDBError ($new_scroll_data_id, $error);
 }
 
 sub getPolygon {
@@ -360,10 +361,11 @@ sub getPolygon {
 sub getScrollArtefacts {
 	
 	my $cgi = shift;
+	my $scroll_id = $cgi->param('scroll_id');
 	my $version_id = $cgi->param('scroll_version_id');
-	my $sql = $cgi->dbh->prepare_cached('CALL getScrollVersionArtefacts(?)') 
+	my $sql = $cgi->dbh->prepare_cached('CALL getScrollVersionArtefacts(?, ?)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($version_id);
+	$sql->execute($scroll_id, $version_id);
 	readResults($sql);
 	return;
 }

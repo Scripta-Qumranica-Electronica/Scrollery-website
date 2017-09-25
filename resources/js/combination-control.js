@@ -9,7 +9,7 @@ var CombinationController = (function () {
             }
             var scroll_version_id;
             var artefacts = [];
-            var zoom_factor = 0.1;
+            var zoom_factor = 0.05;
             var max_zoom = 0.1;
             var scroll_dpi = 1215;
             var scroll_width = 50000;
@@ -27,7 +27,7 @@ var CombinationController = (function () {
             .attr('min', '0.01')
             .attr('max', '0.4')
             .attr('step', '0.001')
-            .attr('value', '0.1')
+            .attr('value', '0.05')
             .on("input", function(){
                 zoom(this.value, true);
             })
@@ -43,7 +43,7 @@ var CombinationController = (function () {
                 scroll_version_id = scroll_version;
                 var scroll_data = new FormData();
                 scroll_data.append('transaction', 'getScrollArtefacts');
-                // scroll_data.append('scroll_id', id);
+                scroll_data.append('scroll_id', id);
                 // scroll_data.append('user_id', Spider.user_id);
                 // scroll_data.append('version', Spider.current_version);
                 scroll_data.append('scroll_version_id', scroll_version_id);
