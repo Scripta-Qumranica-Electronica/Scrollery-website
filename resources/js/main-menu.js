@@ -1,7 +1,7 @@
-var listing_type = {'lv_1': 'composition',
-                    'lv_2': 'edition_location_1',
-                    'lv_3': 'edition_location_2',
-                    'ref': 'edition_catalog_id'
+var listing_type = {'lv_1': 'institution',
+                    'lv_2': 'catalog_plate',
+                    'lv_3': 'catalog_fragment',
+                    'ref': 'image_catalog_id'
                 };
 var current_lvl;
 
@@ -69,6 +69,9 @@ function login(){
     $("#main-menu").on("click", ".fragment_select", function(){
         load_fragment_text($(this).data("col-of-scroll"));
         load_fragment_image($(this).data("id"));
+    });
+    $("#main-menu").on("click", ".add_artefact", function(){
+        add_art_to_comb($(this).prev().html());
     });
     $("#main-menu").on("dblclick", ".editable_name", function(){
         var $this = $(this);
@@ -165,6 +168,22 @@ function rename_combination(comb){
     });
 }
 
+function add_art_to_comb(art){
+    if (Spider.current_combination){
+        data_form = new FormData();
+        data_form.append('transaction', 'addArtToComb');
+        data_form.append("SESSION_ID", Spider.session_id);
+        data_form.append('scroll_id', Spider.current_combination);
+        data_form.append('version', Spider.current_version);
+        data_form.append('version_id', Spider.current_version_id);
+        data_form.append('art_id', art);
+        get_database_data(data_form, function(result){
+            console.log(result.returned_info);
+            $('#user-combination-listings').jstree(true).refresh(); 
+        });
+    }
+}
+
 function populate_combinations(user) {
     var menu = user == 0 ? '#default-combination-listings' : '#user-combination-listings';
     var username = user == 0 ? "default" : Spider.user;
@@ -232,14 +251,16 @@ function populate_combinations(user) {
 
 function populate_fragments() {
     $('#unused-fragments-listing').on('changed.jstree', function (e, data) {
-        if (data.selected[0].startsWith('lvl_3-')) {
-            load_images(listing_type.lv_1, data.selected[0].split('lvl_3-')[1]);
-        }
+        // if (data.selected[0].startsWith('lvl_3-')) {
+        //     console.log( data.selected[0].split('lvl_3-')[1]);
+        //     // load_images(listing_type.lv_1, data.selected[0].split('lvl_3-')[1]);
+        // }
     }).jstree({
         "core" : {
             "themes":{
                 "icons":false
             },
+            "html_titles":true,
 		    "data" : {
 		        'url' : function(node) {
 		            return'resources/cgi-bin/GetImageData.pl';
@@ -279,6 +300,18 @@ function populate_fragments() {
                         }
                         current_lvl = 2;
                     }
+                    else if (node.id.startsWith('lvl_3-')) {
+                        var ref_data = node.id.split('lvl_3-')[1];
+                        var arg_2 = ref_data.split('-')[0];
+                        var arg_3 = ref_data.split('-')[1];
+                        if (listing_type['lv_3'] == 'edition_location_2'){
+                            trans_data = {'transaction' : 'canonicalID2', 'composition' : arg_2, 'edition_location_1' : arg_3};
+                        }
+                        if (listing_type['lv_3'] == 'catalog_fragment'){
+                            trans_data = {'transaction' : 'institutionArtefacts', 'catalog_id' : arg_2, 'user_id' : arg_3};
+                        }
+                        current_lvl = 3;
+                    }
                     trans_data['SESSION_ID'] = Spider['session_id'];
 		            return trans_data;
 		 	    },
@@ -295,7 +328,13 @@ function populate_fragments() {
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 2){
-                            var listing = {"text": entries['results'][i][listing_type.lv_3], "id" : 'lvl_3-' + entries['results'][i][listing_type.ref], "children" : false};
+                            var listing = {"text": entries['results'][i][listing_type.lv_3] + " default", "id" : 'lvl_3-' + entries['results'][i][listing_type.ref] + "-0", "children" : true};
+                            menu_list.push(listing);
+                            listing = {"text": entries['results'][i][listing_type.lv_3] + " user", "id" : 'lvl_3-' + entries['results'][i][listing_type.ref] + "-" + Spider.user_id, "children" : true};
+                            menu_list.push(listing);
+                        }
+                        else if (current_lvl == 3){
+                            var listing = {"text": "<span>" + entries['results'][i]["artefact_id"] + "</span><span class=\"add_artefact\"> +</span>", "id" : 'lvl_4-' + entries['results'][i]["artefact_id"] + "-" + entries['results'][i]["user_id"], "children" : false};
                             menu_list.push(listing);
                         }
                     }

@@ -43,9 +43,9 @@ var CombinationController = (function () {
                 scroll_version_id = scroll_version;
                 var scroll_data = new FormData();
                 scroll_data.append('transaction', 'getScrollArtefacts');
-                scroll_data.append('scroll_id', id);
-                scroll_data.append('user_id', Spider.user_id);
-                scroll_data.append('version', Spider.current_version);
+                // scroll_data.append('scroll_id', id);
+                // scroll_data.append('user_id', Spider.user_id);
+                // scroll_data.append('version', Spider.current_version);
                 scroll_data.append('scroll_version_id', scroll_version_id);
                 scroll_data.append('SESSION_ID', Spider.session_id);
                 jQuery.ajax({

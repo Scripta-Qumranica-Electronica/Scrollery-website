@@ -46,6 +46,8 @@ sub processCGI {
 		'institutions' => \&getInstitutions,
 		'institutionPlates' => \&getInstitutionPlates,
 		'institutionFragments' => \&getInstitutionFragments,
+		'institutionArtefacts' => \&getInstitutionArtefacts,
+		'addArtToComb' => \&addArtToComb,
 		'getPolygon' => \&getPolygon,
 		'getScrollArtefacts' => \&getScrollArtefacts,
 		'newCombination' => \&newCombination,
@@ -297,7 +299,7 @@ sub getInstitutionPlates {
 	
 	my $cgi = shift;
 	my $institution = $cgi->param('institution');
-	my $sql = $cgi->dbh->prepare_cached('SELECT DISTINCT institution, catalog_number_1 FROM image_catalog WHERE institution = ? ORDER BY CAST(catalog_number_1 as unsigned)') 
+	my $sql = $cgi->dbh->prepare_cached('SELECT DISTINCT institution, catalog_number_1 as catalog_plate FROM image_catalog WHERE institution = ? ORDER BY CAST(catalog_number_1 as unsigned)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($institution);
 	readResults($sql);
@@ -309,11 +311,39 @@ sub getInstitutionFragments {
 	my $cgi = shift;
 	my $institution = $cgi->param('institution');
 	my $catalog_number_1 = $cgi->param('catalog_number_1');
-	my $sql = $cgi->dbh->prepare_cached('SELECT catalog_number_2, image_catalog_id FROM image_catalog WHERE institution = ? AND catalog_number_1 = ? AND catalog_side = 0 ORDER BY CAST(catalog_number_2 as unsigned)') 
+	my $sql = $cgi->dbh->prepare_cached('SELECT catalog_number_2 as catalog_fragment, image_catalog_id FROM image_catalog WHERE institution = ? AND catalog_number_1 = ? AND catalog_side = 0 ORDER BY CAST(catalog_number_2 as unsigned)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($institution, $catalog_number_1);
 	readResults($sql);
 	return;
+}
+
+sub getInstitutionArtefacts {
+	
+	my $cgi = shift;
+	my $catalog_id = $cgi->param('catalog_id');
+	my $user_id = $cgi->param('user_id');
+	my $sql = $cgi->dbh->prepare_cached('select distinct artefact.artefact_id, user_id from artefact join SQE_image on SQE_image.sqe_image_id = artefact.master_image_id join artefact_owner using(artefact_id) join scroll_version using(scroll_version_id) where SQE_image.image_catalog_id = ? and user_id = ?') 
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($catalog_id, $user_id);
+	readResults($sql);
+	return;
+}
+
+sub addArtToComb {
+	my $cgi = shift;
+	my $art_id =  $cgi->param('art_id');
+	my $scroll_id =  $cgi->param('scroll_id');
+	my $scroll_version_id =  $cgi->param('version_id');
+	$cgi->dbh->set_scrollversion($scroll_version_id);
+	my $user_id = $cgi->dbh->user_id;
+	$cgi->dbh->start_logged_action;
+	my $sql = $cgi->dbh->prepare_sqe('INSERT IGNORE INTO artefact_owner (artefact_id, scroll_version_id) VALUES(?,?)');
+	$sql->set_action( 'ADD', "artefact_owner" );
+    my $result = $sql->logged_execute($art_id, $scroll_version_id);
+    $sql->finish; 
+	$cgi->dbh->stop_logged_action;
+	print '{"returned_info": "OK"}';
 }
 
 sub getPolygon {
@@ -330,13 +360,10 @@ sub getPolygon {
 sub getScrollArtefacts {
 	
 	my $cgi = shift;
-	my $scroll_id = $cgi->param('scroll_id');
-	my $user_id = $cgi->param('user_id');
-	my $version = $cgi->param('version');
 	my $version_id = $cgi->param('scroll_version_id');
-	my $sql = $cgi->dbh->prepare_cached('CALL getScrollVersionArtefacts(?, ?)') 
+	my $sql = $cgi->dbh->prepare_cached('CALL getScrollVersionArtefacts(?)') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($scroll_id, $version_id);
+	$sql->execute($version_id);
 	readResults($sql);
 	return;
 }

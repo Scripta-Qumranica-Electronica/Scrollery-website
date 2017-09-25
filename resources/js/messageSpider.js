@@ -15,6 +15,7 @@ function Spider() // singleton central component communication system
 	    this.user = "";
 	    this.current_combination = "";
 		this.current_version = "";
+		this.current_version_id = "";
 		this.unlocked = false;
 	    this.registered_objects = {
 	    	load_scroll: [],
