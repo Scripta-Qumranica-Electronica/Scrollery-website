@@ -21,24 +21,11 @@ sub processCGI {
 
 	my $transaction = $cgi->param('transaction') || 'unspecified';
 	my %action = (
-		## Start-Old functions, to be replaced later
-		'readFragmentData' => \&getFragmentData,
-		'readFragmentPosition' => \&getFragmentPos,
-		'readFragmentPicture' => \&getFragmentPicture,
-		'readManuscriptData' => \&getManuscriptData,
-		'writeMask' => \&setMask,
-		'writeFragLocation' => \&setFragmentLocation,
-		'writeFragRotation' => \&setFragmentRotation,
-		## End-Old functions, to be replaced later
-
 		'getCombs' => \&getCombs,
 		'getColOfComb' => \&getColOfComb,
 		'getFragsOfCol' => \&getFragsOfCol,
-		'getIAAEdIDandColOfScrollID' => \&getIAAEdIDandColOfScrollID,
 		'getColOfScrollID' => \&getColOfScrollID,
-		'getIAAEdID' => \&getIAAEdID,
 		'imagesOfFragment' => \&getImagesOfFragment,
-		'allFragments' => \&getAllFragments,
 		'canonicalCompositions' => \&getCanonicalCompositions,
 		'canonicalID1' => \&getCanonicalID1,
 		'canonicalID2' => \&getCanonicalID2,
@@ -48,7 +35,6 @@ sub processCGI {
 		'institutionFragments' => \&getInstitutionFragments,
 		'institutionArtefacts' => \&getInstitutionArtefacts,
 		'addArtToComb' => \&addArtToComb,
-		'getPolygon' => \&getPolygon,
 		'getScrollArtefacts' => \&getScrollArtefacts,
 		'getScrollWidth' => \&getScrollWidth,
 		'getScrollHeight' => \&getScrollHeight,
@@ -139,33 +125,11 @@ sub getFragsOfCol {
 	return;
 }
 
-sub getIAAEdIDandColOfScrollID {
-	
-	my $cgi = shift;
-	my $discCanRef = $cgi->param('discCanRef');
-	my $sql = $cgi->dbh->prepare_cached('select scroll.name as scroll_name, edition_catalog_to_discrete_reference.edition_id, column_of_scroll.name as col_name from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join edition_catalog_to_discrete_reference on edition_catalog_to_discrete_reference.disc_can_ref_id = discrete_canonical_references.discrete_canonical_reference_id inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id inner join column_of_scroll on column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id where edition_catalog.edition_side=0 and discrete_canonical_references.discrete_canonical_reference_id = ?') or die
-			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($discCanRef);
-	readResults($sql);
-	return;
-}
-
 sub getColOfScrollID {
 	
 	my $cgi = shift;
 	my $discCanRef = $cgi->param('discCanRef');
 	my $sql = $cgi->dbh->prepare_cached('select scroll.name as scroll_name, column_of_scroll.name as col_name from discrete_canonical_references inner join scroll on scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id inner join column_of_scroll on column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id where discrete_canonical_references.discrete_canonical_reference_id = ?') or die
-			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($discCanRef);
-	readResults($sql);
-	return;
-}
-
-sub getIAAEdID {
-	
-	my $cgi = shift;
-	my $discCanRef = $cgi->param('discCanRef');
-	my $sql = $cgi->dbh->prepare_cached('select edition_catalog_to_discrete_reference.edition_id from edition_catalog_to_discrete_reference inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id where edition_catalog.edition_side=0 and edition_catalog_to_discrete_reference.disc_can_ref_id = ?') or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($discCanRef);
 	readResults($sql);
@@ -229,16 +193,6 @@ sub getImagesOfFragment {
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	}
 	$sql->execute($id);
-	readResults($sql);
-	return;
-}
-
-sub getAllFragments {
-	
-	my $cgi = shift;
-	my $sql = $cgi->dbh->prepare_cached('CALL getAllFragments()') 
-		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute();
 	readResults($sql);
 	return;
 }
@@ -371,17 +325,6 @@ sub addArtToComb {
 
 	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $art_id, "scroll_id", $scroll_id);
 	handleDBError ($new_scroll_data_id, $error);
-}
-
-sub getPolygon {
-	
-	my $cgi = shift;
-	my $master_image_id = $cgi->param('master_image_id');
-	my $sql = $cgi->dbh->prepare_cached('select ST_AsText(region_in_master_image) from artefact where master_image_id=?') 
-		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($master_image_id);
-	readResults($sql);
-	return;
 }
 
 sub getScrollArtefacts {
