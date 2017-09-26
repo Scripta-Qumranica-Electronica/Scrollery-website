@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="40ef7898-dab8-41ae-a480-79b8c314dfde" name="Default" comment="" />
+    <list default="true" id="40ef7898-dab8-41ae-a480-79b8c314dfde" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/cgi-bin/GetImageData.pl" afterPath="$PROJECT_DIR$/resources/cgi-bin/GetImageData.pl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/js/combination-control.js" afterPath="$PROJECT_DIR$/resources/js/combination-control.js" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -9,13 +13,56 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_TABLE_DETAILS" value="true" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <expand>
+      <path>
+        <item name="" type="eadb38e5:DatabaseStructure$Root" />
+        <item name="SQE@localhost" type="e3449647:DbNodeDescriptor" />
+      </path>
+      <path>
+        <item name="" type="eadb38e5:DatabaseStructure$Root" />
+        <item name="SQE@localhost" type="e3449647:DbNodeDescriptor" />
+        <item name="SQE" type="e3449647:DbNodeDescriptor" />
+      </path>
+      <path>
+        <item name="" type="eadb38e5:DatabaseStructure$Root" />
+        <item name="SQE@localhost" type="e3449647:DbNodeDescriptor" />
+        <item name="SQE" type="e3449647:DbNodeDescriptor" />
+        <item name="" type="fce03ad6:DatabaseStructure$GroupNode" />
+      </path>
+      <path>
+        <item name="" type="eadb38e5:DatabaseStructure$Root" />
+        <item name="SQE@localhost" type="e3449647:DbNodeDescriptor" />
+        <item name="SQE" type="e3449647:DbNodeDescriptor" />
+        <item name="" type="fce03ad6:DatabaseStructure$GroupNode" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="GetImageData.pl" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/resources/cgi-bin/GetImageData.pl">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="692">
-              <caret line="112" column="0" lean-forward="false" selection-start-line="112" selection-start-column="0" selection-end-line="112" selection-end-column="0" />
+            <state relative-caret-position="379">
+              <caret line="124" column="22" lean-forward="false" selection-start-line="124" selection-start-column="22" selection-end-line="124" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="console.sql" pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_CONFIG_DIR$/consoles/db/d5495cc8-869f-4a1a-b630-2ef018dbaa81/console.sql">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="28" lean-forward="false" selection-start-line="0" selection-start-column="28" selection-end-line="0" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -25,7 +72,7 @@
         <entry file="file://$PROJECT_DIR$/resources/js/combination-control.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="4485">
-              <caret line="299" column="14" lean-forward="false" selection-start-line="299" selection-start-column="14" selection-end-line="299" selection-end-column="14" />
+              <caret line="342" column="14" lean-forward="false" selection-start-line="342" selection-start-column="14" selection-end-line="342" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -35,8 +82,31 @@
         <entry file="file://$PROJECT_DIR$/resources/js/messageSpider.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2040">
-              <caret line="136" column="4" lean-forward="false" selection-start-line="136" selection-start-column="4" selection-end-line="136" selection-end-column="4" />
-              <folding />
+              <caret line="137" column="4" lean-forward="false" selection-start-line="137" selection-start-column="4" selection-end-line="137" selection-end-column="4" />
+              <folding>
+                <marker date="1506330589000" expanded="true" signature="70:3493" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="95:1131" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="519:570" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="690:1123" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="731:1118" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="1135:1151" ph="/**...*/" />
+                <marker date="1506330589000" expanded="true" signature="1224:2266" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="1226:1404" ph="//..." />
+                <marker date="1506330589000" expanded="true" signature="1440:1492" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="1525:1652" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="1588:1648" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="1818:2048" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="1824:1911" ph="//..." />
+                <marker date="1506330589000" expanded="true" signature="1949:1978" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="2086:2258" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="2120:2149" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="2192:2253" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="2312:2442" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="2559:2609" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="2614:3117" ph="//..." />
+                <marker date="1506330589000" expanded="true" signature="3162:3311" ph="{...}" />
+                <marker date="1506330589000" expanded="true" signature="3365:3490" ph="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -56,6 +126,9 @@
       <list>
         <option value="$PROJECT_DIR$/resources/js/combination-control.js" />
         <option value="$PROJECT_DIR$/resources/js/messageSpider.js" />
+        <option value="routine:/68b252c8/d5495cc8-869f-4a1a-b630-2ef018dbaa81/SQE.getScrollWidth" />
+        <option value="$APPLICATION_CONFIG_DIR$/consoles/db/d5495cc8-869f-4a1a-b630-2ef018dbaa81/console.sql" />
+        <option value="$PROJECT_DIR$/resources/cgi-bin/GetImageData.pl" />
       </list>
     </option>
   </component>
@@ -65,11 +138,11 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="1">
     <option name="x" value="20" />
     <option name="y" value="43" />
-    <option name="width" value="1400" />
-    <option name="height" value="833" />
+    <option name="width" value="1587" />
+    <option name="height" value="960" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -86,6 +159,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -97,15 +172,14 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="Scratches" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="PERL5_MAIN_SETTINGS" />
+    <property name="com.intellij.database.dataSource.DataSourceTemplate" value="MySQL" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -228,6 +302,7 @@
       <workItem from="1506163577644" duration="30000" />
       <workItem from="1506163625737" duration="1965000" />
       <workItem from="1506166409183" duration="448000" />
+      <workItem from="1506415658133" duration="2485000" />
     </task>
     <task id="LOCAL-00001" summary="Small corrections.">
       <created>1506165895776</created>
@@ -240,10 +315,11 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2443000" />
+    <option name="totallyTimeSpent" value="4928000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="20" y="43" width="1400" height="833" extended-state="0" />
+    <frame x="20" y="43" width="1587" height="960" extended-state="1" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -252,9 +328,11 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28265765" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22054191" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23692502" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -265,7 +343,6 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -303,7 +380,77 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2040">
           <caret line="136" column="4" lean-forward="false" selection-start-line="136" selection-start-column="4" selection-end-line="136" selection-end-column="4" />
+          <folding>
+            <marker date="1506330589000" expanded="true" signature="70:3493" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="95:1131" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="519:570" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="690:1123" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="731:1118" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1135:1151" ph="/**...*/" />
+            <marker date="1506330589000" expanded="true" signature="1224:2266" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1226:1404" ph="//..." />
+            <marker date="1506330589000" expanded="true" signature="1440:1492" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1525:1652" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1588:1648" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1818:2048" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1824:1911" ph="//..." />
+            <marker date="1506330589000" expanded="true" signature="1949:1978" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2086:2258" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2120:2149" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2192:2253" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2312:2442" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2559:2609" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2614:3117" ph="//..." />
+            <marker date="1506330589000" expanded="true" signature="3162:3311" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="3365:3490" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/cgi-bin/GetImageData.pl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/js/combination-control.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4485">
+          <caret line="299" column="14" lean-forward="false" selection-start-line="299" selection-start-column="14" selection-end-line="299" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/js/messageSpider.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2040">
+          <caret line="136" column="4" lean-forward="false" selection-start-line="136" selection-start-column="4" selection-end-line="136" selection-end-column="4" />
+          <folding>
+            <marker date="1506330589000" expanded="true" signature="70:3493" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="95:1131" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="519:570" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="690:1123" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="731:1118" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1135:1151" ph="/**...*/" />
+            <marker date="1506330589000" expanded="true" signature="1224:2266" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1226:1404" ph="//..." />
+            <marker date="1506330589000" expanded="true" signature="1440:1492" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1525:1652" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1588:1648" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1818:2048" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1824:1911" ph="//..." />
+            <marker date="1506330589000" expanded="true" signature="1949:1978" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2086:2258" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2120:2149" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2192:2253" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2312:2442" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2559:2609" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2614:3117" ph="//..." />
+            <marker date="1506330589000" expanded="true" signature="3162:3311" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="3365:3490" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -318,23 +465,77 @@
     <entry file="file://$PROJECT_DIR$/resources/js/messageSpider.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2040">
-          <caret line="136" column="4" lean-forward="false" selection-start-line="136" selection-start-column="4" selection-end-line="136" selection-end-column="4" />
-          <folding />
+          <caret line="137" column="4" lean-forward="false" selection-start-line="137" selection-start-column="4" selection-end-line="137" selection-end-column="4" />
+          <folding>
+            <marker date="1506330589000" expanded="true" signature="70:3493" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="95:1131" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="519:570" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="690:1123" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="731:1118" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1135:1151" ph="/**...*/" />
+            <marker date="1506330589000" expanded="true" signature="1224:2266" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1226:1404" ph="//..." />
+            <marker date="1506330589000" expanded="true" signature="1440:1492" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1525:1652" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1588:1648" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1818:2048" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="1824:1911" ph="//..." />
+            <marker date="1506330589000" expanded="true" signature="1949:1978" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2086:2258" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2120:2149" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2192:2253" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2312:2442" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2559:2609" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="2614:3117" ph="//..." />
+            <marker date="1506330589000" expanded="true" signature="3162:3311" ph="{...}" />
+            <marker date="1506330589000" expanded="true" signature="3365:3490" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/js/combination-control.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4485">
-          <caret line="299" column="14" lean-forward="false" selection-start-line="299" selection-start-column="14" selection-end-line="299" selection-end-column="14" />
+          <caret line="342" column="14" lean-forward="false" selection-start-line="342" selection-start-column="14" selection-end-line="342" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="das://routine:/68b252c8/d5495cc8-869f-4a1a-b630-2ef018dbaa81/SQE.getScrollHeight">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="98" lean-forward="false" selection-start-line="1" selection-start-column="33" selection-end-line="1" selection-end-column="98" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="das://routine:/68b252c8/d5495cc8-869f-4a1a-b630-2ef018dbaa81/SQE.getScrollWidth">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="das://table:/68b252c8/d5495cc8-869f-4a1a-b630-2ef018dbaa81/SQE.area_group">
+      <provider selected="true" editor-type-id="com.intellij.database.editor.DatabaseTableFileEditorProvider">
+        <state>
+          <filtering enabled="true" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/consoles/db/d5495cc8-869f-4a1a-b630-2ef018dbaa81/console.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="28" lean-forward="false" selection-start-line="0" selection-start-column="28" selection-end-line="0" selection-end-column="28" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/cgi-bin/GetImageData.pl">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="692">
-          <caret line="112" column="0" lean-forward="false" selection-start-line="112" selection-start-column="0" selection-end-line="112" selection-end-column="0" />
+        <state relative-caret-position="379">
+          <caret line="124" column="22" lean-forward="false" selection-start-line="124" selection-start-column="22" selection-end-line="124" selection-end-column="22" />
           <folding />
         </state>
       </provider>

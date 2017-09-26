@@ -50,6 +50,8 @@ sub processCGI {
 		'addArtToComb' => \&addArtToComb,
 		'getPolygon' => \&getPolygon,
 		'getScrollArtefacts' => \&getScrollArtefacts,
+		'getScrollWidth' => \&getScrollWidth,
+		'getScrollHeight' => \&getScrollHeight,
 		'newCombination' => \&newCombination,
 		'copyCombination' => \&copyCombination,
 		'nameCombination' => \&nameCombination,
@@ -326,6 +328,28 @@ sub getInstitutionArtefacts {
 	my $sql = $cgi->dbh->prepare_cached('select distinct artefact.artefact_id, user_id from artefact join SQE_image on SQE_image.sqe_image_id = artefact.master_image_id join artefact_owner using(artefact_id) join scroll_version using(scroll_version_id) where SQE_image.image_catalog_id = ? and user_id = ?') 
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($catalog_id, $user_id);
+	readResults($sql);
+	return;
+}
+
+sub getScrollWidth {
+	my $cgi = shift;
+	my $scroll_id =  $cgi->param('scroll_id');
+	my $scroll_version_id =  $cgi->param('scroll_version_id');
+	my $sql = $cgi->dbh->prepare_cached('CALL getScrollWidth(?,?)') 
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($scroll_id, $scroll_version_id);
+	readResults($sql);
+	return;
+}
+
+sub getScrollHeight {
+	my $cgi = shift;
+	my $scroll_id =  $cgi->param('scroll_id');
+	my $scroll_version_id =  $cgi->param('scroll_version_id');
+	my $sql = $cgi->dbh->prepare_cached('CALL getScrollHeight(?,?)') 
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($scroll_id, $scroll_version_id);
 	readResults($sql);
 	return;
 }
