@@ -1,0 +1,2653 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="SQE@localhost">
+  <database-model serializer="dbm" rdbms="MYSQL" format-version="4.4">
+    <root id="1"/>
+    <schema id="2" parent="1" name="SQE">
+      <Current>1</Current>
+      <Visible>1</Visible>
+    </schema>
+    <schema id="3" parent="1" name="information_schema"/>
+    <schema id="4" parent="1" name="library"/>
+    <schema id="5" parent="1" name="mysql"/>
+    <schema id="6" parent="1" name="performance_schema"/>
+    <schema id="7" parent="1" name="QWB"/>
+    <schema id="8" parent="1" name="SQE_A"/>
+    <schema id="9" parent="1" name="SQE_copy"/>
+    <schema id="10" parent="1" name="Text_Comparison"/>
+    <table id="11" parent="2" name="SQE_image"/>
+    <table id="12" parent="2" name="area_group"/>
+    <table id="13" parent="2" name="area_group_member"/>
+    <table id="14" parent="2" name="area_group_owner"/>
+    <table id="15" parent="2" name="artefact"/>
+    <table id="16" parent="2" name="artefact_owner"/>
+    <table id="17" parent="2" name="char_of_writing"/>
+    <table id="18" parent="2" name="col"/>
+    <table id="19" parent="2" name="col_data"/>
+    <table id="20" parent="2" name="col_data_owner"/>
+    <table id="21" parent="2" name="col_to_line"/>
+    <table id="22" parent="2" name="col_to_line_owner"/>
+    <table id="23" parent="2" name="discrete_canonical_references"/>
+    <table id="24" parent="2" name="edition_catalog"/>
+    <table id="25" parent="2" name="edition_catalog_to_discrete_reference"/>
+    <table id="26" parent="2" name="external_font"/>
+    <table id="27" parent="2" name="external_font_glyph"/>
+    <table id="28" parent="2" name="form_of_writing">
+      <Comment>Defines the actual scribe of of sign. As actual scribe the scribe as person using at the very moment a special „font“ caused by the mood the scribe is in (conecentrated, sloppy, fast and furious) and the used equipment. Thus even change of quills or the status of a quill (fresh filled, new, old) could be distinguished. </Comment>
+    </table>
+    <table id="29" parent="2" name="form_of_writing__owner"/>
+    <table id="30" parent="2" name="image_catalog"/>
+    <table id="31" parent="2" name="image_to_edition_catalog">
+      <Comment>Temporary table to link image catalog info with edition info until the SQE_image table is fully populated.  Once that table is populated this one will become redundant.</Comment>
+    </table>
+    <table id="32" parent="2" name="image_to_image_map"/>
+    <table id="33" parent="2" name="image_urls"/>
+    <table id="34" parent="2" name="kerning_of_char"/>
+    <table id="35" parent="2" name="line"/>
+    <table id="36" parent="2" name="line_data"/>
+    <table id="37" parent="2" name="line_data_owner"/>
+    <table id="38" parent="2" name="line_to_sign"/>
+    <table id="39" parent="2" name="line_to_sign_owner"/>
+    <table id="40" parent="2" name="main_action"/>
+    <table id="41" parent="2" name="position_in_stream">
+      <Comment>Put signs in one-dimensional stream (≈ text)
+The reason for this table is, that the manuscripts may contain parallel text-streams created by corrections. Sometimes also scholars put superlinear signs at different places. Thus, this is a discrete layer of interpretation between signs and words.</Comment>
+    </table>
+    <table id="42" parent="2" name="position_in_stream_owner"/>
+    <table id="43" parent="2" name="position_in_stream_to_word_rel"/>
+    <table id="44" parent="2" name="real_char_area">
+      <Comment>Contains data to define a real space on a reference-image (a master-image, to which all other images are mapped)
+
+we have to discuss the unique identifier of the reference image</Comment>
+    </table>
+    <table id="45" parent="2" name="real_char_area_owner"/>
+    <table id="46" parent="2" name="scribal_font_owner"/>
+    <table id="47" parent="2" name="scribe"/>
+    <table id="48" parent="2" name="scribe__owner"/>
+    <table id="49" parent="2" name="scroll"/>
+    <table id="50" parent="2" name="scroll_data"/>
+    <table id="51" parent="2" name="scroll_data_owner"/>
+    <table id="52" parent="2" name="scroll_to_col"/>
+    <table id="53" parent="2" name="scroll_to_col_owner"/>
+    <table id="54" parent="2" name="scroll_version"/>
+    <table id="55" parent="2" name="sign"/>
+    <table id="56" parent="2" name="sign_char"/>
+    <table id="57" parent="2" name="sign_char_owner"/>
+    <table id="58" parent="2" name="sign_char_reading_data">
+      <Comment>Contains a possible content for a given char place (char, space,vacat, meta-sign)</Comment>
+    </table>
+    <table id="59" parent="2" name="sign_char_reading_data_owner"/>
+    <table id="60" parent="2" name="sign_relative_position"/>
+    <table id="61" parent="2" name="sign_relative_position_owner"/>
+    <table id="62" parent="2" name="sign_type"/>
+    <table id="63" parent="2" name="single_action"/>
+    <table id="64" parent="2" name="sqe_session"/>
+    <table id="65" parent="2" name="user">
+      <Comment>Created by Martin 17/03/03</Comment>
+    </table>
+    <table id="66" parent="2" name="user_attribute">
+      <Comment>Created by Martin 17/04/18</Comment>
+    </table>
+    <table id="67" parent="2" name="user_comment">
+      <Comment>Created by Martin 17/03/03</Comment>
+    </table>
+    <table id="68" parent="2" name="user_contributions">
+      <Comment>Created by Martin 17/03/29</Comment>
+    </table>
+    <table id="69" parent="2" name="user_defined_attribute"/>
+    <table id="70" parent="2" name="user_sessions">
+      <Comment>Created by Martin 17/03/03</Comment>
+    </table>
+    <table id="71" parent="2" name="word">
+      <Comment>A collection of signs from a stream</Comment>
+    </table>
+    <table id="72" parent="2" name="word_owner"/>
+    <routine id="73" parent="2" name="cursor_proc">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="74" parent="2" name="getArtefactCols">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="75" parent="2" name="getCatalogAndEdition">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="76" parent="2" name="getMasterImageListings">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="77" parent="2" name="getScrollArtefacts">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="78" parent="2" name="get_fragment">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="79" parent="2" name="get_scroll">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="80" parent="2" name="set_to_json_array">
+      <RoutineKind>function</RoutineKind>
+    </routine>
+    <routine id="81" parent="2" name="SPLIT_STRING">
+      <RoutineKind>function</RoutineKind>
+    </routine>
+    <routine id="82" parent="2" name="getScrollHeight">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="83" parent="2" name="getScrollVersionArtefacts">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="84" parent="2" name="getScrollWidth">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="85" parent="2" name="get_arts">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="86" parent="2" name="get_fragment_text">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="87" parent="2" name="get_line_text">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="88" parent="2" name="get_line_text_html">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="89" parent="2" name="get_sign_html">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <routine id="90" parent="2" name="get_sign_json">
+      <RoutineKind>procedure</RoutineKind>
+    </routine>
+    <column id="91" parent="11" name="sqe_image_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="92" parent="11" name="url_code">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="93" parent="11" name="filename">
+      <Position>3</Position>
+      <DataType>varchar(128)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <column id="94" parent="11" name="native_width">
+      <Position>4</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="95" parent="11" name="native_height">
+      <Position>5</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="96" parent="11" name="dpi">
+      <Position>6</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="97" parent="11" name="type">
+      <Position>7</Position>
+      <Comment>Two values:
+Color = 0
+Grayscale = 1</Comment>
+      <DataType>tinyint(1) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="98" parent="11" name="wavelength_start">
+      <Position>8</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;445&apos;</DefaultExpression>
+    </column>
+    <column id="99" parent="11" name="wavelength_end">
+      <Position>9</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;704&apos;</DefaultExpression>
+    </column>
+    <column id="100" parent="11" name="is_master">
+      <Position>10</Position>
+      <DataType>tinyint(1)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="101" parent="11" name="image_catalog_id">
+      <Position>11</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="102" parent="11" name="edition_id">
+      <Position>12</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="103" parent="11" name="fk_image_to_catalog">
+      <ColNames>image_catalog_id</ColNames>
+    </index>
+    <index id="104" parent="11" name="fk_image_to_edition">
+      <ColNames>edition_id</ColNames>
+    </index>
+    <index id="105" parent="11" name="url_UNIQUE">
+      <ColNames>url_code
+filename</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="106" parent="11" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sqe_image_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="107" parent="11" name="url_UNIQUE">
+      <ColNames>url_code
+filename</ColNames>
+      <UnderlyingIndexName>url_UNIQUE</UnderlyingIndexName>
+    </key>
+    <foreign-key id="108" parent="11" name="fk_image_to_url">
+      <ColNames>url_code</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>image_urls</RefTableName>
+      <RefColNames>id</RefColNames>
+    </foreign-key>
+    <foreign-key id="109" parent="11" name="fk_image_to_catalog">
+      <ColNames>image_catalog_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>image_catalog</RefTableName>
+      <RefColNames>image_catalog_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="110" parent="11" name="fk_image_to_edition">
+      <ColNames>edition_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>edition_catalog</RefTableName>
+      <RefColNames>edition_catalog_id</RefColNames>
+    </foreign-key>
+    <column id="111" parent="12" name="area_group_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="112" parent="12" name="area_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="113" parent="12" name="move_direction">
+      <Position>3</Position>
+      <DataType>set(&apos;x&apos;, &apos;y&apos;)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <column id="114" parent="12" name="name">
+      <Position>4</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <column id="115" parent="12" name="commentary">
+      <Position>5</Position>
+      <DataType>text|0</DataType>
+    </column>
+    <column id="116" parent="12" name="z_index">
+      <Position>6</Position>
+      <DataType>tinyint(4)|0</DataType>
+    </column>
+    <key id="117" parent="12" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>area_group_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="118" parent="13" name="area_group_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="119" parent="13" name="area_id">
+      <Position>2</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="120" parent="13" name="area_type">
+      <Position>3</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <key id="121" parent="13" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>area_group_id
+area_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="122" parent="13" name="fk_group_member_to_group">
+      <ColNames>area_group_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>area_group</RefTableName>
+      <RefColNames>area_group_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="123" parent="14" name="area_group_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="124" parent="14" name="scroll_version">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="125" parent="14" name="fk_area_group_owner_to_scroll_version_idx">
+      <ColNames>scroll_version</ColNames>
+    </index>
+    <key id="126" parent="14" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>area_group_id
+scroll_version</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="127" parent="14" name="fk_area_group_owner_to_area_group">
+      <ColNames>area_group_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>area_group</RefTableName>
+      <RefColNames>area_group_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="128" parent="14" name="fk_area_group_owner_to_scroll_version">
+      <ColNames>scroll_version</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="129" parent="15" name="artefact_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="130" parent="15" name="region_in_master_image">
+      <Position>2</Position>
+      <DataType>polygon|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="131" parent="15" name="owner_id">
+      <Position>3</Position>
+      <DataType>smallint(6)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="132" parent="15" name="date_of_adding">
+      <Position>4</Position>
+      <DataType>timestamp|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;current_timestamp()&apos;</DefaultExpression>
+    </column>
+    <column id="133" parent="15" name="commentary">
+      <Position>5</Position>
+      <DataType>text|0</DataType>
+    </column>
+    <column id="134" parent="15" name="master_image_id">
+      <Position>6</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="135" parent="15" name="position_in_scroll">
+      <Position>7</Position>
+      <DataType>point|0</DataType>
+    </column>
+    <column id="136" parent="15" name="scroll_id">
+      <Position>8</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="137" parent="15" name="z_index">
+      <Position>9</Position>
+      <DataType>tinyint(4)|0</DataType>
+    </column>
+    <column id="138" parent="15" name="rotation">
+      <Position>10</Position>
+      <DataType>float unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="139" parent="15" name="fk_artefact_to_image_idx">
+      <ColNames>master_image_id</ColNames>
+    </index>
+    <index id="140" parent="15" name="fk_artefact_to_scroll_idx">
+      <ColNames>scroll_id</ColNames>
+    </index>
+    <key id="141" parent="15" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>artefact_id
+master_image_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="142" parent="15" name="fk_artefact_to_image">
+      <ColNames>master_image_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>SQE_image</RefTableName>
+      <RefColNames>sqe_image_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="143" parent="15" name="fk_artefact_to_scroll">
+      <ColNames>scroll_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll</RefTableName>
+      <RefColNames>scroll_id</RefColNames>
+    </foreign-key>
+    <column id="144" parent="16" name="artefact_id">
+      <Position>1</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="145" parent="16" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="146" parent="16" name="fk_artefact_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="147" parent="16" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>artefact_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="148" parent="16" name="fk_artefact_owner_to_artefact">
+      <ColNames>artefact_id</ColNames>
+      <RefSchemaName>SQE</RefSchemaName>
+      <RefTableName>artefact</RefTableName>
+      <RefColNames>artefact_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="149" parent="16" name="fk_artefact_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>SQE</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="150" parent="17" name="char_of_writing_id">
+      <Position>1</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="151" parent="17" name="form_of_writing_id">
+      <Position>2</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="152" parent="17" name="unicode_char">
+      <Position>3</Position>
+      <DataType>char(1)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="153" parent="17" name="width">
+      <Position>4</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;1000&apos;</DefaultExpression>
+    </column>
+    <column id="154" parent="17" name="height">
+      <Position>5</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;1000&apos;</DefaultExpression>
+    </column>
+    <column id="155" parent="17" name="line_offset">
+      <Position>6</Position>
+      <DataType>smallint(6)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="156" parent="17" name="path">
+      <Position>7</Position>
+      <DataType>multipolygon|0</DataType>
+    </column>
+    <index id="157" parent="17" name="char">
+      <ColNames>unicode_char</ColNames>
+    </index>
+    <index id="158" parent="17" name="form_char">
+      <ColNames>form_of_writing_id
+unicode_char</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <index id="159" parent="17" name="form_of_writing">
+      <ColNames>form_of_writing_id</ColNames>
+    </index>
+    <key id="160" parent="17" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>char_of_writing_id
+form_of_writing_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="161" parent="17" name="form_char">
+      <ColNames>form_of_writing_id
+unicode_char</ColNames>
+      <UnderlyingIndexName>form_char</UnderlyingIndexName>
+    </key>
+    <foreign-key id="162" parent="17" name="fk_to_form_of_writing">
+      <ColNames>form_of_writing_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>form_of_writing</RefTableName>
+      <RefColNames>form_of_writing_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="163" parent="18" name="col_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <key id="164" parent="18" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>col_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="165" parent="19" name="col_data_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="166" parent="19" name="col_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="167" parent="19" name="name">
+      <Position>3</Position>
+      <DataType>varchar(45)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <index id="168" parent="19" name="fk_col_data_to_col_idx">
+      <ColNames>col_id</ColNames>
+    </index>
+    <key id="169" parent="19" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>col_data_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="170" parent="19" name="fk_col_data_to_col">
+      <ColNames>col_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>col</RefTableName>
+      <RefColNames>col_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="171" parent="20" name="col_data_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="172" parent="20" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="173" parent="20" name="fk_col_data_owner_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="174" parent="20" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>col_data_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="175" parent="20" name="fk_col_data_owner_to_col_data">
+      <ColNames>col_data_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>col_data</RefTableName>
+      <RefColNames>col_data_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="176" parent="20" name="fk_col_data_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="177" parent="21" name="col_to_line_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="178" parent="21" name="col_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="179" parent="21" name="line_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="180" parent="21" name="col_line_idx">
+      <ColNames>col_id
+line_id</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <index id="181" parent="21" name="fk_col_to_line_to_line_idx">
+      <ColNames>line_id</ColNames>
+    </index>
+    <key id="182" parent="21" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>col_to_line_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="183" parent="21" name="col_line_idx">
+      <ColNames>col_id
+line_id</ColNames>
+      <UnderlyingIndexName>col_line_idx</UnderlyingIndexName>
+    </key>
+    <foreign-key id="184" parent="21" name="fk_col_to_line_to_col">
+      <ColNames>col_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>col</RefTableName>
+      <RefColNames>col_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="185" parent="21" name="fk_col_to_line_to_line">
+      <ColNames>line_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>line</RefTableName>
+      <RefColNames>line_id</RefColNames>
+    </foreign-key>
+    <column id="186" parent="22" name="col_to_line_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="187" parent="22" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="188" parent="22" name="fk_col_to_linew_owner_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="189" parent="22" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>col_to_line_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="190" parent="22" name="fk_col_to_line_owner_to_col_to_line">
+      <ColNames>col_to_line_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>col_to_line</RefTableName>
+      <RefColNames>col_to_line_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="191" parent="22" name="fk_col_to_linew_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="192" parent="23" name="discrete_canonical_reference_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="193" parent="23" name="discrete_canonical_name_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="194" parent="23" name="column_name">
+      <Position>3</Position>
+      <DataType>varchar(85)|0</DataType>
+    </column>
+    <column id="195" parent="23" name="fragment_name">
+      <Position>4</Position>
+      <DataType>varchar(85)|0</DataType>
+    </column>
+    <column id="196" parent="23" name="sub_fragment_name">
+      <Position>5</Position>
+      <DataType>varchar(85)|0</DataType>
+    </column>
+    <column id="197" parent="23" name="fragment_column">
+      <Position>6</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+    </column>
+    <column id="198" parent="23" name="side">
+      <Position>7</Position>
+      <Comment>1 for recto, 2 for verso</Comment>
+      <DataType>tinyint(3) unsigned|0</DataType>
+    </column>
+    <column id="199" parent="23" name="column_of_scroll_id">
+      <Position>8</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="200" parent="23" name="fk_discrete_can_ref_to_col_idx">
+      <ColNames>column_of_scroll_id</ColNames>
+    </index>
+    <index id="201" parent="23" name="fk_discrete_can_ref_to_scroll_idx">
+      <ColNames>discrete_canonical_name_id</ColNames>
+    </index>
+    <key id="202" parent="23" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>discrete_canonical_reference_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="203" parent="23" name="fk_discrete_can_ref_to_scroll">
+      <ColNames>discrete_canonical_name_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll</RefTableName>
+      <RefColNames>scroll_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="204" parent="23" name="fk_discrete_can_ref_to_col">
+      <ColNames>column_of_scroll_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>col</RefTableName>
+      <RefColNames>col_id</RefColNames>
+    </foreign-key>
+    <column id="205" parent="24" name="edition_catalog_id">
+      <Position>1</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="206" parent="24" name="composition">
+      <Position>2</Position>
+      <DataType>varchar(128)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <column id="207" parent="24" name="edition_name">
+      <Position>3</Position>
+      <DataType>varchar(45)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <column id="208" parent="24" name="edition_volume">
+      <Position>4</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <column id="209" parent="24" name="edition_location_1">
+      <Position>5</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <column id="210" parent="24" name="edition_location_2">
+      <Position>6</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <column id="211" parent="24" name="edition_side">
+      <Position>7</Position>
+      <DataType>tinyint(1) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="212" parent="24" name="unique_edition_entry">
+      <ColNames>edition_location_1
+edition_location_2
+edition_name
+edition_side
+edition_volume
+composition</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="213" parent="24" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>edition_catalog_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="214" parent="24" name="unique_edition_entry">
+      <ColNames>edition_location_1
+edition_location_2
+edition_name
+edition_side
+edition_volume
+composition</ColNames>
+      <UnderlyingIndexName>unique_edition_entry</UnderlyingIndexName>
+    </key>
+    <column id="215" parent="25" name="edition_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="216" parent="25" name="disc_can_ref_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="217" parent="25" name="fk_ed_cat_to_disc_ref_to_disc_can_ref_id">
+      <ColNames>disc_can_ref_id</ColNames>
+    </index>
+    <key id="218" parent="25" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>edition_id
+disc_can_ref_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="219" parent="25" name="fk_ed_cat_to_disc_ref_to_edition_id">
+      <ColNames>edition_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>edition_catalog</RefTableName>
+      <RefColNames>edition_catalog_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="220" parent="25" name="fk_ed_cat_to_disc_ref_to_disc_can_ref_id">
+      <ColNames>disc_can_ref_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>discrete_canonical_references</RefTableName>
+      <RefColNames>discrete_canonical_reference_id</RefColNames>
+    </foreign-key>
+    <column id="221" parent="26" name="external_font_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="222" parent="26" name="font_id">
+      <Position>2</Position>
+      <DataType>varchar(100)|0</DataType>
+    </column>
+    <key id="223" parent="26" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>external_font_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="224" parent="27" name="external_font_gylph_id">
+      <Position>1</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="225" parent="27" name="external_font_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="226" parent="27" name="unicode_char">
+      <Position>3</Position>
+      <DataType>char(1)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="227" parent="27" name="path">
+      <Position>4</Position>
+      <DataType>multipolygon|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="228" parent="27" name="width">
+      <Position>5</Position>
+      <DataType>smallint(6)|0</DataType>
+    </column>
+    <column id="229" parent="27" name="height">
+      <Position>6</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+    </column>
+    <index id="230" parent="27" name="char_idx">
+      <ColNames>unicode_char</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <index id="231" parent="27" name="fk_efg_to_external_font_idx">
+      <ColNames>external_font_id</ColNames>
+    </index>
+    <key id="232" parent="27" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>external_font_gylph_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="233" parent="27" name="char_idx">
+      <ColNames>unicode_char</ColNames>
+      <UnderlyingIndexName>char_idx</UnderlyingIndexName>
+    </key>
+    <foreign-key id="234" parent="27" name="fk_efg_to_external_font">
+      <ColNames>external_font_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>external_font</RefTableName>
+      <RefColNames>external_font_id</RefColNames>
+    </foreign-key>
+    <column id="235" parent="28" name="form_of_writing_id">
+      <Position>1</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="236" parent="28" name="scribes_scribe_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="237" parent="28" name="pen">
+      <Position>3</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="238" parent="28" name="ink">
+      <Position>4</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="239" parent="28" name="font_id">
+      <Position>5</Position>
+      <DataType>int(10) unsigned|0</DataType>
+    </column>
+    <index id="240" parent="28" name="fk_form_to_char_style_idx">
+      <ColNames>font_id</ColNames>
+    </index>
+    <index id="241" parent="28" name="fk_form_to_scribe_idx">
+      <ColNames>scribes_scribe_id</ColNames>
+    </index>
+    <key id="242" parent="28" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>form_of_writing_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="243" parent="28" name="fk_form_to_scribe">
+      <ColNames>scribes_scribe_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scribe</RefTableName>
+      <RefColNames>scribe_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="244" parent="28" name="fk_form_to_char_style">
+      <ColNames>font_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scribal_font</RefTableName>
+      <RefColNames>scribal_font_id</RefColNames>
+    </foreign-key>
+    <column id="245" parent="29" name="form_of_writing_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="246" parent="29" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="247" parent="29" name="fk_form_of_writing_to_scrollversion_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="248" parent="29" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>form_of_writing_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="249" parent="29" name="fk_form_of_writing_owner_to_scribe">
+      <ColNames>form_of_writing_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>form_of_writing</RefTableName>
+      <RefColNames>form_of_writing_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="250" parent="29" name="fk_form_of_writing_to_scrollversion">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="251" parent="30" name="image_catalog_id">
+      <Position>1</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="252" parent="30" name="institution">
+      <Position>2</Position>
+      <DataType>varchar(128)|0</DataType>
+    </column>
+    <column id="253" parent="30" name="catalog_number_1">
+      <Position>3</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <column id="254" parent="30" name="catalog_number_2">
+      <Position>4</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <column id="255" parent="30" name="catalog_side">
+      <Position>5</Position>
+      <DataType>tinyint(1) unsigned|0</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="256" parent="30" name="unique_catalog_entry">
+      <ColNames>catalog_number_1
+catalog_number_2
+catalog_side
+institution</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="257" parent="30" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>image_catalog_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="258" parent="30" name="unique_catalog_entry">
+      <ColNames>catalog_number_1
+catalog_number_2
+catalog_side
+institution</ColNames>
+      <UnderlyingIndexName>unique_catalog_entry</UnderlyingIndexName>
+    </key>
+    <column id="259" parent="31" name="edition_id">
+      <Position>1</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="260" parent="31" name="catalog_id">
+      <Position>2</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="261" parent="31" name="fk_to_catalog_id">
+      <ColNames>catalog_id</ColNames>
+    </index>
+    <key id="262" parent="31" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>edition_id
+catalog_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="263" parent="31" name="fk_to_edition_id">
+      <ColNames>edition_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>edition_catalog</RefTableName>
+      <RefColNames>edition_catalog_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="264" parent="31" name="fk_to_catalog_id">
+      <ColNames>catalog_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>image_catalog</RefTableName>
+      <RefColNames>image_catalog_id</RefColNames>
+    </foreign-key>
+    <column id="265" parent="32" name="map_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="266" parent="32" name="unnamedColumn">
+      <Position>2</Position>
+      <DataType>enum(&apos;MASTER_TO_IMAGE&apos;, &apos;FRONT_TO_BACK&apos;)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;MASTER_TO_IMAGE&apos;</DefaultExpression>
+    </column>
+    <column id="267" parent="32" name="image1_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="268" parent="32" name="image2_id">
+      <Position>4</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="269" parent="32" name="region_on_image1">
+      <Position>5</Position>
+      <DataType>polygon|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="270" parent="32" name="region_on_image2">
+      <Position>6</Position>
+      <DataType>polygon|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="271" parent="32" name="rotation">
+      <Position>7</Position>
+      <DataType>decimal(6,3)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0.000&apos;</DefaultExpression>
+    </column>
+    <column id="272" parent="32" name="map_type">
+      <Position>8</Position>
+      <DataType>enum(&apos;IMAGE_TO_MASTER&apos;, &apos;BACK_TO_FRONT&apos;)|0</DataType>
+    </column>
+    <column id="273" parent="32" name="validated">
+      <Position>9</Position>
+      <DataType>tinyint(1)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="274" parent="32" name="fk_image1_to_image_id">
+      <ColNames>image1_id</ColNames>
+    </index>
+    <index id="275" parent="32" name="fk_image2_to_image_id">
+      <ColNames>image2_id</ColNames>
+    </index>
+    <key id="276" parent="32" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>map_id
+image1_id
+image2_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="277" parent="32" name="fk_image1_to_image_id">
+      <ColNames>image1_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>SQE_image</RefTableName>
+      <RefColNames>sqe_image_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="278" parent="32" name="fk_image2_to_image_id">
+      <ColNames>image2_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>SQE_image</RefTableName>
+      <RefColNames>sqe_image_id</RefColNames>
+    </foreign-key>
+    <column id="279" parent="33" name="id">
+      <Position>1</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="280" parent="33" name="url">
+      <Position>2</Position>
+      <DataType>varchar(128)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <column id="281" parent="33" name="suffix">
+      <Position>3</Position>
+      <DataType>varchar(128)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;default.jpg&apos;</DefaultExpression>
+    </column>
+    <key id="282" parent="33" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id
+url</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="283" parent="34" name="kerning">
+      <Position>1</Position>
+      <Comment>Kerning in mm</Comment>
+      <DataType>smallint(6)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="284" parent="34" name="previous_char">
+      <Position>2</Position>
+      <DataType>char(1)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="285" parent="34" name="chars_of_writing_char_of_writing_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <key id="286" parent="34" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>chars_of_writing_char_of_writing_id
+previous_char</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="287" parent="34" name="fk_to_chars_of_writing">
+      <ColNames>chars_of_writing_char_of_writing_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>char_of_writing</RefTableName>
+      <RefColNames>char_of_writing_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="288" parent="35" name="line_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <key id="289" parent="35" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>line_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="290" parent="36" name="line_data_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="291" parent="36" name="name">
+      <Position>2</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <column id="292" parent="36" name="line_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="293" parent="36" name="fk_line_data_to_line_idx">
+      <ColNames>line_id</ColNames>
+    </index>
+    <key id="294" parent="36" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>line_data_id
+line_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="295" parent="36" name="fk_line_data_to_line">
+      <ColNames>line_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>line</RefTableName>
+      <RefColNames>line_id</RefColNames>
+    </foreign-key>
+    <column id="296" parent="37" name="line_data_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="297" parent="37" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="298" parent="37" name="fk_line_data_owner_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="299" parent="37" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>line_data_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="300" parent="37" name="fk_line_data_owner_to_line_data">
+      <ColNames>line_data_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>line_data</RefTableName>
+      <RefColNames>line_data_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="301" parent="37" name="fk_line_data_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="302" parent="38" name="line_to_sign_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="303" parent="38" name="sign_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="304" parent="38" name="line_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="305" parent="38" name="fk_line_to_sign_to_line_idx">
+      <ColNames>line_id</ColNames>
+    </index>
+    <index id="306" parent="38" name="line_sign_idx">
+      <ColNames>sign_id
+line_id</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="307" parent="38" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>line_to_sign_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="308" parent="38" name="line_sign_idx">
+      <ColNames>sign_id
+line_id</ColNames>
+      <UnderlyingIndexName>line_sign_idx</UnderlyingIndexName>
+    </key>
+    <foreign-key id="309" parent="38" name="fk_line_to_sign_to_sign">
+      <ColNames>sign_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign</RefTableName>
+      <RefColNames>sign_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="310" parent="38" name="fk_line_to_sign_to_line">
+      <ColNames>line_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>line</RefTableName>
+      <RefColNames>line_id</RefColNames>
+    </foreign-key>
+    <column id="311" parent="39" name="line_to_sign_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="312" parent="39" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="313" parent="39" name="fl_to_sign_owner_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="314" parent="39" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>line_to_sign_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="315" parent="39" name="fk_line_to_sign_owner_to_line_to_sign">
+      <ColNames>line_to_sign_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>line_to_sign</RefTableName>
+      <RefColNames>line_to_sign_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="316" parent="39" name="fl_to_sign_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="317" parent="40" name="main_action_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="318" parent="40" name="time">
+      <Position>2</Position>
+      <DataType>datetime(6)|0</DataType>
+      <DefaultExpression>&apos;current_timestamp(6)&apos;</DefaultExpression>
+    </column>
+    <column id="319" parent="40" name="rewinded">
+      <Position>3</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="320" parent="40" name="scroll_version_id">
+      <Position>4</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="321" parent="40" name="main_action_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="322" parent="40" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>main_action_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="323" parent="40" name="main_action_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="324" parent="41" name="position_in_stream_id">
+      <Position>1</Position>
+      <Comment>Uinique identifiere</Comment>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="325" parent="41" name="sign_id">
+      <Position>2</Position>
+      <Comment>References a sign</Comment>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="326" parent="41" name="next_sign_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+    </column>
+    <column id="327" parent="41" name="version">
+      <Position>4</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="328" parent="41" name="position_in_stream_next_sign_id_IDX">
+      <ColNames>sign_id</ColNames>
+    </index>
+    <key id="329" parent="41" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>position_in_stream_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="330" parent="41" name="fk_to_sign">
+      <ColNames>sign_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign</RefTableName>
+      <RefColNames>sign_id</RefColNames>
+    </foreign-key>
+    <column id="331" parent="42" name="position_in_stream_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="332" parent="42" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="333" parent="42" name="fk_position_in_stream_onwer_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="334" parent="42" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>position_in_stream_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="335" parent="42" name="fk_position_in_stream_owner_to_position_in_stream">
+      <ColNames>position_in_stream_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>position_in_stream</RefTableName>
+      <RefColNames>position_in_stream_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="336" parent="42" name="fk_position_in_stream_onwer_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="337" parent="43" name="position_in_stream_id">
+      <Position>1</Position>
+      <Comment>References a sign in a stream</Comment>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="338" parent="43" name="word_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="339" parent="43" name="position_in_word">
+      <Position>3</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+    </column>
+    <index id="340" parent="43" name="fk_rel_to_word_idx">
+      <ColNames>word_id</ColNames>
+    </index>
+    <index id="341" parent="43" name="fk_sign_stream_has_words_sign_stream1_idx">
+      <ColNames>position_in_stream_id</ColNames>
+    </index>
+    <key id="342" parent="43" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>position_in_stream_id
+word_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="343" parent="43" name="fk_rel_position_in_stream">
+      <ColNames>position_in_stream_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>position_in_stream</RefTableName>
+      <RefColNames>position_in_stream_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="344" parent="43" name="fk_rel_to_word">
+      <ColNames>word_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>word</RefTableName>
+      <RefColNames>word_id</RefColNames>
+    </foreign-key>
+    <column id="345" parent="44" name="real_char_area_id">
+      <Position>1</Position>
+      <Comment>Unique identifier</Comment>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="346" parent="44" name="sign_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+    </column>
+    <column id="347" parent="44" name="char_of_writing_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+    </column>
+    <column id="348" parent="44" name="path">
+      <Position>4</Position>
+      <DataType>multipolygon|0</DataType>
+    </column>
+    <column id="349" parent="44" name="x">
+      <Position>5</Position>
+      <DataType>bigint(20) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="350" parent="44" name="y">
+      <Position>6</Position>
+      <DataType>bigint(20) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="351" parent="44" name="width">
+      <Position>7</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;50&apos;</DefaultExpression>
+    </column>
+    <column id="352" parent="44" name="height">
+      <Position>8</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;50&apos;</DefaultExpression>
+    </column>
+    <column id="353" parent="44" name="line_offset">
+      <Position>9</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="354" parent="44" name="values_set">
+      <Position>10</Position>
+      <Comment>If true, then the are_in_scroll and rotation are set by the user and must not be affected by the automatic placing of the system</Comment>
+      <DataType>tinyint(1)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="355" parent="44" name="exceptional">
+      <Position>11</Position>
+      <DataType>tinyint(4)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <index id="356" parent="44" name="fk_real_area_to_char_of_writing_idx">
+      <ColNames>char_of_writing_id</ColNames>
+    </index>
+    <index id="357" parent="44" name="fk_real_area_to_sign_idx">
+      <ColNames>sign_id</ColNames>
+    </index>
+    <key id="358" parent="44" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>real_char_area_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="359" parent="44" name="fk_real_area_to_sign">
+      <ColNames>sign_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign</RefTableName>
+      <RefColNames>sign_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="360" parent="44" name="fk_real_area_to_char_of_writing">
+      <ColNames>char_of_writing_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>char_of_writing</RefTableName>
+      <RefColNames>char_of_writing_id</RefColNames>
+    </foreign-key>
+    <column id="361" parent="45" name="real_char_area_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="362" parent="45" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="363" parent="45" name="fk_rad_owner_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="364" parent="45" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>real_char_area_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="365" parent="45" name="fk_rad_owner_to_real_char_area_data">
+      <ColNames>real_char_area_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>real_char_area</RefTableName>
+      <RefColNames>real_char_area_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="366" parent="45" name="fk_rad_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="367" parent="46" name="font_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="368" parent="46" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="369" parent="46" name="fk_font_owner_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="370" parent="46" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>font_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="371" parent="46" name="fk_font_owner_to_font">
+      <ColNames>font_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scribal_font</RefTableName>
+      <RefColNames>scribal_font_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="372" parent="46" name="fk_font_owner_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="373" parent="47" name="scribe_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="374" parent="47" name="description">
+      <Position>2</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <column id="375" parent="47" name="commetary">
+      <Position>3</Position>
+      <DataType>text|0</DataType>
+    </column>
+    <key id="376" parent="47" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>scribe_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="377" parent="48" name="scribe_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="378" parent="48" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="379" parent="48" name="fk_scribe_owner_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="380" parent="48" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>scribe_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="381" parent="48" name="fk_scribe_owner_to_scribe">
+      <ColNames>scribe_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scribe</RefTableName>
+      <RefColNames>scribe_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="382" parent="48" name="fk_scribe_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="383" parent="49" name="scroll_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <key id="384" parent="49" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>scroll_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="385" parent="50" name="scroll_data_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="386" parent="50" name="name">
+      <Position>2</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <column id="387" parent="50" name="scroll_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="388" parent="50" name="fk_scroll_to_master_scroll_idx">
+      <ColNames>scroll_id</ColNames>
+    </index>
+    <key id="389" parent="50" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>scroll_data_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="390" parent="50" name="fk_scroll_to_master_scroll">
+      <ColNames>scroll_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll</RefTableName>
+      <RefColNames>scroll_id</RefColNames>
+    </foreign-key>
+    <column id="391" parent="51" name="scroll_data_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="392" parent="51" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="393" parent="51" name="fk_scroll_owner_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="394" parent="51" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>scroll_data_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="395" parent="51" name="fk_scroll_owner_to_scroll_data">
+      <ColNames>scroll_data_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_data</RefTableName>
+      <RefColNames>scroll_data_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="396" parent="51" name="fk_scroll_owner_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="397" parent="52" name="scroll_to_col_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="398" parent="52" name="scroll_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="399" parent="52" name="col_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="400" parent="52" name="fk_scroll_to_column_to_column_idx">
+      <ColNames>col_id</ColNames>
+    </index>
+    <index id="401" parent="52" name="scroll_col_idx">
+      <ColNames>scroll_id
+col_id</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="402" parent="52" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>scroll_to_col_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="403" parent="52" name="scroll_col_idx">
+      <ColNames>scroll_id
+col_id</ColNames>
+      <UnderlyingIndexName>scroll_col_idx</UnderlyingIndexName>
+    </key>
+    <foreign-key id="404" parent="52" name="fk_scroll_to_column_to_scroll">
+      <ColNames>scroll_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll</RefTableName>
+      <RefColNames>scroll_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="405" parent="52" name="fk_scroll_to_column_to_column">
+      <ColNames>col_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>col</RefTableName>
+      <RefColNames>col_id</RefColNames>
+    </foreign-key>
+    <column id="406" parent="53" name="scroll_to_col_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="407" parent="53" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="408" parent="53" name="fk_stco_toscroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="409" parent="53" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>scroll_to_col_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="410" parent="53" name="fk_stco_to_scroll_to_column">
+      <ColNames>scroll_to_col_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_to_col</RefTableName>
+      <RefColNames>scroll_to_col_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="411" parent="53" name="fk_stco_toscroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="412" parent="54" name="scroll_version_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="413" parent="54" name="user_id">
+      <Position>2</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="414" parent="54" name="scroll_id">
+      <Position>3</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="415" parent="54" name="version">
+      <Position>4</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="416" parent="54" name="commentary">
+      <Position>5</Position>
+      <DataType>longtext|0</DataType>
+    </column>
+    <index id="417" parent="54" name="fk_scroll_version_to_scroll_idx">
+      <ColNames>scroll_id</ColNames>
+    </index>
+    <index id="418" parent="54" name="user_scroll_version_idx">
+      <ColNames>user_id
+scroll_id
+version</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="419" parent="54" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="420" parent="54" name="user_scroll_version_idx">
+      <ColNames>user_id
+scroll_id
+version</ColNames>
+      <UnderlyingIndexName>user_scroll_version_idx</UnderlyingIndexName>
+    </key>
+    <foreign-key id="421" parent="54" name="fk_scroll_version_to_user">
+      <ColNames>user_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>user</RefTableName>
+      <RefColNames>user_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="422" parent="54" name="fk_scroll_version_to_scroll">
+      <ColNames>scroll_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll</RefTableName>
+      <RefColNames>scroll_id</RefColNames>
+    </foreign-key>
+    <column id="423" parent="55" name="sign_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <key id="424" parent="55" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sign_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="425" parent="56" name="sign_char_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="426" parent="56" name="sign_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="427" parent="56" name="is_variant">
+      <Position>3</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="428" parent="56" name="sign_type_id">
+      <Position>4</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;1&apos;</DefaultExpression>
+    </column>
+    <column id="429" parent="56" name="break_type">
+      <Position>5</Position>
+      <DataType>set(&apos;LINE_START&apos;, &apos;LINE_END&apos;, &apos;COLUMN_START&apos;, &apos;COLUMN_END&apos;, &apos;SCROLL_START&apos;, &apos;SCROLL_END&apos;)|0</DataType>
+    </column>
+    <column id="430" parent="56" name="sign">
+      <Position>6</Position>
+      <DataType>char(1)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <column id="431" parent="56" name="width">
+      <Position>7</Position>
+      <DataType>decimal(6,3) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;1.000&apos;</DefaultExpression>
+    </column>
+    <column id="432" parent="56" name="might_be_wider">
+      <Position>8</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="433" parent="56" name="vocalization">
+      <Position>9</Position>
+      <DataType>tinyint(4)|0</DataType>
+    </column>
+    <index id="434" parent="56" name="fk_sign_char_to_sign_idx">
+      <ColNames>sign_id</ColNames>
+    </index>
+    <index id="435" parent="56" name="fk_sign_char_to_sign_typ_idx">
+      <ColNames>sign_type_id</ColNames>
+    </index>
+    <key id="436" parent="56" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sign_char_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="437" parent="56" name="fk_sign_char_to_sign">
+      <ColNames>sign_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign</RefTableName>
+      <RefColNames>sign_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="438" parent="56" name="fk_sign_char_to_sign_typ">
+      <ColNames>sign_type_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign_type</RefTableName>
+      <RefColNames>sign_type_id</RefColNames>
+    </foreign-key>
+    <column id="439" parent="57" name="sign_char_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="440" parent="57" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="441" parent="57" name="fk_sign_char_owner_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="442" parent="57" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sign_char_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="443" parent="57" name="fk_sign_char_owner_to_sign_char">
+      <ColNames>sign_char_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign_char</RefTableName>
+      <RefColNames>sign_char_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="444" parent="57" name="fk_sign_char_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="445" parent="58" name="sign_char_reading_data_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="446" parent="58" name="sign_char_id">
+      <Position>2</Position>
+      <Comment>Unique identifier</Comment>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="447" parent="58" name="readability">
+      <Position>3</Position>
+      <DataType>enum(&apos;COMPLETE&apos;, &apos;INCOMPLETE_BUT_CLEAR&apos;, &apos;INCOMPLETE_AND_NOT_CLEAR&apos;)|0</DataType>
+    </column>
+    <column id="448" parent="58" name="readable_areas">
+      <Position>4</Position>
+      <Comment>2x4-field set to locate readable areas
+can be used to set brackets in a more sophisticated way
+
+NW    NE
+MNW MNE
+MSW MSE
+SW    SE</Comment>
+      <DataType>set(&apos;NW&apos;, &apos;NE&apos;, &apos;MW&apos;, &apos;ME&apos;, &apos;SW&apos;, &apos;SE&apos;)|0</DataType>
+    </column>
+    <column id="449" parent="58" name="is_reconstructed">
+      <Position>5</Position>
+      <DataType>tinyint(1)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="450" parent="58" name="is_retraced">
+      <Position>6</Position>
+      <DataType>tinyint(1)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="451" parent="58" name="form_of_writing_id">
+      <Position>7</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;1&apos;</DefaultExpression>
+    </column>
+    <column id="452" parent="58" name="editorial_flag">
+      <Position>8</Position>
+      <DataType>enum(&apos;NO&apos;, &apos;CONJECTURE&apos;, &apos;SHOULD_BE_ADDED&apos;, &apos;SHOULD_BE_DELETED&apos;)|0</DataType>
+    </column>
+    <column id="453" parent="58" name="real_char_areas_id">
+      <Position>9</Position>
+      <DataType>int(11) unsigned|0</DataType>
+    </column>
+    <column id="454" parent="58" name="correction">
+      <Position>10</Position>
+      <DataType>set(&apos;OVERWRITTEN&apos;, &apos;HORIZONTAL_LINE&apos;, &apos;DIAGONAL_LEFT_LINE&apos;, &apos;DIAGONAL_RIGHT_LINE&apos;, &apos;DOT_BELOW&apos;, &apos;DOT_ABOVE&apos;, &apos;LINE_BELOW&apos;, &apos;LINE_ABOVE&apos;, &apos;BOXED&apos;, &apos;ERASED&apos;)|0</DataType>
+    </column>
+    <index id="455" parent="58" name="fk_sign_char_rd_to_sign_char_idx">
+      <ColNames>sign_char_id</ColNames>
+    </index>
+    <key id="456" parent="58" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sign_char_reading_data_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="457" parent="58" name="fk_sign_char_rd_to_sign_char">
+      <ColNames>sign_char_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign_char</RefTableName>
+      <RefColNames>sign_char_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="458" parent="59" name="sign_char_reading_data_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="459" parent="59" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="460" parent="59" name="fk_sign_char_rd_owner_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="461" parent="59" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sign_char_reading_data_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="462" parent="59" name="fk_sign_char_rd_owner_to_sign_char_rd">
+      <ColNames>sign_char_reading_data_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign_char_reading_data</RefTableName>
+      <RefColNames>sign_char_reading_data_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="463" parent="59" name="fk_sign_char_rd_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="464" parent="60" name="sign_relative_position_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="465" parent="60" name="sign_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="466" parent="60" name="type">
+      <Position>3</Position>
+      <DataType>enum(&apos;ABOVE_LINE&apos;, &apos;BELOW_LINE&apos;, &apos;LEFT_MARGIN&apos;, &apos;RIGHT_MARGIN&apos;, &apos;MARGIN&apos;)|0</DataType>
+    </column>
+    <column id="467" parent="60" name="level">
+      <Position>4</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;1&apos;</DefaultExpression>
+    </column>
+    <index id="468" parent="60" name="fk_sign_rel_pos_to:sign_idx">
+      <ColNames>sign_id</ColNames>
+    </index>
+    <key id="469" parent="60" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sign_relative_position_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="470" parent="60" name="fk_sign_rel_pos_to:sign">
+      <ColNames>sign_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign</RefTableName>
+      <RefColNames>sign_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="471" parent="61" name="sign_relative_position_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="472" parent="61" name="scroll_version_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="473" parent="61" name="fk_sign_rel_pos_owner_to_scroll_version_idx">
+      <ColNames>scroll_version_id</ColNames>
+    </index>
+    <key id="474" parent="61" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sign_relative_position_id
+scroll_version_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="475" parent="61" name="fk_sign_rel_pos_owner_to_sign_rel_pos">
+      <ColNames>sign_relative_position_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>sign_relative_position</RefTableName>
+      <RefColNames>sign_relative_position_id</RefColNames>
+      <OnUpdate>cascade</OnUpdate>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <foreign-key id="476" parent="61" name="fk_sign_rel_pos_owner_to_scroll_version">
+      <ColNames>scroll_version_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>scroll_version</RefTableName>
+      <RefColNames>scroll_version_id</RefColNames>
+    </foreign-key>
+    <column id="477" parent="62" name="sign_type_id">
+      <Position>1</Position>
+      <DataType>tinyint(3) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="478" parent="62" name="type">
+      <Position>2</Position>
+      <DataType>varchar(45)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;???&apos;</DefaultExpression>
+    </column>
+    <column id="479" parent="62" name="commentary">
+      <Position>3</Position>
+      <DataType>text|0</DataType>
+    </column>
+    <key id="480" parent="62" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sign_type_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="481" parent="63" name="single_action_id">
+      <Position>1</Position>
+      <DataType>bigint(19) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="482" parent="63" name="main_action_id">
+      <Position>2</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="483" parent="63" name="action">
+      <Position>3</Position>
+      <DataType>enum(&apos;add&apos;, &apos;delete&apos;)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="484" parent="63" name="table">
+      <Position>4</Position>
+      <DataType>varchar(45)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="485" parent="63" name="id_in_table">
+      <Position>5</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="486" parent="63" name="fk_single_action_to_main_idx">
+      <ColNames>main_action_id</ColNames>
+    </index>
+    <key id="487" parent="63" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>single_action_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="488" parent="63" name="fk_single_action_to_main">
+      <ColNames>main_action_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>main_action</RefTableName>
+      <RefColNames>main_action_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <column id="489" parent="64" name="sqe_session_id">
+      <Position>1</Position>
+      <DataType>char(36)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="490" parent="64" name="user_id">
+      <Position>2</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="491" parent="64" name="scroll_version_id">
+      <Position>3</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="492" parent="64" name="session_start">
+      <Position>4</Position>
+      <DataType>timestamp(6)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;current_timestamp(6)&apos;</DefaultExpression>
+    </column>
+    <column id="493" parent="64" name="last_internal_session_end">
+      <Position>5</Position>
+      <DataType>timestamp(6)|0</DataType>
+    </column>
+    <index id="494" parent="64" name="fk_sqe_sesseio_to_user_idx">
+      <ColNames>user_id</ColNames>
+    </index>
+    <key id="495" parent="64" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>sqe_session_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="496" parent="64" name="fk_sqe_sesseio_to_user">
+      <ColNames>user_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>user</RefTableName>
+      <RefColNames>user_id</RefColNames>
+    </foreign-key>
+    <column id="497" parent="65" name="user_id">
+      <Position>1</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="498" parent="65" name="user_name">
+      <Position>2</Position>
+      <DataType>varchar(30)|0</DataType>
+    </column>
+    <column id="499" parent="65" name="pw">
+      <Position>3</Position>
+      <DataType>char(64)|0</DataType>
+    </column>
+    <column id="500" parent="65" name="forename">
+      <Position>4</Position>
+      <DataType>varchar(50)|0</DataType>
+    </column>
+    <column id="501" parent="65" name="surname">
+      <Position>5</Position>
+      <DataType>varchar(50)|0</DataType>
+    </column>
+    <column id="502" parent="65" name="organization">
+      <Position>6</Position>
+      <DataType>varchar(50)|0</DataType>
+    </column>
+    <column id="503" parent="65" name="email">
+      <Position>7</Position>
+      <Comment>max size according to RF 5321</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="504" parent="65" name="registration_date">
+      <Position>8</Position>
+      <DataType>timestamp|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;current_timestamp()&apos;</DefaultExpression>
+    </column>
+    <index id="505" parent="65" name="user">
+      <ColNames>user_name</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="506" parent="65" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>user_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="507" parent="65" name="user">
+      <ColNames>user_name</ColNames>
+      <UnderlyingIndexName>user</UnderlyingIndexName>
+    </key>
+    <column id="508" parent="66" name="user_attribute_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="509" parent="66" name="sign_id">
+      <Position>2</Position>
+      <DataType>int(11) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="510" parent="66" name="user_attribute_type_id">
+      <Position>3</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="511" parent="66" name="fk_sign_correction_correction_type1_idx">
+      <ColNames>user_attribute_type_id</ColNames>
+    </index>
+    <key id="512" parent="66" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>user_attribute_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="513" parent="66" name="fk_user_defined_attribute">
+      <ColNames>user_attribute_type_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>user_defined_attribute</RefTableName>
+      <RefColNames>user_defined_attribute_id</RefColNames>
+    </foreign-key>
+    <column id="514" parent="67" name="comment_id">
+      <Position>1</Position>
+      <DataType>int(10)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="515" parent="67" name="user_id">
+      <Position>2</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="516" parent="67" name="comment_text">
+      <Position>3</Position>
+      <DataType>varchar(5000)|0</DataType>
+    </column>
+    <column id="517" parent="67" name="entry_time">
+      <Position>4</Position>
+      <DataType>datetime|0</DataType>
+    </column>
+    <index id="518" parent="67" name="fk_user_comment_to_user_idx">
+      <ColNames>user_id</ColNames>
+    </index>
+    <key id="519" parent="67" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>comment_id
+user_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="520" parent="67" name="fk_user_comment_to_user">
+      <ColNames>user_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>user</RefTableName>
+      <RefColNames>user_id</RefColNames>
+    </foreign-key>
+    <column id="521" parent="68" name="contribution_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="522" parent="68" name="user_id">
+      <Position>2</Position>
+      <DataType>smallint(5)|0</DataType>
+    </column>
+    <column id="523" parent="68" name="contribution">
+      <Position>3</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="524" parent="68" name="entry_time">
+      <Position>4</Position>
+      <DataType>datetime|0</DataType>
+    </column>
+    <key id="525" parent="68" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>contribution_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="526" parent="69" name="user_defined_attribute_id">
+      <Position>1</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="527" parent="69" name="attribute">
+      <Position>2</Position>
+      <DataType>varchar(45)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="528" parent="69" name="commentary">
+      <Position>3</Position>
+      <DataType>text|0</DataType>
+    </column>
+    <column id="529" parent="69" name="tag">
+      <Position>4</Position>
+      <DataType>varchar(45)|0</DataType>
+    </column>
+    <key id="530" parent="69" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>user_defined_attribute_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="531" parent="70" name="session_id">
+      <Position>1</Position>
+      <DataType>int(10)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="532" parent="70" name="user_id">
+      <Position>2</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="533" parent="70" name="session_key">
+      <Position>3</Position>
+      <DataType>char(56)|0</DataType>
+    </column>
+    <column id="534" parent="70" name="session_start">
+      <Position>4</Position>
+      <DataType>datetime|0</DataType>
+    </column>
+    <column id="535" parent="70" name="session_end">
+      <Position>5</Position>
+      <DataType>datetime|0</DataType>
+    </column>
+    <column id="536" parent="70" name="current">
+      <Position>6</Position>
+      <DataType>tinyint(1)|0</DataType>
+    </column>
+    <key id="537" parent="70" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>session_id
+user_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="538" parent="71" name="word_id">
+      <Position>1</Position>
+      <Comment>Unique identifier</Comment>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="539" parent="71" name="qwb_word_id">
+      <Position>2</Position>
+      <Comment>Old identifier from QWB</Comment>
+      <DataType>int(11) unsigned|0</DataType>
+    </column>
+    <index id="540" parent="71" name="old_word_idx">
+      <ColNames>qwb_word_id</ColNames>
+    </index>
+    <key id="541" parent="71" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>word_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="542" parent="72" name="word_id">
+      <Position>1</Position>
+      <DataType>int(10) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="543" parent="72" name="owner_id">
+      <Position>2</Position>
+      <DataType>smallint(5) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="544" parent="72" name="user_added">
+      <Position>3</Position>
+      <DataType>timestamp|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;current_timestamp()&apos;</DefaultExpression>
+    </column>
+    <index id="545" parent="72" name="fk_to_owner_idx">
+      <ColNames>owner_id</ColNames>
+    </index>
+    <key id="546" parent="72" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>word_id
+owner_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="547" parent="72" name="fk_word_owner_to_word">
+      <ColNames>word_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>word</RefTableName>
+      <RefColNames>word_id</RefColNames>
+    </foreign-key>
+    <foreign-key id="548" parent="72" name="fk_word_owner_to_user">
+      <ColNames>owner_id</ColNames>
+      <RefSchemaName>sqe</RefSchemaName>
+      <RefTableName>user</RefTableName>
+      <RefColNames>user_id</RefColNames>
+      <OnDelete>cascade</OnDelete>
+    </foreign-key>
+    <argument id="549" parent="74" name="art_id">
+      <DataType>int(10) unsigned|0</DataType>
+    </argument>
+    <argument id="550" parent="75" name="param_plate">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="551" parent="75" name="param_fragment">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="552" parent="75" name="param_side">
+      <DataType>tinyint(1)|0</DataType>
+    </argument>
+    <argument id="553" parent="77" name="scroll_id">
+      <DataType>varchar(128)|0</DataType>
+    </argument>
+    <argument id="554" parent="77" name="side">
+      <DataType>tinyint(4)|0</DataType>
+    </argument>
+    <argument id="555" parent="78" name="scroll_id">
+      <DataType>int(11)|0</DataType>
+    </argument>
+    <argument id="556" parent="78" name="column_name">
+      <ArgumentDirection>M</ArgumentDirection>
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="557" parent="78" name="column_count">
+      <ArgumentDirection>O</ArgumentDirection>
+      <DataType>int(11)|0</DataType>
+    </argument>
+    <argument id="558" parent="78" name="column_id">
+      <ArgumentDirection>O</ArgumentDirection>
+      <DataType>int(11)|0</DataType>
+    </argument>
+    <argument id="559" parent="78" name="full_output">
+      <ArgumentDirection>M</ArgumentDirection>
+      <DataType>longtext|0</DataType>
+    </argument>
+    <argument id="560" parent="79" name="scroll_name">
+      <ArgumentDirection>M</ArgumentDirection>
+      <DataType>varchar(50)|0</DataType>
+    </argument>
+    <argument id="561" parent="79" name="scroll_id">
+      <ArgumentDirection>O</ArgumentDirection>
+      <DataType>int(11)|0</DataType>
+    </argument>
+    <argument id="562" parent="79" name="full_output">
+      <ArgumentDirection>M</ArgumentDirection>
+      <DataType>longtext|0</DataType>
+    </argument>
+    <argument id="563" parent="80">
+      <ArgumentDirection>R</ArgumentDirection>
+      <DataType>varchar(250)|0</DataType>
+    </argument>
+    <argument id="564" parent="80" name="my_set">
+      <DataType>varchar(250)|0</DataType>
+    </argument>
+    <argument id="565" parent="81">
+      <ArgumentDirection>R</ArgumentDirection>
+      <DataType>varchar(255)|0</DataType>
+    </argument>
+    <argument id="566" parent="81" name="x">
+      <DataType>varchar(255)|0</DataType>
+    </argument>
+    <argument id="567" parent="81" name="delim">
+      <DataType>varchar(12)|0</DataType>
+    </argument>
+    <argument id="568" parent="81" name="pos">
+      <DataType>int(11)|0</DataType>
+    </argument>
+    <argument id="569" parent="82" name="scroll_id_num">
+      <DataType>int(10) unsigned|0</DataType>
+    </argument>
+    <argument id="570" parent="82" name="version_id">
+      <DataType>int(10) unsigned|0</DataType>
+    </argument>
+    <argument id="571" parent="83" name="scroll_id_num">
+      <DataType>int(10) unsigned|0</DataType>
+    </argument>
+    <argument id="572" parent="83" name="version_id">
+      <DataType>int(10) unsigned|0</DataType>
+    </argument>
+    <argument id="573" parent="84" name="scroll_id_num">
+      <DataType>int(10) unsigned|0</DataType>
+    </argument>
+    <argument id="574" parent="84" name="version_id">
+      <DataType>int(10) unsigned|0</DataType>
+    </argument>
+    <argument id="575" parent="86" name="scroll_name">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="576" parent="86" name="column_name">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="577" parent="87" name="scroll_name">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="578" parent="87" name="column_name">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="579" parent="87" name="line_name">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="580" parent="88" name="scroll_name">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="581" parent="88" name="column_name">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="582" parent="88" name="line_name">
+      <DataType>varchar(45)|0</DataType>
+    </argument>
+    <argument id="583" parent="89" name="next_id_var">
+      <DataType>int(11)|0</DataType>
+    </argument>
+    <argument id="584" parent="89" name="full_output">
+      <ArgumentDirection>M</ArgumentDirection>
+      <DataType>longtext|0</DataType>
+    </argument>
+    <argument id="585" parent="90" name="next_id_var">
+      <DataType>int(11)|0</DataType>
+    </argument>
+    <argument id="586" parent="90" name="full_output">
+      <ArgumentDirection>M</ArgumentDirection>
+      <DataType>longtext|0</DataType>
+    </argument>
+  </database-model>
+</dataSource>

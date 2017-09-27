@@ -13,8 +13,9 @@ function Spider() // singleton central component communication system
 	    this.session_id = "";
 	    this.user_id = "";
 	    this.user = "";
-	    this.current_combination;
-		this.current_version;
+	    this.current_combination = "";
+		this.current_version = "";
+		this.current_version_id = "";
 		this.unlocked = false;
 	    this.registered_objects = {
 	    	load_scroll: [],
@@ -46,7 +47,7 @@ function Spider() // singleton central component communication system
 //		console.log('before request ' + new Date().getTime());
 //		parameters['timeStamp'] = Date.now(); // TODO replace now() entries in DB bei this time, retry connection regularly
 		
-		if (this.session_id != '')
+		if (this.session_id !== '')
 		{
 			parameters['SESSION_ID'] = this.session_id;
 		}
@@ -72,7 +73,7 @@ function Spider() // singleton central component communication system
 				// console.log('response on ' + parameters['request'] + ':');
 				// console.log(data);
 				
-				if (onSuccess != null)
+				if (onSuccess !== null)
 				{
 					onSuccess(data);
 				}
@@ -84,7 +85,7 @@ function Spider() // singleton central component communication system
 		(
 			function(data)
 			{
-				if (onFailure != null)
+				if (onFailure !== null)
 				{
 					onFailure(data);
 				}
@@ -96,7 +97,7 @@ function Spider() // singleton central component communication system
 				}
 			}
 		);
-	}
+	};
 	
 	this.notifyChangedText = function(data)
 	{
@@ -105,13 +106,13 @@ function Spider() // singleton central component communication system
 		this.textObject = data;
 		
 		this.richTextEditor.displayModel(this.textObject);
-	}
+	};
 	
 	// TODO support for multiple rich text editors with add & remove methods?
 	this.addRichTextEditor = function()
 	{
 		this.richTextEditor = new RichTextEditor();
-	}
+	};
 	
 	//Register objects for message notification (add message titles to the this.registered_objects object here).
 	//The message variable is an object with two variables: "type" is the type of message to respond to 
@@ -123,14 +124,14 @@ function Spider() // singleton central component communication system
 		messages.forEach(function(message){
 			this.registered_objects[message.type].push({'execute_function': message.execute_function});
 		}, this);
-	}
+	};
 
 	this.propagate_command = function(command, data)
 	{
 		this.registered_objects[command].forEach(function(listening_object){
 			listening_object.execute_function(data);
 		});
-	}
+	};
 }
 
 // initialize right here
