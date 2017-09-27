@@ -24,6 +24,7 @@ sub processCGI {
 		'getFragsOfCol' => \&getFragsOfCol,
 		'getColOfScrollID' => \&getColOfScrollID,
 		'imagesOfFragment' => \&getImagesOfFragment,
+		'getIAAEdID' => \&getIAAEdID,
 		'canonicalCompositions' => \&getCanonicalCompositions,
 		'canonicalID1' => \&getCanonicalID1,
 		'canonicalID2' => \&getCanonicalID2,
@@ -146,6 +147,16 @@ sub getImagesOfFragment {
 	$sql->execute($id);
 	readResults($sql);
 	return;
+}
+
+sub getIAAEdID {
+        my $cgi = shift;
+        my $discCanRef = $cgi->param('discCanRef');
+        my $sql = $cgi->dbh->prepare_cached('select edition_catalog_to_discrete_reference.edition_id from edition_catalog_to_discrete_reference inner join edition_catalog on edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id where edition_catalog.edition_side=0 and edition_catalog_to_discrete_reference.disc_can_ref_id = ?') 
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+        $sql->execute($discCanRef);
+        readResults($sql);
+        return;
 }
 
 sub getCanonicalCompositions {
