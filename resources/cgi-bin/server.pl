@@ -1,5 +1,5 @@
-#! /usr/bin/perl
-# C:\Strawberry\perl\bin\perl.exe
+#! C:\Strawberry\perl\bin\perl.exe
+# /usr/bin/perl
 
 use strict;
 use warnings;
@@ -17,6 +17,38 @@ use CGI;
 
 
 # helper functions
+
+sub query_SQE
+{
+	my ($cgi, $result_type, $query_text, @query_parameters) = (@_);
+	my $dbh = $cgi->dbh;
+	
+	my $query = $dbh->prepare_sqe($query_text);
+	my $i_param = 1;
+	foreach my $param (@query_parameters)
+	{
+	    $query->bind_param($i_param, $param);
+	    $i_param++;
+    }
+	$query->execute();
+	
+	if ($result_type eq 'first_value')
+	{
+		my $result = ($query->fetchrow_array())[0];
+		$query->finish();
+		return $result; 
+	}
+	elsif ($result_type eq 'first_array')
+	{
+		my @result = $query->fetchrow_array();
+		$query->finish();
+		return @result;
+	}
+	else
+	{
+		return $query;		
+	}
+}
 
 sub query
 {
@@ -475,10 +507,48 @@ sub load # TODO combine queries where possible, for better performance
 sub load_fragment_text
 {
 	my $cgi = shift;
-	my $error= shift;
+	my $error = shift;
 	
 	my $dbh = $cgi->dbh;
-	my $fragment_id = $cgi->param('fragmentId');
+	
+	my ($scroll_id, $col_of_scroll_id) = query_SQE
+	(
+		$cgi,
+		'first_array',
+		
+		'SELECT discrete_canonical_name_id, column_of_scroll_id FROM discrete_canonical_references'
+		.' WHERE discrete_canonical_reference_id = ?',
+		
+		$cgi->param('discreteCanonicalReferenceId')
+	);
+	my $fragment_id = query_SQE
+	(
+		$cgi,
+		'first_value',
+		
+		'SELECT col_id FROM scroll_to_col'
+		.' WHERE scroll_to_col_id = ?',
+		
+		$col_of_scroll_id
+	);
+	
+	my @scroll_and_fragment_names = query_SQE
+	(
+		$cgi,
+		'first_array',
+		
+		'SELECT scroll_data.name, col_data.name FROM scroll_data, col_data'
+		.' WHERE col_data.col_id = ?'
+		.' AND scroll_data.scroll_id ='
+		.' ('
+		.' 		SELECT scroll_id FROM scroll_to_col'
+		.' 		WHERE col_id = ?'
+		.' )',
+		
+		$fragment_id,
+		$fragment_id
+	);
+	my $fragment_name = $scroll_and_fragment_names[0].' '.$scroll_and_fragment_names[1];
 	
 	my $line_ids_query = $dbh->prepare_sqe # TODO sort order
 	(
@@ -507,7 +577,7 @@ sub load_fragment_text
 	my $line_id = ($line_ids_query->fetchrow_array)[0];
 	$line_name_query->execute($line_id);
 	my $line_name = ($line_name_query->fetchrow_array)[0];
-	my $json_string = '[{"lineName":"'.$line_name.'","signs":[';
+	my $json_string = '{"fragmentName":"'.$fragment_name.'","lines":[{"lineName":"'.$line_name.'","signs":[';
 	
 	my $first_sign_of_line = 1;
 	
@@ -587,6 +657,43 @@ sub load_fragment_text
 			$json_string .= ',"isVariant":1';
 		}
 		
+		my $sign_relative_position_query = query_SQE
+		(
+			$cgi,
+			'',
+			
+			'SELECT type FROM sign_relative_position'
+			.' WHERE sign_id = ?',
+			
+			$current_sign[1]
+		);
+		my @sign_relative_position = $sign_relative_position_query->fetchrow_array();
+		if (@sign_relative_position)
+		{
+			my $pos_type = $sign_relative_position[0];
+			
+			if ($pos_type eq 'ABOVE_LINE')
+			{
+				$json_string .= ',"position":"aboveLine"';
+			}
+			elsif ($pos_type eq 'BELOW_LINE')
+			{
+				$json_string .= ',"position":"belowLine"';
+			}
+			elsif ($pos_type eq 'LEFT_MARGIN')
+			{
+				$json_string .= ',"position":"leftMargin"';
+			}
+			elsif ($pos_type eq 'RIGHT_MARGIN')
+			{
+				$json_string .= ',"position":"rightMargin"';
+			}
+			elsif ($pos_type eq 'MARGIN')
+			{
+				$json_string .= ',"position":"margin"';
+			}
+		}
+		
 		$json_string .= '}'; # close sign
 	}
 	
@@ -594,7 +701,7 @@ sub load_fragment_text
 	$line_name_query->finish;
 	$get_start_query->finish;
 	
-	$json_string .= ']'; # close array of lines
+	$json_string .= ']}'; # close array of lines and entire json
 	$cgi->print($json_string);
 }
 

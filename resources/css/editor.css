@@ -71,6 +71,36 @@
 	padding: 5px;
 }
 
+.green
+{
+	color: darkgreen;
+}
+
+.pointerMouse /* TODO use this one for the various elements with a pointer mouse*/
+{
+	cursor: pointer;
+}
+
+.someSpaceAbove
+{
+	margin-top: 10px;
+}
+
+.someSpaceBelow
+{
+	margin-bottom: 10px;
+}
+
+.someSpaceToTheLeft
+{
+	margin-left: 10px;
+}
+
+.mediumFontSize
+{
+	font-size: 14px;
+}
+
 
 /** high level elements */
 
@@ -329,7 +359,7 @@
 .fragmentName
 {
 	font-family: fantasy;
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: bold;	
 }
 
@@ -393,6 +423,16 @@
 
 /** different annotations */
 
+.superscript
+{
+	vertical-align: super;
+}
+
+.subscript
+{
+	vertical-align: sub;
+}
+
 .retraced
 {
 	font-weight: bold;
@@ -443,16 +483,6 @@
 .signDescription
 {
 	font-size: 10px;
-}
-
-.someSpaceAbove
-{
-	margin-top: 10px;
-}
-
-.someSpaceBelow
-{
-	margin-bottom: 10px;
 }
 
 .attributesContainer

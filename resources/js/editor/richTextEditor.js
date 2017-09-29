@@ -1,6 +1,7 @@
 function RichTextEditor()
 {
 	const self = this; // for usage in event listener
+	this.originalText = [];
 	
 	this.signType2Visualisation =
 	{
@@ -11,10 +12,20 @@ function RichTextEditor()
 		6: '¬',
 		7: '¶',
 		8: '?'
-	}
+	};
+	this.signType2Name =
+	{
+		2: 'space',
+		3: 'possible vacat',
+		4: 'vacat',
+		5: 'damage',
+		6: 'blank line',
+		7: 'paragraph marker',
+		8: 'lacuna'
+	};
 	
 	this.fontSize = 20;
-	$('#RichTextPanel').css({ 'font-size': this.fontSize + 'px' });
+	$('#richTextContainer').css({ 'font-size': this.fontSize + 'px' });
 	
 	this.singleSignEditor = new SingleSignEditor(this);
 	
@@ -23,11 +34,16 @@ function RichTextEditor()
 	
 	$('#richTextUndoAll').click(function()
 	{
-		self.displayModel(Spider.textObject); // model isn't changed after loading => simply reload it
+		self.displayModel(self.originalText); // model isn't changed after loading => simply reload it
 	});
 	
 	$('#richTextLineManager').click(function()
 	{
+		if (Spider.unlocked == false)
+		{
+			return;
+		}
+		
 		const manager = $('#richTextLineManager');
 		
 		if (manager.attr('activated') != 1) // null or 0 => activate line management
@@ -48,25 +64,16 @@ function RichTextEditor()
 		}
 	});
 	
-	$('#richTextSave').click(function()
-	{
-	
-	
-	}); // TODO
-	
 	
 	/* methods */
 	
-	this.addFragmentName = function(name) // TODO currently not used
-	{
-		$('<span></span>') // TODO id?
-		.addClass('fragmentName')
-		.text(name)
-		.appendTo('#richTextContainer');
-	}
-	
 	removeTextLineByUser = function(event)
 	{
+		if (Spider.unlocked == false)
+		{
+			return;
+		}
+		
 		const lineNumber = 1 * event.target.id.replace('removeLine', '');
 		$('#line' + lineNumber).remove();
 		
@@ -86,6 +93,11 @@ function RichTextEditor()
 
 	addTextLineByUser = function(event)
 	{
+		if (Spider.unlocked == false)
+		{
+			return;
+		}
+		
 		const previousLineNumber = 1 * event.target.id.replace('addLineAfter', '');
 		
 		
@@ -175,21 +187,21 @@ function RichTextEditor()
 
 		$('<td></td>')
 		.attr('id', 'rightMargin' + number)
-		.attr('contentEditable', 'true')
+		.attr('contentEditable', 'false')
 		.addClass('lineSection')
 		.addClass('coyBottomBorder')
 		.appendTo(line);
 
 		$('<td></td>')
 		.attr('id', 'regularLinePart' + number)
-		.attr('contentEditable', 'true')
+		.attr('contentEditable', 'false') // TODO reactivate later, also for margins
 		.addClass('lineSection')
 		.addClass('normalBottomBorder')
 		.appendTo(line);
 		
 		$('<td></td>')
 		.attr('id', 'leftMargin' + number)
-		.attr('contentEditable', 'true')
+		.attr('contentEditable', 'false')
 		.addClass('lineSection')
 		.addClass('coyBottomBorder')
 		.appendTo(line);
@@ -223,7 +235,7 @@ function RichTextEditor()
 
 	this.addSign = function(model, iLine, iSign)
 	{
-		const attributes = model[iLine]['signs'][iSign];
+		const attributes = model['lines'][iLine]['signs'][iSign];
 		
 		var span =
 		$('<span></span')
@@ -259,7 +271,10 @@ function RichTextEditor()
 			}
 			else
 			{
-				span.attr('title', 'Sign type: ' + attributes['type']); // tooltip			
+				if (this.signType2Name[attributes['type']] != null) // set tooltip
+				{
+					span.attr('title', 'Sign type: ' + this.signType2Name[attributes['type']]);
+				}
 				
 				if (attributes['width'] == null)
 				{
@@ -289,26 +304,22 @@ function RichTextEditor()
 			}
 		}
 		
-		var destination;
-		if (attributes['position'] == null) // chapter 5
-		{
-			destination = $('#regularLinePart' + iLine);
-		}
-		else // TODO stacking positions => check api output
+		var destination = $('#regularLinePart' + iLine);
+		if (attributes['position'] != null) // chapter 5 // TODO stacking positions => check api output
 		{
 			switch (attributes['position'])
 			{
 				case 'aboveLine':
 				{
-					span.html('<sup>' + span.html() + '</sup>');
-					destination = $('#regularLinePart' + iLine);
+					classList.push('superscript');
 				}
 				break;
 				
 				case 'belowLine':
 				{
-					span.html('<sub>' + span.html() + '</sub>');
-					destination = $('#regularLinePart' + iLine);
+					classList.push('subscript');
+//					span.html('<sub>' + span.html() + '</sub>');
+//					destination = $('#regularLinePart' + iLine);
 				}
 				break;
 				
@@ -387,7 +398,7 @@ function RichTextEditor()
 			.singleSignEditor
 			.displaySingleSignSpan
 			(
-				Spider.textObject,
+				self.originalText,
 				event.target['id']
 			);
 		});
@@ -395,20 +406,30 @@ function RichTextEditor()
 	
 	this.displayModel = function(model)
 	{
-		$('#richTextButtons').appendTo('#hidePanel');
-		$('#richTextContainer').empty();
+		this.originalText = model;
+		
+		const buttons = $('#richTextButtons');
+		const fragmentName = $('#fragmentName');
+		const hidePanel = $('#hidePanel');
+		const container = $('#richTextContainer');
+		
+		buttons.appendTo(hidePanel);
+		fragmentName.appendTo(hidePanel);
+		container.empty();
+		fragmentName.text(model['fragmentName']); // TODO use Spider.current_combination ?
+		fragmentName.appendTo(container);
 		
 		var lastMainSign;
 		
-		for (var iLine in model)
+		for (var iLine in model['lines'])
 		{
-			this.addTextLine(iLine, model[iLine]['lineName']);
+			this.addTextLine(iLine, model['lines'][iLine]['lineName']);
 			
-			for (var iSign in model[iLine]['signs'])
+			for (var iSign in model['lines'][iLine]['signs'])
 			{
-				const sign = model[iLine]['signs'][iSign];
+				const sign = model['lines'][iLine]['signs'][iSign];
 				
-				if (sign['isVariant'] == 1)
+				if (sign['isVariant'] == 1) // TODO test
 				{
 					if (lastMainSign != null) // null shouldn't happen, but for safety 
 					{
@@ -434,7 +455,7 @@ function RichTextEditor()
 			}
 		}
 		
-		$('#richTextButtons').appendTo('#richTextContainer');
+		buttons.appendTo(container);
 	}
 }
 
