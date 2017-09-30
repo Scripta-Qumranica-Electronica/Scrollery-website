@@ -67,15 +67,38 @@
 
 .contentField
 {
-	/*width: calc(100% - 12px);*/ /* -2*5 padding -2*1 border */
-	/*
-	border-top: 0px;
-	border-right: 1px solid black;
-	border-bottom: 1px solid black;
-	border-left: 1px solid black;
-	*/
 	margin: 0px;
 	padding: 5px;
+}
+
+.green
+{
+	color: darkgreen;
+}
+
+.pointerMouse /* TODO use this one for the various elements with a pointer mouse*/
+{
+	cursor: pointer;
+}
+
+.someSpaceAbove
+{
+	margin-top: 10px;
+}
+
+.someSpaceBelow
+{
+	margin-bottom: 10px;
+}
+
+.someSpaceToTheLeft
+{
+	margin-left: 10px;
+}
+
+.mediumFontSize
+{
+	font-size: 14px;
 }
 
 
@@ -336,7 +359,7 @@
 .fragmentName
 {
 	font-family: fantasy;
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: bold;	
 }
 
@@ -344,10 +367,6 @@
 {
 	width: 100%;
 	table-layout: auto;
-}
-
-.line
-{
 }
 
 .lineSection
@@ -367,16 +386,52 @@
 	border-bottom: 1px solid darkgrey;
 }
 
+.richTextLine
+{
+}
+
 #richTextContainer
 {
 	table-layout: auto;
 	
 	/* font-family: monospace; */
-	font-size: 18px;
 }
 
+.richTextButtons
+{
+	float: right;
+	white-space: normal; /* overwrites value pre of parent */
+}
+
+.addLineByUser
+{
+	padding-right: 4px;
+	padding-left: 4px;
+	
+	cursor: pointer;
+	color: darkgreen;
+}
+
+.removeLineByUser
+{
+	padding-right: 4px;
+	padding-left: 4px;
+	
+	cursor: pointer;
+	color: darkred;
+}
 
 /** different annotations */
+
+.superscript
+{
+	vertical-align: super;
+}
+
+.subscript
+{
+	vertical-align: sub;
+}
 
 .retraced
 {
@@ -428,16 +483,6 @@
 .signDescription
 {
 	font-size: 10px;
-}
-
-.someSpaceAbove
-{
-	margin-top: 10px;
-}
-
-.someSpaceBelow
-{
-	margin-bottom: 10px;
 }
 
 .attributesContainer

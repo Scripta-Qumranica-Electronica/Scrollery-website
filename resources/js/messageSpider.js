@@ -14,13 +14,13 @@ function Spider() // singleton central component communication system
 	    this.user_id = "";
 	    this.user = "";
 	    this.current_combination = "";
-		this.current_version = "";
-		this.current_version_id = "";
-		this.unlocked = false;
+		  this.current_version = "";
+		  this.current_version_id = "";
+		  this.unlocked = false;
 	    this.registered_objects = {
-	    	load_scroll: [],
-		load_fragment: []
-	    };
+	    load_scroll: [],
+		  load_fragment: []
+	  };
 	    
 		$(document).ajaxError // log server connection errors to console
 		(
@@ -45,7 +45,6 @@ function Spider() // singleton central component communication system
 	this.requestFromServer = function(parameters, onSuccess, onFailure)
 	{
 //		console.log('before request ' + new Date().getTime());
-//		parameters['timeStamp'] = Date.now(); // TODO replace now() entries in DB bei this time, retry connection regularly
 		
 		if (this.session_id !== '')
 		{
@@ -70,9 +69,6 @@ function Spider() // singleton central component communication system
 		(
 			function(data)
 			{
-				// console.log('response on ' + parameters['request'] + ':');
-				// console.log(data);
-				
 				if (onSuccess !== null)
 				{
 					onSuccess(data);
@@ -103,9 +99,7 @@ function Spider() // singleton central component communication system
 	{
 		console.log('text');
 		console.log(data);
-		this.textObject = data;
-		
-		this.richTextEditor.displayModel(this.textObject);
+		this.richTextEditor.displayModel(data);
 	};
 	
 	// TODO support for multiple rich text editors with add & remove methods?

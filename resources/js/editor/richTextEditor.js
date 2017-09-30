@@ -1,6 +1,7 @@
 function RichTextEditor()
 {
 	const self = this; // for usage in event listener
+	this.originalText = [];
 	
 	this.signType2Visualisation =
 	{
@@ -11,18 +12,163 @@ function RichTextEditor()
 		6: '¬',
 		7: '¶',
 		8: '?'
-	}
+	};
+	this.signType2Name =
+	{
+		2: 'space',
+		3: 'possible vacat',
+		4: 'vacat',
+		5: 'damage',
+		6: 'blank line',
+		7: 'paragraph marker',
+		8: 'lacuna'
+	};
 	
 	this.fontSize = 20;
+	$('#richTextContainer').css({ 'font-size': this.fontSize + 'px' });
 	
 	this.singleSignEditor = new SingleSignEditor(this);
 	
-	this.addFragmentName = function(name) // TODO currently not used
+	
+	/* button listeners */
+	
+	$('#richTextUndoAll').click(function()
 	{
-		$('<span></span>') // TODO id?
-		.addClass('fragmentName')
-		.text(name)
-		.appendTo('#richTextContainer');
+		self.displayModel(self.originalText); // model isn't changed after loading => simply reload it
+	});
+	
+	$('#richTextLineManager').click(function()
+	{
+		if (Spider.unlocked == false)
+		{
+			return;
+		}
+		
+		const manager = $('#richTextLineManager');
+		
+		if (manager.attr('activated') != 1) // null or 0 => activate line management
+		{
+			$('.addLineByUser').show();
+			$('.removeLineByUser').show();
+			$('.lineName').attr('contentEditable', 'true');
+			
+			manager.attr('activated', 1);
+		}
+		else // deactivate line management
+		{
+			$('.addLineByUser').hide();
+			$('.removeLineByUser').hide();
+			$('.lineName').attr('contentEditable', 'false');
+			
+			manager.attr('activated', 0);
+		}
+	});
+	
+	
+	/* methods */
+	
+	removeTextLineByUser = function(event)
+	{
+		if (Spider.unlocked == false)
+		{
+			return;
+		}
+		
+		const lineNumber = 1 * event.target.id.replace('removeLine', '');
+		$('#line' + lineNumber).remove();
+		
+		for (var iLineNumber = lineNumber + 1; $('#line' + iLineNumber).length > 0; iLineNumber++) // decrement the indexes of each line behind the removed one
+		{
+			const newNumber = iLineNumber - 1;
+			
+			$('#line'            + iLineNumber).attr('id', 'line'            + newNumber);
+			$('#lineName'        + iLineNumber).attr('id', 'lineName'        + newNumber);
+			$('#rightMargin'     + iLineNumber).attr('id', 'rightMargin'     + newNumber);
+			$('#regularLinePart' + iLineNumber).attr('id', 'regularLinePart' + newNumber);
+			$('#leftMargin'      + iLineNumber).attr('id', 'leftMargin'      + newNumber);
+			$('#removeLine'      + iLineNumber).attr('id', 'removeLine'      + newNumber);
+			$('#addLineAfter'    + iLineNumber).attr('id', 'addLineAfter'    + newNumber);
+		}
+	}
+
+	addTextLineByUser = function(event)
+	{
+		if (Spider.unlocked == false)
+		{
+			return;
+		}
+		
+		const previousLineNumber = 1 * event.target.id.replace('addLineAfter', '');
+		
+		
+		/** move lines after the upcoming new one by 1 index */
+		
+		var lineNumber = previousLineNumber + 1;
+		var followingLine = $('#line' + lineNumber);
+		var maxNumber = -1;
+		while (followingLine.length > 0) // find last line (going backwards avoids index collision)
+		{
+			maxNumber = lineNumber;
+			console.log('maxNumber ' + maxNumber);
+			
+			lineNumber++;
+			followingLine = $('#line' + lineNumber);
+		}
+		
+		if (maxNumber != -1)
+		{
+			for (var iLineNumber = maxNumber; iLineNumber > previousLineNumber; iLineNumber--) // increment the indexes of each line behind the upcoming new one
+			{
+				const newNumber = iLineNumber + 1;
+				
+				$('#line'            + iLineNumber).attr('id', 'line'            + newNumber);
+				$('#lineName'        + iLineNumber).attr('id', 'lineName'        + newNumber);
+				$('#rightMargin'     + iLineNumber).attr('id', 'rightMargin'     + newNumber);
+				$('#regularLinePart' + iLineNumber).attr('id', 'regularLinePart' + newNumber);
+				$('#leftMargin'      + iLineNumber).attr('id', 'leftMargin'      + newNumber);
+				$('#removeLine'      + iLineNumber).attr('id', 'removeLine'      + newNumber);
+				$('#addLineAfter'    + iLineNumber).attr('id', 'addLineAfter'    + newNumber);
+			}
+		}
+		
+		
+		/** try to determine line name automatically */
+		
+		const previousName = $('#lineName' + previousLineNumber).text();
+		
+		var name = '?';
+		if (previousName * 1 == previousName) // name is number
+		{
+			name = (previousName * 1) + 1; // increment the number (might collide with following line, scholar must handle that)
+		}
+		else
+		{
+			const lastCharCode = previousName.substr(previousName.length() - 1).charCodeAt(0);
+			
+			if ((lastCharCode > 96 && lastCharCode < 123)
+			||  (lastCharCode > 64 && lastCharCode <  91)) // previous name ends with a to y OR A .. Y 
+			{
+				name = previousName.substr(0, previousName.length() - 1) + String.fromCharCode(lastCharCode + 1);
+			}
+		}
+		
+		
+		/** add new line */
+		
+		const number = previousLineNumber + 1;
+		
+		$('#line' + previousLineNumber)
+		.after
+		(
+			self.addTextLine
+			(
+				number,
+				name
+			)
+		);
+		
+		$('#removeLine'   + number).show();
+		$('#addLineAfter' + number).show();
 	}
 
 	this.addTextLine = function(number, name)
@@ -30,39 +176,66 @@ function RichTextEditor()
 		const line =
 		$('<tr></tr>')
 		.attr('id', 'line' + number)
-		.addClass('line')
+		.addClass('richTextLine')
 		.appendTo('#richTextContainer');
 		
 		$('<td></td>')
 		.attr('id', 'lineName' + number)
+		.addClass('lineName')
 		.text(name)
 		.appendTo(line);
 
 		$('<td></td>')
 		.attr('id', 'rightMargin' + number)
-		.attr('contentEditable', 'true')
+		.attr('contentEditable', 'false')
 		.addClass('lineSection')
 		.addClass('coyBottomBorder')
 		.appendTo(line);
 
 		$('<td></td>')
 		.attr('id', 'regularLinePart' + number)
-		.attr('contentEditable', 'true')
+		.attr('contentEditable', 'false') // TODO reactivate later, also for margins
 		.addClass('lineSection')
 		.addClass('normalBottomBorder')
 		.appendTo(line);
 		
 		$('<td></td>')
 		.attr('id', 'leftMargin' + number)
-		.attr('contentEditable', 'true')
+		.attr('contentEditable', 'false')
 		.addClass('lineSection')
 		.addClass('coyBottomBorder')
 		.appendTo(line);
+		
+		$('<td></td>')
+		.text('–')
+		.attr('id', 'removeLine' + number)
+		.attr('title', 'Remove this line')
+		.addClass('removeLineByUser')
+		.hide()
+		.click(function(event)
+		{
+			removeTextLineByUser(event)
+		})
+		.appendTo(line);
+		
+		$('<td></td>')
+		.text('+')
+		.attr('id', 'addLineAfter' + number)
+		.attr('title', 'Add a line after this one')
+		.addClass('addLineByUser')
+		.hide()
+		.click(function(event)
+		{
+			addTextLineByUser(event)
+		})
+		.appendTo(line);
+		
+		return line;
 	}
 
 	this.addSign = function(model, iLine, iSign)
 	{
-		const attributes = model[iLine]['signs'][iSign];
+		const attributes = model['lines'][iLine]['signs'][iSign];
 		
 		var span =
 		$('<span></span')
@@ -98,7 +271,10 @@ function RichTextEditor()
 			}
 			else
 			{
-				span.attr('title', 'Sign type: ' + attributes['type']); // tooltip			
+				if (this.signType2Name[attributes['type']] != null) // set tooltip
+				{
+					span.attr('title', 'Sign type: ' + this.signType2Name[attributes['type']]);
+				}
 				
 				if (attributes['width'] == null)
 				{
@@ -128,26 +304,22 @@ function RichTextEditor()
 			}
 		}
 		
-		var destination;
-		if (attributes['position'] == null) // chapter 5
-		{
-			destination = $('#regularLinePart' + iLine);
-		}
-		else // TODO stacking positions => check api output
+		var destination = $('#regularLinePart' + iLine);
+		if (attributes['position'] != null) // chapter 5 // TODO stacking positions => check api output
 		{
 			switch (attributes['position'])
 			{
 				case 'aboveLine':
 				{
-					span.html('<sup>' + span.html() + '</sup>');
-					destination = $('#regularLinePart' + iLine);
+					classList.push('superscript');
 				}
 				break;
 				
 				case 'belowLine':
 				{
-					span.html('<sub>' + span.html() + '</sub>');
-					destination = $('#regularLinePart' + iLine);
+					classList.push('subscript');
+//					span.html('<sub>' + span.html() + '</sub>');
+//					destination = $('#regularLinePart' + iLine);
 				}
 				break;
 				
@@ -226,7 +398,7 @@ function RichTextEditor()
 			.singleSignEditor
 			.displaySingleSignSpan
 			(
-				Spider.textObject,
+				self.originalText,
 				event.target['id']
 			);
 		});
@@ -234,19 +406,30 @@ function RichTextEditor()
 	
 	this.displayModel = function(model)
 	{
-		$('#richTextContainer').empty();
+		this.originalText = model;
+		
+		const buttons = $('#richTextButtons');
+		const fragmentName = $('#fragmentName');
+		const hidePanel = $('#hidePanel');
+		const container = $('#richTextContainer');
+		
+		buttons.appendTo(hidePanel);
+		fragmentName.appendTo(hidePanel);
+		container.empty();
+		fragmentName.text(model['fragmentName']); // TODO use Spider.current_combination ?
+		fragmentName.appendTo(container);
 		
 		var lastMainSign;
 		
-		for (var iLine in model)
+		for (var iLine in model['lines'])
 		{
-			this.addTextLine(iLine, model[iLine]['lineName']);
+			this.addTextLine(iLine, model['lines'][iLine]['lineName']);
 			
-			for (var iSign in model[iLine]['signs'])
+			for (var iSign in model['lines'][iLine]['signs'])
 			{
-				const sign = model[iLine]['signs'][iSign];
+				const sign = model['lines'][iLine]['signs'][iSign];
 				
-				if (sign['isVariant'] == 1)
+				if (sign['isVariant'] == 1) // TODO test
 				{
 					if (lastMainSign != null) // null shouldn't happen, but for safety 
 					{
@@ -271,6 +454,8 @@ function RichTextEditor()
 				);
 			}
 		}
+		
+		buttons.appendTo(container);
 	}
 }
 

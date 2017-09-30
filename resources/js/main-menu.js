@@ -6,7 +6,6 @@ var listing_type = {'lv_1': 'institution',
 var current_lvl;
 
 function login(){
-    // GUI setup
     $(".collapsible").click(function(){show_item(this);});
     $("#new-combination").css("visibility", "visible");
     $(".accordion-title").css("visibility", "visible");
@@ -16,11 +15,6 @@ function login(){
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
     $("#combinations").css("visibility", "visible");
-
-    // Menu event listeners
-    $("#main-menu").on("click", "#new-combination", function(){
-        new_combination();
-    });
     $("#main-menu").on("click", ".clone_combination", function(){
         data_form = new FormData();
         data_form.append('transaction', 'copyCombination');
@@ -41,33 +35,8 @@ function login(){
             Spider.propagate_command('load_scroll', {id: $(this).data("id"), scroll_version: $(this).data("scroll-version")});
         }
     });
-    // var longpress = 300;
-    // var start;
-    // $("#main-menu").on("mousedown", ".editable_name", function(e){
-    //     start = new Date().getTime();
-    //     $(e.target).on('mouseleave', function(e) {
-    //         start = 0;
-    //         $(e.target).off('mouseleave');
-    //         $(e.target).off('mouseup');
-    //     });
-    //     $(e.target).on('mouseup', function(e) {
-    //         $(e.target).off('mouseleave');
-    //         $(e.target).off('mouseup');
-    //         if (new Date().getTime() >= (start + longpress)) {
-    //             var $this = $(e.target);
-    //             console.log($this);
-    //             $this.hide().next().val($this.text()).show().focus().select();   
-    //         } else {
-    //             if (Spider.current_combination != $(this).data("id")) {
-    //                 Spider.propagate_command('load_scroll', {id: $(this).data("id")});
-    //                 Spider.current_combination = $(this).data("id");
-    //                 Spider.current_version = $(this).data("version");
-    //             }   
-    //         }
-    //     } );
-    // } );
     $("#main-menu").on("click", ".fragment_select", function(){
-        load_fragment_text($(this).data("col-of-scroll"));
+        load_fragment_text($(this).data("id"));
         load_fragment_image($(this).data("id"));
     });
     $("#main-menu").on("click", ".add_artefact", function(){
@@ -98,17 +67,22 @@ function show_item(item){
 
 function load_fragment_text(selected_frag)
 {
-	console.log('selected_frag ' + selected_frag);
     data_form = new FormData();
     data_form.append('transaction', 'getScrollColNameFromDiscCanRef');
     data_form.append('frag_id', selected_frag);
+//	const data_form =
+//	{
+//		'transaction': 'getScrollColNameFromDiscCanRef',
+//		'frag_id': selected_frag
+//	};
+
     get_database_data(data_form, function(results){
         results['results'].forEach(function(result) {
             Spider.requestFromServer
             (
                 {
                 	'request': 'loadFragmentText',
-                    'fragmentId': selected_frag // result.col
+                    'discreteCanonicalReferenceId': selected_frag // result.col
                 },
                 function(data)
                 {
@@ -116,9 +90,6 @@ function load_fragment_text(selected_frag)
                     {
                         return;
                     }
-                    
-                    console.log('data');
-                    console.log(data);
                     
                     Spider.notifyChangedText(data);
                 },
@@ -215,7 +186,7 @@ function populate_combinations(user) {
                     }
                     else if (node.id.startsWith('lvl_2-')) {
                         var column = node.id.split('-')[1];
-                        var version = node.id.split('-')[3];
+                        var version = node.id.split('-')[2];
                         trans_data = {'transaction' : 'getFragsOfCol', 'colID' : column, 'user' : user, 'version': version, 'SESSION_ID' : Spider['session_id']};
                         current_lvl = 2;
                     }
@@ -369,7 +340,7 @@ function populate_fragments() {
 // }
 
 function get_database_data(data_form, callback) {
-	data_form.append('SESSION_ID', Spider.session_id);
+	data_form.append('SESSION_ID', Spider['session_id']);
     jQuery.ajax({
         url: 'resources/cgi-bin/GetImageData.pl',
         data: data_form,

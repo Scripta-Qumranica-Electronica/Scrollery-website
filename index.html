@@ -9,11 +9,9 @@
     <script type="text/javascript" src="vendors/openseadragon/openseadragon.js"></script>
     <script type="text/javascript" src="vendors/RubaXa/Sortable.min.js"></script>
     <script type="text/javascript" src="resources/js/messageSpider.js"></script>
-<!--<script type="text/javascript" src="resources/js/server.js"></script>-->
     <script type="text/javascript" src="resources/js/layout-control.js"></script>
     <script type="text/javascript" src="resources/js/editor/singleSignEditor.js"></script>
     <script type="text/javascript" src="resources/js/editor/richTextEditor.js"></script>
-<!--<script type="text/javascript" src="resources/js/editor/editor.js"></script>-->
     <script type="text/javascript" src="resources/js/single-image-control.js"></script>
     <script type="text/javascript" src="resources/js/combination-control.js"></script>
     <script type="text/javascript" src="resources/js/main-menu.js"></script>
@@ -25,7 +23,7 @@
     <title>SQE-Scrollery</title>
 	</head>
 
-	<body>
+	<body> 
     <div id="login">
       <div id="inputFields">
         <div id="userNameDiv">
@@ -90,30 +88,69 @@
         <div id="signs-container" class="main-container">
           <div id="signs-pane" class="main-pane">
             <div id="singleSignContainer"
-                class="hidden scrollable fillingMostHeight contentField">
+                class="hidden fillingMostHeight contentField">
               
-              <div id="signAndAlternatives"></div>
+				<div id="signAndAlternatives"
+					 class="scrollable">
+					
+					<span id="addReadingPseudoButton"
+						  class="someSpaceToTheLeft pointerMouse">+</span>
+					
+				</div>
               
               <span id="signContext"
                   dir="rtl">Context</span>
               
-              <button id="confirmSingleSignChangesButton"
+              <button id="finishSingleSignChangesButton"
+                  class="someSpaceAbove">Done</button>
+              
+            </div>
+
+            <div id="RichTextPanel"
+				 class="frame">
+              
+				<div id="richTextContainer"
+					 class="protectedLineBreaks contentField"
+					 dir="rtl">
+				
+					<span id="fragmentName"
+						  class="fragmentName"></span>
+				
+				</div>
+              
+            </div>
+            
+			<div id="hidePanel"
+				 class="hidden">
+            
+            	<div id="richTextButtons"
+                	 class="someSpaceAbove richTextButtons"
+                	 dir="rtl">
+              
+					<button id="richTextUndoAll" disabled>Undo all</button>
+					<button id="richTextLineManager">Manage lines</button>
+				
+				</div>
+				
+				<div id="addReadingDiv">
+				
+					<input id="addReadingInput"
+						   maxlength="1"
+						   size="1"></input>
+					
+					<button id="confirmAddReadingButton">Ok</button>
+					<button id="cancelAddReadingButton">Cancel</button>
+				
+				</div>
+				
+			  <button id="confirmSingleSignChangesButton"
                   class="someSpaceAbove">Ok</button>
               
               <button id="cancelSingleSignChangesButton"
                   class="someSpaceAbove">Cancel</button>
               
+				
             </div>
-
-            <div id="RichTextPanel"
-                class="frame">
-              
-              <div id="richTextContainer"
-                  class="protectedLineBreaks contentField"
-                  dir="rtl"></div> <!-- fillingMostHeight -->
-              
-            </div>
-            <div id="hidePanel" class="hidden"></div>
           </div>
           <div id="horizontal-divider" class="pane-size"></div>
           <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
