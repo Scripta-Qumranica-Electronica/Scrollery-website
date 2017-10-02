@@ -41,6 +41,7 @@ sub processCGI {
 		'copyCombination' => \&copyCombination,
 		'nameCombination' => \&nameCombination,
 		'setArtPosition' => \&setArtPosition,
+		'setArtRotate' => \&setArtRotate,
 	);
 
 	print $cgi->header(
@@ -352,6 +353,19 @@ sub setArtPosition {
 	my $x = $cgi->param('x');
 	my $y = $cgi->param('y');
 	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $art_id, "position_in_scroll", ['POINT', $x, $y]);
+	handleDBError ($new_id, $error);
+	return;
+}
+
+sub setArtRotate {
+	my $cgi = shift;
+	my $user_id = $cgi->dbh->user_id;
+	my $scroll_id = $cgi->param('scroll_id');
+	my $version_id = $cgi->param('version_id');
+	$cgi->dbh->set_scrollversion($version_id);
+	my $art_id = $cgi->param('art_id');
+	my $rotation = $cgi->param('rotation');
+	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $art_id, "rotation", $rotation);
 	handleDBError ($new_id, $error);
 	return;
 }

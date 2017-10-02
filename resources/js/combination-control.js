@@ -14,7 +14,7 @@ var CombinationController = (function () {
             var scroll_dpi = 1215;
             var scroll_width = 50000;
             var scroll_height = 5000;
-            var $comb_scroll = $('<div></div>');
+            var $comb_scroll = $('<div ondragstart="return false;"></div>');
             $comb_scroll.attr('id','combination-viewport');
             $comb_scroll.css('width', (scroll_width * zoom_factor) + 'px');
             $comb_scroll.css('height', (scroll_height * zoom_factor) + 'px');
@@ -35,11 +35,24 @@ var CombinationController = (function () {
                 zoom(this.value, false);
             });
             $container.append($zoom_control);
+            var focused_element = undefined;
             var self = this;
     
             // Private functions, will be invoked by name.call(this, ...input vars)
             function load_scroll(id, scroll_version){
                 $comb_scroll.empty();
+                var $osd = $('<div></div>');
+                $osd.attr('id', 'combination_osd');
+                $osd.attr('class', 'comb_osd');
+                $osd.css('visibility', 'hidden');
+                $osd.css('position', 'absolute');
+                $osd.css('top', '50%');
+                $osd.css('left', '50%');
+                $osd.css('margin-left', '-20px');
+                $osd.css('margin-top', '-20px');
+                $osd.css('display', 'block');
+                $osd.prepend('<img id="osd_rotate" class="rotate_handle" width="40" height="40" src="resources/images/rotate.png" style="pointer-events: auto"/>');
+                $comb_scroll.append($osd);
                 scroll_version_id = scroll_version;
 
                 var scroll_data = new FormData();
@@ -106,6 +119,7 @@ var CombinationController = (function () {
                                                     var img_y = coords[0].split(' ')[1];
                                                     var img_width = coords[2].split(' ')[0] - img_x;
                                                     var img_height = coords[2].split(' ')[1] - img_y;
+                                                    var img_rotation = artefact.rotation;
                                                     var new_polygons = '';
                                                     polygons.forEach(function(polygon, index) {
                                                         new_polygons += 'M';
@@ -129,6 +143,7 @@ var CombinationController = (function () {
                                                     var image_cont_rotate = document.createElement('div');
                                                     image_cont_rotate.setAttribute('id', 'image-cont-rotate-' + artefact['id']);
                                                     image_cont_rotate.setAttribute('class', 'fragment fragment-cont-rot');
+                                                    image_cont_rotate.setAttribute('data-rotate', img_rotation);
                             
                                                     var image = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                                                     image.setAttribute('id', 'SVG-' + artefact['id']);
@@ -192,7 +207,8 @@ var CombinationController = (function () {
                                                     image_cont_xy.dataset.y_loc = y_loc;
                                                     $(image_cont_xy).css({
                                                         top: y_loc * zoom_factor,
-                                                        left: ((scroll_width - x_loc) * zoom_factor) - (img_width * scale)}); //1Q7 is not being placed properly wrt width
+                                                        left: ((scroll_width - x_loc) * zoom_factor) - (img_width * scale)});
+                                                    $(image_cont_rotate).css('transform', 'rotate(' + img_rotation + 'deg)');
                                                     $comb_scroll.append($(image_cont_xy));
                                                 }, this);
                                             }
@@ -205,7 +221,12 @@ var CombinationController = (function () {
                 });
 
                 //Event handling
+                var start_angle = 0;
                 $comb_scroll.off('mousedown');
+                $comb_scroll.off('mousemove');
+
+                $comb_scroll.on('mousemove', mousehover);
+
                 $comb_scroll.on('mousedown', mouseDown);
                 var mouseOrigin = {x: 0, y: 0};
                 var selected_artefact;
@@ -222,9 +243,100 @@ var CombinationController = (function () {
                                 mouseOrigin.x = evt.clientX;
                                 mouseOrigin.y = evt.clientY;
                                 evt.stopPropagation();
+                            } 
+                        } else if($(evt.target).attr("class") === 'rotate_handle'){
+                            if (Spider.unlocked){
+                                selected_artefact = evt.target;
+                                evt.preventDefault();
+                                var domRect = evt.target.getBoundingClientRect();
+                                var cx = domRect.left + (domRect.width/2);
+                                var cy = domRect.top + (domRect.height/2);
+                                console.log($(evt.target).parent().parent().data('rotate'));
+                                var frag_rot = $(evt.target).parent().parent().data('rotate');
+                                start_angle = angle(cx, cy, evt.pageX, evt.pageY) + frag_rot;
+                                $comb_scroll.off('mousedown', mouseDown);
+                                $comb_scroll.off('mousemove', mousehover);
+                                $comb_scroll.on('mousemove', rotateMove);
+                                $comb_scroll.on('mouseup', rotateUp);
                             }
                         }
                     }
+                }
+
+                function rotateMove(evt) {
+                    var domRect = selected_artefact.getBoundingClientRect();
+                    var cx = domRect.left + (domRect.width/2);
+                    var cy = domRect.top + (domRect.height/2);
+                    var rot_angle = angle(cx, cy, evt.pageX, evt.pageY) - start_angle;
+                    $(selected_artefact).parent().parent().css('transform', 'rotate(' + rot_angle + 'deg)')
+                }
+
+                function rotateUp(evt) {
+                    var domRect = selected_artefact.getBoundingClientRect();
+                    var cx = domRect.left + (domRect.width/2);
+                    var cy = domRect.top + (domRect.height/2);
+                    var rot_angle = angle(cx, cy, evt.pageX, evt.pageY) - start_angle;
+                    rot_angle = rot_angle < 0 ? 360 + rot_angle : rot_angle;
+                    start_angle = 0;
+                    var $frag_cont = $(selected_artefact).parent().parent().parent();
+                    $(selected_artefact).parent().parent().data('rotate', rot_angle);
+                    selected_artefact = undefined;
+                    $comb_scroll.off('mousemove', rotateMove);
+                    $comb_scroll.off('mouseup', rotateUp);
+                    var scroll_data = new FormData();
+                    scroll_data.append('transaction', 'setArtRotation');
+                    scroll_data.append('scroll_id', Spider.current_combination);
+                    scroll_data.append('version', Spider.current_version);
+                    scroll_data.append('version_id',scroll_version_id);
+                    scroll_data.append('art_id', $frag_cont.attr("id").split("image-cont-xy-")[1]);
+                    scroll_data.append('rotation', rot_angle);
+                    scroll_data.append("SESSION_ID", Spider.session_id);
+                    jQuery.ajax({
+                        url: 'resources/cgi-bin/GetImageData.pl',
+                        context: this,
+                        data: scroll_data,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        type: 'POST',
+                        success: function(selected_artefacts){
+                            console.log("successful move: " + selected_artefacts.returned_info);
+                            $frag_cont.attr("id", "image-cont-xy-" + selected_artefacts.returned_info);
+                            $comb_scroll.on('mousedown', mouseDown);
+                            $comb_scroll.on('mousemove', mousehover);
+                        }
+                    });
+                }
+                
+                function angle(cx, cy, ex, ey) {
+                    var dy = cy - ey;
+                    var dx = ex - cx;
+                    return Math.atan2(dx, dy) * 180 / Math.PI;
+                    }
+
+                function mousehover(evt) {
+                    if (!focused_element) {
+                        if($(evt.target).attr("class") === 'clippedImg'){
+                            evt.preventDefault();
+                            if (Spider.unlocked){
+                                focused_element = evt.target;
+                                $(focused_element).parent().parent().parent().append($osd);
+                                $osd.css('visibility', 'visible');
+                            }
+                            evt.stopPropagation();
+                        }
+                    } else {
+                        if($(evt.target).attr("class") !== 'clippedImg' && $(evt.target).attr("class") !== 'rotate_handle'){
+                            if(evt.target !== focused_element){
+                                evt.preventDefault();
+                                if (Spider.unlocked){
+                                    focused_element = undefined;
+                                    $osd.css('visibility', 'hidden');
+                                }
+                                evt.stopPropagation();
+                            }
+                        }
+                    } 
                 }
         
                 function mouseMove(evt){
@@ -279,13 +391,10 @@ var CombinationController = (function () {
                     $frag_cont.data('y_loc', parseInt($frag_cont.css('top')) / zoom_factor);
                     $frag_cont.data('x_loc', ((scroll_width * zoom_factor) - parseInt($frag_cont.css('left')) - $frag_cont.width()) / zoom_factor);
                     var scroll_data = new FormData();
-                    console.log($frag_cont.attr("id").split("image-cont-xy-")[1]);
                     scroll_data.append('transaction', 'setArtPosition');
                     scroll_data.append('scroll_id', Spider.current_combination);
                     scroll_data.append('version', Spider.current_version);
                     scroll_data.append('version_id',scroll_version_id);
-                    console.log("Scroll id " + Spider.current_combination);
-                    console.log("Current version " + Spider.current_version);
                     scroll_data.append('art_id', $frag_cont.attr("id").split("image-cont-xy-")[1]);
                     scroll_data.append('x', ((scroll_width * zoom_factor) - parseInt($frag_cont.css('left')) - $frag_cont.width()) / zoom_factor);
                     scroll_data.append('y', parseInt($frag_cont.css('top')) / zoom_factor);
