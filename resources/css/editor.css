@@ -394,7 +394,7 @@
 {
 	table-layout: auto;
 	
-	/* font-family: monospace; */
+	overflow-x: auto;
 }
 
 .richTextButtons

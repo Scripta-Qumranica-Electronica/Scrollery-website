@@ -67,7 +67,7 @@ function RichTextEditor()
 	
 	/* methods */
 	
-	removeTextLineByUser = function(event)
+	this.removeTextLineByUser = function(event)
 	{
 		if (Spider.unlocked == false)
 		{
@@ -91,7 +91,7 @@ function RichTextEditor()
 		}
 	}
 
-	addTextLineByUser = function(event)
+	this.addTextLineByUser = function(event)
 	{
 		if (Spider.unlocked == false)
 		{
@@ -214,7 +214,7 @@ function RichTextEditor()
 		.hide()
 		.click(function(event)
 		{
-			removeTextLineByUser(event)
+			self.removeTextLineByUser(event)
 		})
 		.appendTo(line);
 		
@@ -226,7 +226,7 @@ function RichTextEditor()
 		.hide()
 		.click(function(event)
 		{
-			addTextLineByUser(event)
+			self.addTextLineByUser(event)
 		})
 		.appendTo(line);
 		

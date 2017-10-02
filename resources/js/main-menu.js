@@ -82,6 +82,7 @@ function load_fragment_text(selected_frag)
             (
                 {
                 	'request': 'loadFragmentText',
+                	'scroll_version': Spider.current_version_id,
                     'discreteCanonicalReferenceId': selected_frag // result.col
                 },
                 function(data)

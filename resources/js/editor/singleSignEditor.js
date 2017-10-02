@@ -179,6 +179,7 @@ function SingleSignEditor(richTextEditor)
 	{
 		if (Spider.unlocked == false)
 		{
+			console.log('Spider.unlocked == false');
 			return;
 		}
 		
@@ -189,16 +190,37 @@ function SingleSignEditor(richTextEditor)
 			return;
 		}
 		
+		const iSign = pa.attr('iSign');
 		const attribute = pa.attr('attribute');
 		const value = pa.attr('value');
-		const iSign = pa.attr('iSign');
 		
-		$('.attribute_' + attribute + '_' + iSign)
-		.removeClass('attribute')
-		.addClass('chosenAttribute')
-		.off('click');
-		
-		$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
+		Spider.requestFromServer
+		(
+			{
+				'request'       : 'addAttribute',
+				'scrollVersion' : Spider.current_version_id,
+				'signId'        : $('#reading' + iSign).attr('signId'),
+				'signCharId'    : $('#reading' + iSign).attr('signCharId'),
+				'signPositionId': $('#reading' + iSign).attr('signPositionId'),
+				'attributeName' : attribute,
+				'attributeValue': value
+			},
+			function(json) // on result
+			{
+				if (json['error'] != null)
+				{
+					console.log('error when adding attribute: ' + json['error']);
+					return;
+				}
+				
+				$('.attribute_' + attribute + '_' + iSign)
+				.removeClass('attribute')
+				.addClass('chosenAttribute')
+				.off('click');
+				
+				$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
+			}
+		);
 	};
 	
 	this.removeAttribute = function(currentAttributeId)
@@ -234,6 +256,9 @@ function SingleSignEditor(richTextEditor)
 		const signElement =
 		$('<span></span>')
 		.attr('id', 'reading' + iReading)
+		.attr('signId', signData['signId'])
+		.attr('signCharId', signData['signCharId'])
+		.attr('signPositionId', signData['signPositionId']) // usually null, handled by Perl script
 		.attr('mainSignId', mainSignId)
 		.addClass('alternativeSign')
 		.click(function(event)
