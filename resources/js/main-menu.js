@@ -15,6 +15,9 @@ function login(){
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
     $("#combinations").css("visibility", "visible");
+    $("#main-menu").on("click", "#new-combination", function(){
+        new_combination();
+    });
     $("#main-menu").on("click", ".clone_combination", function(){
         data_form = new FormData();
         data_form.append('transaction', 'copyCombination');
@@ -23,7 +26,6 @@ function login(){
         data_form.append('scroll_version_id', $(this).prev().prev().prev().data("scroll-version"));
         get_database_data(data_form, function(result){
             $('#user-combination-listings').jstree(true).refresh();
-            tree.refresh();
         });
     });
     $("#main-menu").on("click", ".scroll_select", function(){
@@ -124,6 +126,7 @@ function new_combination(){
         Spider.current_combination = result.created.scroll_version;
         console.log("New scroll " + result.created.scroll_version);
         populate_combinations(Spider.user_id);
+        $('#user-combination-listings').jstree(true).refresh();
     });
 }
 
