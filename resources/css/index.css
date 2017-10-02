@@ -185,16 +185,8 @@ svg g {
 	opacity: 1.0;
 }
 
-svg g:hover {
-	opacity: 0.85;
-}
-
 .fragOutline {
 	visibility: hidden;
-}
-
-svg g:hover + .fragOutline {
-	visibility: visible;
 }
 
 .clippedImg {
