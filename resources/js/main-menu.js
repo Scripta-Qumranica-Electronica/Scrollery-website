@@ -42,7 +42,6 @@ function login(){
         load_fragment_image($(this).data("id"));
     });
     $("#main-menu").on("click", ".add_artefact", function(){
-        console.log($(this).prev().html());
         add_art_to_comb($(this).prev().html());
     });
     $("#main-menu").on("dblclick", ".editable_name", function(){
