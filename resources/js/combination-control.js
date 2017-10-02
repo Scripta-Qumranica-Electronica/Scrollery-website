@@ -235,6 +235,7 @@ var CombinationController = (function () {
                         if($(evt.target).attr("class") === 'clippedImg'){
                             evt.preventDefault();
                             $comb_scroll.off('mousedown', mouseDown);
+                            $comb_scroll.off('mousemove', mousehover);
                             if (Spider.unlocked){
                                 selected_artefact = evt.target;
                                 $comb_scroll.on('mousemove', mouseMove);
@@ -251,9 +252,8 @@ var CombinationController = (function () {
                                 var domRect = evt.target.getBoundingClientRect();
                                 var cx = domRect.left + (domRect.width/2);
                                 var cy = domRect.top + (domRect.height/2);
-                                console.log($(evt.target).parent().parent().data('rotate'));
                                 var frag_rot = $(evt.target).parent().parent().data('rotate');
-                                start_angle = angle(cx, cy, evt.pageX, evt.pageY) + frag_rot;
+                                start_angle = angle(cx, cy, evt.pageX, evt.pageY) - frag_rot;
                                 $comb_scroll.off('mousedown', mouseDown);
                                 $comb_scroll.off('mousemove', mousehover);
                                 $comb_scroll.on('mousemove', rotateMove);
@@ -300,7 +300,7 @@ var CombinationController = (function () {
                         processData: false,
                         type: 'POST',
                         success: function(selected_artefacts){
-                            console.log("successful move: " + selected_artefacts.returned_info);
+                            stopFragSelect();
                             $frag_cont.attr("id", "image-cont-xy-" + selected_artefacts.returned_info);
                             $comb_scroll.on('mousedown', mouseDown);
                             $comb_scroll.on('mousemove', mousehover);
@@ -320,21 +320,21 @@ var CombinationController = (function () {
                             evt.preventDefault();
                             if (Spider.unlocked){
                                 focused_element = evt.target;
-                                $(focused_element).parent().parent().parent().append($osd);
+                                $(focused_element).parent().css('opacity', 0.85);
+                                $(focused_element).parent().next().css('visibility', 'visible');
+                                $(focused_element).parent().parent().parent().prepend($osd);
                                 $osd.css('visibility', 'visible');
+                                $comb_scroll.append($(focused_element).parent().parent().parent().parent());
                             }
                             evt.stopPropagation();
                         }
                     } else {
-                        if($(evt.target).attr("class") !== 'clippedImg' && $(evt.target).attr("class") !== 'rotate_handle'){
-                            if(evt.target !== focused_element){
-                                evt.preventDefault();
-                                if (Spider.unlocked){
-                                    focused_element = undefined;
-                                    $osd.css('visibility', 'hidden');
-                                }
-                                evt.stopPropagation();
+                        if(evt.target !== focused_element && $(evt.target).attr("class") !== 'rotate_handle'){
+                            evt.preventDefault();
+                            if (Spider.unlocked){
+                                stopFragSelect();
                             }
+                            evt.stopPropagation();
                         }
                     } 
                 }
@@ -408,11 +408,19 @@ var CombinationController = (function () {
                         processData: false,
                         type: 'POST',
                         success: function(selected_artefacts){
-                            console.log("successful move: " + selected_artefacts.returned_info);
+                            stopFragSelect();
                             $frag_cont.attr("id", "image-cont-xy-" + selected_artefacts.returned_info);
                             $comb_scroll.on('mousedown', mouseDown);
+                            $comb_scroll.on('mousemove', mousehover);
                         }
                     });
+                }
+
+                function stopFragSelect() {
+                    $(focused_element).parent().css('opacity', 1.00);
+                    $(focused_element).parent().next().css('visibility', 'hidden');
+                    focused_element = undefined;
+                    $osd.css('visibility', 'hidden');
                 }
             }
     

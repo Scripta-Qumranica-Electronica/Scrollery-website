@@ -1,5 +1,5 @@
-#! C:\Strawberry\perl\bin\perl.exe
-# /usr/bin/perl
+#! /usr/bin/perl
+# C:\Strawberry\perl\bin\perl.exe
 
 use strict;
 use warnings;

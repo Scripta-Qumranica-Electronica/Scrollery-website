@@ -41,7 +41,7 @@ sub processCGI {
 		'copyCombination' => \&copyCombination,
 		'nameCombination' => \&nameCombination,
 		'setArtPosition' => \&setArtPosition,
-		'setArtRotate' => \&setArtRotate,
+		'setArtRotation' => \&setArtRotation,
 	);
 
 	print $cgi->header(
@@ -357,7 +357,7 @@ sub setArtPosition {
 	return;
 }
 
-sub setArtRotate {
+sub setArtRotation {
 	my $cgi = shift;
 	my $user_id = $cgi->dbh->user_id;
 	my $scroll_id = $cgi->param('scroll_id');
