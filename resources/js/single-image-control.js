@@ -170,13 +170,13 @@ var SingleImageController = (function () {
         		type: 'POST', //This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 				dataType: "json",
 				context: this,
-				url: "https://134.76.19.179/cgi-bin/sqe-iiif.pl"
+				url: "https://www.qumranica.org/cgi-bin/sqe-iiif.pl"
 			}).done(function (infoJson, status, jqXHR) {
 				//This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
-				if (infoJson["@id"].includes("134.76.19.179")){
+				if (infoJson["@id"].includes("www.qumranica.org")){
 					infoJson["@id"] = infoJson["@id"].replace("iipsrv.fcgi?IIIF=", "sqe-iiif.pl?user=" + Spider.user + "&url=" + url + "&file=");
 				} else if (infoJson["@id"].includes("gallica")){
-					infoJson["@id"] = infoJson["@id"].replace("http://gallica.bnf.fr/iiif/ark%3A%2F", "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + url + "&file=");
+					infoJson["@id"] = infoJson["@id"].replace("http://gallica.bnf.fr/iiif/ark%3A%2F", "https://www.qumranica.org/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + url + "&file=");
 				}
 				var viewer = OpenSeadragon({
 					id: 'single_image-' + file,

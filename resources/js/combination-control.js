@@ -192,7 +192,7 @@ var CombinationController = (function () {
                                                     var scale = (scroll_dpi / artefact_dpi) * zoom_factor; //I may have a problem with the math here
                                                     path.setAttribute('d', new_polygons);
                                                     path.setAttribute('transform', 'scale(' + scale + ')');
-                                                    svgImage.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + artefact.url + "&file="
+                                                    svgImage.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', "https://www.qumranica.org/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + artefact.url + "&file="
                                                       + artefact.filename + '/' + img_x + ',' + img_y + ',' + img_width + ',' + img_height + '/pct:' + (scale * 100 < 100 ? scale * 100 : 100) + '/0/' + artefact.suffix);
                                                     svgImage.setAttribute('class', 'clippedImg');
                                                     svgImage.setAttribute('width', img_width * scale);
@@ -434,7 +434,7 @@ var CombinationController = (function () {
                     artefact.path.setAttribute('transform', 'scale(' + scale + ')');
                     if (!dynamic){
                         if (max_zoom < zoom_factor) {
-                            artefact.image.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + artefact.url + "&file="
+                            artefact.image.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', "https://www.qumranica.org/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + artefact.url + "&file="
                             + artefact.filename + '/' + artefact.crop_x + ',' + artefact.crop_y + ',' + artefact.crop_width + ',' + artefact.crop_height + '/pct:' + (scale * 100 < 100 ? scale * 100 : 100) + '/0/' + artefact.suffix);
                             if (index === artefact.length -1){
                                 max_zoom = zoom_factor;
