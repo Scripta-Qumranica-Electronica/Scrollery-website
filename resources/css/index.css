@@ -170,10 +170,12 @@ html, body {
 
 .fragment-cont-xy {
   position: absolute;
+  z-index: 1;
 }
 
 .fragment-cont-rot {
   position: relative;
+  z-index: inherit;
 }
 
 svg {
