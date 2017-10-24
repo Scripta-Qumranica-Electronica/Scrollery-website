@@ -14,6 +14,7 @@ use SQE_DBI;
 use SQE_API::Queries;
 
 use CGI;
+use JSON;
 
 
 # helper functions
@@ -71,7 +72,7 @@ sub lastInsertedId_SQE
 	return query_SQE
 	(
 		$cgi,
-		'first',
+		'first_value',
 	
 		'SELECT LAST_INSERT_ID()'
 	);
@@ -537,7 +538,7 @@ sub load_fragment_text
 	my $error = shift;
 	
 	my $dbh = $cgi->dbh;
-#	$dbh->set_scrollversion($cgi->param('scroll_version'));
+	$dbh->set_scrollversion($cgi->param('scroll_version')); # TODO currently works only if scroll was clicked in client
 	
 	
 	# get scroll & fragment data
@@ -615,11 +616,10 @@ sub load_fragment_text
 	
 	my $first_sign_of_line = 1;
 	
-	my $next_sign;
-	my @current_sign;
-	while ($next_sign = $sign_stream->next_sign)
+	my $current_sign_scalar; # as scalar first for simple check whether existant
+	while ($current_sign_scalar = $sign_stream->next_sign)
 	{
-		@current_sign = @{ $next_sign };
+		my @current_sign = @{ $current_sign_scalar };
 		
 		if ($current_sign[3] == 9) # line end / line start (might be column end / scroll end also, but not relevant here) 
 		{
@@ -651,13 +651,47 @@ sub load_fragment_text
 		
 		# collect sign attributes
 		
-		$json_string .= '{"signCharId":'.$current_sign[0].', "signId":'.$current_sign[1];
+		$json_string .= '{"signId":'.$current_sign[1];
+		
+		my @sign_char = query_SQE # TODO replace this rather inefficient query
+		(
+			$cgi,
+			'first_array',
+		
+			'SELECT sign_char_id, might_be_wider FROM sign_char'
+			.' WHERE sign_id = ?'
+			.' AND sign_char_id IN'
+			.' ('
+			.' 		SELECT sign_char_id FROM sign_char_owner'
+			.' 		WHERE scroll_version_id = ?'
+			.' )',
+		
+			$current_sign[1],
+			$cgi->param('scroll_version')
+		);
+#		if (scalar @sign_char == 2) # entry in sign_char found
+#		{
+#			$json_string .= ',"signCharId":'.$sign_char[0];
+#			
+#			if ($sign_char[1] == 1)
+#			{
+##				$json_string .= ',"mightBeWider":1';
+#			}
+#		}
+#		else
+#		{
+#			$json_string .= ',"undefinedSignCharId":"true"'; # TODO remove later (should happen only because of misguided manual deletion)
+#		}
 		
 		if ($current_sign[3] == 1) { $json_string .= ',"sign":"'.$current_sign[2].'"'; } # letter
 		else                       { $json_string .= ',"type":"'.$current_sign[3].'"'; }
 		
+		$json_string .= ',"mightBeWider":"'.$current_sign[6].'"'; # TODO is always 0 from API 
+		
 		if ($current_sign[5] != 1)             { $json_string .= ',"width":"'.$current_sign[5].'"'; }
-		if ($current_sign[6] == 1)             { $json_string .= ',"mightBeWider":1'; }
+#		if ($current_sign[6] eq '1')        { $json_string .= ',"mightBeWider1":1'; }
+#		if ($current_sign[6] == '1')        { $json_string .= ',"mightBeWider2":1'; }
+#		if ($current_sign[6] == 1)        { $json_string .= ',"mightBeWider3":1'; }
 		if (!($current_sign[7] eq 'COMPLETE')) { $json_string .= ',"readability":"'.$current_sign[7].'"'; }
 		if ($current_sign[8] == 1)             { $json_string .= ',"retraced":1'; }
 		if ($current_sign[9] == 1)             { $json_string .= ',"reconstructed":1'; }
@@ -670,7 +704,12 @@ sub load_fragment_text
 			'',
 			
 			'SELECT sign_relative_position_id, type FROM sign_relative_position'
-			.' WHERE sign_id = ?',
+			.' WHERE sign_id = ?'
+			.' AND sign_relative_position_id IN'
+			.' ('
+			.' 		SELECT sign_relative_position_id FROM sign_relative_position_owner'
+			.' 		WHERE scroll_version_id = ?'
+			.' )',
 			
 			$current_sign[1]
 		);
@@ -735,48 +774,16 @@ sub add_attribute
 	
 	my $sign_id = $cgi->param('signId');
 	my $sign_char_id = $cgi->param('signCharId');
-#	my $sign_relative_position_id = $cgi->param('signPositionId');
+	my $sign_relative_position_id = $cgi->param('signPositionId');
 	my $attribute_name = $cgi->param('attributeName');
 	my $attribute_value = $cgi->param('attributeValue');
 	
 	if ($attribute_name eq 'mightBeWider')
 	{
-		my @existing_such_variants = query_SQE # TODO doesn't cover other differences yet (e.g. width)
-		(
-			$cgi,
-			'all',
-		
-			'SELECT sign_char.sign_char_id from sign_char'
-			.' JOIN sign_char_owner'
-			.' ON sign_char_owner.sign_char_id = sign_char.sign_char_id'
-			.' WHERE sign_id = ?'
-			.' AND might_be_wider = 1'
-			.' AND scroll_version_id = ?',
-			
-			$sign_id,
-			$scroll_version_id
-		);
-		if (scalar @existing_such_variants > 0)
-		{
-			$cgi->print('{"signCharId":'.$existing_such_variants[0].'}');
-			return;
-		}
-		
-		query_SQE
-		(
-			$cgi,
-			'',
-			
-			'INSERT IGNORE INTO sign_char_owner (sign_char_id, scroll_version_id) VALUES (?, ?)',
-			
-			$sign_char_id,
-			$scroll_version_id
-		);
-		
 		my @result = $dbh->change_value
 		(
 			'sign_char',
-			$sign_id,
+			$sign_char_id,
 			'might_be_wider',
 			$attribute_value
 		);
@@ -798,6 +805,60 @@ sub add_attribute
 		elsif ($attribute_value eq 'aboveLine')   { $type = 'ABOVE_LINE'; }
 		elsif ($attribute_value eq 'belowLine')   { $type = 'BELOW_LINE'; }
 		elsif ($attribute_value eq 'margin')      { $type = 'MARGIN'; }
+		
+#		$cgi->print('{"signPositionId":'.$sign_relative_position_id.'}');
+#		return;
+		
+		my @result;
+		if ($sign_relative_position_id != -1)
+		{
+			@result = $dbh->change_value
+			(
+				'sign_relative_position',
+				$sign_relative_position_id,
+				'position',
+				$attribute_value
+			);
+		}
+		else
+		{
+			query_SQE
+			(
+				$cgi,
+				'none',
+				
+				'INSERT INTO sign_relative_position (sign_id, type) VALUES (?, ?)',
+				
+				$sign_id,
+				$type
+			);
+			$sign_relative_position_id = lastInsertedId_SQE($cgi);
+#			$cgi->print('{"signPositionId":'.$sign_relative_position_id.'}');
+#			return;
+			
+			query_SQE
+			(
+				$cgi,
+				'none',
+				
+				'INSERT INTO sign_relative_position_owner (sign_relative_position_id, scroll_version_id) VALUES (?, ?)',
+				
+				$sign_relative_position_id,
+				$scroll_version_id
+			);
+			
+			$result[0] = 1; # TODO check whether inserts really worked
+		}
+		
+		if (defined $result[0])
+		{
+			$cgi->print('{"signPositionId":'.$sign_relative_position_id.'}');
+		}
+		else
+		{
+			$cgi->print('{"error":"'.${$result[1]}[1].'"}');
+		}
+		
 		
 #		query_SQE
 #		(

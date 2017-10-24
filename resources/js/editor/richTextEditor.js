@@ -3,30 +3,10 @@ function RichTextEditor()
 	const self = this; // for usage in event listener
 	this.originalText = [];
 	
-	this.signType2Visualisation =
-	{
-		2: ' ',
-		3: '.',
-		4: '_',
-		5: '#',
-		6: '¬',
-		7: '¶',
-		8: '?'
-	};
-	this.signType2Name =
-	{
-		2: 'space',
-		3: 'possible vacat',
-		4: 'vacat',
-		5: 'damage',
-		6: 'blank line',
-		7: 'paragraph marker',
-		8: 'lacuna'
-	};
-	
 	this.fontSize = 20;
 	$('#richTextContainer').css({ 'font-size': this.fontSize + 'px' });
 	
+	this.signVisualisation = new SignVisualisation();
 	this.singleSignEditor = new SingleSignEditor(this);
 	
 	
@@ -244,8 +224,6 @@ function RichTextEditor()
 		.attr('iSign', iSign)
 		.attr('signId', attributes['signId']);
 		
-		const classList = [];
-		
 		// chapter 2 & 3
 		if (attributes['type'] == null) // letter
 		{
@@ -263,44 +241,34 @@ function RichTextEditor()
 		}
 		else // not a letter
 		{
-			var sign = this.signType2Visualisation[attributes['type']];
+			var sign = this.signVisualisation.placeholder([attributes['type']]);
 			
-			if (sign == null) // unknown sign type
+			span.attr('title', 'Sign type: ' + this.signVisualisation.typeName(attributes['type'])); // set tooltip
+			
+			if (attributes['width'] == null)
 			{
-				sign = '?';
+				span
+				.text(sign)
+				.css
+				({
+					'font-size': this.fontSize + 'px'
+				});
 			}
 			else
 			{
-				if (this.signType2Name[attributes['type']] != null) // set tooltip
+				var markers = sign;
+				for (var iSpace = 1; iSpace < Math.floor(attributes['width']); iSpace++)
 				{
-					span.attr('title', 'Sign type: ' + this.signType2Name[attributes['type']]);
+					markers += sign;
 				}
+				sign = markers;
 				
-				if (attributes['width'] == null)
-				{
-					span
-					.text(sign)
-					.css
-					({
-						'font-size': this.fontSize + 'px'
-					});
-				}
-				else
-				{
-					var markers = sign;
-					for (var iSpace = 1; iSpace < Math.floor(attributes['width']); iSpace++)
-					{
-						markers += sign;
-					}
-					sign = markers;
-					
-					span
-					.text(markers)
-					.css
-					({
-						'font-size': Math.ceil((this.fontSize * attributes['width']) / markers.length) + 'px'
-					});
-				}
+				span
+				.text(markers)
+				.css
+				({
+					'font-size': Math.ceil((this.fontSize * attributes['width']) / markers.length) + 'px'
+				});
 			}
 		}
 		
@@ -309,31 +277,11 @@ function RichTextEditor()
 		{
 			switch (attributes['position'])
 			{
-				case 'aboveLine':
-				{
-					classList.push('superscript');
-				}
-				break;
+				case 'aboveLine'  : span.addClass('superscript'); break;
+				case 'belowLine'  : span.addClass('subscript');   break;
 				
-				case 'belowLine':
-				{
-					classList.push('subscript');
-//					span.html('<sub>' + span.html() + '</sub>');
-//					destination = $('#regularLinePart' + iLine);
-				}
-				break;
-				
-				case 'leftMargin':
-				{
-					destination = $('#leftMargin' + iLine);
-				}
-				break;
-				
-				case 'rightMargin':
-				{
-					destination = $('#rightMargin' + iLine);
-				}
-				break;
+				case 'leftMargin' : destination = $('#leftMargin' + iLine);  break;
+				case 'rightMargin': destination = $('#rightMargin' + iLine); break;
 			}
 		}
 		span.appendTo(destination);
@@ -346,7 +294,7 @@ function RichTextEditor()
 		
 		if ((attributes['retraced']) == 1) // 6.2
 		{
-			classList.push('retraced');
+			span.addClass('retraced');
 		}
 		
 		if ((attributes['readability']) != null) // 9
@@ -361,19 +309,19 @@ function RichTextEditor()
 			}
 		}
 		
-		if ((attributes['reconstructed']) == 'true') // 10
+		if ((attributes['reconstructed']) == 1) // 10
 		{
-			classList.push('reconstructed');
+			span.addClass('reconstructed');
 		}
 		
 		if ((attributes['corrected']) != null) // 11
 		{
-			classList.push('corrected'); // TODO differentiate by different corrections?
+			span.addClass('corrected'); // TODO differentiate by different corrections?
 		}
 		
 //		if ((attributes['suggested']) != null) // 13.1
 //		{
-//			classList.push('suggested');
+//			span.addClass('suggested');
 //		}
 		
 //		if ((attributes['comment']) != null) // 13.2
@@ -383,11 +331,6 @@ function RichTextEditor()
 		
 		// TODO vocalization (8)
 
-		for (var i in classList)
-		{
-			span.addClass(classList[i]);
-		}
-		
 		span.dblclick(function(event) // TODO just one listener for whole frame
 		{
 			$('#richTextContainer').appendTo('#hidePanel');
@@ -398,7 +341,7 @@ function RichTextEditor()
 			.singleSignEditor
 			.displaySingleSignSpan
 			(
-				self.originalText,
+				self.originalText, // TODO respect user's changes
 				event.target['id']
 			);
 		});
@@ -407,6 +350,9 @@ function RichTextEditor()
 	this.displayModel = function(model)
 	{
 		this.originalText = model;
+		
+		$('#richTextContainer').appendTo('#RichTextPanel'); // switch back from single sign editor, if necessary
+		$('#singleSignContainer').appendTo('#hidePanel');
 		
 		const buttons = $('#richTextButtons');
 		const fragmentName = $('#fragmentName');

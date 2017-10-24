@@ -10,6 +10,7 @@
     <script type="text/javascript" src="vendors/RubaXa/Sortable.min.js"></script>
     <script type="text/javascript" src="resources/js/messageSpider.js"></script>
     <script type="text/javascript" src="resources/js/layout-control.js"></script>
+    <script type="text/javascript" src="resources/js/editor/signVisualisation.js"></script>
     <script type="text/javascript" src="resources/js/editor/singleSignEditor.js"></script>
     <script type="text/javascript" src="resources/js/editor/richTextEditor.js"></script>
     <script type="text/javascript" src="resources/js/single-image-control.js"></script>
@@ -90,16 +91,16 @@
             <div id="singleSignContainer"
                 class="hidden fillingMostHeight contentField">
               
-				<div id="signAndAlternatives"
+				<div id="signContext"
+					 dir="rtl"></div>
+              
+				<div id="signReadings"
 					 class="scrollable">
 					
 					<span id="addReadingPseudoButton"
 						  class="someSpaceToTheLeft pointerMouse">+</span>
 					
 				</div>
-              
-              <span id="signContext"
-                  dir="rtl">Context</span>
               
               <button id="finishSingleSignChangesButton"
                   class="someSpaceAbove">Done</button>
@@ -138,9 +139,6 @@
 						   maxlength="1"
 						   size="1"></input>
 					
-					<button id="confirmAddReadingButton">Ok</button>
-					<button id="cancelAddReadingButton">Cancel</button>
-				
 				</div>
 				
 			  <button id="confirmSingleSignChangesButton"

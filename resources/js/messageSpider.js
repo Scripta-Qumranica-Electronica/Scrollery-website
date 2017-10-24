@@ -69,7 +69,7 @@ function Spider() // singleton central component communication system
 		(
 			function(data)
 			{
-				if (onSuccess !== null)
+				if (onSuccess) // first method was provided as parameter 
 				{
 					onSuccess(data);
 				}
@@ -81,7 +81,7 @@ function Spider() // singleton central component communication system
 		(
 			function(data)
 			{
-				if (onFailure !== null)
+				if (onFailure) // second method was provided as parameter
 				{
 					onFailure(data);
 				}

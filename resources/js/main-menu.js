@@ -181,7 +181,7 @@ function populate_combinations(user) {
                         var combination = node.id.split('-')[1];
                         // var version = node.id.split('-')[3];
                         var version_id = node.id.split('-')[3];
-                        console.log(version_id);
+                        console.log('version_id ' + version_id);
                         trans_data = {'transaction' : 'getColOfComb', 'combID' : combination, 'user' : user, 'version_id': version_id, 'SESSION_ID' : Spider['session_id']};
                         current_lvl = 1;
                     }

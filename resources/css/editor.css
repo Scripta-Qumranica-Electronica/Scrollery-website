@@ -386,10 +386,6 @@
 	border-bottom: 1px solid darkgrey;
 }
 
-.richTextLine
-{
-}
-
 #richTextContainer
 {
 	table-layout: auto;
@@ -498,7 +494,7 @@
 
 .attributesList
 {
-	height: 200px;
+	height: 160px;
 	
 	padding: 4px;
 }
