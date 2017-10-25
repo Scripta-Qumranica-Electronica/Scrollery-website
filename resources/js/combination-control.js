@@ -14,6 +14,7 @@ var CombinationController = (function () {
         var scroll_dpi = 1215;
         var scroll_width = 50000;
         var scroll_height = 5000;
+        var $comb_pane = $("combination-pane");
         var $comb_scroll = $('<div ondragstart="return false;"></div>');
         $comb_scroll.attr('id','combination-viewport');
         $comb_scroll.css('width', (scroll_width * zoom_factor) + 'px');
@@ -220,46 +221,83 @@ var CombinationController = (function () {
                 }
             });
 
-            //Event handling
+            /*****************
+            * Event handling *
+            ******************/
+            
+            //Initialize necessary variables
             var start_angle = 0;
-            $comb_scroll.off('mousedown');
-            $comb_scroll.off('mousemove');
-
-            $comb_scroll.on('mousemove', mousehover);
-
-            $comb_scroll.on('mousedown', mouseDown);
             var mouseOrigin = {x: 0, y: 0};
             var selected_artefact;
-            function mouseDown(evt) {
-                if (evt.target !== evt.currentTarget) {
-                    if($(evt.target).attr("class") === 'clippedImg'){
-                        evt.preventDefault();
-                        $comb_scroll.off('mousedown', mouseDown);
-                        $comb_scroll.off('mousemove', mousehover);
-                        if (Spider.unlocked){
-                            selected_artefact = evt.target;
-                            $comb_scroll.on('mousemove', mouseMove);
-                            $comb_scroll.on('mouseup', mouseUp);
-                            $comb_scroll.append($(evt.target).parent().parent().parent().parent());
-                            mouseOrigin.x = evt.clientX;
-                            mouseOrigin.y = evt.clientY;
-                            evt.stopPropagation();
-                        } 
-                    } else if($(evt.target).attr("class") === 'rotate_handle'){
-                        if (Spider.unlocked){
-                            selected_artefact = evt.target;
-                            evt.preventDefault();
-                            var domRect = evt.target.getBoundingClientRect();
-                            var cx = domRect.left + (domRect.width/2);
-                            var cy = domRect.top + (domRect.height/2);
-                            var frag_rot = $(evt.target).parent().parent().data('rotate');
-                            start_angle = angle(cx, cy, evt.pageX, evt.pageY) - frag_rot;
-                            $comb_scroll.off('mousedown', mouseDown);
-                            $comb_scroll.off('mousemove', mousehover);
-                            $comb_scroll.on('mousemove', rotateMove);
-                            $comb_scroll.on('mouseup', rotateUp);
-                        }
-                    }
+
+            //Clear any existing event handlers
+            $comb_scroll.off('mousedown.art');
+            $comb_scroll.off('mousedown.osd');
+            $comb_scroll.off('mouseenter.hover');
+            $comb_scroll.off('mouseleave.hover');
+
+            //Load the event handlers
+            $comb_scroll.on('mouseenter.hover', ".fragment-cont-xy", enterHover);
+            $comb_scroll.on('mouseleave.hover', ".fragment-cont-xy", leaveHover);
+            $comb_scroll.on('mousedown.art', "image", mouseDownArt);
+            $comb_scroll.on('mousedown.osd', "#osd_rotate", mouseDownOSD);
+
+            function enterHover (evt) {
+                if (Spider.unlocked){
+                    focused_element = evt.target;
+                    $(focused_element).parent().css('opacity', 0.85);
+                    $(focused_element).parent().next().css('visibility', 'visible');
+                    $(focused_element).parent().parent().parent().parent().children(":first").prepend($osd);
+                    $osd.css('visibility', 'visible');
+                    $(evt.target).parent().parent().parent().parent().css("z-index", 10);
+                }
+            }
+
+            function leaveHover () {
+                deselectFocused();
+            }
+
+            function deselectFocused(){
+                $(focused_element).parent().parent().parent().parent().css("z-index", 1);
+                $(focused_element).parent().css('opacity', 1.00);
+                $(focused_element).parent().next().css('visibility', 'hidden');
+                focused_element = undefined;
+                $osd.css('visibility', 'hidden');
+            }
+
+            function mouseDownArt(evt) {
+                $comb_scroll.off('mousedown.art');
+                $comb_scroll.off('mousedown.osd');
+                $comb_scroll.off('mouseenter.hover');
+                $comb_scroll.off('mouseleave.hover');
+                evt.preventDefault();
+                //evt.stopPropagation();
+                if (Spider.unlocked){
+                    selected_artefact = evt.target;
+                    $(document).on('mousemove.art', $comb_scroll, mouseMoveArt);
+                    $(document).on('mouseup.art', mouseUpArt);
+                    $(evt.target).parent().parent().parent().parent().css("z-index", 10);
+                    mouseOrigin.x = evt.clientX;
+                    mouseOrigin.y = evt.clientY;
+                } 
+            }
+
+            function mouseDownOSD (evt) {
+                $comb_scroll.off('mousedown.art');
+                $comb_scroll.off('mousedown.osd');
+                $comb_scroll.off('mouseenter.hover');
+                $comb_scroll.off('mouseleave.hover');
+                evt.preventDefault();
+                //evt.stopPropagation();
+                if (Spider.unlocked){
+                    selected_artefact = evt.target;
+                    var domRect = evt.target.getBoundingClientRect();
+                    var cx = domRect.left + (domRect.width/2);
+                    var cy = domRect.top + (domRect.height/2);
+                    var frag_rot = $(evt.target).parent().parent().data('rotate');
+                    start_angle = angle(cx, cy, evt.pageX, evt.pageY) - frag_rot;
+                    $(document).on('mousemove.rot', rotateMove);
+                    $(document).on('mouseup.rot', rotateUp);
                 }
             }
 
@@ -281,8 +319,8 @@ var CombinationController = (function () {
                 var $frag_cont = $(selected_artefact).parent().parent().parent();
                 $(selected_artefact).parent().parent().data('rotate', rot_angle);
                 selected_artefact = undefined;
-                $comb_scroll.off('mousemove', rotateMove);
-                $comb_scroll.off('mouseup', rotateUp);
+                $(document).off('mousemove.rot');
+                $(document).off('mouseup.rot');
                 var scroll_data = new FormData();
                 scroll_data.append('transaction', 'setArtRotation');
                 scroll_data.append('scroll_id', Spider.current_combination);
@@ -300,10 +338,12 @@ var CombinationController = (function () {
                     processData: false,
                     type: 'POST',
                     success: function(selected_artefacts){
-                        stopFragSelect();
                         $frag_cont.attr("id", "image-cont-xy-" + selected_artefacts.returned_info);
-                        $comb_scroll.on('mousedown', mouseDown);
-                        $comb_scroll.on('mousemove', mousehover);
+                        $comb_scroll.on('mousedown.art', "image", mouseDownArt);
+                        $comb_scroll.on('mousedown.osd', "#osd_rotate", mouseDownOSD);
+                        $comb_scroll.on('mouseenter.hover', ".fragment-cont-xy", enterHover);
+                        $comb_scroll.on('mouseleave.hover', ".fragment-cont-xy", leaveHover);
+                        deselectFocused(); //Maybe make this more intelligent to check if mouse is still inside element
                     }
                 });
             }
@@ -314,38 +354,13 @@ var CombinationController = (function () {
                 return Math.atan2(dx, dy) * 180 / Math.PI;
                 }
 
-            function mousehover(evt) {
-                if (!focused_element) {
-                    if($(evt.target).attr("class") === 'clippedImg'){
-                        evt.preventDefault();
-                        if (Spider.unlocked){
-                            focused_element = evt.target;
-                            $(focused_element).parent().css('opacity', 0.85);
-                            $(focused_element).parent().next().css('visibility', 'visible');
-                            $(focused_element).parent().parent().parent().prepend($osd);
-                            $osd.css('visibility', 'visible');
-                            $comb_scroll.append($(focused_element).parent().parent().parent().parent());
-                        }
-                        evt.stopPropagation();
-                    }
-                } else {
-                    if(evt.target !== focused_element && $(evt.target).attr("class") !== 'rotate_handle'){
-                        evt.preventDefault();
-                        if (Spider.unlocked){
-                            stopFragSelect();
-                        }
-                        evt.stopPropagation();
-                    }
-                } 
-            }
-    
-            function mouseMove(evt){
+            function mouseMoveArt(evt){
                 var x = evt.clientX;
                 var y = evt.clientY;
-                // var viewport = {t: $comb_scroll.offsetTop + 10,
-                //                 b: $comb_scroll.offsetTop +  $comb_scroll.clientHeight - 10,
-                //                 l: $comb_scroll.offsetLeft + 10,
-                //                 r: $comb_scroll.offsetLeft + $comb_scroll.clientWidth - 10,
+                // var viewport = {t: $comb_pane.offsetTop + 10,
+                //                 b: $comb_pane.offsetTop +  $comb_scroll.clientHeight - 10,
+                //                 l: $comb_pane.offsetLeft + 10,
+                //                 r: $comb_pane.offsetLeft + $comb_scroll.clientWidth - 10,
                 // };
                 // switch (true){
                 //     case (y < viewport.t):
@@ -373,10 +388,10 @@ var CombinationController = (function () {
                 $(selected_artefact).parent().parent().parent().parent().css('transform', 'translate3d(' + moveXY.x + 'px, ' + moveXY.y + 'px, 0px)');
             }
     
-            function mouseUp(evt) {
+            function mouseUpArt(evt) {
                 evt.preventDefault();
-                $comb_scroll.off('mousemove', mouseMove);
-                $comb_scroll.off('mouseup', mouseUp);
+                $(document).off('mousemove.art');
+                $(document).off('mouseup.art');
                 var x = evt.clientX;
                 var y = evt.clientY;
                 var moveXY = {
@@ -408,19 +423,14 @@ var CombinationController = (function () {
                     processData: false,
                     type: 'POST',
                     success: function(selected_artefacts){
-                        stopFragSelect();
                         $frag_cont.attr("id", "image-cont-xy-" + selected_artefacts.returned_info);
-                        $comb_scroll.on('mousedown', mouseDown);
-                        $comb_scroll.on('mousemove', mousehover);
+                        $comb_scroll.on('mousedown.art', "image", mouseDownArt);
+                        $comb_scroll.on('mousedown.osd', "#osd_rotate", mouseDownOSD);
+                        $comb_scroll.on('mouseenter.hover', ".fragment-cont-xy", enterHover);
+                        $comb_scroll.on('mouseleave.hover', ".fragment-cont-xy", leaveHover);
+                        deselectFocused(); //Maybe make this more intelligent to check if mouse is still inside element
                     }
                 });
-            }
-
-            function stopFragSelect() {
-                $(focused_element).parent().css('opacity', 1.00);
-                $(focused_element).parent().next().css('visibility', 'hidden');
-                focused_element = undefined;
-                $osd.css('visibility', 'hidden');
             }
         }
 
