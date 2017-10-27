@@ -82,8 +82,8 @@ function load_fragment_text(selected_frag)
             (
                 {
                 	'request': 'loadFragmentText',
-                	'scroll_version': Spider.current_version_id,
-                    'discreteCanonicalReferenceId': selected_frag // result.col
+                    'discreteCanonicalReferenceId': selected_frag, // result.col
+                    'SCROLLVERSION': Spider.current_version_id
                 },
                 function(data)
                 {
@@ -93,10 +93,6 @@ function load_fragment_text(selected_frag)
                     }
                     
                     Spider.notifyChangedText(data);
-                },
-                function()
-                {
-                	console.log('loadFragmentText() went wrong');
                 }
             );
         });

@@ -213,12 +213,12 @@ function SingleSignEditor(richTextEditor)
 			(
 				{
 					'request'       : 'addAttribute',
-					'scrollVersion' : Spider.current_version_id,
 					'signId'        : $('#reading' + iSign).attr('signId'),
 					'signCharId'    : $('#reading' + iSign).attr('signCharId'),
 					'signPositionId': signPositionId,
 					'attributeName' : attribute,
-					'attributeValue': value
+					'attributeValue': value,
+					'SCROLLVERSION' : Spider.current_version_id
 				},
 				function(json) // on result
 				{

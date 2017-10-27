@@ -538,7 +538,12 @@ sub load_fragment_text
 	my $error = shift;
 	
 	my $dbh = $cgi->dbh;
-	$dbh->set_scrollversion($cgi->param('scroll_version')); # TODO currently works only if scroll was clicked in client
+	if (defined $cgi->param('SCROLLVERSION'))
+	{
+		$dbh->set_scrollversion($cgi->param('SCROLLVERSION')); # TODO currently works only if scroll was clicked in client	
+	}
+	
+	
 	
 	
 	# get scroll & fragment data
@@ -612,13 +617,21 @@ sub load_fragment_text
 	my $line_id = ($line_ids_query->fetchrow_array)[0];
 	$line_name_query->execute($line_id);
 	my $line_name = ($line_name_query->fetchrow_array)[0];
-	my $json_string = '{"scroll_version":"'.$cgi->param('scroll_version').'","$col_of_scroll_id":'.$col_of_scroll_id.',"fragmentName":"'.$fragment_name.'","lines":[{"lineName":"'.$line_name.'","signs":[';
+	my $json_string = '{"param SCROLLVERSION":'.$cgi->param('SCROLLVERSION').',"actual SCROLLVERSION":'.$dbh->scrollversion().',"$col_of_scroll_id":'.$col_of_scroll_id.',"fragmentName":"'.$fragment_name.'","lines":[{"lineName":"'.$line_name.'","signs":[';
 	
 	my $first_sign_of_line = 1;
 	
 	my $current_sign_scalar; # as scalar first for simple check whether existant
-	while ($current_sign_scalar = $sign_stream->next_sign)
+	while (1)
 	{
+		$current_sign_scalar = $sign_stream->next_sign();
+		if (!defined $current_sign_scalar)
+		{
+#			$json_string .= ',"dumpScalar":"'.Dumper($current_sign_scalar).'"';
+#			$json_string .= ',"dumpArray":"'.Dumper(@{ $current_sign_scalar }).'"';
+			last;
+		}
+		
 		my @current_sign = @{ $current_sign_scalar };
 		
 		if ($current_sign[3] == 9) # line end / line start (might be column end / scroll end also, but not relevant here) 
@@ -653,23 +666,23 @@ sub load_fragment_text
 		
 		$json_string .= '{"signId":'.$current_sign[1];
 		
-		my @sign_char = query_SQE # TODO replace this rather inefficient query
-		(
-			$cgi,
-			'first_array',
-		
-			'SELECT sign_char_id, might_be_wider FROM sign_char'
-			.' WHERE sign_id = ?'
-			.' AND sign_char_id IN'
-			.' ('
-			.' 		SELECT sign_char_id FROM sign_char_owner'
-			.' 		WHERE scroll_version_id = ?'
-			.' )',
-		
-			$current_sign[1],
-			$cgi->param('scroll_version')
-		);
-#		if (scalar @sign_char == 2) # entry in sign_char found
+#		my @sign_char = query_SQE # TODO replace this rather inefficient query
+#		(
+#			$cgi,
+#			'first_array',
+#		
+#			'SELECT sign_char_id, might_be_wider FROM sign_char'
+#			.' WHERE sign_id = ?'
+#			.' AND sign_char_id IN'
+#			.' ('
+#			.' 		SELECT sign_char_id FROM sign_char_owner'
+#			.' 		WHERE scroll_version_id = ?'
+#			.' )',
+#		
+#			$current_sign[1],
+#			$cgi->param('SCROLLVERSION')
+#		);
+#		if (scalar @sign_char > 0) # entry in sign_char found
 #		{
 #			$json_string .= ',"signCharId":'.$sign_char[0];
 #			
@@ -686,19 +699,20 @@ sub load_fragment_text
 		if ($current_sign[3] == 1) { $json_string .= ',"sign":"'.$current_sign[2].'"'; } # letter
 		else                       { $json_string .= ',"type":"'.$current_sign[3].'"'; }
 		
-		$json_string .= ',"mightBeWider":"'.$current_sign[6].'"'; # TODO is always 0 from API 
+#		$json_string .= ',"mightBeWider":"'.$current_sign[6].'"'; # TODO is always 0 from API 
 		
 		if ($current_sign[5] != 1)             { $json_string .= ',"width":"'.$current_sign[5].'"'; }
-#		if ($current_sign[6] eq '1')        { $json_string .= ',"mightBeWider1":1'; }
-#		if ($current_sign[6] == '1')        { $json_string .= ',"mightBeWider2":1'; }
-#		if ($current_sign[6] == 1)        { $json_string .= ',"mightBeWider3":1'; }
+		if ($current_sign[6] eq '1')        { $json_string .= ',"mightBeWider1":1'; }
+		if ($current_sign[6] == '1')        { $json_string .= ',"mightBeWider2":1'; }
+		if ($current_sign[6] == 1)        { $json_string .= ',"mightBeWider3":1'; }
 		if (!($current_sign[7] eq 'COMPLETE')) { $json_string .= ',"readability":"'.$current_sign[7].'"'; }
 		if ($current_sign[8] == 1)             { $json_string .= ',"retraced":1'; }
 		if ($current_sign[9] == 1)             { $json_string .= ',"reconstructed":1'; }
 		if (!($current_sign[10] eq ''))        { $json_string .= ',"corrected":"'.$current_sign[10].'"'; }
 		if ($current_sign[11] != 0)            { $json_string .= ',"isVariant":1'; }
+		if ($current_sign[13] != 0)            { $json_string .= ',"signCharId":'.$current_sign[13]; }
 		
-		my $sign_relative_position_query = query_SQE
+		my $sign_relative_position_query = query_SQE # TODO 
 		(
 			$cgi,
 			'',
@@ -765,7 +779,7 @@ sub add_attribute
 	
 	my $dbh = $cgi->dbh;
 	
-	my $scroll_version_id = $cgi->param('scrollVersion');
+	my $scroll_version_id = $cgi->param('SCROLLVERSION');
 	if (!defined $scroll_version_id)
 	{
 		$scroll_version_id = 1;
