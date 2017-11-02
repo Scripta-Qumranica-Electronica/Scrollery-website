@@ -127,7 +127,7 @@ sub getColOfComb {
 			   (SELECT COUNT(*)
 					FROM discrete_canonical_references
 					WHERE discrete_canonical_references.column_of_scroll_id = col_id)
-				   AS COUNT
+				   AS count
 		FROM col_data
 			JOIN col_data_owner USING(col_data_id)
 			JOIN scroll_to_col USING(col_id)
