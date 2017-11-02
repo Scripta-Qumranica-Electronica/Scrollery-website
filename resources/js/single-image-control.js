@@ -99,13 +99,11 @@ var SingleImageController = (function () {
 						});
 						
 						var visible = document.createElement("td");
-						var eye = document.createElement("img");
-						//eye.setAttribute("id", "eye-" + entry['filename']);
-						eye.setAttribute("src", "resources/images/eye-closed.png");
-						eye.setAttribute("alt", "not visible");
+						var eye = document.createElement("i");
+						eye.classList.add("fa");
+						eye.classList.add("fa-eye-slash");
+						eye.style.color = "red";
 						eye.dataset.url = entry['url'];
-						eye.setAttribute("width", "20");
-						eye.setAttribute("height", "20");
 						eye.addEventListener("click", function(){
 							toggle_image(filename, this);
 						});
@@ -170,13 +168,13 @@ var SingleImageController = (function () {
         		type: 'POST', //This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
 				dataType: "json",
 				context: this,
-				url: "https://134.76.19.179/cgi-bin/sqe-iiif.pl"
+				url: "https://www.qumranica.org/cgi-bin/sqe-iiif.pl"
 			}).done(function (infoJson, status, jqXHR) {
 				//This if method is purely to secure our SQE IIIF server, remove it when we switch to the IAA NLI server
-				if (infoJson["@id"].includes("134.76.19.179")){
+				if (infoJson["@id"].includes("www.qumranica.org")){
 					infoJson["@id"] = infoJson["@id"].replace("iipsrv.fcgi?IIIF=", "sqe-iiif.pl?user=" + Spider.user + "&url=" + url + "&file=");
 				} else if (infoJson["@id"].includes("gallica")){
-					infoJson["@id"] = infoJson["@id"].replace("http://gallica.bnf.fr/iiif/ark%3A%2F", "https://134.76.19.179/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + url + "&file=");
+					infoJson["@id"] = infoJson["@id"].replace("http://gallica.bnf.fr/iiif/ark%3A%2F", "https://www.qumranica.org/cgi-bin/sqe-iiif.pl?user=" + Spider.user + "&url=" + url + "&file=");
 				}
 				var viewer = OpenSeadragon({
 					id: 'single_image-' + file,
@@ -215,17 +213,20 @@ var SingleImageController = (function () {
 		function toggle_image(file, eye_icon){
 			if ($('#single_image-' + $.escapeSelector(file)).length == 0){
 				display_image.call(this, file, eye_icon.dataset.url);
-				eye_icon.setAttribute("src", "resources/images/eye-open.png");
-				eye_icon.setAttribute("alt", "visible");
+				eye_icon.classList.remove("fa-eye-slash");
+				eye_icon.style.color = "green";
+				eye_icon.classList.add("fa-eye");
 			} else {
 				if ($('#single_image-' + $.escapeSelector(file)).css("visibility") == "visible"){
 					$('#single_image-' + $.escapeSelector(file)).css("visibility", "hidden");
-					eye_icon.setAttribute("src", "resources/images/eye-closed.png");
-					eye_icon.setAttribute("alt", "not visible");
+					eye_icon.classList.remove("fa-eye");
+					eye_icon.style.color = "red";
+					eye_icon.classList.add("fa-eye-slash");
 				} else {
 					$('#single_image-' + $.escapeSelector(file)).css("visibility", "visible");
-					eye_icon.setAttribute("src", "resources/images/eye-open.png");
-					eye_icon.setAttribute("alt", "visible");
+					eye_icon.classList.remove("fa-eye-slash");
+					eye_icon.style.color = "green";
+					eye_icon.classList.add("fa-eye");
 				}
 			}
 		}

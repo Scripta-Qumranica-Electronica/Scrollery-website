@@ -41,6 +41,7 @@ sub processCGI {
 		'copyCombination' => \&copyCombination,
 		'nameCombination' => \&nameCombination,
 		'setArtPosition' => \&setArtPosition,
+		'setArtRotation' => \&setArtRotation,
 	);
 
 	print $cgi->header(
@@ -137,8 +138,21 @@ sub getImagesOfFragment {
 	my $sql;
 	my $idType = $cgi->param('idType');
 	my $id = $cgi->param('id');
+	my $query = <<'MYSQL';
+SELECT 	SQE_image.filename as filename,
+		SQE_image.wavelength_start as start,
+		SQE_image.wavelength_end as end,
+		SQE_image.is_master,
+		image_urls.url as url
+	FROM SQE_image
+		INNER JOIN image_urls on image_urls.id = SQE_image.url_code
+		INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id
+		INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id
+	WHERE image_to_edition_catalog.edition_id = ?
+MYSQL
+
 	if ($idType eq 'composition') {
-		$sql = $cgi->dbh->prepare_cached('SELECT SQE_image.filename as filename, SQE_image.wavelength_start as start, SQE_image.wavelength_end as end, SQE_image.is_master, image_urls.url as url FROM SQE_image INNER JOIN image_urls on image_urls.id = SQE_image.url_code INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id WHERE image_to_edition_catalog.edition_id = ?') 
+		$sql = $cgi->dbh->prepare_cached($query)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	} elsif ($idType eq 'institution') {
 		$sql = $cgi->dbh->prepare_cached('SELECT * FROM SQE_image WHERE image_catalog_id = ?') 
@@ -352,6 +366,19 @@ sub setArtPosition {
 	my $x = $cgi->param('x');
 	my $y = $cgi->param('y');
 	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $art_id, "position_in_scroll", ['POINT', $x, $y]);
+	handleDBError ($new_id, $error);
+	return;
+}
+
+sub setArtRotation {
+	my $cgi = shift;
+	my $user_id = $cgi->dbh->user_id;
+	my $scroll_id = $cgi->param('scroll_id');
+	my $version_id = $cgi->param('version_id');
+	$cgi->dbh->set_scrollversion($version_id);
+	my $art_id = $cgi->param('art_id');
+	my $rotation = $cgi->param('rotation');
+	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $art_id, "rotation", $rotation);
 	handleDBError ($new_id, $error);
 	return;
 }

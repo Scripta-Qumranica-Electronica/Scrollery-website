@@ -15,6 +15,9 @@ function login(){
     $("#combinations").css("max-height", "50vh");
     $("#combinations").css("height", "50vh");
     $("#combinations").css("visibility", "visible");
+    $("#main-menu").on("click", "#new-combination", function(){
+        new_combination();
+    });
     $("#main-menu").on("click", ".clone_combination", function(){
         data_form = new FormData();
         data_form.append('transaction', 'copyCombination');
@@ -23,21 +26,25 @@ function login(){
         data_form.append('scroll_version_id', $(this).prev().prev().prev().data("scroll-version"));
         get_database_data(data_form, function(result){
             $('#user-combination-listings').jstree(true).refresh();
-            tree.refresh();
         });
     });
     $("#main-menu").on("click", ".scroll_select", function(){
-        if (Spider.current_combination != $(this).data("id") || Spider.current_version_id != $(this).data("scroll-version")) {
-            Spider.unlocked = $(this).data("user") == "default" ? false : true;
-            Spider.current_combination = $(this).data("id");
-            Spider.current_version = $(this).data("version");
-            Spider.current_version_id = $(this).data("scroll-version");
-            Spider.propagate_command('load_scroll', {id: $(this).data("id"), scroll_version: $(this).data("scroll-version")});
-        }
+        // if (Spider.current_combination != $(this).data("id") || Spider.current_version_id != $(this).data("scroll-version")) {
+        //     Spider.unlocked = $(this).data("user") == "default" ? false : true;
+        //     Spider.current_combination = $(this).data("id");
+        //     Spider.current_version = $(this).data("version");
+        //     Spider.current_version_id = $(this).data("scroll-version");
+        //     Spider.propagate_command('load_scroll', {id: $(this).data("id"), scroll_version: $(this).data("scroll-version")});
+        // }
+        loadMenuScroll(this);
     });
     $("#main-menu").on("click", ".fragment_select", function(){
+        var scroll = $(this).parents("[id^=lvl_1]:first").find(".scroll_select:first");
+        Spider.current_version = $(scroll).data("version");
+        Spider.current_version_id = $(scroll).data("scroll-version");
         load_fragment_text($(this).data("id"));
         load_fragment_image($(this).data("id"));
+        loadMenuScroll(scroll);
     });
     $("#main-menu").on("click", ".add_artefact", function(){
         add_art_to_comb($(this).prev().html());
@@ -63,6 +70,17 @@ function show_item(item){
     $(".collapsible").next().css("max-height", "0vh");
     $(item).next().css("max-height", "25vh");
     $(item).next().css("visibility", "visible");
+}
+
+function loadMenuScroll(item) {
+    var $scroll = $(item);
+    if (Spider.current_combination != $scroll.data("id") || Spider.current_version_id != $scroll.data("scroll-version")) {
+        Spider.unlocked = $scroll.data("user") == "default" ? false : true;
+        Spider.current_combination = $scroll.data("id");
+        Spider.current_version = $scroll.data("version");
+        Spider.current_version_id = $scroll.data("scroll-version");
+        Spider.propagate_command('load_scroll', {id: $scroll.data("id"), scroll_version: $scroll.data("scroll-version")});
+    }
 }
 
 function load_fragment_text(selected_frag)
@@ -120,6 +138,7 @@ function new_combination(){
         Spider.current_combination = result.created.scroll_version;
         console.log("New scroll " + result.created.scroll_version);
         populate_combinations(Spider.user_id);
+        $('#user-combination-listings').jstree(true).refresh();
     });
 }
 
@@ -177,7 +196,6 @@ function populate_combinations(user) {
                         var combination = node.id.split('-')[1];
                         // var version = node.id.split('-')[3];
                         var version_id = node.id.split('-')[3];
-                        console.log('version_id ' + version_id);
                         trans_data = {'transaction' : 'getColOfComb', 'combID' : combination, 'user' : user, 'version_id': version_id, 'SESSION_ID' : Spider['session_id']};
                         current_lvl = 1;
                     }
