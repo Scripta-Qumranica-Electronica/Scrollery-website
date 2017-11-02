@@ -92,7 +92,24 @@ sub handleDBError {
 sub getCombs {
 	my $cgi = shift;
 	my $userID = $cgi->param('user');
-	my $sql = $cgi->dbh->prepare_cached('select scroll_data.scroll_id as scroll_id, scroll_data.name as name, scroll_version.version as version, scroll_version.scroll_version_id as version_id, scroll_data.scroll_data_id as scroll_data_id, (SELECT COUNT(*) FROM scroll_to_col_owner WHERE scroll_to_col_owner.scroll_version_id = version_id) as count from scroll_version join scroll_data_owner using(scroll_version_id) join scroll_data using(scroll_data_id) where scroll_version.user_id = ? order by LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"), LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"), scroll_version.version') or die
+	my $query = <<'MYSQL';
+		select scroll_data.scroll_id as scroll_id,
+			   scroll_data.name as name,
+			   scroll_version.version as version,
+			   scroll_version.scroll_version_id as version_id,
+			   scroll_data.scroll_data_id as scroll_data_id,
+			   (SELECT COUNT(*)
+					FROM scroll_to_col_owner
+					WHERE scroll_to_col_owner.scroll_version_id = version_id) as count
+		from scroll_version
+			join scroll_data_owner using(scroll_version_id)
+			join scroll_data using(scroll_data_id)
+		where scroll_version.user_id = ?
+		order by LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"), 
+			LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"),
+			scroll_version.version
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($query) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($userID);
 	readResults($sql);
