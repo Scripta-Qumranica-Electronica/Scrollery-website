@@ -16,7 +16,6 @@ use SQE_API::Queries;
 use CGI;
 use JSON;
 
-
 # helper functions
 
 sub query_SQE
@@ -328,44 +327,46 @@ MYSQL
 #		
 #		.' WHERE sign.sign_id = ?'
 #	);
-	my $line_id_and_name_query = <<'MYSQL';
-SELECT line.line_id,
-	name
-FROM line
-WHERE line.line_id = (
-	SELECT real_area.line_id
-	FROM real_area
-	WHERE real_area.real_area_id =   (
-		SELECT real_areas_id
+
+	my $get_line_id_and_name_query = $dbh->prepare
+	(
+		<<'MYSQL'
+		SELECT line.line_id,
+			name
+		FROM line
+		WHERE line.line_id = (
+			SELECT real_area.line_id
+			FROM real_area
+			WHERE real_area.real_area_id =   (
+				SELECT real_areas_id
+				FROM sign
+				WHERE sign.sign_id = ?
+			)
+		)
+MYSQL
+	);
+	my $get_variant_signs_query = $dbh->prepare
+	(
+		<<'MYSQL'
+		SELECT *
 		FROM sign
-		WHERE sign.sign_id = ?
-	)
-)
+		WHERE sign_id
+		      IN (
+			      SELECT sign_id
+			      FROM is_variant_sign_of
+			      WHERE main_sign_id = ?
+		      )
 MYSQL
-
-	my $get_line_id_and_name_query = $dbh->prepare($line_id_and_name_query);
-
-	my $variant_signs_query = <<'MYSQL';
-SELECT *
-FROM sign
-WHERE sign_id
-      IN (
-	      SELECT sign_id
-	      FROM is_variant_sign_of
-	      WHERE main_sign_id = ?
-      )
+	);
+	my $get_sign_position_query = $dbh->prepare
+	(
+		<<'MYSQL'
+		SELECT type
+		FROM sign_relative_position
+		WHERE sign_relative_position_id = ?
+		ORDER by level
 MYSQL
-	my $get_variant_signs_query = $dbh->prepare($variant_signs_query);
-
-	my $sign_position_query = <<'MYSQL';
-SELECT type
-FROM sign_relative_position
-WHERE sign_relative_position_id = ?
-ORDER by level
-MYSQL
-	my $get_sign_position_query = $dbh->prepare($sign_position_query);
-
-
+	);
 	
 	my $json_string = '[';
 	
@@ -929,9 +930,11 @@ MYSQL
 			(
 				$cgi,
 				'none',
-				# TODO change this query to the proper format.
-				'INSERT INTO sign_char_reading_data (sign_char_id, '.$name.') VALUES (?, ?)',
-				
+				<<'MYSQL',
+				INSERT INTO sign_char_reading_data (sign_char_id, ?)
+				VALUES (?, ?)
+MYSQL
+				$name,
 				$cgi->param('signCharId'),
 				$value
 			);
