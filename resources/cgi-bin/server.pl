@@ -73,9 +73,11 @@ sub lastInsertedId_SQE
 	(
 		$cgi,
 		'first_value',
-	
-		'SELECT LAST_INSERT_ID()'
-	);
+
+		<<'MYSQL'
+		SELECT LAST_INSERT_ID()
+MYSQL
+);
 }
 
 sub query
@@ -88,7 +90,7 @@ sub query
 	# }
 	
 	my $query = $dbh->prepare($sql_command) or die DBI->errstr;
-	$query->execute() or die DBI->errstr;
+	$query->execute(@_) or die DBI->errstr;
 	$query->finish();
 }
 
@@ -100,7 +102,7 @@ sub queryResult
 	# say '$sql_command '.$sql_command;
 	
 	my $query = $dbh->prepare($sql_command) or die DBI->errstr;
-	$query->execute() or die DBI->errstr;
+	$query->execute(@_) or die DBI->errstr;
 	
 	my @row = $query->fetchrow_array();
 	my $returnValue = $row[0];
@@ -152,7 +154,7 @@ sub queryAll
 	my $dbh = shift;
 	
 	my $query = $dbh->prepare($sql_command);
-	$query->execute();
+	$query->execute(@_);
 	
 	my @row;
 	my @allResults;
@@ -191,7 +193,9 @@ sub lastInsertedId()
 {
 	return queryResult
 	(
-		'SELECT LAST_INSERT_ID()'
+		<<'MYSQL'
+		SELECT LAST_INSERT_ID()
+MYSQL
 	);
 }
 
@@ -218,12 +222,15 @@ sub logout
 	# end their session if one is running
 	query
 	(
-		'UPDATE user_sessions '
-		.'SET session_end = NOW()'
-		.', current = false '
-		.'WHERE user_id='.$user_id
-		.' AND current = true',
-		$dbh
+		<<'MYSQL',
+		UPDATE user_sessions
+		SET session_end = NOW(),
+			current = false
+		WHERE user_id=?
+		      AND current = true
+MYSQL
+		$dbh,
+		$user_id
 	);
 		
 	print 1;
@@ -250,7 +257,12 @@ sub load # TODO combine queries where possible, for better performance
 	my %id2SignType;
 	my @sign_types = queryAll
 	(
-		'SELECT sign_type_id, type FROM sign_type', $dbh
+		<<'MYSQL', 
+		SELECT sign_type_id, 
+			type 
+		FROM sign_type
+MYSQL
+		$dbh
 	);
 	for (my $i = 0; $i < scalar @sign_types; $i += 2)
 	{
@@ -259,27 +271,24 @@ sub load # TODO combine queries where possible, for better performance
 	
 	my $column_start_sign_id = queryResult # TODO scroll owner relevant?
 	(
-		'SELECT sign.sign_id'
-		.' FROM sign'
-		
-		.' JOIN real_area'
-		.' ON real_area.real_area_id = sign.real_areas_id'
-		
-		.' JOIN line'
-		.' ON line.line_id = real_area.line_id'
-		
-		.' JOIN column_of_scroll'
-		.' ON column_of_scroll.column_of_scroll_id = line.column_id'
-
-		.' JOIN discrete_canonical_references'		
-		.' ON discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id'
-		
-		.' JOIN scroll'
-		.' ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id'
-		
-		.' WHERE FIND_IN_SET("COLUMN_START", sign.break_type) > 0'
-		.' AND discrete_canonical_references.discrete_canonical_reference_id ='.$disc_can_ref_id, 
-		$dbh
+		<<'MYSQL', 
+		SELECT sign.sign_id 
+		FROM sign 
+			JOIN real_area 
+				ON real_area.real_area_id = sign.real_areas_id 
+			JOIN line 
+				ON line.line_id = real_area.line_id 
+			JOIN column_of_scroll 
+				ON column_of_scroll.column_of_scroll_id = line.column_id 
+			JOIN discrete_canonical_references 
+				ON discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id 
+			JOIN scroll 
+				ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id 
+		WHERE FIND_IN_SET("COLUMN_START", sign.break_type) > 0 
+		      AND discrete_canonical_references.discrete_canonical_reference_id = ?
+MYSQL
+		$dbh,
+		$disc_can_ref_id
 	);
 	if (!defined $column_start_sign_id)
 	{
@@ -291,15 +300,20 @@ sub load # TODO combine queries where possible, for better performance
 	# prepare queries
 	my $get_next_sign_id_query = $dbh->prepare
 	(
-		'SELECT next_sign_id'
-		.' FROM position_in_stream'
-		.' WHERE position_in_stream.sign_id = ?'
+		<<'MYSQL'
+		SELECT next_sign_id 
+		FROM position_in_stream 
+		WHERE position_in_stream.sign_id = ?
+MYSQL
 	);
 	my $get_main_sign_query = $dbh->prepare
 	(
-		'SELECT *, FIND_IN_SET("COLUMN_END", sign.break_type)'
-		.' FROM sign'
-		.' WHERE sign.sign_id = ?'
+		<<'MYSQL'
+		SELECT *, 
+			FIND_IN_SET("COLUMN_END", sign.break_type) 
+		FROM sign 
+		WHERE sign.sign_id = ?
+MYSQL
 	);
 #	my $get_line_id_and_name_query = $dbh->prepare
 #	(
@@ -314,48 +328,49 @@ sub load # TODO combine queries where possible, for better performance
 #		
 #		.' WHERE sign.sign_id = ?'
 #	);
-	my $get_line_id_and_name_query = $dbh->prepare
-	(
-		'SELECT line.line_id, name'
-		.' FROM line'
-		.' WHERE line.line_id =' 
-		
-		.' ('
-		.'   SELECT real_area.line_id'
-		.'   FROM real_area'
-		.'   WHERE real_area.real_area_id ='
-		
-		.'   ('
-		.'     SELECT real_areas_id'
-		.'     FROM sign'
-		.'     WHERE sign.sign_id = ?'
-		.'   )'
-		
-		.' )'
-	);
-	my $get_variant_signs_query = $dbh->prepare
-	(
-		'SELECT *'
-		.' FROM sign'
-		.' WHERE sign_id IN'
-		
-		.' ('
-		.'    SELECT sign_id'
-		.'    FROM is_variant_sign_of' 
-		.'    WHERE main_sign_id = ?'
-		.' )'
-	);
-	my $get_sign_position_query = $dbh->prepare
-	(
-		'SELECT type'
-		.' FROM sign_relative_position'
-		.' WHERE sign_relative_position_id = ?'
-		.' ORDER by level'
-	);
+	my $line_id_and_name_query = <<'MYSQL';
+SELECT line.line_id,
+	name
+FROM line
+WHERE line.line_id = (
+	SELECT real_area.line_id
+	FROM real_area
+	WHERE real_area.real_area_id =   (
+		SELECT real_areas_id
+		FROM sign
+		WHERE sign.sign_id = ?
+	)
+)
+MYSQL
+
+	my $get_line_id_and_name_query = $dbh->prepare($line_id_and_name_query);
+
+	my $variant_signs_query = <<'MYSQL';
+SELECT *
+FROM sign
+WHERE sign_id
+      IN (
+	      SELECT sign_id
+	      FROM is_variant_sign_of
+	      WHERE main_sign_id = ?
+      )
+MYSQL
+	my $get_variant_signs_query = $dbh->prepare($variant_signs_query);
+
+	my $sign_position_query = <<'MYSQL';
+SELECT type
+FROM sign_relative_position
+WHERE sign_relative_position_id = ?
+ORDER by level
+MYSQL
+	my $get_sign_position_query = $dbh->prepare($sign_position_query);
+
+
 	
 	my $json_string = '[';
 	
 	my $previous_line_id = -1;
+	# TODO This variable is apparently never used.
 	my $i_area_in_line;
 	
 	# build json till first column end is encountered (capped to the signs of 100,000 real areas)
@@ -551,20 +566,27 @@ sub load_fragment_text
 	(
 		$cgi,
 		'first_array',
-		
-		'SELECT discrete_canonical_name_id, column_of_scroll_id FROM discrete_canonical_references'
-		.' WHERE discrete_canonical_reference_id = ?',
-		
+
+		<<'MYSQL',
+		SELECT discrete_canonical_name_id, 
+			column_of_scroll_id 
+		FROM discrete_canonical_references 
+		WHERE discrete_canonical_reference_id = ?
+MYSQL
+
 		$cgi->param('discreteCanonicalReferenceId')
 	);
 	my $fragment_id = query_SQE
 	(
 		$cgi,
 		'first_value',
-		
-		'SELECT col_id FROM scroll_to_col'
-		.' WHERE scroll_to_col_id = ?',
-		
+
+		<<'MYSQL',
+		SELECT col_id 
+		FROM scroll_to_col 
+		WHERE scroll_to_col_id = ?
+MYSQL
+
 		$col_of_scroll_id
 	);
 	
@@ -572,15 +594,20 @@ sub load_fragment_text
 	(
 		$cgi,
 		'first_array',
-		
-		'SELECT scroll_data.name, col_data.name FROM scroll_data, col_data'
-		.' WHERE col_data.col_id = ?'
-		.' AND scroll_data.scroll_id ='
-		.' ('
-		.' 		SELECT scroll_id FROM scroll_to_col'
-		.' 		WHERE col_id = ?'
-		.' )',
-		
+
+		<<'MYSQL',
+		SELECT scroll_data.name, 
+			col_data.name 
+		FROM scroll_data, 
+			col_data 
+		WHERE col_data.col_id = ? 
+		      AND scroll_data.scroll_id = (
+				SELECT scroll_id 
+				FROM scroll_to_col 		
+				WHERE col_id = ? 
+			  )
+MYSQL
+
 		$fragment_id,
 		$fragment_id
 	);
@@ -591,15 +618,21 @@ sub load_fragment_text
 	
 	my $line_ids_query = $dbh->prepare_sqe # TODO sort order
 	(
-		'SELECT line_id FROM col_to_line'
-		.' WHERE col_id = ?'
+		<<'MYSQL'
+		SELECT line_id 
+		FROM col_to_line 
+		WHERE col_id = ?
+MYSQL
 	);
 	$line_ids_query->execute($fragment_id);
 	
 	my $line_name_query = $dbh->prepare_sqe
 	(
-		'SELECT name FROM line_data'
-		.' WHERE line_id = ?'
+		<<'MYSQL'
+		SELECT name 
+		FROM line_data 
+		WHERE line_id = ?
+MYSQL
 	);
 	
 #	my $get_start_query = $dbh->prepare_sqe(SQE_API::Queries::GET_LINE_BREAK);
@@ -679,16 +712,22 @@ sub load_fragment_text
 		(
 			$cgi,
 			'all',
-			
-			'SELECT sign_relative_position_id, type, level FROM sign_relative_position'
-			.' WHERE sign_id = ?'
-			.' AND sign_relative_position_id IN'
-			.' ('
-			.' 		SELECT sign_relative_position_id FROM sign_relative_position_owner'
-			.' 		WHERE scroll_version_id = ?'
-			.' )'
-			.' ORDER BY level',
-			
+
+			<<'MYSQL',
+			SELECT sign_relative_position_id, 
+				type, 
+				level 
+			FROM sign_relative_position 
+			WHERE sign_id = ? 
+			      AND sign_relative_position_id 
+			          IN ( 		
+				          SELECT sign_relative_position_id 
+				          FROM sign_relative_position_owner 		
+				          WHERE scroll_version_id = ? 
+			          ) 
+			ORDER BY level
+MYSQL
+
 			$sign[1],
 			$scroll_version
 		);
@@ -817,11 +856,12 @@ sub add_attribute
 			(
 				$cgi,
 				'none',
-				
-				'INSERT INTO sign_relative_position'
-				.' (sign_id, type)'
-				.' VALUES (?, ?)',
-				
+
+				<<'MYSQL',
+				INSERT INTO sign_relative_position (sign_id, type)
+				VALUES (?, ?)
+MYSQL
+
 				$cgi->param('signId'),
 				$type
 			);
@@ -831,11 +871,13 @@ sub add_attribute
 			(
 				$cgi,
 				'none',
-				
-				'INSERT INTO sign_relative_position_owner'
-				.' (sign_relative_position_id, scroll_version_id)'
-				.' VALUES (?, ?)',
-				
+
+				<<'MYSQL',
+				INSERT INTO sign_relative_position_owner
+				(sign_relative_position_id, scroll_version_id)
+				VALUES (?, ?)
+MYSQL
+
 				$sign_relative_position_id,
 				$scroll_version_id
 			);
@@ -887,10 +929,8 @@ sub add_attribute
 			(
 				$cgi,
 				'none',
-				
-				'INSERT INTO sign_char_reading_data'
-				.' (sign_char_id, '.$name.')'
-				.' VALUES (?, ?)',
+				# TODO change this query to the proper format.
+				'INSERT INTO sign_char_reading_data (sign_char_id, '.$name.') VALUES (?, ?)',
 				
 				$cgi->param('signCharId'),
 				$value
@@ -901,11 +941,13 @@ sub add_attribute
 			(
 				$cgi,
 				'none',
-				
-				'INSERT INTO sign_char_reading_data_owner'
-				.' (sign_char_reading_data_id, scroll_version_id)'
-				.' VALUES (?, ?)',
-				
+
+				<<'MYSQL',
+				INSERT INTO sign_char_reading_data_owner
+				(sign_char_reading_data_id, scroll_version_id)
+				VALUES (?, ?)
+MYSQL
+
 				$id,
 				$scroll_version_id
 			);
@@ -1047,16 +1089,19 @@ sub potentially_save_new_variant
 	  
 	my @existingSigns = queryAll
 	(
-		'SELECT *'
-		.' FROM sign'
-		.' WHERE sign_id = '.$new_variant{'mainSignId'}
-		.' OR sign_id IN'
-		
-		.' ('
-		.'    SELECT sign_id'
-		.'    FROM is_variant_sign_of' 
-		.'    WHERE main_sign_id = '.$new_variant{'mainSignId'}
-		.' )'
+		<<'MYSQL',
+		SELECT *
+		FROM sign
+		WHERE sign_id = ?
+		      OR sign_id
+		         IN (
+			         SELECT sign_id
+			         FROM is_variant_sign_of
+			         WHERE main_sign_id = ?
+		         )
+MYSQL
+		$new_variant{'mainSignId'},
+		$new_variant{'mainSignId'}
 	);
 	
 	my @sign_strings;
@@ -1068,10 +1113,13 @@ sub potentially_save_new_variant
 	{
 		my $position = queryResult
 		(
-			'SELECT type'
-			.' FROM sign_relative_position'
-			.' WHERE sign_relative_position_id = '.$existingSigns[$i_sign * 17],
-			$dbh
+			<<'MYSQL',
+			SELECT type
+			FROM sign_relative_position
+			WHERE sign_relative_position_id = ?
+MYSQL
+			$dbh,
+			$existingSigns[$i_sign * 17]
 		);
 		
 		my $sign_string = ''
@@ -1138,10 +1186,14 @@ sub potentially_save_new_variant
 	# table sign_owner
 	query # TODO set proper version
 	(
-		'INSERT INTO sign_owner'
-		.' SET sign_id = '.$sign_id
-		.' , user_id = '.$user_id,
-		$dbh
+		<<'MYSQL',
+		INSERT INTO sign_owner
+		SET sign_id = ?,
+			user_id = ?
+MYSQL
+		$dbh,
+		$sign_id,
+		$user_id
 	);
 	
 	# table sign_relative_position
@@ -1149,20 +1201,28 @@ sub potentially_save_new_variant
 	{
 		query
 		(
-			'INSERT INTO sign_relative_position'
-			.' SET sign_relative_position_id = '.$sign_id
-			.' , type = '.$new_variant{'position'},
-			$dbh
+			<<'MYSQL',
+			INSERT INTO sign_relative_position
+			SET sign_relative_position_id = ?,
+				type = ?
+MYSQL
+			$dbh,
+			$sign_id,
+			$new_variant{'position'}
 		);
 	}
 	
 	# table is_variant_sign_of
 	query # TODO proper rank
 	(
-		'INSERT INTO is_variant_sign_of'
-		.' SET main_sign_id = '.$new_variant{'mainSignId'}
-		.' , sign_id = '.$sign_id,
-		$dbh
+		<<'MYSQL',
+		INSERT INTO is_variant_sign_of
+		SET main_sign_id = ?,
+			sign_id = ?
+MYSQL
+		$dbh,
+		$new_variant{'mainSignId'},
+		$sign_id
 	);
 }
 
@@ -1202,11 +1262,14 @@ sub save_single_sign_change
 	
 	my @signs_in_db = queryAll
 	(
-		'SELECT *'
-		.' FROM sign'
-		.' WHERE sign_id IN'
-		.' ('.$idsString.')',
-		$dbh
+		<<'MYSQL',
+		SELECT *
+		FROM sign
+		WHERE sign_id
+		      IN (?)
+MYSQL
+		$dbh,
+		$idsString
 	);
 	
 	# say Dumper @signs_in_db;
@@ -1317,9 +1380,12 @@ sub saveToStream
 	
 	query
 	(
-		'INSERT INTO position_in_stream '
-		.'SET sign_id = '.$sign_id,
-		$dbh
+		<<'MYSQL',
+		INSERT INTO position_in_stream
+		SET sign_id = ?
+MYSQL
+		$dbh,
+		$sign_id
 	);
 	my $current_pos_in_stream_id = lastInsertedId();
 	
@@ -1327,10 +1393,14 @@ sub saveToStream
 	{
 		query
 		(
-			'INSERT INTO next_position_in_stream '
-			.'SET position_in_stream_id = '.$previous_pos_in_stream_id
-			.', next_position_in_stream_id = '.$current_pos_in_stream_id,
-			$dbh
+			<<'MYSQL',
+			INSERT INTO next_position_in_stream
+			SET position_in_stream_id = ?,
+				next_position_in_stream_id = ?
+MYSQL
+			$dbh,
+			$previous_pos_in_stream_id,
+			$current_pos_in_stream_id
 		);
 	}
 	
@@ -1346,19 +1416,26 @@ sub saveBreak
 	
 	query
 	(
-		'INSERT INTO sign '
-		.'SET sign = "|"'
-		.', sign_type_id = 9'
-		.', break_type = "'.$break_type.'"',
-		$dbh
+		<<'MYSQL',
+		INSERT INTO sign
+		SET sign = "|",
+			sign_type_id = 9,
+			break_type = "?"
+MYSQL
+		$dbh,
+		$break_type
 	);
 	my $sign_id = lastInsertedId();
 		
 	query
 	(
-		'INSERT INTO sign_owner '
-		.'VALUES ('.$sign_id.', '.$user_id.', now())',
-		$dbh
+		<<'MYSQL',
+		INSERT INTO sign_owner
+		VALUES (?, ?, now())
+MYSQL
+		$dbh,
+		$sign_id,
+		$user_id
 	);
 	
 	my $current_pos_in_stream_id = saveToStream
@@ -1524,10 +1601,13 @@ sub saveSigns
 				{
 					$scroll_id = queryResult
 					(
-						'SELECT scroll_id FROM scroll WHERE name = "'
-						.$a
-						.'"',
-						$dbh
+						<<'MYSQL',
+						SELECT scroll_id
+						FROM scroll
+						WHERE name = "?"
+MYSQL
+						$dbh,
+						$a
 					);
 					# if null, connection to scroll will be ignored
 					 
@@ -1615,12 +1695,13 @@ sub saveSigns
 				# save sign owner
 				query
 				(
-					'INSERT INTO sign_owner VALUES ('
-					.$sign_id
-					.','
-					.$user_id
-					.',now())',
-					$dbh
+					<<'MYSQL',
+					INSERT INTO sign_owner
+					VALUES (?,?,now())
+MYSQL
+					$dbh,
+					$sign_id,
+					$user_id
 				);
 				
 				# save position
@@ -1634,13 +1715,16 @@ sub saveSigns
 						{
 							query
 							(
-								'INSERT sign_relative_position SET sign_relative_position_id = '
-								.$sign_id
-								.', type = \''
-								.$value
-								.'\', level = '
-								.$position_level,
-								$dbh
+								<<'MYSQL',
+								INSERT sign_relative_position
+								SET sign_relative_position_id = ?,
+									type = '?',
+									level = ?
+MYSQL
+								$dbh,
+								$sign_id,
+								$value,
+								$position_level
 							);
 							
 							$position_level++;
@@ -1657,11 +1741,13 @@ sub saveSigns
 						{
 							query
 							(
-								'INSERT INTO sign_correction (sign_id, correction) VALUES ('
-								.$sign_id
-								.', \''
-								.$value.'\')',
-								$dbh
+								<<'MYSQL',
+								INSERT INTO sign_correction (sign_id, correction)
+								VALUES (?, '?')
+MYSQL
+								$dbh,
+								$sign_id,
+								$value
 							); 
 						}
 					}
@@ -1672,12 +1758,14 @@ sub saveSigns
 				{
 					query
 					(
-						'INSERT INTO is_variant_sign_of VALUES ('
-						.$main_sign_id
-						.','
-						.$sign_id
-						.',1)',
-						$dbh
+						<<'MYSQL',
+						INSERT INTO is_variant_sign_of
+						VALUES (?,?,1)
+MYSQL
+						$dbh,
+						$main_sign_id,
+						$sign_id
+
 					);
 					
 					# no direct link to sign stream, but indirectly via is_variant_sign_of
@@ -1699,10 +1787,14 @@ sub saveSigns
 				{
 					query # TODO later save in 1..n sign_comment table
 					(
-						'UPDATE sign'
-						.' SET commentary = "'.$a.'"'
-						.' WHERE sign_id = '.$sign_id,
-						$dbh
+						<<'MYSQL',
+						UPDATE sign
+						SET commentary = "?"
+						WHERE sign_id = ?
+MYSQL
+						$dbh,
+						$a,
+						$sign_id
 					);
 				}
 				
@@ -1711,17 +1803,24 @@ sub saveSigns
 				{
 					query
 					(
-						'INSERT real_area'
-						.' SET scroll_id = '.$scroll_id,
-						$dbh
+						<<'MYSQL',
+						INSERT real_area
+						SET scroll_id = ?
+MYSQL
+						$dbh,
+						$scroll_id
 					);
 					
 					query
 					(
-						'UPDATE sign'
-						.' SET real_areas_id = '.lastInsertedId()
-						.' WHERE sign_id = '.$sign_id,
-						$dbh
+						<<'MYSQL',
+						UPDATE sign
+						SET real_areas_id = ?
+						WHERE sign_id = ?
+MYSQL
+						$dbh,
+						lastInsertedId(),
+						$sign_id
 					);
 				}
 				
@@ -1745,7 +1844,10 @@ sub getAllComments
 	my $error= shift;
 	my @comments = queryAll
 	(
-		'SELECT user_id, comment_text, entry_time FROM user_comment',
+		<<'MYSQL',
+		SELECT user_id, comment_text, entry_time
+		FROM user_comment
+MYSQL
 		$dbh
 	);
 	
@@ -1760,8 +1862,7 @@ sub getAllComments
 		$json_string .= '{"name":"';
 		$json_string .= queryResult
 		(
-			'SELECT user_name FROM user '
-			.'WHERE user_id = "'.$comments[$i].'"',
+			'SELECT user_name FROM user WHERE user_id = "'.$comments[$i].'"',
 			$dbh
 		);
 		$json_string .= '", ';
@@ -1792,18 +1893,26 @@ sub saveComment
 	# get user id
 	my $user_id = queryResult
 	(
-		'SELECT user_id FROM user '
-		.'WHERE user_name = "'.$user_name.'"',
-		$dbh
+		<<'MYSQL',
+		SELECT user_id
+		FROM user
+		WHERE user_name = "?"
+MYSQL
+		$dbh,
+		$user_name
 	);
 	say '$user_id '."$user_id";
 	
 	# add comment to db
 	query
 	(
-		'INSERT INTO user_comment (user_id, comment_text, entry_time) '
-		.'VALUES '.'('.$user_id.', '.'"'.$comment.'", '.'NOW())',
-		$dbh
+		<<'MYSQL',
+		INSERT INTO user_comment (user_id, comment_text, entry_time)
+		VALUES (?, "?", NOW())
+MYSQL
+		$dbh,
+		$user_id,
+		$comment
 	);
 }
 
