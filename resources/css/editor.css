@@ -419,12 +419,12 @@
 
 /** different annotations */
 
-.superscript
+.aboveLine
 {
 	vertical-align: super;
 }
 
-.subscript
+.belowLine
 {
 	vertical-align: sub;
 }

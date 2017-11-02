@@ -1,7 +1,7 @@
 function RichTextEditor()
 {
 	const self = this; // for usage in event listener
-	this.originalText = [];
+	this.originalText = []; // TODO rename since now modified after DB change
 	
 	this.fontSize = 20;
 	$('#richTextContainer').css({ 'font-size': this.fontSize + 'px' });
@@ -273,15 +273,18 @@ function RichTextEditor()
 		}
 		
 		var destination = $('#regularLinePart' + iLine);
-		if (attributes['position'] != null) // chapter 5 // TODO stacking positions => check api output
+		if (attributes['position'] != null) // chapter 5
 		{
-			switch (attributes['position'])
+			const pos = attributes['position'][0]['position']; // TODO support multiple levels
+			
+			if (pos == 'aboveLine'
+			||  pos == 'belowLine')
 			{
-				case 'aboveLine'  : span.addClass('superscript'); break;
-				case 'belowLine'  : span.addClass('subscript');   break;
-				
-				case 'leftMargin' : destination = $('#leftMargin' + iLine);  break;
-				case 'rightMargin': destination = $('#rightMargin' + iLine); break;
+				span.addClass(pos);
+			}
+			else // leftMargin / rightMargin
+			{
+				destination = $('#' + pos + iLine);
 			}
 		}
 		span.appendTo(destination);
