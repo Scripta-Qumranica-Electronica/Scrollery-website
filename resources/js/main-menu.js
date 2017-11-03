@@ -85,36 +85,48 @@ function loadMenuScroll(item) {
 
 function load_fragment_text(selected_frag)
 {
-    data_form = new FormData();
-    data_form.append('transaction', 'getScrollColNameFromDiscCanRef');
-    data_form.append('frag_id', selected_frag);
-//	const data_form =
-//	{
-//		'transaction': 'getScrollColNameFromDiscCanRef',
-//		'frag_id': selected_frag
-//	};
+    // data_form = new FormData();
+    // data_form.append('transaction', 'getScrollColNameFromDiscCanRef');
+    // data_form.append('frag_id', selected_frag);
+    // get_database_data(data_form, function(results){
+    //     results['results'].forEach(function(result) {
+    //         Spider.requestFromServer
+    //         (
+    //             {
+    //             	'request': 'loadFragmentText',
+    //                 'discreteCanonicalReferenceId': selected_frag, // result.col
+    //                 'SCROLLVERSION': Spider.current_version_id
+    //             },
+    //             function(data)
+    //             {
+    //                 if (data == 0)
+    //                 {
+    //                     return;
+    //                 }
+    //
+    //                 Spider.notifyChangedText(data);
+    //             }
+    //         );
+    //     });
+    // });
+    Spider.requestFromServer
+          (
+              {
+                  'request': 'loadFragmentText',
+                  'discreteCanonicalReferenceId': selected_frag, // result.col
+                  'SCROLLVERSION': Spider.current_version_id
+              },
+              function(data)
+              {
+                  if (data == 0)
+                  {
+                      return;
+                  }
 
-    get_database_data(data_form, function(results){
-        results['results'].forEach(function(result) {
-            Spider.requestFromServer
-            (
-                {
-                	'request': 'loadFragmentText',
-                    'discreteCanonicalReferenceId': selected_frag, // result.col
-                    'SCROLLVERSION': Spider.current_version_id
-                },
-                function(data)
-                {
-                    if (data == 0)
-                    {
-                        return;
-                    }
-                    
-                    Spider.notifyChangedText(data);
-                }
-            );
-        });
-    });
+                  Spider.propagate_command('load_text', {data: data});
+                  //Spider.notifyChangedText(data);
+              }
+          );
 }
 
 function load_fragment_image(selected_frag){

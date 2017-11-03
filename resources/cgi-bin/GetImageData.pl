@@ -190,26 +190,30 @@ sub getImagesOfFragment {
 	my $sql;
 	my $idType = $cgi->param('idType');
 	my $id = $cgi->param('id');
-	my $getImagesOfFragmentQuery = <<'MYSQL';
-SELECT 	SQE_image.filename AS filename,
-		SQE_image.wavelength_start AS start,
-		SQE_image.wavelength_end AS end,
-		SQE_image.is_master,
-		image_urls.url AS url
-	FROM SQE_image
-		INNER JOIN image_urls ON image_urls.id = SQE_image.url_code
-		INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id
-		INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id
-	WHERE image_to_edition_catalog.edition_id = ?
-MYSQL
+	my $getImagesOfFragmentQuery;
 
 	if ($idType eq 'composition') {
-		$sql = $cgi->dbh->prepare_cached($getImagesOfFragmentQuery)
-		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+		$getImagesOfFragmentQuery = <<'MYSQL';
+SELECT 	SQE_image.filename AS filename,
+		  SQE_image.wavelength_start AS start,
+		  SQE_image.wavelength_end AS end,
+	SQE_image.is_master,
+		  image_urls.url AS url
+FROM SQE_image
+	INNER JOIN image_urls ON image_urls.id = SQE_image.url_code
+	INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id
+	INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id
+WHERE image_to_edition_catalog.edition_id = ?
+MYSQL
 	} elsif ($idType eq 'institution') {
-		$sql = $cgi->dbh->prepare_cached('SELECT * FROM SQE_image WHERE image_catalog_id = ?') 
-		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+		$getImagesOfFragmentQuery = <<'MYSQL';
+			SELECT *
+			FROM SQE_image
+			WHERE image_catalog_id = ?
+MYSQL
 	}
+	$sql = $cgi->dbh->prepare_cached($getImagesOfFragmentQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($id);
 	readResults($sql);
 	return;
