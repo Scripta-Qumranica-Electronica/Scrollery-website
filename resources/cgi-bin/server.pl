@@ -21,7 +21,11 @@ use JSON;
 
 sub query_SQE
 {
-	my ($cgi, $result_type, $query_text, @query_parameters) = (@_);
+	my $cgi = shift;
+	my $result_type = shift;
+	my $query_text = shift;
+	my @query_parameters = @_; # might be empty
+	
 	my $dbh = $cgi->dbh;
 	
 	my $query = $dbh->prepare_sqe($query_text);
@@ -552,9 +556,11 @@ sub load_fragment_text
 		$cgi,
 		'first_array',
 		
-		'SELECT discrete_canonical_name_id, column_of_scroll_id FROM discrete_canonical_references'
-		.' WHERE discrete_canonical_reference_id = ?',
-		
+		<<'MYSQL',
+		SELECT discrete_canonical_name_id, column_of_scroll_id FROM discrete_canonical_references
+		WHERE discrete_canonical_reference_id = ?
+MYSQL
+		,
 		$cgi->param('discreteCanonicalReferenceId')
 	);
 	my $fragment_id = query_SQE
@@ -562,9 +568,11 @@ sub load_fragment_text
 		$cgi,
 		'first_value',
 		
-		'SELECT col_id FROM scroll_to_col'
-		.' WHERE scroll_to_col_id = ?',
-		
+		<<'MYSQL',
+		SELECT col_id FROM scroll_to_col
+		WHERE scroll_to_col_id = ?
+MYSQL
+		,
 		$col_of_scroll_id
 	);
 	
@@ -572,15 +580,17 @@ sub load_fragment_text
 	(
 		$cgi,
 		'first_array',
-		
-		'SELECT scroll_data.name, col_data.name FROM scroll_data, col_data'
-		.' WHERE col_data.col_id = ?'
-		.' AND scroll_data.scroll_id ='
-		.' ('
-		.' 		SELECT scroll_id FROM scroll_to_col'
-		.' 		WHERE col_id = ?'
-		.' )',
-		
+
+		<<'MYSQL',		
+		SELECT scroll_data.name, col_data.name FROM scroll_data, col_data
+		WHERE col_data.col_id = ?
+		AND scroll_data.scroll_id =
+		(
+			SELECT scroll_id FROM scroll_to_col
+			WHERE col_id = ?
+		)
+MYSQL
+		,		
 		$fragment_id,
 		$fragment_id
 	);
@@ -591,15 +601,19 @@ sub load_fragment_text
 	
 	my $line_ids_query = $dbh->prepare_sqe # TODO sort order
 	(
-		'SELECT line_id FROM col_to_line'
-		.' WHERE col_id = ?'
+		<<'MYSQL',
+		SELECT line_id FROM col_to_line
+		WHERE col_id = ?
+MYSQL
 	);
 	$line_ids_query->execute($fragment_id);
 	
 	my $line_name_query = $dbh->prepare_sqe
 	(
-		'SELECT name FROM line_data'
-		.' WHERE line_id = ?'
+		<<'MYSQL',
+		SELECT name FROM line_data
+		WHERE line_id = ?
+MYSQL
 	);
 	
 #	my $get_start_query = $dbh->prepare_sqe(SQE_API::Queries::GET_LINE_BREAK);
@@ -621,6 +635,7 @@ sub load_fragment_text
 	my $first_sign_of_line = 1;
 	
 	my $current_sign_scalar; # as scalar first for simple check whether existant
+	my $sign_id;
 	while ($current_sign_scalar = $sign_stream->next_sign())
 	{
 		my @sign = @{ $current_sign_scalar };
@@ -656,6 +671,7 @@ sub load_fragment_text
 		# collect sign attributes
 		
 		$json_string .= '{"signId":'.$sign[1];
+		$sign_id = $sign[1];
 		
 		if ($sign[3] == 1) { $json_string .= ',"sign":"'.$sign[2].'"'; } # letter
 		else               { $json_string .= ',"type":"'.$sign[3].'"'; }
@@ -665,14 +681,14 @@ sub load_fragment_text
 		if ($sign[5]  != 1) { $json_string .= ',"width":"'.$sign[5].'"'; }
 		if ($sign[6]  == 1) { $json_string .= ',"mightBeWider":1'; }
 		
-		if ($sign[12]) # sign_char_reading_data entry exists
+		if (defined $sign[12]) # sign_char_reading_data entry exists
 		{
 			$json_string .= ',"signCharReadingDataId":'.$sign[12];
 			
-			if (!($sign[7]  eq 'COMPLETE')) { $json_string .= ',"readability":"'.$sign[7].'"'; }
-			if (  $sign[8]  == 1)           { $json_string .= ',"retraced":1'; }
-			if (  $sign[9]  == 1)           { $json_string .= ',"reconstructed":1'; }
-			if (!($sign[10] eq ''))         { $json_string .= ',"corrected":"'.$sign[10].'"'; }
+			if (defined $sign[ 7] && !($sign[7]  eq 'COMPLETE')) { $json_string .= ',"readability":"'.$sign[7].'"'; }
+			if (defined $sign[ 8] &&   $sign[8]  == 1)           { $json_string .= ',"retraced":1'; }
+			if (defined $sign[ 9] &&   $sign[9]  == 1)           { $json_string .= ',"reconstructed":1'; }
+			if (defined $sign[10] && !($sign[10] eq ''))         { $json_string .= ',"corrected":"'.$sign[10].'"'; }
 		}
 		
 		my @sign_relative_positions = query_SQE 
@@ -680,15 +696,17 @@ sub load_fragment_text
 			$cgi,
 			'all',
 			
-			'SELECT sign_relative_position_id, type, level FROM sign_relative_position'
-			.' WHERE sign_id = ?'
-			.' AND sign_relative_position_id IN'
-			.' ('
-			.' 		SELECT sign_relative_position_id FROM sign_relative_position_owner'
-			.' 		WHERE scroll_version_id = ?'
-			.' )'
-			.' ORDER BY level',
-			
+			<<'MYSQL',
+			SELECT sign_relative_position_id, type, level FROM sign_relative_position
+			WHERE sign_id = ?
+			AND sign_relative_position_id IN
+			(
+				SELECT sign_relative_position_id FROM sign_relative_position_owner
+				WHERE scroll_version_id = ?
+			)
+			ORDER BY level
+MYSQL
+			,
 			$sign[1],
 			$scroll_version
 		);
@@ -727,6 +745,93 @@ sub load_fragment_text
 	
 	$json_string .= ']}'; # close array of lines and entire json
 	$cgi->print($json_string);
+}
+
+sub add_char
+{
+	my $cgi = shift;
+	my $dbh = $cgi->dbh;
+	
+	my $scroll_version_id = $cgi->param('SCROLLVERSION');
+	if (!defined $scroll_version_id)
+	{
+		$scroll_version_id = 1;
+	}
+	$dbh->set_scrollversion($scroll_version_id);
+	
+	query_SQE # TODO replace by reference to sign id of main sign
+	(
+		$cgi,
+		'none',
+		
+		<<'MYSQL',
+		INSERT INTO sign VALUES ()
+MYSQL
+	);
+	my $sign_id = lastInsertedId_SQE($cgi);
+	
+	my @result = $dbh->add_value # TODO has no effect
+	(
+		'sign_char',
+		0,
+		'sign_id',
+		$sign_id,
+		'is_variant',
+		1,
+		'sign',
+		$cgi->param('sign')
+	);
+
+	$cgi->print('{"scroll_version":'.$dbh->scrollversion().',"sign_id":'.$sign_id.',"sign":"'.$cgi->param('sign').'","error":"'.${$result[1]}[1].'"}');
+	return;
+
+#
+#	if (scalar @result > 1)
+#	{
+#		$cgi->print('{"error":"'.${$result[1]}[1].'"}');	
+#	}
+#	else
+#	{
+#		$cgi->print('{}');
+#	}
+
+#	query_SQE
+#	(
+#		$cgi,
+#		'none',
+#		
+#		'INSERT INTO sign_char'
+#		.' (sign_id, is_variant, sign)'
+#		.' VALUES (?, 1, ?)',
+#		
+#		$sign_id,
+#		$cgi->param('sign')
+#	);
+#	my $sign_char_id = lastInsertedId_SQE($cgi);
+#	
+#	query_SQE
+#	(
+#		$cgi,
+#		'none',
+#		
+#		'INSERT INTO sign_char_owner'
+#		.' (sign_char_id, scroll_version_id)'
+#		.' VALUES (?, ?)',
+#		
+#		$sign_char_id,
+#		$scroll_version_id
+#	);
+	
+
+
+
+
+
+	
+	# TODO position in stream
+	
+	
+	
 }
 
 sub change_width
@@ -818,10 +923,12 @@ sub add_attribute
 				$cgi,
 				'none',
 				
-				'INSERT INTO sign_relative_position'
-				.' (sign_id, type)'
-				.' VALUES (?, ?)',
-				
+				<<'MYSQL',
+				INSERT INTO sign_relative_position
+				(sign_id, type)
+				VALUES (?, ?)
+MYSQL
+				,
 				$cgi->param('signId'),
 				$type
 			);
@@ -832,10 +939,12 @@ sub add_attribute
 				$cgi,
 				'none',
 				
-				'INSERT INTO sign_relative_position_owner'
-				.' (sign_relative_position_id, scroll_version_id)'
-				.' VALUES (?, ?)',
-				
+				<<'MYSQL',
+				INSERT INTO sign_relative_position_owner
+				(sign_relative_position_id, scroll_version_id)
+				VALUES (?, ?)
+MYSQL
+				,
 				$sign_relative_position_id,
 				$scroll_version_id
 			);
@@ -869,48 +978,57 @@ sub add_attribute
 			(
 				'sign_char_reading_data',
 				$cgi->param('signCharReadingDataId'),
-				'correction',
+				$name,
 				$value
 			);
 		}
 		else
 		{
-#			@result = $dbh->add_value
-#			(
-#				'sign_char_reading_data',
-#				0,
-#				'sign_char_id',
-#				$cgi->param('signCharId')
-#			);
-			
-			query_SQE # TODO all entries show up on load
+			@result = $dbh->add_value
 			(
-				$cgi,
-				'none',
-				
-				'INSERT INTO sign_char_reading_data'
-				.' (sign_char_id, '.$name.')'
-				.' VALUES (?, ?)',
-				
+				'sign_char_reading_data',
+				0,
+				'sign_char_id',
 				$cgi->param('signCharId'),
+				$name,
 				$value
 			);
-			$id = lastInsertedId_SQE($cgi);
 			
-			query_SQE
-			(
-				$cgi,
-				'none',
-				
-				'INSERT INTO sign_char_reading_data_owner'
-				.' (sign_char_reading_data_id, scroll_version_id)'
-				.' VALUES (?, ?)',
-				
-				$id,
-				$scroll_version_id
-			);
 			
-			$result[0] = $id;
+			
+			
+#			query_SQE # TODO all entries show up on load => remove ownership (?) / wait for ingo's fix
+#			(
+#				$cgi,
+#				'none',
+#				
+#				<<'MYSQL',
+#				INSERT INTO sign_char_reading_data
+#				(sign_char_id, '.$name.')
+#				VALUES (?, ?)
+#MYSQL
+#				,
+#				$cgi->param('signCharId'),
+#				$value
+#			);
+#			$id = lastInsertedId_SQE($cgi);
+#			
+#			query_SQE
+#			(
+#				$cgi,
+#				'none',
+#				
+#				<<'MYSQL',
+#				INSERT INTO sign_char_reading_data_owner
+#				(sign_char_reading_data_id, scroll_version_id)
+#				VALUES (?, ?)
+#MYSQL
+#				,
+#				$id,
+#				$scroll_version_id
+#			);
+			
+#			$result[0] = $id;
 		}
 		
 		if (defined $result[0])
@@ -1832,6 +1950,7 @@ sub main
 		'login'            => \&login,
 		'loadFragmentText' => \&load_fragment_text,
 		
+		'addChar'          => \&add_char,
 		'changeWidth'      => \&change_width,
 		'addAttribute'     => \&add_attribute,
 		'removeAttribute'  => \&remove_attribute,

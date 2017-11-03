@@ -11,7 +11,7 @@ function SingleSignEditor(richTextEditor)
 			return;
 		}
 		
-		$('#addReadingPseudoButton').hide();
+		$('#addReadingPseudoButton').appendTo('#hidePanel');
 		
 		$('#addReadingInput').val(''); // reset input field 
 		$('#addReadingDiv').appendTo('#signReadings');
@@ -34,56 +34,91 @@ function SingleSignEditor(richTextEditor)
 			{
 				if (existingReadingElements[iElement].textContent == newReading)
 				{
-					readingAlreadyExists = true;
-					break;
+					return;
 				}
 			}
 			
-			if (!readingAlreadyExists)
-			{
-				const iReading = $('.alternativeSign').length;
-				const signData = { 'sign': newReading };
-				const signsDiv = $('#signReadings');
-				
-				self.createSignElement
-				(
-					iReading,
-					$('#reading0').attr('mainSignId'),
-					signData,
-					false
-				)
-				.appendTo(signsDiv);
-				
-				// TODO special mark for newly added reading?
+			const iReading = $('.alternativeSign').length;
+			const signData = { 'sign': newReading };
+			const signsDiv = $('#signReadings');
+			
+			Spider.requestFromServer
+			(
+				{
+					'request'       : 'addChar',
+					'sign'          : newReading,
+					'mainSignId'    : $('#reading0').attr('mainSignId'),
+					'SCROLLVERSION' : Spider.current_version_id
+				},
+				function(json) // on result
+				{
+					if (json['error'] != null)
+					{
+						console.log("json['error'] " + json['error']);
+						return;
+					}
+					
+					reading.attr('signCharId', json['signCharId']);
+					
+					const linePreview = $('.chosenSignInLine');
+					const iLine = linePreview.attr('iLine');
+					const iSign = linePreview.attr('iSign');
+					
+					$('#span_' + iLine + '_' + iSign) // rich text editor equivalent
+					.css
+					({
+						'font-size': Math.ceil(self.richTextEditor.fontSize * width) + 'px'
+					});
+					
+					const signData = self.richTextEditor.originalText['lines'][iLine]['signs'][iSign];
+					signData['signCharId'] = json['signCharId'];
+					signData['width'] = width;
+					
+					self.notifySignChange(target['id'].replace('widthInput', ''));
+				}
+			);
 
-				$('<span></span>')
-				.addClass('signDescription')
-				.text('(variant)')
-				.appendTo(signsDiv);
-				
-				const attributesDiv = self.createAttributesDiv(iReading);
-				
-				self.createAttributesLists
-				(
-					iReading,
-					signData
-				)
-				.appendTo(attributesDiv);
-				
-				self.switchReading(iReading);
-			}
+			
+			
+			
+			self.createSignElement
+			(
+				iReading,
+				$('#reading0').attr('mainSignId'),
+				signData,
+				false
+			)
+			.appendTo(signsDiv);
+			
+			// TODO special mark for newly added reading?
+
+			$('<span></span>')
+			.addClass('signDescription')
+			.text('(variant)')
+			.appendTo(signsDiv);
+			
+			const attributesDiv = self.createAttributesDiv(iReading);
+			
+			self.createAttributesLists
+			(
+				iReading,
+				signData
+			)
+			.appendTo(attributesDiv);
+			
+			self.switchReading(iReading);
 		}
 		
 		$('#addReadingDiv').appendTo('#hidePanel');
 		
-		$('#addReadingPseudoButton').show();
+		$('#addReadingPseudoButton').appendTo('#signReadings');
 	});
 	
 	$('#cancelAddReadingButton').click(function()
 	{
 		$('#addReadingDiv').appendTo('#hidePanel');
 		
-		$('#addReadingPseudoButton').show();
+		$('#addReadingPseudoButton').appendTo('#signReadings');
 	});
 	
 //	$('#confirmSingleSignChangesButton').click(function()
