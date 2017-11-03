@@ -493,9 +493,11 @@ var CombinationController = (function () {
 
         //register responders with messageSpider
         Spider.register_object([
-            {type: 'load_scroll', execute_function: function(data){
+            {type: 'load_scroll',
+                execute_function: function(data){
                 self.display_scroll(data.id, data.scroll_version);
-                }
+                },
+                name: "CombinationControl"
             }
         ]);
     }

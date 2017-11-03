@@ -408,11 +408,13 @@ function RichTextEditor()
 	}
 
     Spider.register_object([
-	   {type: 'load_text', execute_function: function(data){
+	   {type: 'load_text',
+		   execute_function: function(data){
            console.log('text from registered message');
            console.log(data.data);
            self.displayModel(data.data);
-	   		}
+	   		},
+		   name: "RichTextEditor"
 	   }
    ]);
 }

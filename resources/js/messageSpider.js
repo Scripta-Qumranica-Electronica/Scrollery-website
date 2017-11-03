@@ -117,7 +117,8 @@ function Spider() // singleton central component communication system
 	this.register_object = function(messages)
 	{
 		messages.forEach(function(message){
-			this.registered_objects[message.type].push({'execute_function': message.execute_function});
+			this.registered_objects[message.type].push({'execute_function': message.execute_function, name:
+				message.name});
 		}, this);
 	};
 
@@ -125,7 +126,7 @@ function Spider() // singleton central component communication system
 	{
 		this.registered_objects[command].forEach(function(listening_object){
 			listening_object.execute_function(data);
-		});
+		})
 	};
 }
 
