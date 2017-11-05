@@ -29,13 +29,6 @@ function login(){
         });
     });
     $("#main-menu").on("click", ".scroll_select", function(){
-        // if (Spider.current_combination != $(this).data("id") || Spider.current_version_id != $(this).data("scroll-version")) {
-        //     Spider.unlocked = $(this).data("user") == "default" ? false : true;
-        //     Spider.current_combination = $(this).data("id");
-        //     Spider.current_version = $(this).data("version");
-        //     Spider.current_version_id = $(this).data("scroll-version");
-        //     Spider.propagate_command('load_scroll', {id: $(this).data("id"), scroll_version: $(this).data("scroll-version")});
-        // }
         loadMenuScroll(this);
     });
     $("#main-menu").on("click", ".fragment_select", function(){
@@ -223,12 +216,7 @@ function populate_combinations(user) {
 }
 
 function populate_fragments() {
-    $('#unused-fragments-listing').on('changed.jstree', function (e, data) {
-        // if (data.selected[0].startsWith('lvl_3-')) {
-        //     console.log( data.selected[0].split('lvl_3-')[1]);
-        //     // load_images(listing_type.lv_1, data.selected[0].split('lvl_3-')[1]);
-        // }
-    }).jstree({
+    $('#unused-fragments-listing').jstree({
         "core" : {
             "themes":{
                 "icons":false
@@ -317,29 +305,6 @@ function populate_fragments() {
 	    }
     });
 }
-
-// function load_text(scroll, fragment){
-//     var data_form = new FormData();
-//     data_form.append('USER_NAME', 'sqe_api');
-//     data_form.append('PASSWORD', ''); // PW removed for security
-//     data_form.append('SCROLL', scroll);
-//     data_form.append('FRAGMENT', fragment.replace("+", "\\+"));
-//     data_form.append('FORMAT', 'QWB_HTML');
-//     jQuery.ajax({
-//         url: 'https://134.76.19.179/sqe_api/run_api.cgi',
-//         data: data_form,
-//         cache: false,
-//         contentType: false,
-//         processData: false,
-//         type: 'POST',
-//         success: function(response){
-//             $("#signs-pane").html(response.VALUE);
-//         },
-//         error: function(){
-//             alert("Error retrieving data from database.");
-//         }
-//     });
-// }
 
 function get_database_data(data_form, callback) {
 	data_form.append('SESSION_ID', Spider['session_id']);
