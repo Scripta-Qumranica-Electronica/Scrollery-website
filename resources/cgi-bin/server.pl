@@ -16,6 +16,9 @@ use SQE_API::Queries;
 use CGI;
 use JSON;
 
+binmode(STDOUT, ":utf8");          #treat as if it is UTF-8
+binmode(STDIN, ":encoding(utf8)");
+
 # helper functions
 
 sub query_SQE

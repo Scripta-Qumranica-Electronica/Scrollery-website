@@ -145,6 +145,7 @@ var CombinationController = (function () {
                                                 image_cont_rotate.setAttribute('id', 'image-cont-rotate-' + artefact['id']);
                                                 image_cont_rotate.setAttribute('class', 'fragment fragment-cont-rot');
                                                 image_cont_rotate.setAttribute('data-rotate', img_rotation);
+                                                console.log('Image cont. rotate: ' + $(image_cont_rotate).data('rotate'));
                         
                                                 var image = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                                                 image.setAttribute('id', 'SVG-' + artefact['id']);
@@ -295,8 +296,10 @@ var CombinationController = (function () {
                     var domRect = evt.target.getBoundingClientRect();
                     var cx = domRect.left + (domRect.width/2);
                     var cy = domRect.top + (domRect.height/2);
-                    var frag_rot = $(evt.target).parent().parent().data('rotate');
+                    var frag_rot = $(evt.target).parent().parent().parent().data('rotate');
                     start_angle = angle(cx, cy, evt.pageX, evt.pageY) - frag_rot;
+                    console.log('Clicked: ' + selected_artefact.id);
+                    console.log(frag_rot);
                     $(document).on('mousemove.rot', rotateMove);
                     $(document).on('mouseup.rot', rotateUp);
                 }
@@ -307,7 +310,8 @@ var CombinationController = (function () {
                 var cx = domRect.left + (domRect.width/2);
                 var cy = domRect.top + (domRect.height/2);
                 var rot_angle = angle(cx, cy, evt.pageX, evt.pageY) - start_angle;
-                $(selected_artefact).parent().parent().css('transform', 'rotate(' + rot_angle + 'deg)')
+                console.log(cx + ' ' + cy + ' ' + evt.pageX + ' ' + evt.pageY + ' ' + start_angle);
+                $(selected_artefact).parent().parent().parent().css('transform', 'rotate(' + rot_angle + 'deg)')
             }
 
             function rotateUp(evt) {
@@ -317,8 +321,8 @@ var CombinationController = (function () {
                 var rot_angle = angle(cx, cy, evt.pageX, evt.pageY) - start_angle;
                 rot_angle = rot_angle < 0 ? 360 + rot_angle : rot_angle;
                 start_angle = 0;
-                var $frag_cont = $(selected_artefact).parent().parent().parent();
-                $(selected_artefact).parent().parent().data('rotate', rot_angle);
+                var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
+                $(selected_artefact).parent().parent().parent().data('rotate', rot_angle);
                 selected_artefact = undefined;
                 $(document).off('mousemove.rot');
                 $(document).off('mouseup.rot');

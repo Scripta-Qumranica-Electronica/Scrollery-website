@@ -194,7 +194,7 @@ function populate_combinations(user) {
                         if (current_lvl == 0){
                             var scroll_version_id = username == "default" ? 1 : entries['results'][i]["version_id"];
                             var children = entries['results'][i]["count"] > 0 ? true :false;
-                            var listing = {"text": "<span class=\"menu scroll_select editable_name\" data-id=\"" + entries['results'][i]["scroll_id"] + "\" data-version=\"" + entries['results'][i]["version"] + "\" data-user=\"" + username + "\" data-scroll-version=\"" + scroll_version_id + "\" data-scroll-data-id=\"" + entries['results'][i]["scroll_data_id"] + "\">" + entries['results'][i]["name"] + '</span><input type=\"text\" class=\"edited_name\" hidden/><span class=\"menu\"> – ' + username + ' – v. ' + entries['results'][i]["version"] + ' ' + "</span><span class=\"menu clone_combination\">clone</span>", "id" : 'lvl_1-' + entries['results'][i]["scroll_id"] + '-' + entries['results'][i]["name"] + '-' + entries['results'][i]["version_id"], "children" : children, state : {disabled  : true}};
+                            var listing = {"text": "<span class=\"menu scroll_select editable_name\" data-id=\"" + entries['results'][i]["scroll_id"] + "\" data-version=\"" + entries['results'][i]["version"] + "\" data-user=\"" + username + "\" data-scroll-version=\"" + scroll_version_id + "\" data-scroll-data-id=\"" + entries['results'][i]["scroll_data_id"] + "\">" + entries['results'][i]["name"] + '</span><input type=\"text\" class=\"edited_name\" hidden/><span class=\"menu\"> – ' + username + ' – v. ' + entries['results'][i]["version"] + ' ' + "</span><span class=\"menu clone_combination\"><i class=\"fa fa-clone\" aria-hidden=\"true\"></i></span>", "id" : 'lvl_1-' + entries['results'][i]["scroll_id"] + '-' + entries['results'][i]["name"] + '-' + entries['results'][i]["version_id"], "children" : children, state : {disabled  : true}};
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 1){
@@ -295,7 +295,7 @@ function populate_fragments() {
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 3){
-                            var listing = {"text": "<span>" + entries['results'][i]["artefact_id"] + "</span><span class=\"add_artefact\"> +</span>", "id" : 'lvl_4-' + entries['results'][i]["artefact_id"] + "-" + entries['results'][i]["user_id"], "children" : false};
+                            var listing = {"text": "<span>" + entries['results'][i]["artefact_id"] + "&nbsp&nbsp&nbsp</span><span class=\"add_artefact\"><i class=\"fa fa-plus-square-o\" aria-hidden=\"true\"></i></span>", "id" : 'lvl_4-' + entries['results'][i]["artefact_id"] + "-" + entries['results'][i]["user_id"], "children" : false};
                             menu_list.push(listing);
                         }
                     }
