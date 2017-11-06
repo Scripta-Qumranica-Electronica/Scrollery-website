@@ -8,7 +8,7 @@ use feature qw(say);
 use Data::Dumper;
 
 use lib qw(/home/perl_libs);
-use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
+#use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
 use SQE_CGI;
 use SQE_DBI;
 use SQE_API::Queries;
@@ -16,16 +16,13 @@ use SQE_API::Queries;
 use CGI;
 use JSON;
 
-binmode(STDOUT, ":utf8");          #treat as if it is UTF-8
-binmode(STDIN, ":encoding(utf8)");
-
 # helper functions
 
 sub query_SQE
 {
 	my ($cgi, $result_type, $query_text, @query_parameters) = (@_);
 	my $dbh = $cgi->dbh;
-	
+
 	my $query = $dbh->prepare_sqe($query_text);
 	my $i_param = 1;
 	foreach my $param (@query_parameters)
@@ -34,12 +31,12 @@ sub query_SQE
 	    $i_param++;
     }
 	$query->execute();
-	
+
 	if ($result_type eq 'first_value')
 	{
 		my $result = ($query->fetchrow_array())[0];
 		$query->finish();
-		return $result; 
+		return $result;
 	}
 	elsif ($result_type eq 'first_array')
 	{
@@ -63,14 +60,14 @@ sub query_SQE
 	}
 	else
 	{
-		return $query;		
+		return $query;
 	}
 }
 
 sub lastInsertedId_SQE
 {
 	my $cgi = shift;
-	
+
 	return query_SQE
 	(
 		$cgi,
@@ -88,9 +85,9 @@ sub query
 	my $dbh = shift;
 	# if (index($sql_command, 'user_sessions') == -1)
 	# {
-	# 	say '$sql_command '.$sql_command;	
+	# 	say '$sql_command '.$sql_command;
 	# }
-	
+
 	my $query = $dbh->prepare($sql_command) or die DBI->errstr;
 	$query->execute(@_) or die DBI->errstr;
 	$query->finish();
@@ -100,53 +97,53 @@ sub queryResult
 {
 	my $sql_command = shift;
 	my $dbh = shift;
-	
+
 	# say '$sql_command '.$sql_command;
-	
+
 	my $query = $dbh->prepare($sql_command) or die DBI->errstr;
 	$query->execute(@_) or die DBI->errstr;
-	
+
 	my @row = $query->fetchrow_array();
 	my $returnValue = $row[0];
-	
+
 	$query->finish();
-	
+
 	return $returnValue;
 }
 
 sub queryResultPrepared
 {
 	my $prepared_query = shift;
-	
+
 	my $i_param = 1;
 	foreach my $param (@_)
 	{
 	    $prepared_query->bind_param($i_param, $param);
 	    $i_param++;
     }
-	
+
 	$prepared_query->execute() or die DBI->errstr;
 	my $returnValue = ($prepared_query->fetchrow_array())[0];
 	$prepared_query->finish();
-	
+
 	return $returnValue;
 }
 
 sub queryAllPrepared
 {
 	my $prepared_query = shift;
-	
+
 	my $i_param = 1;
 	foreach my $param (@_)
 	{
 	    $prepared_query->bind_param($i_param, $param);
 	    $i_param++;
     }
-	
+
 	$prepared_query->execute() or die DBI->errstr;
 	my @returnValue = $prepared_query->fetchrow_array();
 	$prepared_query->finish();
-	
+
 	return @returnValue;
 }
 
@@ -154,17 +151,17 @@ sub queryAll
 {
 	my $sql_command = shift;
 	my $dbh = shift;
-	
+
 	my $query = $dbh->prepare($sql_command);
 	$query->execute(@_);
-	
+
 	my @row;
 	my @allResults;
 	while (@row = $query->fetchrow_array())
 	{
 		push @allResults, @row;
 	}
-		
+
 	$query->finish();
 	return @allResults;
 }
@@ -173,20 +170,20 @@ sub queryAllRows
 {
 	my $sql_command = shift;
 	my $dbh = shift;
-	
+
 	my $query = $dbh->prepare($sql_command);
 	$query->execute();
-	
+
 	my @row;
 	my %allRows = {};
 	my $allRowsIndex = 0;
-	
+
 	while (@row = $query->fetchrow_array())
 	{
 		$allRows{$allRowsIndex} = @row;
 		$allRowsIndex++;
 	}
-		
+
 	$query->finish();
 	return %allRows;
 }
@@ -204,12 +201,12 @@ MYSQL
 
 # functions related to client requests
 
-# returns session & user id; most work is covered by SQE_CGI.pm 
+# returns session & user id; most work is covered by SQE_CGI.pm
 sub login
 {
 	my $cgi = shift;
 	my $dbh = $cgi->dbh;
-	
+
 	$cgi->print('{"SESSION_ID":"'.$cgi->session_id.'", "USER_ID":'.$dbh->user_id.'}');
 }
 
@@ -220,7 +217,7 @@ sub logout
 	my $error= shift;
 	my $user_name = $cgi->param('user');
 	my $user_id = userId($user_name);
-	
+
 	# end their session if one is running
 	query
 	(
@@ -234,7 +231,7 @@ MYSQL
 		$dbh,
 		$user_id
 	);
-		
+
 	print 1;
 }
 
@@ -245,7 +242,7 @@ sub getManifest
 	my $error= shift;
 	my $url = $cgi->param('url');
 	my $sou = get($url) or die "cannot retrieve code\n";
-	
+
 	print $sou;
 }
 
@@ -255,13 +252,13 @@ sub load # TODO combine queries where possible, for better performance
 	my $cgi = shift;
 	my $error= shift;
 	my $disc_can_ref_id = $cgi->param('disc_can_ref_id'); # could be a fragment also
-	
+
 	my %id2SignType;
 	my @sign_types = queryAll
 	(
-		<<'MYSQL', 
-		SELECT sign_type_id, 
-			type 
+		<<'MYSQL',
+		SELECT sign_type_id,
+			type
 		FROM sign_type
 MYSQL
 		$dbh
@@ -270,23 +267,23 @@ MYSQL
 	{
 		$id2SignType{$sign_types[$i]} = $sign_types[$i + 1];
 	}
-	
+
 	my $column_start_sign_id = queryResult # TODO scroll owner relevant?
 	(
-		<<'MYSQL', 
-		SELECT sign.sign_id 
-		FROM sign 
-			JOIN real_area 
-				ON real_area.real_area_id = sign.real_areas_id 
-			JOIN line 
-				ON line.line_id = real_area.line_id 
-			JOIN column_of_scroll 
-				ON column_of_scroll.column_of_scroll_id = line.column_id 
-			JOIN discrete_canonical_references 
-				ON discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id 
-			JOIN scroll 
-				ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id 
-		WHERE FIND_IN_SET("COLUMN_START", sign.break_type) > 0 
+		<<'MYSQL',
+		SELECT sign.sign_id
+		FROM sign
+			JOIN real_area
+				ON real_area.real_area_id = sign.real_areas_id
+			JOIN line
+				ON line.line_id = real_area.line_id
+			JOIN column_of_scroll
+				ON column_of_scroll.column_of_scroll_id = line.column_id
+			JOIN discrete_canonical_references
+				ON discrete_canonical_references.column_of_scroll_id = column_of_scroll.column_of_scroll_id
+			JOIN scroll
+				ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id
+		WHERE FIND_IN_SET("COLUMN_START", sign.break_type) > 0
 		      AND discrete_canonical_references.discrete_canonical_reference_id = ?
 MYSQL
 		$dbh,
@@ -298,22 +295,22 @@ MYSQL
 		return;
 	}
 	my $next_sign_id = $column_start_sign_id;
-	
+
 	# prepare queries
 	my $get_next_sign_id_query = $dbh->prepare
 	(
 		<<'MYSQL'
-		SELECT next_sign_id 
-		FROM position_in_stream 
+		SELECT next_sign_id
+		FROM position_in_stream
 		WHERE position_in_stream.sign_id = ?
 MYSQL
 	);
 	my $get_main_sign_query = $dbh->prepare
 	(
 		<<'MYSQL'
-		SELECT *, 
-			FIND_IN_SET("COLUMN_END", sign.break_type) 
-		FROM sign 
+		SELECT *,
+			FIND_IN_SET("COLUMN_END", sign.break_type)
+		FROM sign
 		WHERE sign.sign_id = ?
 MYSQL
 	);
@@ -321,13 +318,13 @@ MYSQL
 #	(
 #		'SELECT line.line_id, name'
 #		.' FROM line'
-#		
+#
 #		.' JOIN real_area'
 #		.' ON real_area.line_id = line.line_id'
-#		
+#
 #		.' JOIN sign'
 #		.' ON sign.real_areas_id = real_area.real_area_id'
-#		
+#
 #		.' WHERE sign.sign_id = ?'
 #	);
 
@@ -370,13 +367,13 @@ MYSQL
 		ORDER by level
 MYSQL
 	);
-	
+
 	my $json_string = '[';
-	
+
 	my $previous_line_id = -1;
 	# TODO This variable is apparently never used.
 	my $i_area_in_line;
-	
+
 	# build json till first column end is encountered (capped to the signs of 100,000 real areas)
 	for (my $i_area = 0; $i_area < 100000; $i_area++)
 	{
@@ -401,7 +398,7 @@ MYSQL
 			last;
 		}
 		pop @main_sign; # remove column end detection to get same array length as for alternative signs
-		
+
 		# add new line, if needed
 		my @current_line = queryAllPrepared
 		(
@@ -415,10 +412,10 @@ MYSQL
 				$json_string .= ']},'; # end previous line
 			}
 			$json_string .= '{"lineName":"'.$current_line[1].'","signs":[';
-			
+
 			$previous_line_id = $current_line[0];
 		}
-		
+
 		# save main sign & its alternatives
 		if (substr($json_string, -1) eq ']') # second or later area within line
 		{
@@ -426,7 +423,7 @@ MYSQL
 		}
 		else # first area
 		{
-			$json_string .= '[';	
+			$json_string .= '[';
 		}
 		my @sign_data = (@main_sign, queryAllPrepared # TODO ignores 3rd alternative
 		(
@@ -437,96 +434,96 @@ MYSQL
 		{
 			if ($i_sign_data == 0) # first possible sign (and main sign) of area
 			{
-				$json_string .= '{';				
+				$json_string .= '{';
 			}
 			else # later sign
 			{
 				$json_string .= ',{';
 			}
-			
+
 			$json_string .= '"id":'.$sign_data[$i_sign_data];
-			
+
 			# skip date_of_adding
-			
+
 			my $a = $sign_data[$i_sign_data + 2];
 			if (!($a eq '?'))
 			{
-				$json_string .= ',"sign":"'.$a.'"';	
+				$json_string .= ',"sign":"'.$a.'"';
 			}
-			
+
 			$a = $sign_data[$i_sign_data + 3];
 			if ($a != 1) # not a letter
 			{
 				$json_string .= ',"signType":"'.$id2SignType{$a}.'"';
 			}
-			
+
 			$a = $sign_data[$i_sign_data + 4];
 			if ($a != 0
 			&&  $a != 1) # width other than 0.0 (not a letter) and 1.0 (standard letter)
 			{
 				$json_string .= ',"width":'.$a;
 			}
-			
+
 			if ($sign_data[$i_sign_data + 5] != 0) # might be wider
 			{
 				$json_string .= ',"mightBeWider":1';
 			}
-			
+
 			# skip vocalization_id
-			
+
 			$a = $sign_data[$i_sign_data + 7];
 			if (defined $a
 			&&  !($a eq 'COMPLETE')) # readability impaired
 			{
 				$json_string .= ',"damaged":"'.$a.'"';
 			}
-			
+
 			$a = $sign_data[$i_sign_data + 8];
 			if (defined $a) # readable areas are declared
 			{
 				$json_string .= ',"readableAreas":"'.$a.'"';
 			}
-			
+
 			if ($sign_data[$i_sign_data + 9] == 1) # is reconstructed
 			{
 				$json_string .= ',"reconstructed":1';
 			}
-			
+
 			if ($sign_data[$i_sign_data + 10] == 1) # is retraced
 			{
 				$json_string .= ',"retraced":1';
 			}
-			
+
 			# skip form_of_writing_id
-			
+
 			$a = $sign_data[$i_sign_data + 12];
 			if (defined $a
 			&&  !($a eq 'NO')) # editorial flag is set
 			{
 				$json_string .= ',"suggested":"'.$a.'"';
 			}
-			
+
 			$a = $sign_data[$i_sign_data + 13];
 			if (defined $a) # commentary exists
 			{
 				$json_string .= ',"comment":"'.$a.'"';
 			}
-			
+
 			# skip real_areas_id
-			
+
 			$a = $sign_data[$i_sign_data + 15];
 			if (defined $a) # break type(s)
 			{
 				$json_string .= ',"break":"'.$a.'"';
 			}
-			
+
 			$a = $sign_data[$i_sign_data + 16];
 			if (defined $a
 			&&  !($a eq '')) # there is 1+ correction
 			{
 				$json_string .= ',"corrected":"'.$a.'"';
 			}
-			
+
 			my @sign_position = queryAllPrepared
 			(
 				$get_sign_position_query,
@@ -536,18 +533,18 @@ MYSQL
 			{
 				$json_string .= ',"position":"'.$sign_position[0].'"';
 			}
-			
+
 			$json_string .= '}';
 		}
 		$json_string .= ']'; # end area
 	}
-	
+
 	if (length $json_string > 1) # 1+ line was added
 	{
 		$json_string .= ']}'; # close signs array and line
 	}
 	$json_string .= ']'; # end json
-	
+
 	print $json_string;
 }
 
@@ -555,26 +552,26 @@ sub load_fragment_text
 {
 	my $cgi = shift;
 	my $error = shift;
-	
+
 	my $dbh = $cgi->dbh;
 	my $scroll_version = $cgi->param('SCROLLVERSION');
 	if (defined $scroll_version)
 	{
 		$dbh->set_scrollversion($scroll_version);
 	}
-	
-	
+
+
 	# get scroll & fragment data
-	
+
 	my ($scroll_id, $col_of_scroll_id) = query_SQE
 	(
 		$cgi,
 		'first_array',
 
 		<<'MYSQL',
-		SELECT discrete_canonical_name_id, 
-			column_of_scroll_id 
-		FROM discrete_canonical_references 
+		SELECT discrete_canonical_name_id,
+			column_of_scroll_id
+		FROM discrete_canonical_references
 		WHERE discrete_canonical_reference_id = ?
 MYSQL
 
@@ -586,29 +583,29 @@ MYSQL
 		'first_value',
 
 		<<'MYSQL',
-		SELECT col_id 
-		FROM scroll_to_col 
+		SELECT col_id
+		FROM scroll_to_col
 		WHERE scroll_to_col_id = ?
 MYSQL
 
 		$col_of_scroll_id
 	);
-	
+
 	my @scroll_and_fragment_names = query_SQE
 	(
 		$cgi,
 		'first_array',
 
 		<<'MYSQL',
-		SELECT scroll_data.name, 
-			col_data.name 
-		FROM scroll_data, 
-			col_data 
-		WHERE col_data.col_id = ? 
+		SELECT scroll_data.name,
+			col_data.name
+		FROM scroll_data,
+			col_data
+		WHERE col_data.col_id = ?
 		      AND scroll_data.scroll_id = (
-				SELECT scroll_id 
-				FROM scroll_to_col 		
-				WHERE col_id = ? 
+				SELECT scroll_id
+				FROM scroll_to_col
+				WHERE col_id = ?
 			  )
 MYSQL
 
@@ -616,29 +613,29 @@ MYSQL
 		$fragment_id
 	);
 	my $fragment_name = $scroll_and_fragment_names[0].' '.$scroll_and_fragment_names[1];
-	
-	
+
+
 	# get sign stream
-	
+
 	my $line_ids_query = $dbh->prepare_sqe # TODO sort order
 	(
 		<<'MYSQL'
-		SELECT line_id 
-		FROM col_to_line 
+		SELECT line_id
+		FROM col_to_line
 		WHERE col_id = ?
 MYSQL
 	);
 	$line_ids_query->execute($fragment_id);
-	
+
 	my $line_name_query = $dbh->prepare_sqe
 	(
 		<<'MYSQL'
-		SELECT name 
-		FROM line_data 
+		SELECT name
+		FROM line_data
 		WHERE line_id = ?
 MYSQL
 	);
-	
+
 #	my $get_start_query = $dbh->prepare_sqe(SQE_API::Queries::GET_LINE_BREAK);
 	my $get_start_query = $dbh->prepare_sqe(SQE_API::Queries::GET_FRAGMENT_BREAK);
 
@@ -647,22 +644,22 @@ MYSQL
 	$get_start_query->execute($fragment_id, 'COLUMN_START');
 	my $start_sign_id = ($get_start_query->fetchrow_array)[0];
 	$sign_stream->set_start_id($start_sign_id);
-	
+
 	my $line_end = 1;
-	
+
 	my $line_id = ($line_ids_query->fetchrow_array)[0];
 	$line_name_query->execute($line_id);
 	my $line_name = ($line_name_query->fetchrow_array)[0];
 	my $json_string = '{"param SCROLLVERSION":'.$scroll_version.',"actual SCROLLVERSION":'.$dbh->scrollversion().',"$col_of_scroll_id":'.$col_of_scroll_id.',"fragmentName":"'.$fragment_name.'","lines":[{"lineName":"'.$line_name.'","signs":[';
-	
+
 	my $first_sign_of_line = 1;
-	
+
 	my $current_sign_scalar; # as scalar first for simple check whether existant
 	while ($current_sign_scalar = $sign_stream->next_sign())
 	{
 		my @sign = @{ $current_sign_scalar };
-		
-		if ($sign[3] == 9) # line end / line start (might be column end / scroll end also, but not relevant here) 
+
+		if ($sign[3] == 9) # line end / line start (might be column end / scroll end also, but not relevant here)
 		{
 			if ($line_end)
 			{
@@ -674,61 +671,61 @@ MYSQL
 				$line_name_query->execute($line_id);
 				$line_name = ($line_name_query->fetchrow_array)[0];
 				$json_string .= ',{"lineName":"'.$line_name.'","signs":[';
-				
+
 				$first_sign_of_line = 1;
 			}
-			
+
 			$line_end = !$line_end;
-			
+
 			next;
 		}
-		
+
 		if (!$first_sign_of_line)
 		{
 			$json_string .= ',';
 		}
 		$first_sign_of_line = 0;
-		
-		
+
+
 		# collect sign attributes
-		
+
 		$json_string .= '{"signId":'.$sign[1];
-		
+
 		if ($sign[3] == 1) { $json_string .= ',"sign":"'.$sign[2].'"'; } # letter
 		else               { $json_string .= ',"type":"'.$sign[3].'"'; }
-		
+
 		if ($sign[13] != 0) { $json_string .= ',"signCharId":'.$sign[13]; }
 		if ($sign[11] != 0) { $json_string .= ',"isVariant":1'; }
 		if ($sign[5]  != 1) { $json_string .= ',"width":"'.$sign[5].'"'; }
 		if ($sign[6]  == 1) { $json_string .= ',"mightBeWider":1'; }
-		
+
 		if ($sign[12]) # sign_char_reading_data entry exists
 		{
 			$json_string .= ',"signCharReadingDataId":'.$sign[12];
-			
+
 			if (!($sign[7]  eq 'COMPLETE')) { $json_string .= ',"readability":"'.$sign[7].'"'; }
 			if (  $sign[8]  == 1)           { $json_string .= ',"retraced":1'; }
 			if (  $sign[9]  == 1)           { $json_string .= ',"reconstructed":1'; }
 			if (!($sign[10] eq ''))         { $json_string .= ',"corrected":"'.$sign[10].'"'; }
 		}
-		
-		my @sign_relative_positions = query_SQE 
+
+		my @sign_relative_positions = query_SQE
 		(
 			$cgi,
 			'all',
 
 			<<'MYSQL',
-			SELECT sign_relative_position_id, 
-				type, 
-				level 
-			FROM sign_relative_position 
-			WHERE sign_id = ? 
-			      AND sign_relative_position_id 
-			          IN ( 		
-				          SELECT sign_relative_position_id 
-				          FROM sign_relative_position_owner 		
-				          WHERE scroll_version_id = ? 
-			          ) 
+			SELECT sign_relative_position_id,
+				type,
+				level
+			FROM sign_relative_position
+			WHERE sign_id = ?
+			      AND sign_relative_position_id
+			          IN (
+				          SELECT sign_relative_position_id
+				          FROM sign_relative_position_owner
+				          WHERE scroll_version_id = ?
+			          )
 			ORDER BY level
 MYSQL
 
@@ -738,36 +735,36 @@ MYSQL
 		if (scalar @sign_relative_positions > 0)
 		{
 			$json_string .= ',"position":[';
-			
+
 			for (my $pos_i = 0; $pos_i < scalar @sign_relative_positions; $pos_i += 3)
 			{
 				if ($pos_i) # not the lowest level
 				{
 					$json_string .= ',';
 				}
-				
+
 				$json_string .= '{"signPositionId":'.$sign_relative_positions[$pos_i];
-				
+
 				my $pos = $sign_relative_positions[$pos_i + 1];
 				if    ($pos eq 'ABOVE_LINE')   { $json_string .= ',"position":"aboveLine"'; }
 				elsif ($pos eq 'BELOW_LINE')   { $json_string .= ',"position":"belowLine"'; }
 				elsif ($pos eq 'LEFT_MARGIN')  { $json_string .= ',"position":"leftMargin"'; }
 				elsif ($pos eq 'RIGHT_MARGIN') { $json_string .= ',"position":"rightMargin"'; }
 				elsif ($pos eq 'MARGIN')       { $json_string .= ',"position":"margin"'; }
-				
+
 				$json_string .= ',"level":'.$sign_relative_positions[$pos_i + 2].'}';
 			}
-			
+
 			$json_string .= ']';
 		}
-		
+
 		$json_string .= '}'; # close sign
 	}
-	
+
 	$line_ids_query->finish;
 	$line_name_query->finish;
 	$get_start_query->finish;
-	
+
 	$json_string .= ']}'; # close array of lines and entire json
 	$cgi->print($json_string);
 }
@@ -776,14 +773,14 @@ sub change_width
 {
 	my $cgi = shift;
 	my $dbh = $cgi->dbh;
-	
+
 	my $scroll_version_id = $cgi->param('SCROLLVERSION');
 	if (!defined $scroll_version_id)
 	{
 		$scroll_version_id = 1;
 	}
 	$dbh->set_scrollversion($scroll_version_id);
-	
+
 	my @result = $dbh->change_value
 	(
 		'sign_char',
@@ -791,7 +788,7 @@ sub change_width
 		'width',
 		$cgi->param('width')
 	);
-	
+
 	if (defined $result[0])
 	{
 		$cgi->print('{"signCharId":'.$result[0].'}');
@@ -806,17 +803,17 @@ sub add_attribute
 {
 	my $cgi = shift;
 	my $dbh = $cgi->dbh;
-	
+
 	my $scroll_version_id = $cgi->param('SCROLLVERSION');
 	if (!defined $scroll_version_id)
 	{
 		$scroll_version_id = 1;
 	}
 	$dbh->set_scrollversion($scroll_version_id);
-	
+
 	my $attribute_name = $cgi->param('attributeName');
 	my $attribute_value = $cgi->param('attributeValue');
-	
+
 	my @result;
 	if ($attribute_name eq 'mightBeWider')
 	{
@@ -827,7 +824,7 @@ sub add_attribute
 			'might_be_wider',
 			$attribute_value
 		);
-		
+
 		if (defined $result[0])
 		{
 			$cgi->print('{"signCharId":'.$result[0].'}');
@@ -841,7 +838,7 @@ sub add_attribute
 		elsif ($attribute_value eq 'aboveLine')   { $type = 'ABOVE_LINE'; }
 		elsif ($attribute_value eq 'belowLine')   { $type = 'BELOW_LINE'; }
 		elsif ($attribute_value eq 'margin')      { $type = 'MARGIN'; }
-		
+
 		my $sign_relative_position_id = $cgi->param('signPositionId');
 		if (defined $sign_relative_position_id
 		&&  $sign_relative_position_id != -1)
@@ -870,7 +867,7 @@ MYSQL
 				$type
 			);
 			$sign_relative_position_id = lastInsertedId_SQE($cgi);
-			
+
 			query_SQE
 			(
 				$cgi,
@@ -885,10 +882,10 @@ MYSQL
 				$sign_relative_position_id,
 				$scroll_version_id
 			);
-			
+
 			$result[0] = 1;
 		}
-		
+
 		if (defined $result[0])
 		{
 			$cgi->print('{"signPositionId":'.$sign_relative_position_id.'}');
@@ -907,7 +904,7 @@ MYSQL
 			$name = 'is_'.$attribute_name;
 			$value = 1;
 		}
-		
+
 		my $id = $cgi->param('signCharReadingDataId');
 		if (defined $id)
 		{
@@ -928,7 +925,7 @@ MYSQL
 #				'sign_char_id',
 #				$cgi->param('signCharId')
 #			);
-			
+
 			query_SQE # TODO all entries show up on load
 			(
 				$cgi,
@@ -942,7 +939,7 @@ MYSQL
 				$value
 			);
 			$id = lastInsertedId_SQE($cgi);
-			
+
 			query_SQE
 			(
 				$cgi,
@@ -957,10 +954,10 @@ MYSQL
 				$id,
 				$scroll_version_id
 			);
-			
+
 			$result[0] = $id;
 		}
-		
+
 		if (defined $result[0])
 		{
 			$cgi->print('{"signCharReadingDataId":'.$result[0].'}');
@@ -977,17 +974,17 @@ sub remove_attribute
 {
 	my $cgi = shift;
 	my $dbh = $cgi->dbh;
-	
+
 	my $scroll_version_id = $cgi->param('SCROLLVERSION');
 	if (!defined $scroll_version_id)
 	{
 		$scroll_version_id = 1;
 	}
 	$dbh->set_scrollversion($scroll_version_id);
-	
+
 	my $sign_id = $cgi->param('signId');
 	my $attribute_name = $cgi->param('attributeName');
-	
+
 	my @result;
 	if ($attribute_name eq 'mightBeWider')
 	{
@@ -998,7 +995,7 @@ sub remove_attribute
 			'might_be_wider',
 			0
 		);
-		
+
 		if (defined $result[0])
 		{
 			$cgi->print('{"signCharId":'.$result[0].'}');
@@ -1011,7 +1008,7 @@ sub remove_attribute
 			'sign_relative_position',
 			$cgi->param('signPositionId')
 		);
-		
+
 		if (defined $result[0]) # TODO doesn't fire
 		{
 			$cgi->print('{"signPositionId":-1}');
@@ -1026,7 +1023,7 @@ sub remove_attribute
 			'correction',
 			''
 		);
-		
+
 		if (defined $result[0])
 		{
 			$cgi->print('{"signCharReadingDataId":'.$result[0].'}');
@@ -1041,13 +1038,13 @@ sub remove_attribute
 			'is_'.$attribute_name,
 			0
 		);
-		
+
 		if (defined $result[0])
 		{
 			$cgi->print('{"signCharReadingDataId":'.$result[0].'}');
 		}
 	}
-	
+
 	if (defined $result[1])
 	{
 		$cgi->print('{"error":"'.${$result[1]}[1].'"}');
@@ -1060,7 +1057,7 @@ sub potentially_save_new_variant
 	my $cgi = shift;
 	my $error= shift;
 	my %new_variant = %{ decode_json($cgi->param('variant')) };
-	
+
 	# set dummy values for stringification
 	if (! defined $new_variant{'mightBeWider'})
 	{
@@ -1078,9 +1075,9 @@ sub potentially_save_new_variant
 	{
 		$new_variant{'commentary'} = '';
 	}
-	
+
 	# stringify for comparison
-	
+
 	my $new_variant_stringified
 	=  $new_variant{'sign'         }.'§'
 	. ($new_variant{'width'} * 1000).'§' # neutralizes decimal formatting issues
@@ -1090,9 +1087,9 @@ sub potentially_save_new_variant
 	.  $new_variant{'commentary'   }.'§'
 	.  $new_variant{'corrected'    }.'§'
 	.  $new_variant{'position'     }.'§';
-	
+
 	say '$new_variant_stringified '.$new_variant_stringified;
-	  
+
 	my @existingSigns = queryAll
 	(
 		<<'MYSQL',
@@ -1109,12 +1106,12 @@ MYSQL
 		$new_variant{'mainSignId'},
 		$new_variant{'mainSignId'}
 	);
-	
+
 	my @sign_strings;
 	my $sign_amount = (scalar @existingSigns) / 17;
-	
+
 	my $is_new_variant = 1;
-	
+
 	for (my $i_sign = 0; $i_sign < $sign_amount; $i_sign++)
 	{
 		my $position = queryResult
@@ -1127,7 +1124,7 @@ MYSQL
 			$dbh,
 			$existingSigns[$i_sign * 17]
 		);
-		
+
 		my $sign_string = ''
 		. $existingSigns[$i_sign * 17 +  2].'§' # actual sign
 		.($existingSigns[$i_sign * 17 +  4] * 1000).'§' # width, multiplied with 1000 to standardize formatting
@@ -1137,24 +1134,24 @@ MYSQL
 		. $existingSigns[$i_sign * 17 + 13].'§' # commentary
 		. $existingSigns[$i_sign * 17 + 16].'§' # correction
 		. $position                        .'§';
-		
+
 		say '$sign_string '.$sign_string;
-		
+
 		if ($sign_string eq $new_variant_stringified)
 		{
 			$is_new_variant = 0;
 			last;
 		}
 	}
-	
+
 	if (!$is_new_variant)
 	{
 		print 0;
 		return;
 	}
-	
+
 	# save to table sign # TODO
-	
+
 	my $sql_query = 'INSERT INTO sign SET ';
 	if (defined $new_variant{'sign'})
 	{
@@ -1174,21 +1171,21 @@ MYSQL
 	$sql_query .= 'is_retraced = '.$new_variant{'retraced'}.',';
 	$sql_query .= 'commentary = "'.$new_variant{'commentary'}.'",';
 	$sql_query .= 'real_areas_id = '.$existingSigns[14].',';
-	
+
 	$sql_query = substr($sql_query, 0, (length $sql_query) - 1); # remove final ,
 	query
 	(
-		$sql_query, 
+		$sql_query,
 		$dbh
 	);
-	
+
 	my $sign_id = lastInsertedId();
 	my $user_id = userId $cgi->param('user');
 	if (undef $user_id || $user_id == '')
 	{
 		$user_id = 5; # TODO
 	}
-	
+
 	# table sign_owner
 	query # TODO set proper version
 	(
@@ -1201,7 +1198,7 @@ MYSQL
 		$sign_id,
 		$user_id
 	);
-	
+
 	# table sign_relative_position
 	if (defined $new_variant{'position'})
 	{
@@ -1217,7 +1214,7 @@ MYSQL
 			$new_variant{'position'}
 		);
 	}
-	
+
 	# table is_variant_sign_of
 	query # TODO proper rank
 	(
@@ -1243,9 +1240,9 @@ sub save_single_sign_change
 		print 0;
 		return;
 	}
-	
+
 	my @signs = @{ decode_json $cgi->param('signs') }; # main sign, afterwards variant readings
-	
+
 	my $idsString = '';
 	my @idsArray;
 	for my $sign (@signs) # collect ids of main sign & its variants
@@ -1256,16 +1253,16 @@ sub save_single_sign_change
 		{
 			next;
 		}
-		
+
 		if (length $idsString > 0)
 		{
 			$idsString .= ',';
 		}
 		$idsString .= $a;
-		
+
 		push @idsArray, $a;
 	}
-	
+
 	my @signs_in_db = queryAll
 	(
 		<<'MYSQL',
@@ -1277,97 +1274,97 @@ MYSQL
 		$dbh,
 		$idsString
 	);
-	
+
 	# say Dumper @signs_in_db;
-	
+
 	for (my $i_id = 0; $i_id < scalar @idsArray; $i_id++)
 	{
 		my %attributes = %{ $signs[$i_id] };
-		
+
 #		if (%attributes{''})
-#		
-#		
-#		
-#	2 	date_of_adding 	timestamp 			Ja 	CURRENT_TIMESTAMP 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#
+#
+#
+#	2 	date_of_adding 	timestamp 			Ja 	CURRENT_TIMESTAMP 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	3 	signIndex 	char(1) 	utf8_general_ci 		Nein 	? 	the sign itself\nspaces = text-space („ „) + _is_vacat=no\nvacat = text-space + is_vacat=yes\nthe logic is: we would like to distinguish between different width of spaces without to decide beforehand whether it is an intended vacat or not. 		Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	3 	signIndex 	char(1) 	utf8_general_ci 		Nein 	? 	the sign itself\nspaces = text-space („ „) + _is_vacat=no\nvacat = text-space + is_vacat=yes\nthe logic is: we would like to distinguish between different width of spaces without to decide beforehand whether it is an intended vacat or not. 		Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	4 	sign_type_idIndex 	tinyint(3) 		UNSIGNED 	Nein 	1 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	4 	sign_type_idIndex 	tinyint(3) 		UNSIGNED 	Nein 	1 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	5 	width 	decimal(6,3) 			Nein 	1.000 	width in chars\ncan also be used as a sloppy way to estimate the place used by the sign (especially when there are no font-information), which is handy if the sign is not yet related to a real area\nFinally the value 255 marks a break with unknown width 		Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	5 	width 	decimal(6,3) 			Nein 	1.000 	width in chars\ncan also be used as a sloppy way to estimate the place used by the sign (especially when there are no font-information), which is handy if the sign is not yet related to a real area\nFinally the value 255 marks a break with unknown width 		Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	6 	might_be_wider 	tinyint(1) 			Nein 	0 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	6 	might_be_wider 	tinyint(1) 			Nein 	0 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	7 	vocalization_id 	tinyint(3) 		UNSIGNED 	Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	7 	vocalization_id 	tinyint(3) 		UNSIGNED 	Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	8 	readability 	enum('COMPLETE', 'INCOMPLETE_BUT_CLEAR', 'INCOMPLE... 	utf8_general_ci 		Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	8 	readability 	enum('COMPLETE', 'INCOMPLETE_BUT_CLEAR', 'INCOMPLE... 	utf8_general_ci 		Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	9 	readable_areas 	set('NW', 'NE', 'MW', 'ME', 'SW', 'SE') 	utf8_general_ci 		Ja 	NULL 	2x4-field set to locate readable areas can be used to set brackets in a more sophisticated way NW NE MNW MNE MSW MSE SW SE 		Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	9 	readable_areas 	set('NW', 'NE', 'MW', 'ME', 'SW', 'SE') 	utf8_general_ci 		Ja 	NULL 	2x4-field set to locate readable areas can be used to set brackets in a more sophisticated way NW NE MNW MNE MSW MSE SW SE 		Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	10 	is_reconstructed 	tinyint(1) 			Nein 	0 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	10 	is_reconstructed 	tinyint(1) 			Nein 	0 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	11 	is_retraced 	tinyint(1) 			Nein 	0 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	11 	is_retraced 	tinyint(1) 			Nein 	0 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	12 	form_of_writing_idIndex 	int(11) 		UNSIGNED 	Nein 	1 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	12 	form_of_writing_idIndex 	int(11) 		UNSIGNED 	Nein 	1 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	13 	editorial_flag 	enum('NO', 'CONJECTURE', 'SHOULD_BE_ADDED', 'SHOUL... 	utf8_general_ci 		Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	13 	editorial_flag 	enum('NO', 'CONJECTURE', 'SHOULD_BE_ADDED', 'SHOUL... 	utf8_general_ci 		Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	14 	commentary 	text 	utf8_general_ci 		Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	14 	commentary 	text 	utf8_general_ci 		Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	15 	real_areas_idIndex 	int(11) 		UNSIGNED 	Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	15 	real_areas_idIndex 	int(11) 		UNSIGNED 	Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	16 	break_type 	set('LINE_START', 'LINE_END', 'COLUMN_START', 'COL... 	utf8_general_ci 		Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen 	
+#	16 	break_type 	set('LINE_START', 'LINE_END', 'COLUMN_START', 'COL... 	utf8_general_ci 		Ja 	NULL 			Bearbeiten Bearbeiten 	Löschen Löschen
 #
 #    Mehr
 #
-#	17 	correction 
-		
+#	17 	correction
+
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
 	# TODO
 	# check whether equal to existing main sign / variant
 	# if yes, skip
 	# if no, create new variant
 	# relevant tables: sign, sign_owner?, sign_relative_pos, is_variant_of, more?
-	
+
 	# assumed default values set by DB:
 	# sign_type_id = 1, width = 1, might_be_wider = 0, vocalization_id = null
 	# readability = null, readable_areas = (NW,NE,MW,ME,SW,SE)
@@ -1383,7 +1380,7 @@ sub saveToStream
 	my $dbh = shift;
 	my $cgi = shift;
 	my $error= shift;
-	
+
 	query
 	(
 		<<'MYSQL',
@@ -1394,7 +1391,7 @@ MYSQL
 		$sign_id
 	);
 	my $current_pos_in_stream_id = lastInsertedId();
-	
+
 	if (defined $previous_pos_in_stream_id)
 	{
 		query
@@ -1409,7 +1406,7 @@ MYSQL
 			$current_pos_in_stream_id
 		);
 	}
-	
+
 	return $current_pos_in_stream_id;
 }
 
@@ -1419,7 +1416,7 @@ sub saveBreak
 	my $dbh = shift;
 	my $cgi = shift;
 	my $error= shift;
-	
+
 	query
 	(
 		<<'MYSQL',
@@ -1432,7 +1429,7 @@ MYSQL
 		$break_type
 	);
 	my $sign_id = lastInsertedId();
-		
+
 	query
 	(
 		<<'MYSQL',
@@ -1443,13 +1440,13 @@ MYSQL
 		$sign_id,
 		$user_id
 	);
-	
+
 	my $current_pos_in_stream_id = saveToStream
 	(
 		$sign_id,
 		$previous_position_id
 	);
-	
+
 	return ($sign_id, $current_pos_in_stream_id);
 }
 
@@ -1465,12 +1462,12 @@ sub saveSigns
 		say 'error: not logged in when saving signs';
 		return;
 	}
-	
+
 	my $input = $cgi->param('signs');
 	say 'JSON: '.$input."\n";
-	
+
 	my $decoded = decode_json $input;
-	
+
 	my %signType2Id =
 	(
 		'space'				=> 2,
@@ -1513,37 +1510,37 @@ sub saveSigns
 		'boxed'				=> 'BOXED',
 		'erased'			=> 'ERASED'
 	);
-	
+
 	my @lines = @{$decoded};
 	my $a;
 	my $main_sign_id;
 	my $position_level;
 	my $scroll_id;
-	
+
 	# TODO break for scroll start, if fitting
-	
+
 	# TODO begin of input is probably not begin of column => check line tag first
 	my ($previous_sign_id, $previous_stream_position_id)
 	= saveBreak('COLUMN_START', $user_id, undef);
-	
+
 	foreach my $line (@lines) # TODO combine queries for all signs
 	{
 		# assume that line always starts with first sign
 		($previous_sign_id, $previous_stream_position_id)
 		= saveBreak('LINE_START', $user_id, $previous_stream_position_id);
-		
+
 		my @alternatives = @{$line};
-		
+
 		# no signs in this line => insert 'blank line' sign
 		if (scalar @alternatives == 0)
 		{
 			@alternatives = ([{'sign' => 'blankLine'}]);
 		}
-		
+
 		foreach my $alternative (@alternatives)
 		{
 			my $is_variant_sign = 0; # set to main sign
-			
+
 			my @signs = @{$alternative};
 			foreach my $sign (@signs)
 			{
@@ -1555,18 +1552,18 @@ sub saveSigns
 				# form_of_writing_id = 0
 				# editorial_flag = null
 				# no commentary at sign_comment
-				
+
 				# transform from JSON to DB
 				# TODO prohibit code injection
-				
+
 				my %attributes = %{$sign};
-				
+
 				if ($a = $attributes{'sign'})
 				{
 					if ($signType2Id{$a})
 					{
 						$sign_entries{'sign_type_id'} = $signType2Id{$a};
-						
+
 						if (my $char = $signType2Char{$a}) # space, vacat, possibleVacat -> single whitespace sign
 						{
 							$sign_entries{'sign'} = $char;
@@ -1596,13 +1593,13 @@ sub saveSigns
 				if ($a = $attributes{'vocalization'})
 				{
 					# TODO needs separate table, then usage of vocalization_id
-					
+
 					if ($vocalization2Id{$a})
 					{
 						# $sign_entries{'vocalization'} = $vocalization2Id{$a};
 					}
 				}
-				
+
 				if ($a = $attributes{'manuscript'})
 				{
 					$scroll_id = queryResult
@@ -1616,7 +1613,7 @@ MYSQL
 						$a
 					);
 					# if null, connection to scroll will be ignored
-					 
+
 					# TODO restrict to scrolls the user has access to
 					# TODO there might be multiple scrolls with the same name the user has access to
 				}
@@ -1637,7 +1634,7 @@ MYSQL
 						# $sign_entries{'scribe_id'} = $a;
 					}
 				}
-				
+
 				if ($a = $attributes{'readability'}) # COMPLETE / INCOMPLETE_BUT_CLEAR / INCOMPLETE_AND_NOT_CLEAR
 				{
 					# TODO damaged: clear / unclear
@@ -1650,17 +1647,17 @@ MYSQL
 				{
 					if ($a eq 'true')
 					{
-						$sign_entries{'is_reconstructed'} = 1;	
+						$sign_entries{'is_reconstructed'} = 1;
 					}
 				}
 				if ($a = $attributes{'retraced'})
 				{
 					if ($a eq 'true')
 					{
-						$sign_entries{'is_retraced'} = 1;	
+						$sign_entries{'is_retraced'} = 1;
 					}
 				}
-				
+
 				if ($a = $attributes{'suggested'})
 				{
 					if ($a eq '')
@@ -1678,11 +1675,11 @@ MYSQL
 						$sign_entries{'editorial_flag'} = '"CONJECTURE"';
 					}
 				}
-				
+
 				say Dumper(%sign_entries);
-				
+
 				# TODO check whether sign already exists (then only add it to the new user)
-				
+
 				# save sign itself
 				my $sql_query = 'INSERT INTO sign SET ';
 				while (my ($key, $value) = each %sign_entries)
@@ -1694,10 +1691,10 @@ MYSQL
 				(
 					$sql_query
 				);
-				
+
 				# get id for current sign, relevant for follow-up queries
 				my $sign_id = lastInsertedId();
-				
+
 				# save sign owner
 				query
 				(
@@ -1709,12 +1706,12 @@ MYSQL
 					$sign_id,
 					$user_id
 				);
-				
+
 				# save position
 				if ($a = $attributes{'position'})
 				{
 					$position_level = 1;
-					
+
 					while (my ($key, $value) = each %position2Enum)
 					{
 						if (index($a, $key) != -1)
@@ -1732,12 +1729,12 @@ MYSQL
 								$value,
 								$position_level
 							);
-							
+
 							$position_level++;
 						}
 					}
 				}
-				
+
 				# save correction
 				if ($a = $attributes{'corrected'})
 				{
@@ -1754,11 +1751,11 @@ MYSQL
 								$dbh,
 								$sign_id,
 								$value
-							); 
+							);
 						}
 					}
 				}
-				
+
 				# save alternatives and stream position
 				if ($is_variant_sign)
 				{
@@ -1773,7 +1770,7 @@ MYSQL
 						$sign_id
 
 					);
-					
+
 					# no direct link to sign stream, but indirectly via is_variant_sign_of
 				}
 				else # first sign of alternative (maybe the only one)
@@ -1783,11 +1780,11 @@ MYSQL
 						$sign_id,
 						$previous_stream_position_id
 					);
-					
+
 					$main_sign_id = $sign_id;
-					$is_variant_sign = 1; # for next signs of alternative (if existing)	
+					$is_variant_sign = 1; # for next signs of alternative (if existing)
 				}
-				
+
 				# save user's comment
 				if ($a = $attributes{'comment'})
 				{
@@ -1803,7 +1800,7 @@ MYSQL
 						$sign_id
 					);
 				}
-				
+
 				# save connection to scroll
 				if ($scroll_id != undef)
 				{
@@ -1816,7 +1813,7 @@ MYSQL
 						$dbh,
 						$scroll_id
 					);
-					
+
 					query
 					(
 						<<'MYSQL',
@@ -1829,17 +1826,17 @@ MYSQL
 						$sign_id
 					);
 				}
-				
+
 				say 'saved to DB';
 			}
 		}
-		
+
 		($previous_sign_id, $previous_stream_position_id)
 		= saveBreak('LINE_END', $user_id, $previous_stream_position_id);
 	}
-	
+
 	saveBreak('COLUMN_END', $user_id, $previous_stream_position_id);
-	
+
 	# TODO break for scroll end, if fitting
 }
 
@@ -1856,7 +1853,7 @@ sub getAllComments
 MYSQL
 		$dbh
 	);
-	
+
 	my $json_string = '[';
 	for (my $i = 0; $i < scalar @comments - 2; $i += 3)
 	{
@@ -1864,7 +1861,7 @@ MYSQL
 		{
 			$json_string .= ', ';
 		}
-		
+
 		$json_string .= '{"name":"';
 		$json_string .= queryResult
 		(
@@ -1872,19 +1869,19 @@ MYSQL
 			$dbh
 		);
 		$json_string .= '", ';
-		
+
 		$json_string .=
 		'"comment":"'
 		.$comments[$i + 1]
 		.'", ';
-		
+
 		$json_string .=
 		'"time":"'
 		.$comments[$i + 2]
 		.'"}';
 	}
 	$json_string .= ']';
-	
+
 	print $json_string;
 }
 
@@ -1893,9 +1890,9 @@ sub saveComment
 	my $dbh = shift;
 	my $cgi = shift;
 	my $error= shift;
-	my $user_name = $cgi->param('user'   );	
+	my $user_name = $cgi->param('user'   );
 	my $comment   = $cgi->param('comment');
-	
+
 	# get user id
 	my $user_id = queryResult
 	(
@@ -1908,7 +1905,7 @@ MYSQL
 		$user_name
 	);
 	say '$user_id '."$user_id";
-	
+
 	# add comment to db
 	query
 	(
@@ -1935,23 +1932,23 @@ sub main
 		print '{"errorCode":'.@{$error}[0].',"error":"'.@{$error}[1].'"}';
 		exit;
 	}
-	
+
 #	print $cgi->header('text/plain; charset=utf-8'); # support for Hebrew etc. characters
 	print $cgi->header('application/json; charset=utf-8');
-	
-	
+
+
 	# handle requests
-	
+
 	my %request2Sub =
 	(
 		'login'            => \&login,
 		'loadFragmentText' => \&load_fragment_text,
-		
+
 		'changeWidth'      => \&change_width,
 		'addAttribute'     => \&add_attribute,
 		'removeAttribute'  => \&remove_attribute,
 	);
-	
+
 	my $request = $cgi->param('request');
 	if (defined $request2Sub{$request})
 	{
@@ -1965,7 +1962,7 @@ sub main
 			"Request '".$request."' not understood."
 		});
 	}
-	
+
 
 #	if ($request eq 'login')
 #	{
