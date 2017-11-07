@@ -29,13 +29,6 @@ function login(){
         });
     });
     $("#main-menu").on("click", ".scroll_select", function(){
-        // if (Spider.current_combination != $(this).data("id") || Spider.current_version_id != $(this).data("scroll-version")) {
-        //     Spider.unlocked = $(this).data("user") == "default" ? false : true;
-        //     Spider.current_combination = $(this).data("id");
-        //     Spider.current_version = $(this).data("version");
-        //     Spider.current_version_id = $(this).data("scroll-version");
-        //     Spider.propagate_command('load_scroll', {id: $(this).data("id"), scroll_version: $(this).data("scroll-version")});
-        // }
         loadMenuScroll(this);
     });
     $("#main-menu").on("click", ".fragment_select", function(){
@@ -85,36 +78,23 @@ function loadMenuScroll(item) {
 
 function load_fragment_text(selected_frag)
 {
-    data_form = new FormData();
-    data_form.append('transaction', 'getScrollColNameFromDiscCanRef');
-    data_form.append('frag_id', selected_frag);
-//	const data_form =
-//	{
-//		'transaction': 'getScrollColNameFromDiscCanRef',
-//		'frag_id': selected_frag
-//	};
+    Spider.requestFromServer
+          (
+              {
+                  'request': 'loadFragmentText',
+                  'discreteCanonicalReferenceId': selected_frag, // result.col
+                  'SCROLLVERSION': Spider.current_version_id
+              },
+              function(data)
+              {
+                  if (data == 0)
+                  {
+                      return;
+                  }
 
-    get_database_data(data_form, function(results){
-        results['results'].forEach(function(result) {
-            Spider.requestFromServer
-            (
-                {
-                	'request': 'loadFragmentText',
-                    'discreteCanonicalReferenceId': selected_frag, // result.col
-                    'SCROLLVERSION': Spider.current_version_id
-                },
-                function(data)
-                {
-                    if (data == 0)
-                    {
-                        return;
-                    }
-                    
-                    Spider.notifyChangedText(data);
-                }
-            );
-        });
-    });
+                  Spider.propagate_command('load_text', {data: data});
+              }
+          );
 }
 
 function load_fragment_image(selected_frag){
@@ -214,7 +194,7 @@ function populate_combinations(user) {
                         if (current_lvl == 0){
                             var scroll_version_id = username == "default" ? 1 : entries['results'][i]["version_id"];
                             var children = entries['results'][i]["count"] > 0 ? true :false;
-                            var listing = {"text": "<span class=\"menu scroll_select editable_name\" data-id=\"" + entries['results'][i]["scroll_id"] + "\" data-version=\"" + entries['results'][i]["version"] + "\" data-user=\"" + username + "\" data-scroll-version=\"" + scroll_version_id + "\" data-scroll-data-id=\"" + entries['results'][i]["scroll_data_id"] + "\">" + entries['results'][i]["name"] + '</span><input type=\"text\" class=\"edited_name\" hidden/><span class=\"menu\"> – ' + username + ' – v. ' + entries['results'][i]["version"] + ' ' + "</span><span class=\"menu clone_combination\">clone</span>", "id" : 'lvl_1-' + entries['results'][i]["scroll_id"] + '-' + entries['results'][i]["name"] + '-' + entries['results'][i]["version_id"], "children" : children, state : {disabled  : true}};
+                            var listing = {"text": "<span class=\"menu scroll_select editable_name\" data-id=\"" + entries['results'][i]["scroll_id"] + "\" data-version=\"" + entries['results'][i]["version"] + "\" data-user=\"" + username + "\" data-scroll-version=\"" + scroll_version_id + "\" data-scroll-data-id=\"" + entries['results'][i]["scroll_data_id"] + "\">" + entries['results'][i]["name"] + '</span><input type=\"text\" class=\"edited_name\" hidden/><span class=\"menu\"> – ' + username + ' – v. ' + entries['results'][i]["version"] + ' ' + "</span><span class=\"menu clone_combination\"><i class=\"fa fa-clone\" aria-hidden=\"true\"></i></span>", "id" : 'lvl_1-' + entries['results'][i]["scroll_id"] + '-' + entries['results'][i]["name"] + '-' + entries['results'][i]["version_id"], "children" : children, state : {disabled  : true}};
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 1){
@@ -236,12 +216,7 @@ function populate_combinations(user) {
 }
 
 function populate_fragments() {
-    $('#unused-fragments-listing').on('changed.jstree', function (e, data) {
-        // if (data.selected[0].startsWith('lvl_3-')) {
-        //     console.log( data.selected[0].split('lvl_3-')[1]);
-        //     // load_images(listing_type.lv_1, data.selected[0].split('lvl_3-')[1]);
-        // }
-    }).jstree({
+    $('#unused-fragments-listing').jstree({
         "core" : {
             "themes":{
                 "icons":false
@@ -320,7 +295,7 @@ function populate_fragments() {
                             menu_list.push(listing);
                         }
                         else if (current_lvl == 3){
-                            var listing = {"text": "<span>" + entries['results'][i]["artefact_id"] + "</span><span class=\"add_artefact\"> +</span>", "id" : 'lvl_4-' + entries['results'][i]["artefact_id"] + "-" + entries['results'][i]["user_id"], "children" : false};
+                            var listing = {"text": "<span>" + entries['results'][i]["artefact_id"] + "&nbsp&nbsp&nbsp</span><span class=\"add_artefact\"><i class=\"fa fa-plus-square-o\" aria-hidden=\"true\"></i></span>", "id" : 'lvl_4-' + entries['results'][i]["artefact_id"] + "-" + entries['results'][i]["user_id"], "children" : false};
                             menu_list.push(listing);
                         }
                     }
@@ -330,29 +305,6 @@ function populate_fragments() {
 	    }
     });
 }
-
-// function load_text(scroll, fragment){
-//     var data_form = new FormData();
-//     data_form.append('USER_NAME', 'sqe_api');
-//     data_form.append('PASSWORD', ''); // PW removed for security
-//     data_form.append('SCROLL', scroll);
-//     data_form.append('FRAGMENT', fragment.replace("+", "\\+"));
-//     data_form.append('FORMAT', 'QWB_HTML');
-//     jQuery.ajax({
-//         url: 'https://134.76.19.179/sqe_api/run_api.cgi',
-//         data: data_form,
-//         cache: false,
-//         contentType: false,
-//         processData: false,
-//         type: 'POST',
-//         success: function(response){
-//             $("#signs-pane").html(response.VALUE);
-//         },
-//         error: function(){
-//             alert("Error retrieving data from database.");
-//         }
-//     });
-// }
 
 function get_database_data(data_form, callback) {
 	data_form.append('SESSION_ID', Spider['session_id']);

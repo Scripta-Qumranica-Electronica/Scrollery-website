@@ -218,7 +218,7 @@ function RichTextEditor()
 		const attributes = model['lines'][iLine]['signs'][iSign];
 		
 		var span =
-		$('<span></span')
+		$('<span></span>')
 		.attr('id', 'span_' + iLine + '_' + iSign) // only for identification, not for data transport
 		.attr('iLine', iLine)
 		.attr('iSign', iSign)
@@ -416,6 +416,17 @@ function RichTextEditor()
 		
 		buttons.appendTo(container);
 	}
+
+    Spider.register_object([
+	   {type: 'load_text',
+		   execute_function: function(data){
+           console.log('text from registered message');
+           console.log(data.data);
+           self.displayModel(data.data);
+	   		},
+		   name: "RichTextEditor"
+	   }
+   ]);
 }
 
 // TODO add context menus based on example of fragmentPuzzle.js
