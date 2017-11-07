@@ -44,6 +44,7 @@ function SignVisualisation()
 	}
 
 	// TODO reconstructed etc.
+	// TODO sign attributes including corrections?
 
 
 

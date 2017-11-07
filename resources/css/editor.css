@@ -101,6 +101,11 @@
 	font-size: 14px;
 }
 
+.largeFontSize
+{
+	font-size: 28px;
+}
+
 
 /** high level elements */
 
@@ -446,14 +451,59 @@
 	padding-right: 1px;
 }
 
-.corrected
-{
-	text-decoration: line-through; 
-}
-
 .suggested
 {
 	color: darkred;
+}
+
+.overwritten
+{
+	text-decoration: line-through;
+}
+
+.horizontal_line
+{
+	text-decoration: line-through;
+}
+
+.diagonal_left_line
+{
+	text-decoration: line-through;
+}
+
+.diagonal_right_line
+{
+	text-decoration: line-through;
+}
+
+.dot_below
+{
+	text-decoration: line-through;
+}
+
+.dot_above
+{
+	text-decoration: line-through;
+}
+
+.line_below
+{
+	text-decoration: underline;
+}
+
+.line_above
+{
+	text-decoration: overline;
+}
+
+.boxed
+{
+	border: 1px solid black;
+}
+
+.erased
+{
+	color: grey;
 }
 
 
@@ -510,9 +560,4 @@
 .attribute
 {
 	cursor: pointer;
-}
-
-.chosenAttribute
-{
-	color: lightgrey;
 }

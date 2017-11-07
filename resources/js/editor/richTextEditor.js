@@ -319,7 +319,17 @@ function RichTextEditor()
 		
 		if ((attributes['corrected']) != null) // 11
 		{
-			span.addClass('corrected'); // TODO differentiate by different corrections?
+			if (typeof attributes['corrected'] == 'string') // one correction only
+			{
+				span.addClass(attributes['corrected'].toLowerCase());
+			}
+			else if (typeof attributes['corrected'] == 'object') // multiple
+			{
+				for (var i in attributes['corrected'])
+				{
+					span.addClass(attributes['corrected'].toLowerCase());
+				}
+			}
 		}
 		
 //		if ((attributes['suggested']) != null) // 13.1

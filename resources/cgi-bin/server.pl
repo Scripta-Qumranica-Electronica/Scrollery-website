@@ -20,7 +20,11 @@ use JSON;
 
 sub query_SQE
 {
-	my ($cgi, $result_type, $query_text, @query_parameters) = (@_);
+	my $cgi = shift;
+	my $result_type = shift;
+	my $query_text = shift;
+	my @query_parameters = @_; # might be empty
+	
 	my $dbh = $cgi->dbh;
 
 	my $query = $dbh->prepare_sqe($query_text);
@@ -609,6 +613,7 @@ MYSQL
 			  )
 MYSQL
 
+
 		$fragment_id,
 		$fragment_id
 	);
@@ -655,6 +660,7 @@ MYSQL
 	my $first_sign_of_line = 1;
 
 	my $current_sign_scalar; # as scalar first for simple check whether existant
+	my $sign_id;
 	while ($current_sign_scalar = $sign_stream->next_sign())
 	{
 		my @sign = @{ $current_sign_scalar };
@@ -690,23 +696,59 @@ MYSQL
 		# collect sign attributes
 
 		$json_string .= '{"signId":'.$sign[1];
-
+		$sign_id = $sign[1];
+		
 		if ($sign[3] == 1) { $json_string .= ',"sign":"'.$sign[2].'"'; } # letter
 		else               { $json_string .= ',"type":"'.$sign[3].'"'; }
 
 		if ($sign[13] != 0) { $json_string .= ',"signCharId":'.$sign[13]; }
-		if ($sign[11] != 0) { $json_string .= ',"isVariant":1'; }
-		if ($sign[5]  != 1) { $json_string .= ',"width":"'.$sign[5].'"'; }
-		if ($sign[6]  == 1) { $json_string .= ',"mightBeWider":1'; }
 
-		if ($sign[12]) # sign_char_reading_data entry exists
+		if ($sign[11] == 1) { $json_string .= ',"isVariant":1'; }
+		if ($sign[ 5] != 1) { $json_string .= ',"width":"'.$sign[5].'"'; }
+		if ($sign[ 6] == 1) { $json_string .= ',"mightBeWider":1'; }
+		
+		if (defined $sign[12]) # sign_char_reading_data entry exists, but might be off for this scroll_version
 		{
+#			my @scrd = query_SQE # sign_char_reading_data 
+#			(
+#				$cgi,
+#				'first_array',
+#				
+#				<<'MYSQL',
+#				SELECT sign_char_reading_data_id, readability, is_reconstructed, is_retraced, correction FROM sign_char_reading_data
+#				WHERE sign_char_id = ?
+#				AND sign_char_reading_data_id IN
+#				(
+#					SELECT sign_char_reading_data_id FROM sign_char_reading_data_owner
+#					WHERE scroll_version_id = ?
+#				)
+#MYSQL
+#				,
+#				$sign[13],
+#				$scroll_version
+#			);
+#			
+#			if (scalar @scrd > 0)
+#			{
+#				$json_string .= ',"signCharReadingDataId":'.$scrd[0];
+#
+#				if (!($scrd[1] eq 'COMPLETE')) { $json_string .= ',"readability":"'.$scrd[1].'"'; }
+#				if (  $scrd[2] == 1)           { $json_string .= ',"reconstructed":1'; }
+#				if (  $scrd[3] == 1)           { $json_string .= ',"retraced":1'; }
+#				
+#				if (!($scrd[4] eq ''))
+#				{
+#					$scrd[4] =~ s/,/","/; # put "" around each entry
+#					$json_string .= ',"corrected":["'.$scrd[4].'"]'; # TODO test whether it works for multiple entries
+#				}
+#			}
+			
 			$json_string .= ',"signCharReadingDataId":'.$sign[12];
-
-			if (!($sign[7]  eq 'COMPLETE')) { $json_string .= ',"readability":"'.$sign[7].'"'; }
-			if (  $sign[8]  == 1)           { $json_string .= ',"retraced":1'; }
-			if (  $sign[9]  == 1)           { $json_string .= ',"reconstructed":1'; }
-			if (!($sign[10] eq ''))         { $json_string .= ',"corrected":"'.$sign[10].'"'; }
+			
+			if (defined $sign[ 7] && !($sign[ 7] eq 'COMPLETE')) { $json_string .= ',"readability":"'.$sign[7].'"'; }
+			if (defined $sign[ 8] &&   $sign[ 8] == 1)           { $json_string .= ',"retraced":1'; }
+			if (defined $sign[ 9] &&   $sign[ 9] == 1)           { $json_string .= ',"reconstructed":1'; }
+			if (defined $sign[10] && !($sign[10] eq ''))         { $json_string .= ',"corrected":"'.$sign[10].'"'; }
 		}
 
 		my @sign_relative_positions = query_SQE
@@ -767,6 +809,96 @@ MYSQL
 
 	$json_string .= ']}'; # close array of lines and entire json
 	$cgi->print($json_string);
+}
+
+sub add_char
+{
+	my $cgi = shift;
+	my $dbh = $cgi->dbh;
+	
+	$cgi->print('{"signCharId":-1}'); # TODO
+	return;
+	
+	my $scroll_version_id = $cgi->param('SCROLLVERSION');
+	if (!defined $scroll_version_id)
+	{
+		$scroll_version_id = 1;
+	}
+	$dbh->set_scrollversion($scroll_version_id);
+	
+	query_SQE # TODO replace by reference to sign id of main sign
+	(
+		$cgi,
+		'none',
+		
+		<<'MYSQL',
+		INSERT INTO sign VALUES ()
+MYSQL
+	);
+	my $sign_id = lastInsertedId_SQE($cgi);
+	
+	my @result = $dbh->add_value # TODO has no effect
+	(
+		'sign_char',
+		0,
+		'sign_id',
+		$sign_id,
+		'is_variant',
+		1,
+		'sign',
+		$cgi->param('sign')
+	);
+
+	$cgi->print('{"scroll_version":'.$dbh->scrollversion().',"sign_id":'.$sign_id.',"sign":"'.$cgi->param('sign').'","error":"'.${$result[1]}[1].'"}');
+	return;
+
+#
+#	if (scalar @result > 1)
+#	{
+#		$cgi->print('{"error":"'.${$result[1]}[1].'"}');	
+#	}
+#	else
+#	{
+#		$cgi->print('{}');
+#	}
+
+#	query_SQE
+#	(
+#		$cgi,
+#		'none',
+#		
+#		'INSERT INTO sign_char'
+#		.' (sign_id, is_variant, sign)'
+#		.' VALUES (?, 1, ?)',
+#		
+#		$sign_id,
+#		$cgi->param('sign')
+#	);
+#	my $sign_char_id = lastInsertedId_SQE($cgi);
+#	
+#	query_SQE
+#	(
+#		$cgi,
+#		'none',
+#		
+#		'INSERT INTO sign_char_owner'
+#		.' (sign_char_id, scroll_version_id)'
+#		.' VALUES (?, ?)',
+#		
+#		$sign_char_id,
+#		$scroll_version_id
+#	);
+	
+
+
+
+
+
+	
+	# TODO position in stream
+	
+	
+	
 }
 
 sub change_width
@@ -872,13 +1004,11 @@ MYSQL
 			(
 				$cgi,
 				'none',
-
 				<<'MYSQL',
 				INSERT INTO sign_relative_position_owner
 				(sign_relative_position_id, scroll_version_id)
 				VALUES (?, ?)
 MYSQL
-
 				$sign_relative_position_id,
 				$scroll_version_id
 			);
@@ -912,50 +1042,56 @@ MYSQL
 			(
 				'sign_char_reading_data',
 				$cgi->param('signCharReadingDataId'),
-				'correction',
+				$name,
 				$value
 			);
 		}
 		else
 		{
-#			@result = $dbh->add_value
-#			(
-#				'sign_char_reading_data',
-#				0,
-#				'sign_char_id',
-#				$cgi->param('signCharId')
-#			);
 
-			query_SQE # TODO all entries show up on load
+			@result = $dbh->add_value
 			(
-				$cgi,
-				'none',
-				<<'MYSQL',
-				INSERT INTO sign_char_reading_data (sign_char_id, ?)
-				VALUES (?, ?)
-MYSQL
-				$name,
+				'sign_char_reading_data',
+				0,
+				'sign_char_id',
 				$cgi->param('signCharId'),
+				$name,
 				$value
 			);
-			$id = lastInsertedId_SQE($cgi);
+			
+#			query_SQE # TODO all entries show up on load => remove ownership (?) / wait for ingo's fix
+#			(
+#				$cgi,
+#				'none',
+#				
+#				<<'MYSQL',
+#				INSERT INTO sign_char_reading_data
+#				(sign_char_id, '.$name.')
+#				VALUES (?, ?)
+#MYSQL
+#				,
+#				$cgi->param('signCharId'),
+#				$value
+#			);
+#			$id = lastInsertedId_SQE($cgi);
+#			
+#			query_SQE
+#			(
+#				$cgi,
+#				'none',
+#				
+#				<<'MYSQL',
+#				INSERT INTO sign_char_reading_data_owner
+#				(sign_char_reading_data_id, scroll_version_id)
+#				VALUES (?, ?)
+#MYSQL
+#				,
+#				$id,
+#				$scroll_version_id
+#			);
+			
+#			$result[0] = $id;
 
-			query_SQE
-			(
-				$cgi,
-				'none',
-
-				<<'MYSQL',
-				INSERT INTO sign_char_reading_data_owner
-				(sign_char_reading_data_id, scroll_version_id)
-				VALUES (?, ?)
-MYSQL
-
-				$id,
-				$scroll_version_id
-			);
-
-			$result[0] = $id;
 		}
 
 		if (defined $result[0])
@@ -1008,8 +1144,8 @@ sub remove_attribute
 			'sign_relative_position',
 			$cgi->param('signPositionId')
 		);
-
-		if (defined $result[0]) # TODO doesn't fire
+		
+		if (!defined $result[1])
 		{
 			$cgi->print('{"signPositionId":-1}');
 		}
@@ -1943,7 +2079,7 @@ sub main
 	(
 		'login'            => \&login,
 		'loadFragmentText' => \&load_fragment_text,
-
+		'addChar'          => \&add_char,
 		'changeWidth'      => \&change_width,
 		'addAttribute'     => \&add_attribute,
 		'removeAttribute'  => \&remove_attribute,
