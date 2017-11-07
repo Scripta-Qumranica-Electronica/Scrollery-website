@@ -677,17 +677,51 @@ MYSQL
 		else               { $json_string .= ',"type":"'.$sign[3].'"'; }
 		
 		if ($sign[13] != 0) { $json_string .= ',"signCharId":'.$sign[13]; }
-		if ($sign[11] != 0) { $json_string .= ',"isVariant":1'; }
-		if ($sign[5]  != 1) { $json_string .= ',"width":"'.$sign[5].'"'; }
-		if ($sign[6]  == 1) { $json_string .= ',"mightBeWider":1'; }
+		if ($sign[11] == 1) { $json_string .= ',"isVariant":1'; }
+		if ($sign[ 5] != 1) { $json_string .= ',"width":"'.$sign[5].'"'; }
+		if ($sign[ 6] == 1) { $json_string .= ',"mightBeWider":1'; }
 		
-		if (defined $sign[12]) # sign_char_reading_data entry exists
+		if (defined $sign[12]) # sign_char_reading_data entry exists, but might be off for this scroll_version
 		{
+#			my @scrd = query_SQE # sign_char_reading_data 
+#			(
+#				$cgi,
+#				'first_array',
+#				
+#				<<'MYSQL',
+#				SELECT sign_char_reading_data_id, readability, is_reconstructed, is_retraced, correction FROM sign_char_reading_data
+#				WHERE sign_char_id = ?
+#				AND sign_char_reading_data_id IN
+#				(
+#					SELECT sign_char_reading_data_id FROM sign_char_reading_data_owner
+#					WHERE scroll_version_id = ?
+#				)
+#MYSQL
+#				,
+#				$sign[13],
+#				$scroll_version
+#			);
+#			
+#			if (scalar @scrd > 0)
+#			{
+#				$json_string .= ',"signCharReadingDataId":'.$scrd[0];
+#
+#				if (!($scrd[1] eq 'COMPLETE')) { $json_string .= ',"readability":"'.$scrd[1].'"'; }
+#				if (  $scrd[2] == 1)           { $json_string .= ',"reconstructed":1'; }
+#				if (  $scrd[3] == 1)           { $json_string .= ',"retraced":1'; }
+#				
+#				if (!($scrd[4] eq ''))
+#				{
+#					$scrd[4] =~ s/,/","/; # put "" around each entry
+#					$json_string .= ',"corrected":["'.$scrd[4].'"]'; # TODO test whether it works for multiple entries
+#				}
+#			}
+			
 			$json_string .= ',"signCharReadingDataId":'.$sign[12];
 			
-			if (defined $sign[ 7] && !($sign[7]  eq 'COMPLETE')) { $json_string .= ',"readability":"'.$sign[7].'"'; }
-			if (defined $sign[ 8] &&   $sign[8]  == 1)           { $json_string .= ',"retraced":1'; }
-			if (defined $sign[ 9] &&   $sign[9]  == 1)           { $json_string .= ',"reconstructed":1'; }
+			if (defined $sign[ 7] && !($sign[ 7] eq 'COMPLETE')) { $json_string .= ',"readability":"'.$sign[7].'"'; }
+			if (defined $sign[ 8] &&   $sign[ 8] == 1)           { $json_string .= ',"retraced":1'; }
+			if (defined $sign[ 9] &&   $sign[ 9] == 1)           { $json_string .= ',"reconstructed":1'; }
 			if (defined $sign[10] && !($sign[10] eq ''))         { $json_string .= ',"corrected":"'.$sign[10].'"'; }
 		}
 		
@@ -751,6 +785,9 @@ sub add_char
 {
 	my $cgi = shift;
 	my $dbh = $cgi->dbh;
+	
+	$cgi->print('{"signCharId":-1}'); # TODO
+	return;
 	
 	my $scroll_version_id = $cgi->param('SCROLLVERSION');
 	if (!defined $scroll_version_id)
@@ -1082,7 +1119,7 @@ sub remove_attribute
 			$cgi->param('signPositionId')
 		);
 		
-		if (defined $result[0]) # TODO doesn't fire
+		if (!defined $result[1])
 		{
 			$cgi->print('{"signPositionId":-1}');
 		}
