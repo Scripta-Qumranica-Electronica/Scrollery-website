@@ -145,7 +145,6 @@ var CombinationController = (function () {
                                                 image_cont_rotate.setAttribute('id', 'image-cont-rotate-' + artefact['id']);
                                                 image_cont_rotate.setAttribute('class', 'fragment fragment-cont-rot');
                                                 image_cont_rotate.setAttribute('data-rotate', img_rotation);
-                                                console.log('Image cont. rotate: ' + $(image_cont_rotate).data('rotate'));
                         
                                                 var image = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                                                 image.setAttribute('id', 'SVG-' + artefact['id']);
@@ -210,7 +209,7 @@ var CombinationController = (function () {
                                                 $(image_cont_xy).css({
                                                     top: y_loc * zoom_factor,
                                                     left: ((scroll_width - x_loc) * zoom_factor) - (img_width * scale)});
-                                                $(image_cont_rotate).css('transform', 'rotate(' + img_rotation + 'deg)');
+                                                $(image_cont_rotate).css('transform', 'rotateZ(' + img_rotation + 'deg)');
                                                 $comb_scroll.append($(image_cont_xy));
                                             }, this);
                                         }
@@ -311,7 +310,7 @@ var CombinationController = (function () {
                 var cy = domRect.top + (domRect.height/2);
                 var rot_angle = angle(cx, cy, evt.pageX, evt.pageY) - start_angle;
                 console.log(cx + ' ' + cy + ' ' + evt.pageX + ' ' + evt.pageY + ' ' + start_angle);
-                $(selected_artefact).parent().parent().parent().css('transform', 'rotate(' + rot_angle + 'deg)')
+                $(selected_artefact).parent().parent().parent().css('transform', 'rotateZ(' + rot_angle + 'deg)')
             }
 
             function rotateUp(evt) {
@@ -456,10 +455,12 @@ var CombinationController = (function () {
                         }
                     }
                 }
-                artefact.image.setAttribute('width', artefact.width * scale);
-                artefact.image.setAttribute('height', artefact.height * scale);
-                artefact.container.setAttribute('width', artefact.width * scale);
-                artefact.container.setAttribute('height', artefact.height * scale);
+                artwidth = artefact.width * scale;
+                artheight = artefact.height * scale;
+                artefact.image.setAttribute('width', artwidth);
+                artefact.image.setAttribute('height', artheight);
+                artefact.container.setAttribute('width', artwidth);
+                artefact.container.setAttribute('height', artheight);
                 var $frag_cont = $(artefact.container).parent().parent();
                 $frag_cont.css({
                     top: (parseFloat($frag_cont.data('y_loc')) * zoom_factor) + 'px',
@@ -474,28 +475,8 @@ var CombinationController = (function () {
         CombinationController.prototype.change_zoom = function (new_zoom, dynamic) {
             return zoom.call(this, new_zoom, dynamic);
         };
-        // CombinationController.prototype.setOpacity = function(value, filename) {
-        // 	$('#single_image-' + $.escapeSelector(filename)).css("opacity", value / 100);
-        // }
-        // CombinationController.prototype.toggle_image = function(file, eye_icon){
-        // 	if ($('#single_image-' + $.escapeSelector(file)).length == 0){
-        // 		display_image(file, eye_icon.dataset.url);
-        // 		eye_icon.setAttribute("src", "resources/images/eye-open.png");
-        // 		eye_icon.setAttribute("alt", "visible");
-        // 	} else {
-        // 		if ($('#single_image-' + $.escapeSelector(file)).css("visibility") == "visible"){
-        // 			$('#single_image-' + $.escapeSelector(file)).css("visibility", "hidden");
-        // 			eye_icon.setAttribute("src", "resources/images/eye-closed.png");
-        // 			eye_icon.setAttribute("alt", "not visible");
-        // 		} else {
-        // 			$('#single_image-' + $.escapeSelector(file)).css("visibility", "visible");
-        // 			eye_icon.setAttribute("src", "resources/images/eye-open.png");
-        // 			eye_icon.setAttribute("alt", "visible");
-        // 		}
-        // 	}
-        // }
 
-        //register responders with messageSpider
+        //register event responders with messageSpider
         Spider.register_object([
             {type: 'load_scroll',
                 execute_function: function(data){
