@@ -579,7 +579,7 @@ sub load_fragment_text
 		WHERE discrete_canonical_reference_id = ?
 MYSQL
 
-		$cgi->param('discreteCanonicalReferenceId')
+		scalar $cgi->param('discreteCanonicalReferenceId')
 	);
 	my $fragment_id = query_SQE
 	(
@@ -846,10 +846,10 @@ MYSQL
 		'is_variant',
 		1,
 		'sign',
-		$cgi->param('sign')
+		scalar $cgi->param('sign')
 	);
 
-	$cgi->print('{"scroll_version":'.$dbh->scrollversion().',"sign_id":'.$sign_id.',"sign":"'.$cgi->param('sign').'","error":"'.${$result[1]}[1].'"}');
+	$cgi->print('{"scroll_version":'.$dbh->scrollversion().',"sign_id":'.$sign_id.',"sign":"'.scalar $cgi->param('sign').'","error":"'.${$result[1]}[1].'"}');
 	return;
 
 #
@@ -916,9 +916,9 @@ sub change_width
 	my @result = $dbh->change_value
 	(
 		'sign_char',
-		$cgi->param('signCharId'),
+		scalar $cgi->param('signCharId'),
 		'width',
-		$cgi->param('width')
+		scalar $cgi->param('width')
 	);
 
 	if (defined $result[0])
@@ -952,7 +952,7 @@ sub add_attribute
 		@result = $dbh->change_value
 		(
 			'sign_char',
-			$cgi->param('signCharId'),
+			scalar $cgi->param('signCharId'),
 			'might_be_wider',
 			$attribute_value
 		);
@@ -995,7 +995,7 @@ sub add_attribute
 				VALUES (?, ?)
 MYSQL
 
-				$cgi->param('signId'),
+				scalar $cgi->param('signId'),
 				$type
 			);
 			$sign_relative_position_id = lastInsertedId_SQE($cgi);
@@ -1041,7 +1041,7 @@ MYSQL
 			@result = $dbh->change_value
 			(
 				'sign_char_reading_data',
-				$cgi->param('signCharReadingDataId'),
+				scalar $cgi->param('signCharReadingDataId'),
 				$name,
 				$value
 			);
@@ -1054,7 +1054,7 @@ MYSQL
 				'sign_char_reading_data',
 				0,
 				'sign_char_id',
-				$cgi->param('signCharId'),
+				scalar $cgi->param('signCharId'),
 				$name,
 				$value
 			);
@@ -1127,7 +1127,7 @@ sub remove_attribute
 		@result = $dbh->change_value
 		(
 			'sign_char',
-			$cgi->param('signCharId'),
+			scalar $cgi->param('signCharId'),
 			'might_be_wider',
 			0
 		);
@@ -1142,7 +1142,7 @@ sub remove_attribute
 		my @result = $dbh->remove_entry
 		(
 			'sign_relative_position',
-			$cgi->param('signPositionId')
+			scalar $cgi->param('signPositionId')
 		);
 		
 		if (!defined $result[1])
@@ -1155,7 +1155,7 @@ sub remove_attribute
 		my @result = $dbh->change_value
 		(
 			'sign_char_reading_data',
-			$cgi->param('signCharReadingDataId'),
+			scalar $cgi->param('signCharReadingDataId'),
 			'correction',
 			''
 		);
@@ -1170,7 +1170,7 @@ sub remove_attribute
 		my @result = $dbh->change_value
 		(
 			'sign_char_reading_data',
-			$cgi->param('signCharReadingDataId'),
+			scalar $cgi->param('signCharReadingDataId'),
 			'is_'.$attribute_name,
 			0
 		);
@@ -1192,7 +1192,7 @@ sub potentially_save_new_variant
 	my $dbh = shift;
 	my $cgi = shift;
 	my $error= shift;
-	my %new_variant = %{ decode_json($cgi->param('variant')) };
+	my %new_variant = %{ decode_json(scalar $cgi->param('variant')) };
 
 	# set dummy values for stringification
 	if (! defined $new_variant{'mightBeWider'})
