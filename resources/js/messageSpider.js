@@ -56,7 +56,14 @@ function Spider() // singleton central component communication system
 			console.log('Request');
 			for (var key in parameters)
 			{
-				console.log('* ' + key + ': ' + parameters[key]);
+				if (key != 'PASSWORD')
+				{
+					console.log('* ' + key + ': ' + parameters[key]);
+				}
+				else
+				{
+					console.log('* ' + key + ': ***');
+				}
 			}
 		}
 		
@@ -95,11 +102,9 @@ function Spider() // singleton central component communication system
 		);
 	};
 	
-	this.notifyChangedText = function(data)
+	this.notifyChangedText = function(json)
 	{
-		console.log('text');
-		console.log(data);
-		this.richTextEditor.displayModel(data);
+		this.richTextEditor.displayModel(json);
 	};
 	
 	// TODO support for multiple rich text editors with add & remove methods?

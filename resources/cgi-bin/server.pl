@@ -539,8 +539,7 @@ sub load # TODO combine queries where possible, for better performance
 sub load_fragment_text
 {
 	my $cgi = shift;
-	my $error = shift;
-	
+
 	my $dbh = $cgi->dbh;
 	my $scroll_version = $cgi->param('SCROLLVERSION');
 	if (defined $scroll_version)
@@ -560,8 +559,8 @@ sub load_fragment_text
 		SELECT discrete_canonical_name_id, column_of_scroll_id FROM discrete_canonical_references
 		WHERE discrete_canonical_reference_id = ?
 MYSQL
-		,
-		$cgi->param('discreteCanonicalReferenceId')
+
+		scalar $cgi->param('discreteCanonicalReferenceId')
 	);
 	my $fragment_id = query_SQE
 	(
@@ -572,7 +571,7 @@ MYSQL
 		SELECT col_id FROM scroll_to_col
 		WHERE scroll_to_col_id = ?
 MYSQL
-		,
+
 		$col_of_scroll_id
 	);
 	
@@ -590,7 +589,7 @@ MYSQL
 			WHERE col_id = ?
 		)
 MYSQL
-		,		
+
 		$fragment_id,
 		$fragment_id
 	);
@@ -630,7 +629,7 @@ MYSQL
 	my $line_id = ($line_ids_query->fetchrow_array)[0];
 	$line_name_query->execute($line_id);
 	my $line_name = ($line_name_query->fetchrow_array)[0];
-	my $json_string = '{"param SCROLLVERSION":'.$scroll_version.',"actual SCROLLVERSION":'.$dbh->scrollversion().',"$col_of_scroll_id":'.$col_of_scroll_id.',"fragmentName":"'.$fragment_name.'","lines":[{"lineName":"'.$line_name.'","signs":[';
+	my $json_string = '{"fragmentName":"'.$fragment_name.'","lines":[{"lineName":"'.$line_name.'","signs":[';
 	
 	my $first_sign_of_line = 1;
 	
@@ -740,7 +739,7 @@ MYSQL
 			)
 			ORDER BY level
 MYSQL
-			,
+
 			$sign[1],
 			$scroll_version
 		);
@@ -763,6 +762,8 @@ MYSQL
 				elsif ($pos eq 'LEFT_MARGIN')  { $json_string .= ',"position":"leftMargin"'; }
 				elsif ($pos eq 'RIGHT_MARGIN') { $json_string .= ',"position":"rightMargin"'; }
 				elsif ($pos eq 'MARGIN')       { $json_string .= ',"position":"margin"'; }
+				elsif ($pos eq 'UPPER_MARGIN') { $json_string .= ',"position":"upperMargin"'; }
+				elsif ($pos eq 'LOWER_MARGIN') { $json_string .= ',"position":"lowerMargin"'; }
 				
 				$json_string .= ',"level":'.$sign_relative_positions[$pos_i + 2].'}';
 			}
@@ -786,89 +787,58 @@ sub add_char
 	my $cgi = shift;
 	my $dbh = $cgi->dbh;
 	
-	$cgi->print('{"signCharId":-1}'); # TODO
-	return;
-	
 	my $scroll_version_id = $cgi->param('SCROLLVERSION');
 	if (!defined $scroll_version_id)
 	{
 		$scroll_version_id = 1;
 	}
 	$dbh->set_scrollversion($scroll_version_id);
-	
-	query_SQE # TODO replace by reference to sign id of main sign
+	if ($scroll_version_id == 1)
+	{
+		$cgi->print('{"error":"QWB scroll"}');
+
+		return;
+	}
+
+	query_SQE
 	(
 		$cgi,
 		'none',
-		
-		<<'MYSQL',
-		INSERT INTO sign VALUES ()
+
+<<'MYSQL',
+INSERT INTO sign_char
+SET sign_id = ?,
+	is_variant = 1,
+	sign = ?
 MYSQL
+
+		scalar $cgi->param('mainSignId'),
+		scalar $cgi->param('sign')
 	);
-	my $sign_id = lastInsertedId_SQE($cgi);
-	
-	my @result = $dbh->add_value # TODO has no effect
+	my $sign_char_id = lastInsertedId_SQE($cgi);
+
+	query_SQE
 	(
-		'sign_char',
-		0,
-		'sign_id',
-		$sign_id,
-		'is_variant',
-		1,
-		'sign',
-		$cgi->param('sign')
+		$cgi,
+		'none',
+
+<<'MYSQL',
+INSERT INTO sign_char_owner
+SET sign_char_id = ?,
+	scroll_version_id = ?
+MYSQL
+
+		$sign_char_id,
+		$scroll_version_id
 	);
 
-	$cgi->print('{"scroll_version":'.$dbh->scrollversion().',"sign_id":'.$sign_id.',"sign":"'.$cgi->param('sign').'","error":"'.${$result[1]}[1].'"}');
-	return;
-
-#
-#	if (scalar @result > 1)
-#	{
-#		$cgi->print('{"error":"'.${$result[1]}[1].'"}');	
-#	}
-#	else
-#	{
-#		$cgi->print('{}');
-#	}
-
-#	query_SQE
+#	my @result = $dbh->add_value # called only for logging
 #	(
-#		$cgi,
-#		'none',
-#		
-#		'INSERT INTO sign_char'
-#		.' (sign_id, is_variant, sign)'
-#		.' VALUES (?, 1, ?)',
-#		
-#		$sign_id,
-#		$cgi->param('sign')
+#		'sign_char',
+#		$sign_char_id
 #	);
-#	my $sign_char_id = lastInsertedId_SQE($cgi);
-#	
-#	query_SQE
-#	(
-#		$cgi,
-#		'none',
-#		
-#		'INSERT INTO sign_char_owner'
-#		.' (sign_char_id, scroll_version_id)'
-#		.' VALUES (?, ?)',
-#		
-#		$sign_char_id,
-#		$scroll_version_id
-#	);
-	
 
-
-
-
-
-	
-	# TODO position in stream
-	
-	
-	
+	$cgi->print('{"sign_char_id":'.$sign_char_id.'}');
 }
 
 sub change_width
@@ -886,9 +856,9 @@ sub change_width
 	my @result = $dbh->change_value
 	(
 		'sign_char',
-		$cgi->param('signCharId'),
+		scalar $cgi->param('signCharId'),
 		'width',
-		$cgi->param('width')
+		scalar $cgi->param('width')
 	);
 	
 	if (defined $result[0])
@@ -899,6 +869,126 @@ sub change_width
 	{
 		$cgi->print('{"error":"'.${$result[1]}[1].'"}');
 	}
+}
+
+sub _add_position
+{
+	my $cgi = shift;
+	my $dbh = $cgi->dbh;
+	my $scroll_version_id = shift;
+	my $attribute_value = shift;
+
+	my $json = '{';
+
+	my $type;
+	if    ($attribute_value eq 'leftMargin')  { $type = 'LEFT_MARGIN'; }
+	elsif ($attribute_value eq 'rightMargin') { $type = 'RIGHT_MARGIN'; }
+	elsif ($attribute_value eq 'aboveLine')   { $type = 'ABOVE_LINE'; }
+	elsif ($attribute_value eq 'belowLine')   { $type = 'BELOW_LINE'; }
+	elsif ($attribute_value eq 'margin')      { $type = 'MARGIN'; }
+	elsif ($attribute_value eq 'upperMargin') { $type = 'UPPER_MARGIN'; }
+	elsif ($attribute_value eq 'lowerMargin') { $type = 'LOWER_MARGIN'; }
+
+	my $sign_id = $cgi->param('signId');
+
+	# determine new level
+
+	my $level = 1;
+	my @previous_max_level = query_SQE # TODO restrict to scroll_version specific?
+	(
+		$cgi,
+		'all',
+
+<<'MYSQL',
+SELECT level FROM sign_relative_position
+WHERE sign_id = ?
+ORDER BY level DESC
+LIMIT 1
+MYSQL
+
+		$sign_id
+	);
+	if (scalar @previous_max_level > 0)
+	{
+		$level = $previous_max_level[0] + 1;
+	}
+	$json .= '"level":'.$level;
+
+
+	# check whether there is already a fitting entry to be reused
+
+	my @existing_entries = query_SQE
+	(
+		$cgi,
+		'all',
+
+<<'MYSQL',
+SELECT sign_relative_position_id FROM sign_relative_position
+WHERE sign_id = ?
+AND type = ?
+MYSQL
+
+		$sign_id,
+		$type
+	);
+
+	my $sign_relative_position_id;
+	my @result;
+	if (scalar @existing_entries > 0)
+	{
+		$sign_relative_position_id = $existing_entries[0];
+
+		@result = $dbh->add_value
+		(
+			'sign_relative_position',
+			$sign_relative_position_id,
+			'level',
+			$level
+		);
+		$json .= ',"existing add_value":"'.Dumper(@result).'"';
+	}
+	else
+	{
+		query_SQE
+		(
+			$cgi,
+			'none',
+
+<<'MYSQL',
+INSERT INTO sign_relative_position
+(sign_id, type, level)
+VALUES (?, ?, ?)
+MYSQL
+
+			$sign_id,
+			$type,
+			$level
+		);
+		$sign_relative_position_id = lastInsertedId_SQE($cgi);
+
+		query_SQE
+		(
+			$cgi,
+			'none',
+
+<<'MYSQL',
+INSERT INTO sign_relative_position_owner
+(sign_relative_position_id, scroll_version_id)
+VALUES (?, ?)
+MYSQL
+
+			$sign_relative_position_id,
+			$scroll_version_id
+		);
+
+		@result = $dbh->add_value # called only for logging
+		(
+			'sign_relative_position',
+			$sign_relative_position_id
+		);
+	}
+
+	$cgi->print('{"signPositionId":'.$sign_relative_position_id.',"level":'.$level.'}');
 }
 
 sub add_attribute
@@ -922,7 +1012,7 @@ sub add_attribute
 		@result = $dbh->change_value
 		(
 			'sign_char',
-			$cgi->param('signCharId'),
+			scalar $cgi->param('signCharId'),
 			'might_be_wider',
 			$attribute_value
 		);
@@ -934,65 +1024,12 @@ sub add_attribute
 	}
 	elsif ($attribute_name eq 'position')
 	{
-		my $type;
-		if    ($attribute_value eq 'leftMargin')  { $type = 'LEFT_MARGIN'; }
-		elsif ($attribute_value eq 'rightMargin') { $type = 'RIGHT_MARGIN'; }
-		elsif ($attribute_value eq 'aboveLine')   { $type = 'ABOVE_LINE'; }
-		elsif ($attribute_value eq 'belowLine')   { $type = 'BELOW_LINE'; }
-		elsif ($attribute_value eq 'margin')      { $type = 'MARGIN'; }
-		
-		my $sign_relative_position_id = $cgi->param('signPositionId');
-		if (defined $sign_relative_position_id
-		&&  $sign_relative_position_id != -1)
-		{
-			@result = $dbh->change_value
-			(
-				'sign_relative_position',
-				$sign_relative_position_id,
-				'position',
-				$type
-			);
-		}
-		else
-		{
-			query_SQE
-			(
-				$cgi,
-				'none',
-				
-				<<'MYSQL',
-				INSERT INTO sign_relative_position
-				(sign_id, type)
-				VALUES (?, ?)
-MYSQL
-				,
-				$cgi->param('signId'),
-				$type
-			);
-			$sign_relative_position_id = lastInsertedId_SQE($cgi);
-			
-			query_SQE
-			(
-				$cgi,
-				'none',
-				
-				<<'MYSQL',
-				INSERT INTO sign_relative_position_owner
-				(sign_relative_position_id, scroll_version_id)
-				VALUES (?, ?)
-MYSQL
-				,
-				$sign_relative_position_id,
-				$scroll_version_id
-			);
-			
-			$result[0] = 1;
-		}
-		
-		if (defined $result[0])
-		{
-			$cgi->print('{"signPositionId":'.$sign_relative_position_id.'}');
-		}
+		_add_position
+		(
+			$cgi,
+			$scroll_version_id,
+			$attribute_value
+		);
 	}
 	else # corrected / reconstructed / retraced
 	{
@@ -1014,7 +1051,7 @@ MYSQL
 			@result = $dbh->change_value
 			(
 				'sign_char_reading_data',
-				$cgi->param('signCharReadingDataId'),
+				scalar $cgi->param('signCharReadingDataId'),
 				$name,
 				$value
 			);
@@ -1026,7 +1063,7 @@ MYSQL
 				'sign_char_reading_data',
 				0,
 				'sign_char_id',
-				$cgi->param('signCharId'),
+				scalar $cgi->param('signCharId'),
 				$name,
 				$value
 			);
@@ -1092,7 +1129,6 @@ sub remove_attribute
 	}
 	$dbh->set_scrollversion($scroll_version_id);
 	
-	my $sign_id = $cgi->param('signId');
 	my $attribute_name = $cgi->param('attributeName');
 	
 	my @result;
@@ -1101,7 +1137,7 @@ sub remove_attribute
 		@result = $dbh->change_value
 		(
 			'sign_char',
-			$cgi->param('signCharId'),
+			scalar $cgi->param('signCharId'),
 			'might_be_wider',
 			0
 		);
@@ -1116,7 +1152,7 @@ sub remove_attribute
 		my @result = $dbh->remove_entry
 		(
 			'sign_relative_position',
-			$cgi->param('signPositionId')
+			scalar $cgi->param('signPositionId')
 		);
 		
 		if (!defined $result[1])
@@ -1129,7 +1165,7 @@ sub remove_attribute
 		my @result = $dbh->change_value
 		(
 			'sign_char_reading_data',
-			$cgi->param('signCharReadingDataId'),
+			scalar $cgi->param('signCharReadingDataId'),
 			'correction',
 			''
 		);
@@ -1144,7 +1180,7 @@ sub remove_attribute
 		my @result = $dbh->change_value
 		(
 			'sign_char_reading_data',
-			$cgi->param('signCharReadingDataId'),
+			scalar $cgi->param('signCharReadingDataId'),
 			'is_'.$attribute_name,
 			0
 		);
@@ -1159,6 +1195,111 @@ sub remove_attribute
 	{
 		$cgi->print('{"error":"'.${$result[1]}[1].'"}');
 	}
+}
+
+sub locate_sign
+{
+	my $cgi = shift;
+	my $sign_id = $cgi->param('signId');
+
+	my $sign_char = query_SQE
+	(
+		$cgi,
+		'first_value',
+
+		<<'MYSQL',
+SELECT sign FROM sign_char
+WHERE sign_id = ?
+MYSQL
+
+		$sign_id
+	);
+	my $line_id = query_SQE
+	(
+		$cgi,
+		'first_value',
+
+<<'MYSQL',
+SELECT line_id FROM line_to_sign
+WHERE sign_id = ?
+MYSQL
+
+		$sign_id
+	);
+	my $line_name = query_SQE
+	(
+		$cgi,
+		'first_value',
+
+<<'MYSQL',
+SELECT name FROM line_data
+WHERE line_id = ?
+MYSQL
+
+		$line_id
+	);
+	my $col_id = query_SQE
+	(
+		$cgi,
+		'first_value',
+
+<<'MYSQL',
+SELECT col_id FROM col_to_line
+WHERE line_id = ?
+MYSQL
+
+		$line_id
+	);
+	my $col_name = query_SQE
+	(
+		$cgi,
+		'first_value',
+
+<<'MYSQL',
+SELECT name FROM col_data
+WHERE col_id = ?
+MYSQL
+
+		$col_id
+	);
+	my $scroll_id = query_SQE
+	(
+		$cgi,
+		'first_value',
+
+<<'MYSQL',
+SELECT scroll_id FROM scroll_to_col
+WHERE col_id = ?
+MYSQL
+
+		$col_id
+	);
+	my $scroll_name = query_SQE
+	(
+		$cgi,
+		'first_value',
+
+<<'MYSQL',
+SELECT name FROM scroll_data
+WHERE scroll_id = ?
+MYSQL
+
+		$scroll_id
+	);
+
+	my $json =
+	'{'
+	.'"scrollName":"'.$scroll_name.'"'
+	.',"scrollId":'.$scroll_id
+	.',"columnName":"'.$col_name.'"'
+	.',"columnId":'.$col_id
+	.',"lineName":"'.$line_name.'"'
+	.',"lineId":'.$line_id
+	.',"qwbMainChar":"'.$sign_char.'"'
+	.',"signId":'.$sign_id
+	.'}';
+
+	$cgi->print($json);
 }
 
 sub potentially_save_new_variant
@@ -1986,11 +2127,11 @@ sub main
 	(
 		'login'            => \&login,
 		'loadFragmentText' => \&load_fragment_text,
-		
 		'addChar'          => \&add_char,
 		'changeWidth'      => \&change_width,
 		'addAttribute'     => \&add_attribute,
 		'removeAttribute'  => \&remove_attribute,
+		'locateSign'       => \&locate_sign
 	);
 	
 	my $request = $cgi->param('request');

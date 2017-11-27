@@ -1,21 +1,17 @@
 function RichTextEditor()
 {
-	const self = this; // for usage in event listener
-	this.originalText = []; // TODO rename since now modified after DB change
-	
+	this.textModel = new FragmentTextModel();
+	this.text = this.textModel.signs;
+	this.signVisualisation = new SignVisualisation();
+
 	this.fontSize = 20;
 	$('#richTextContainer').css({ 'font-size': this.fontSize + 'px' });
 	
-	this.signVisualisation = new SignVisualisation();
 	this.singleSignEditor = new SingleSignEditor(this);
-	
-	
+	const self = this; // for usage in event listener
+
+
 	/* button listeners */
-	
-	$('#richTextUndoAll').click(function()
-	{
-		self.displayModel(self.originalText); // model isn't changed after loading => simply reload it
-	});
 	
 	$('#richTextLineManager').click(function()
 	{
@@ -149,7 +145,7 @@ function RichTextEditor()
 		
 		$('#removeLine'   + number).show();
 		$('#addLineAfter' + number).show();
-	}
+	};
 
 	this.addTextLine = function(number, name)
 	{
@@ -211,18 +207,15 @@ function RichTextEditor()
 		.appendTo(line);
 		
 		return line;
-	}
+	};
 
-	this.addSign = function(model, iLine, iSign)
+	this.addSign = function(attributes, iLine, iSign)
 	{
-		const attributes = model['lines'][iLine]['signs'][iSign];
-		
 		var span =
-		$('<span></span')
+		$('<span></span>')
 		.attr('id', 'span_' + iLine + '_' + iSign) // only for identification, not for data transport
 		.attr('iLine', iLine)
-		.attr('iSign', iSign)
-		.attr('signId', attributes['signId']);
+		.attr('iSign', iSign);
 		
 		// chapter 2 & 3
 		if (attributes['type'] == null) // letter
@@ -261,8 +254,7 @@ function RichTextEditor()
 				{
 					markers += sign;
 				}
-				sign = markers;
-				
+
 				span
 				.text(markers)
 				.css
@@ -275,16 +267,48 @@ function RichTextEditor()
 		var destination = $('#regularLinePart' + iLine);
 		if (attributes['position'] != null) // chapter 5
 		{
-			const pos = attributes['position'][0]['position']; // TODO support multiple levels
-			
-			if (pos == 'aboveLine'
-			||  pos == 'belowLine')
+            var isVerticalPositionInLineSet = false;
+			var isHorizontalMarginSet = false;
+			var isVerticalMarginSet = false;
+
+			for (var iPos in attributes['position'])
 			{
-				span.addClass(pos);
-			}
-			else // leftMargin / rightMargin
-			{
-				destination = $('#' + pos + iLine);
+				var pos = attributes['position'][iPos]['position'];
+
+				if (!isVerticalPositionInLineSet)
+				{
+                    if (pos == 'aboveLine'
+					||  pos == 'belowLine')
+                    {
+                        span.addClass(pos);
+                        isVerticalPositionInLineSet = true;
+                    }
+				}
+
+				if (!isHorizontalMarginSet)
+				{
+					if (pos == 'margin')
+					{
+						pos = 'leftMargin';
+					}
+
+					if (pos == 'leftMargin'
+					||  pos == 'rightMargin')
+					{
+                        destination = $('#' + pos + iLine);
+                        isHorizontalMarginSet = true;
+					}
+				}
+
+				if (!isVerticalMarginSet) // TODO combination of horizontal & vertical margin?
+				{
+                    if (pos == 'upperMargin'
+                    ||  pos == 'lowerMargin')
+                    {
+                        destination = $('#regularLinePart_' + pos);
+                        isVerticalMarginSet = true;
+                    }
+				}
 			}
 		}
 		span.appendTo(destination);
@@ -347,48 +371,87 @@ function RichTextEditor()
 		span.dblclick(function(event) // TODO just one listener for whole frame
 		{
 			$('#richTextContainer').appendTo('#hidePanel');
-			$('#singleSignContainer').appendTo('#RichTextPanel');
-			$('#singleSignContainer').show();
+
+			$('#singleSignContainer')
+			.appendTo('#RichTextPanel')
+			.show();
 			
 			self
 			.singleSignEditor
-			.displaySingleSignSpan
+			.displaySingleSign
 			(
-				self.originalText, // TODO respect user's changes
 				event.target['id']
 			);
 		});
-	}
-	
-	this.displayModel = function(model)
+	};
+
+    this.addVerticalMargin = function(position)
 	{
-		this.originalText = model;
-		
-		$('#richTextContainer').appendTo('#RichTextPanel'); // switch back from single sign editor, if necessary
+        const margin =
+		$('<tr></tr>')
+		.attr('id', position + 'Margin')
+		.appendTo('#richTextContainer');
+
+        $('<td></td>')
+        .attr('id', 'lineName_' + position)
+        .appendTo(margin);
+
+        $('<td></td>')
+		.attr('id', 'rightMargin_' + position)
+		.attr('contentEditable', 'false')
+		.appendTo(margin);
+
+        $('<td></td>')
+		.attr('id', 'regularLinePart_' + position)
+		.attr('contentEditable', 'false') // TODO reactivate later, also for margins
+		.appendTo(margin);
+
+        $('<td></td>')
+		.attr('id', 'leftMargin_' + position)
+		.attr('contentEditable', 'false')
+		.appendTo(margin);
+
+        return margin;
+    };
+
+    this.displayModel = function(json)
+	{
+		this.textModel.setFragment(json);
+		this.text = this.textModel['signs'];
+
+		const lineNames = this.textModel['lineNames'];
+		const text = this.text;
+
+        const container = $('#richTextContainer');
+		container.appendTo('#RichTextPanel'); // switch back from single sign editor, if necessary
 		$('#singleSignContainer').appendTo('#hidePanel');
 		
 		const buttons = $('#richTextButtons');
 		const fragmentName = $('#fragmentName');
 		const hidePanel = $('#hidePanel');
-		const container = $('#richTextContainer');
 		
 		buttons.appendTo(hidePanel);
 		fragmentName.appendTo(hidePanel);
 		container.empty();
-		fragmentName.text(model['fragmentName']); // TODO use Spider.current_combination ?
+		fragmentName.text(this.textModel['fragmentName']);
 		fragmentName.appendTo(container);
 		
-		var lastMainSign;
-		
-		for (var iLine in model['lines'])
+		this.addVerticalMargin('upperMargin');
+        const lowerMargin = this.addVerticalMargin('lowerMargin'); // must be created before normal lines so signs can be added
+
+		var lastMainSign = null;
+
+        for (var iLine in text)
 		{
-			this.addTextLine(iLine, model['lines'][iLine]['lineName']);
-			
-			for (var iSign in model['lines'][iLine]['signs'])
+			const line = text[iLine];
+
+			this.addTextLine(iLine, lineNames[iLine]);
+
+			for (var iSign in line)
 			{
-				const sign = model['lines'][iLine]['signs'][iSign];
-				
-				if (sign['isVariant'] == 1) // TODO test
+				const sign = line[iSign];
+
+				if (sign['isVariant'] == 1)
 				{
 					if (lastMainSign != null) // null shouldn't happen, but for safety 
 					{
@@ -407,15 +470,20 @@ function RichTextEditor()
 				
 				this.addSign
 				(
-					model,
+					sign,
 					iLine,
 					iSign
 				);
 			}
 		}
-		
+
+		if (text.length > 0) // at least 1 text line
+        {
+            lowerMargin.insertAfter('#line' + (text.length - 1));
+        }
+
 		buttons.appendTo(container);
-	}
+	};
 }
 
 // TODO add context menus based on example of fragmentPuzzle.js
