@@ -2,7 +2,6 @@ var SingleImageController = (function () {
 
     // Constructor
     function SingleImageController ($cont, idx) {
-		this.info = "stuff";
 		var current_images = {};
 		var notes = "other things";
 		var $full_screen = $('<img>')
@@ -238,9 +237,11 @@ var SingleImageController = (function () {
 
 		//register responders with messageSpider
 		Spider.register_object([
-			{type: 'load_fragment', execute_function: function(data){
+			{type: 'load_fragment',
+				execute_function: function(data){
 				self.display_fragment(data);
-				}
+				},
+				name: "SingleImageControl"
 			}
 		]);
 	}

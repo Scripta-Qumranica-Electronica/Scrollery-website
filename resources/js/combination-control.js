@@ -49,10 +49,10 @@ var CombinationController = (function () {
             $osd.css('position', 'absolute');
             $osd.css('top', '50%');
             $osd.css('left', '50%');
-            $osd.css('margin-left', '-20px');
-            $osd.css('margin-top', '-20px');
+            $osd.css('margin-left', '-15px');
+            $osd.css('margin-top', '-15px');
             $osd.css('display', 'block');
-            $osd.prepend('<img id="osd_rotate" class="rotate_handle" width="40" height="40" src="resources/images/rotate.png" style="pointer-events: auto"/>');
+            $osd.prepend('<svg width="30" height="30" xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><path id="osd_rotate" class="rotate_handle" pointer-events="auto" d="M4 0c-2.2 0-4 1.8-4 4s1.8 4 4 4c1.1 0 2.12-.43 2.84-1.16l-.72-.72c-.54.54-1.29.88-2.13.88-1.66 0-3-1.34-3-3s1.34-3 3-3c.83 0 1.55.36 2.09.91l-1.09 1.09h3v-3l-1.19 1.19c-.72-.72-1.71-1.19-2.81-1.19z" /></svg>'); //<i id="osd_rotate" class="fa fa-repeat fa-spin fa-3x fa-fw" aria-hidden="true"style="pointer-events: auto"></i><img id="osd_rotate" class="rotate_handle" width="30" height="30" src="resources/images/reload.svg" style="pointer-events: auto"/>
             $comb_scroll.append($osd);
             scroll_version_id = scroll_version;
 
@@ -209,7 +209,7 @@ var CombinationController = (function () {
                                                 $(image_cont_xy).css({
                                                     top: y_loc * zoom_factor,
                                                     left: ((scroll_width - x_loc) * zoom_factor) - (img_width * scale)});
-                                                $(image_cont_rotate).css('transform', 'rotate(' + img_rotation + 'deg)');
+                                                $(image_cont_rotate).css('transform', 'rotateZ(' + img_rotation + 'deg)');
                                                 $comb_scroll.append($(image_cont_xy));
                                             }, this);
                                         }
@@ -290,12 +290,15 @@ var CombinationController = (function () {
                 evt.preventDefault();
                 //evt.stopPropagation();
                 if (Spider.unlocked){
+                    console.log("OSD pressed.");
                     selected_artefact = evt.target;
                     var domRect = evt.target.getBoundingClientRect();
                     var cx = domRect.left + (domRect.width/2);
                     var cy = domRect.top + (domRect.height/2);
-                    var frag_rot = $(evt.target).parent().parent().data('rotate');
+                    var frag_rot = $(evt.target).parent().parent().parent().data('rotate');
                     start_angle = angle(cx, cy, evt.pageX, evt.pageY) - frag_rot;
+                    console.log('Clicked: ' + selected_artefact.id);
+                    console.log(frag_rot);
                     $(document).on('mousemove.rot', rotateMove);
                     $(document).on('mouseup.rot', rotateUp);
                 }
@@ -306,7 +309,8 @@ var CombinationController = (function () {
                 var cx = domRect.left + (domRect.width/2);
                 var cy = domRect.top + (domRect.height/2);
                 var rot_angle = angle(cx, cy, evt.pageX, evt.pageY) - start_angle;
-                $(selected_artefact).parent().parent().css('transform', 'rotate(' + rot_angle + 'deg)')
+                console.log(cx + ' ' + cy + ' ' + evt.pageX + ' ' + evt.pageY + ' ' + start_angle);
+                $(selected_artefact).parent().parent().parent().css('transform', 'rotateZ(' + rot_angle + 'deg)')
             }
 
             function rotateUp(evt) {
@@ -316,8 +320,8 @@ var CombinationController = (function () {
                 var rot_angle = angle(cx, cy, evt.pageX, evt.pageY) - start_angle;
                 rot_angle = rot_angle < 0 ? 360 + rot_angle : rot_angle;
                 start_angle = 0;
-                var $frag_cont = $(selected_artefact).parent().parent().parent();
-                $(selected_artefact).parent().parent().data('rotate', rot_angle);
+                var $frag_cont = $(selected_artefact).parent().parent().parent().parent();
+                $(selected_artefact).parent().parent().parent().data('rotate', rot_angle);
                 selected_artefact = undefined;
                 $(document).off('mousemove.rot');
                 $(document).off('mouseup.rot');
@@ -451,10 +455,12 @@ var CombinationController = (function () {
                         }
                     }
                 }
-                artefact.image.setAttribute('width', artefact.width * scale);
-                artefact.image.setAttribute('height', artefact.height * scale);
-                artefact.container.setAttribute('width', artefact.width * scale);
-                artefact.container.setAttribute('height', artefact.height * scale);
+                artwidth = artefact.width * scale;
+                artheight = artefact.height * scale;
+                artefact.image.setAttribute('width', artwidth);
+                artefact.image.setAttribute('height', artheight);
+                artefact.container.setAttribute('width', artwidth);
+                artefact.container.setAttribute('height', artheight);
                 var $frag_cont = $(artefact.container).parent().parent();
                 $frag_cont.css({
                     top: (parseFloat($frag_cont.data('y_loc')) * zoom_factor) + 'px',
@@ -469,32 +475,14 @@ var CombinationController = (function () {
         CombinationController.prototype.change_zoom = function (new_zoom, dynamic) {
             return zoom.call(this, new_zoom, dynamic);
         };
-        // CombinationController.prototype.setOpacity = function(value, filename) {
-        // 	$('#single_image-' + $.escapeSelector(filename)).css("opacity", value / 100);
-        // }
-        // CombinationController.prototype.toggle_image = function(file, eye_icon){
-        // 	if ($('#single_image-' + $.escapeSelector(file)).length == 0){
-        // 		display_image(file, eye_icon.dataset.url);
-        // 		eye_icon.setAttribute("src", "resources/images/eye-open.png");
-        // 		eye_icon.setAttribute("alt", "visible");
-        // 	} else {
-        // 		if ($('#single_image-' + $.escapeSelector(file)).css("visibility") == "visible"){
-        // 			$('#single_image-' + $.escapeSelector(file)).css("visibility", "hidden");
-        // 			eye_icon.setAttribute("src", "resources/images/eye-closed.png");
-        // 			eye_icon.setAttribute("alt", "not visible");
-        // 		} else {
-        // 			$('#single_image-' + $.escapeSelector(file)).css("visibility", "visible");
-        // 			eye_icon.setAttribute("src", "resources/images/eye-open.png");
-        // 			eye_icon.setAttribute("alt", "visible");
-        // 		}
-        // 	}
-        // }
 
-        //register responders with messageSpider
+        //register event responders with messageSpider
         Spider.register_object([
-            {type: 'load_scroll', execute_function: function(data){
+            {type: 'load_scroll',
+                execute_function: function(data){
                 self.display_scroll(data.id, data.scroll_version);
-                }
+                },
+                name: "CombinationControl"
             }
         ]);
     }
