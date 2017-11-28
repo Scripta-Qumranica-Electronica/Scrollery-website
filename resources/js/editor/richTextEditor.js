@@ -484,6 +484,20 @@ function RichTextEditor()
 
 		buttons.appendTo(container);
 	};
+
+	Spider.register_object
+	([
+		{
+			type: 'load_text',
+			execute_function: function(data)
+			{
+				console.log('text from registered message');
+				console.log(data.data);
+				self.displayModel(data.data);
+			},
+			name: "RichTextEditor"
+		}
+	]);
 }
 
 // TODO add context menus based on example of fragmentPuzzle.js
