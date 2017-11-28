@@ -46,8 +46,91 @@ function SignVisualisation()
 	// TODO reconstructed etc.
 	// TODO sign attributes including corrections?
 
+	this.repositionChar = function(iLine, iSign, positionData, span)
+	{
+		var verticalPositionInLine = null;
+		var horizontalMargin = null;
+		var verticalMargin = null;
 
+		span
+		.removeClass('aboveLine')
+		.removeClass('belowLine');
 
+		for (var iPos in positionData)
+		{
+			var pos = positionData[iPos]['position'];
+
+			if (verticalPositionInLine == null)
+			{
+				if (pos == 'aboveLine'
+				||  pos == 'belowLine')
+				{
+					span.addClass(pos);
+					verticalPositionInLine = pos;
+				}
+			}
+
+			if (horizontalMargin == null)
+			{
+				if (pos == 'margin')
+				{
+					pos = 'leftMargin';
+				}
+
+				if (pos == 'leftMargin'
+				||  pos == 'rightMargin')
+				{
+					if (verticalMargin == null)
+					{
+						span.appendTo('#' + pos + iLine);
+					}
+					else
+					{
+						span.appendTo('#' + pos + '_' + verticalMargin);
+					}
+
+					horizontalMargin = pos;
+				}
+			}
+
+			if (verticalMargin == null)
+			{
+				if (pos == 'upperMargin'
+				||  pos == 'lowerMargin')
+				{
+					if (horizontalMargin == null)
+					{
+						span.appendTo('#regularLinePart_' + pos);
+					}
+					else
+					{
+						span.appendTo('#' + horizontalMargin + '_' + pos);
+					}
+
+					verticalMargin = pos;
+				}
+			}
+		}
+
+			// const signsOnRegularLine = $('#regularLinePart' + iLine).children();
+			// var inserted = false;
+			//
+			// for (var i in signsOnRegularLine)
+			// {
+			// 	if (signsOnRegularLine[i]['attributes']['isign']['nodeValue'] * 1 > iSign)
+			// 	{
+			// 		linePreview.insertBefore('#' + signsOnRegularLine[i]['id']);
+			// 		inserted = true;
+			//
+			// 		break;
+			// 	}
+			// }
+			//
+			// if (!inserted) // iSign is higher than any in line
+			// {
+			// 	linePreview.appendTo('#regularLinePart' + iLine);
+			// }
+	};
 
 
 

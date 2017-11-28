@@ -1,6 +1,8 @@
 function SingleSignEditor(richTextEditor)
 {
 	this.richTextEditor = richTextEditor;
+	this.textModel = richTextEditor.textModel;
+	this.text = richTextEditor.textModel.signs;
 	this.signVisualisation = richTextEditor.signVisualisation;
 	const self = this;
 	
@@ -19,96 +21,7 @@ function SingleSignEditor(richTextEditor)
 	
 	$('#confirmAddReadingButton').click(function()
 	{
-		if (Spider.unlocked == false)
-		{
-			return;
-		}
-		
-		const newReading = $('#addReadingInput').val();
-		
-		if (newReading.length == 1) // ignore empty entry and multiple chars
-		{
-			const existingReadingElements = $('.alternativeSign');
-			var readingAlreadyExists = false;
-			for (var iElement in existingReadingElements)
-			{
-				if (existingReadingElements[iElement].textContent == newReading)
-				{
-					return;
-				}
-			}
-			
-			const iReading = $('.alternativeSign').length;
-			const signData = { 'sign': newReading };
-			const signsDiv = $('#signReadings');
-			
-			Spider.requestFromServer
-			(
-				{
-					'request'       : 'addChar',
-					'sign'          : newReading,
-					'mainSignId'    : $('#reading0').attr('mainSignId'),
-					'SCROLLVERSION' : Spider.current_version_id
-				},
-				function(json) // on result
-				{
-					if (json['error'] != null)
-					{
-						console.log("json['error'] " + json['error']);
-						return;
-					}
-					
-					reading.attr('signCharId', json['signCharId']);
-					
-					const linePreview = $('.chosenSignInLine');
-					const iLine = linePreview.attr('iLine');
-					const iSign = linePreview.attr('iSign');
-					
-					$('#span_' + iLine + '_' + iSign)
-					.css
-					({
-						'font-size': Math.ceil(self.richTextEditor.fontSize * width) + 'px'
-					});
-					
-					const signData = self.richTextEditor.originalText['lines'][iLine]['signs'][iSign];
-					signData['signCharId'] = json['signCharId'];
-					signData['width'] = width;
-					
-					self.notifySignChange(target['id'].replace('widthInput', ''));
-				}
-			);
-
-			self.createSignElement
-			(
-				iReading,
-				$('#reading0').attr('mainSignId'),
-				signData,
-				false
-			)
-			.appendTo(signsDiv);
-			
-			// TODO special mark for newly added reading?
-
-			$('<span></span>')
-			.addClass('signDescription')
-			.text('(variant)')
-			.appendTo(signsDiv);
-			
-			const attributesDiv = self.createAttributesDiv(iReading);
-			
-			self.createAttributesLists
-			(
-				iReading,
-				signData
-			)
-			.appendTo(attributesDiv);
-			
-			self.switchReading(iReading);
-		}
-		
-		$('#addReadingDiv').appendTo('#hidePanel');
-		
-		$('#addReadingPseudoButton').appendTo('#signReadings');
+		self.addReading();
 	});
 	
 	$('#cancelAddReadingButton').click(function()
@@ -124,22 +37,28 @@ function SingleSignEditor(richTextEditor)
 		.removeClass('chosenSign')
 		.removeClass('chosenSignInLine');
 		
-		const previewLine = $('#signContext > tr'); // move preview line back // TODO
-		const index = previewLine.attr('id').replace('line', '');
-		
-		if ($('#line' + (index + 1)).length == 1)
+		const previewLine = $('#signContext > tr'); // move preview line back
+		const index = 1 * previewLine.attr('id').replace('line', '');
+
+		var neighbour = $('#line' + (index + 1));
+		if (neighbour.length == 1) // there is a line below the previewed one
 		{
-			previewLine.insertBefore('#line' + (index + 1));
-		}
-		else if ($('#line' + (index - 1)).length == 1)
-		{
-			previewLine.insertAfter('#line' + (index - 1));
+			previewLine.insertBefore(neighbour);
 		}
 		else
-		{
-			previewLine.appendTo('#richTextContainer');
-		}
-		
+        {
+            neighbour = $('#line' + (index - 1));
+
+            if (neighbour.length == 1) // there is a line above the previewed one
+            {
+                previewLine.insertAfter(neighbour);
+            }
+            else
+            {
+                previewLine.appendTo('#richTextContainer');
+            }
+        }
+
 		$('#richTextContainer').appendTo('#RichTextPanel');
 		$('#singleSignContainer').appendTo('#hidePanel');
 	});
@@ -154,42 +73,59 @@ function SingleSignEditor(richTextEditor)
 	 		'jsonValue'    : 1
 	 	},
 	 	{
-	 		'displayName'  : 'on left margin',
-	 		'jsonAttribute': 'position',
-	 		'jsonValue'    : 'leftMargin'
-	 	},
-	 	{
-	 		'displayName'  : 'on right margin',
-	 		'jsonAttribute': 'position',
-	 		'jsonValue'    : 'rightMargin'
-	 	},
-	 	{
-	 		'displayName'  : 'above line',
-	 		'jsonAttribute': 'position',
-	 		'jsonValue'    : 'aboveLine'
-	 	},
-	 	{
-	 		'displayName'  : 'below line',
-	 		'jsonAttribute': 'position',
-	 		'jsonValue'    : 'belowLine'
-	 	},
-	 	{
 	 		'displayName'  : 'reconstructed',
 	 		'jsonAttribute': 'reconstructed',
 	 		'jsonValue'    : 1
 	 	},
+		{
+			'displayName'  : 'retraced',
+			'jsonAttribute': 'retraced',
+			'jsonValue'    : 1
+		},
+		{
+			'displayName'  : 'position',
+			'jsonAttribute': 'position',
+			'jsonValue'    : '' // covered by drop down entries (this.possiblePositions)
+		},
 	 	{
 	 		'displayName'  : 'corrected',
 	 		'jsonAttribute': 'corrected',
 	 		'jsonValue'    : '' // covered by drop down entries (this.possibleCorrections)
-	 	},
-	 	{
-	 		'displayName'  : 'retraced',
-	 		'jsonAttribute': 'retraced',
-	 		'jsonValue'    : 1
 	 	}
 	];
-	
+
+	this.possiblePositions =
+	[
+		{
+			'displayName'  : 'on left margin',
+			'jsonValue'    : 'leftMargin'
+		},
+		{
+			'displayName'  : 'on right margin',
+			'jsonValue'    : 'rightMargin'
+		},
+		{
+			'displayName'  : 'margin',
+			'jsonValue'    : 'margin'
+		},
+		{
+			'displayName'  : 'on upper margin',
+			'jsonValue'    : 'upperMargin'
+		},
+		{
+			'displayName'  : 'on lower margin',
+			'jsonValue'    : 'lowerMargin'
+		},
+		{
+			'displayName'  : 'above line',
+			'jsonValue'    : 'aboveLine'
+		},
+		{
+			'displayName'  : 'below line',
+			'jsonValue'    : 'belowLine'
+		}
+	];
+
 	this.possibleCorrections =
 	[
 	 	{
@@ -238,17 +174,27 @@ function SingleSignEditor(richTextEditor)
 	{
 		$('.attributesDiv:visible').hide();
 		$('#attributesDiv' + readingId).show();
-		
-		$('.alternativeSign')
+
+		const previouslyChosenReading =
+		$('.reading.chosenSign')
 		.removeClass('chosenSign')
 		.addClass('otherSign');
-		
+
+		const iLinePrev = previouslyChosenReading.attr('iLine');
+		const iSignPrev = previouslyChosenReading.attr('iSign');
+		$('#span_' + iLinePrev + '_' + iSignPrev).hide();
+
+		const nowChosenReading =
 		$('#reading' + readingId)
 		.removeClass('otherSign')
 		.addClass('chosenSign');
+
+		const iLineNow = nowChosenReading.attr('iLine');
+		const iSignNow = nowChosenReading.attr('iSign');
+		$('#span_' + iLineNow + '_' + iSignNow).show();
 	};
 	
-	this.notifySignChange = function(index)
+	this.showCharChange = function(index)
 	{
 		if (Spider.unlocked == false)
 		{
@@ -257,8 +203,102 @@ function SingleSignEditor(richTextEditor)
 		
 		$('#reading' + index).addClass('modifiedSign'); // TODO remove it once it's back to initial attributes
 	};
-	
-	this.saveWidthChange = function(target)
+
+	this.addReading = function()
+	{
+		if (Spider.unlocked == false)
+		{
+			return;
+		}
+
+		const newReading = $('#addReadingInput').val();
+		if (newReading.length != 1) // ignore empty entry and multiple chars
+		{
+			return;
+		}
+
+		const mainSign = $('#reading0');
+		const iLineMain = mainSign.attr('iLine');
+		const iSignMain = 1 * mainSign.attr('iSign'); // change type to integer
+		const mainSignId = this.text[iLineMain][iSignMain]['signId'];
+
+		const readings = $('.reading'); // main sign and previous variants
+		const iReading = readings.length; // 1 for first variant etc.
+		const iSign = iSignMain + iReading;
+
+		var wasChangeSuccessful = true;
+
+		Spider.requestFromServer
+		(
+			{
+				'request'      : 'addChar',
+				'sign'         : newReading,
+				'mainSignId'   : mainSignId,
+				'SCROLLVERSION': Spider.current_version_id
+			},
+			function(json) // on result
+			{
+				if (json['error'] != null)
+				{
+					console.log("json['error'] " + json['error']);
+					wasChangeSuccessful = false;
+
+					return;
+				}
+
+				self.textModel.addSignAfter
+				(
+					{
+						'sign': newReading,
+						'signId': mainSignId,
+						'signCharId': json['signCharId']
+					},
+					iLineMain,
+					iSign - 1
+				);
+			},
+			function()
+			{
+				wasChangeSuccessful = false;
+			}
+		);
+
+		if (!wasChangeSuccessful)
+		{
+			return;
+		}
+
+		self.showReading
+		(
+			iReading,
+			iLineMain,
+			iSign,
+			false,
+			$('#signReadings')
+		);
+		self.switchReading(iReading);
+
+		const attributesDiv = self.createAttributesDiv(iReading);
+
+		self.createAttributesLists
+		(
+			iReading,
+			{}
+		)
+		.appendTo(attributesDiv);
+
+		for (var i = self.text[iLineMain].length - 1; i > iSign; i--) // increment sign indexes in DOM
+		{
+			$('#span_' + iLineMain + '_' + i)
+			.attr('id', 'span_' + iLineMain + '_' + (i + 1))
+			.attr('iSign', i + 1);
+		}
+
+		$('#addReadingDiv').appendTo('#hidePanel');
+		$('#addReadingPseudoButton').appendTo('#signReadings');
+	};
+
+	this.changeWidth = function(target)
 	{
 		if (Spider.unlocked == false)
 		{
@@ -270,20 +310,25 @@ function SingleSignEditor(richTextEditor)
 		{
 			width = 1;
 		}
-		else if (isNaN(parseFloat(width))) // given value is not a number
+		else if (isNaN(parseFloat(width))
+			 &&  isNaN(parseInt(width)))
 		{
 			console.log('invalid width: ' + width);
 			return;
 		}
-		
-		const readingId = target['id'].replace('widthInput', '');
-		const reading = $('#reading' + readingId);
-		
+
+		const reading = $('#reading' + target['id'].replace('widthInput', ''));
+		const iLine = reading.attr('iLine');
+		const iSign = reading.attr('iSign');
+		const signData = this.text[iLine][iSign];
+
+		var wasChangeSuccessful = true;
+
 		Spider.requestFromServer
 		(
 			{
 				'request'       : 'changeWidth',
-				'signCharId'    : reading.attr('signCharId'),
+				'signCharId'    : signData['signCharId'],
 				'width'         : width,
 				'SCROLLVERSION' : Spider.current_version_id
 			},
@@ -292,37 +337,42 @@ function SingleSignEditor(richTextEditor)
 				if (json['error'] != null)
 				{
 					console.log("json['error'] " + json['error']);
+					wasChangeSuccessful = false;
+
 					return;
 				}
-				
-				reading.attr('signCharId', json['signCharId']);
-				
-				const linePreview = $('.chosenSignInLine');
-				const iLine = linePreview.attr('iLine');
-				const iSign = linePreview.attr('iSign');
-				
-				$('#span_' + iLine + '_' + iSign)
-				.css
-				({
-					'font-size': Math.ceil(self.richTextEditor.fontSize * width) + 'px'
-				});
-				
-				const signData = self.richTextEditor.originalText['lines'][iLine]['signs'][iSign];
+
 				signData['signCharId'] = json['signCharId'];
-				
+
 				if (width == 1)
 				{
 					signData['width'] = null;
 				}
 				else
 				{
-					signData['width'] = width;	
+					signData['width'] = width;
 				}
-				
-				self.notifySignChange(target['id'].replace('widthInput', ''));
+
+				self.showCharChange(target['id'].replace('widthInput', ''));
+			},
+			function()
+			{
+				wasChangeSuccessful = false;
 			}
 		);
-	}
+
+
+		/** adapt visualization */
+
+		if (wasChangeSuccessful)
+		{
+			$('#span_' + iLine + '_' + iSign)
+			.css
+			({
+				'font-size': Math.ceil(self.richTextEditor.fontSize * width) + 'px'
+			});
+		}
+	};
 	
 	this.addAttribute = function(possibleAttributeId, doSave)
 	{
@@ -343,32 +393,40 @@ function SingleSignEditor(richTextEditor)
 		const iReading = pa.attr('iReading');
 		const attribute = pa.attr('attribute');
 		const value = pa.attr('value');
-		
-		if (attribute == 'corrected'
-		&&  value == '')
+
+		if (attribute == 'position'
+		&&  value     == '')
 		{
-			$('#correctionDropDown' + iReading).toggle();
-			console.log('correctionDropDown');
-			
+			$('#positionDropDown' + iReading).toggle();
+
 			return;
 		}
-		
+		else if (attribute == 'corrected'
+			 &&  value     == '')
+		{
+			$('#correctionDropDown' + iReading).toggle();
+
+			return;
+		}
+
+		const reading = $('#reading' + iReading);
+		const iLine = reading.attr('iLine');
+		const iSign = reading.attr('iSign');
+		const signData = this.text[iLine][iSign];
+
 		var wasChangeSuccessful = true;
-		
+
 		if (doSave)
 		{
-			const reading = $('#reading' + iReading);
-			
 			Spider.requestFromServer
 			(
 				{
 					'request'       : 'addAttribute',
-					'signId'        : reading.attr('signId'),
-					'signCharId'    : reading.attr('signCharId'),
-					'signCharReadingDataId': reading.attr('signCharReadingDataId'), // might be null
-					'signPositionId': reading.attr('signPositionId'), // might be null // TODO support multiple (separate handling of position saving?)
 					'attributeName' : attribute,
 					'attributeValue': value,
+					'signId'        : signData['signId'],
+					'signCharId'    : signData['signCharId'],
+					'signCharReadingDataId': signData['signCharReadingDataId'], // might be null
 					'SCROLLVERSION' : Spider.current_version_id
 				},
 				function(json) // on result
@@ -379,22 +437,19 @@ function SingleSignEditor(richTextEditor)
 						
 						return;
 					}
-					
-					const ids =
-					[
-					 	'signCharId',
-					 	'signCharReadingDataId',
-					 	'signPositionId'
-					];
-					for (var i in ids)
+
+					wasChangeSuccessful = self.textModel.addAttribute
+					(
+						json,
+						signData,
+						attribute,
+						value
+					);
+
+					if (wasChangeSuccessful)
 					{
-						if (json[ids[i]] != null)
-						{
-							$('#reading' + iReading).attr(ids[i], json[ids[i]]);
-						}
+						self.showCharChange(iReading);
 					}
-					
-					self.notifySignChange(iReading);
 				},
 				function()
 				{
@@ -407,57 +462,49 @@ function SingleSignEditor(richTextEditor)
 		{
 			return;
 		}
-		
-		/** adapt attribute entry */
-		
-		pa.hide();
-		
-		$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
-		
-		
-		/** adapt previews and data */
-		
-		const linePreview = $('.chosenSignInLine');
-		const iLine = linePreview.attr('iLine');
-		const iSign = linePreview.attr('iSign');
-		
-		const signData = self.richTextEditor.originalText['lines'][iLine]['signs'][iSign];
-		
+
+
+		/** adapt visualization */
+
 		if (attribute == 'position')
 		{
-			if (value == 'aboveLine'
-			||  value == 'belowLine')
-			{
-				$('.chosenSign').addClass(value);
-			}
-			else // leftMargin / rightMargin
-			{
-				linePreview.appendTo('#' + value + iLine);
-			}
+			self.signVisualisation.repositionChar(iLine, iSign, signData['position'], $('.chosenSignInLine'));
 
-			if (signData['position'] == null)
+			var ca = $('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute'));
+			if (ca.is(':visible')) // this position was already chosen at least once
 			{
-				signData['position'] = [{}];
+				const previousText = ca.text();
+				const amountIndex = previousText.indexOf('^'); // assumes there is no ^ in position value name
+
+				if (amountIndex == -1) // was chosen exactly once so far
+				{
+					ca.text(previousText + '^2');
+				}
+				else // was chosen more than once already
+				{
+					const newIndex = (1 * previousText.substr(amountIndex + 1)) + 1;
+
+					ca.text(previousText.substr(0, amountIndex + 1) + newIndex);
+				}
 			}
-			
-			signData['position'][0]['signPositionId'] = $('#reading' + iReading).attr('signPositionId');
-			signData['position'][0]['level'         ] = 1; // TODO support multiple levels
-			signData['position'][0]['position'      ] = value;
-		}
-		else if (attribute == 'corrected') 
-		{
-			$('.chosenSign').addClass(value); // both preview signs in single sign editor
-			
-			if (doSave)
+			else
 			{
-				signData[attribute].push(value);
+				ca.show();
 			}
 		}
-		else
+		else if (attribute == 'corrected')
 		{
-			$('.chosenSign').addClass(attribute); // both preview signs in single sign editor
-			
-			signData[attribute] = 1;
+			$('.chosenSign').addClass(value);
+
+			pa.hide();
+			$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
+		}
+		else // any attribute but position or corrected
+		{
+			$('.chosenSign').addClass(attribute);
+
+			pa.hide();
+			$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
 		}
 	};
 	
@@ -473,28 +520,43 @@ function SingleSignEditor(richTextEditor)
 		{
 			return;
 		}
-		
+
 		const iReading = ca.attr('iReading');
-		const reading = $('#reading' + iReading);
 		const attribute = ca.attr('attribute');
 		const value = ca.attr('value');
-		
-		const linePreview = $('.chosenSignInLine');
-		const iLine = linePreview.attr('iLine');
-		const iSign = linePreview.attr('iSign');
-		
+
+		const reading = $('#reading' + iReading);
+		const iLine = reading.attr('iLine');
+		const iSign = reading.attr('iSign');
+		const signData = this.text[iLine][iSign];
+
+		var signPositionId = null;
+		if (attribute == 'position'
+		&&  signData['position'] != null)
+		{
+			const posData = signData['position'];
+
+			for (var iPos = posData.length - 1; iPos >= 0; iPos--)
+			{
+				if (posData[iPos]['position'] == value)
+				{
+					signPositionId = posData[iPos]['signPositionId'];
+
+					break;
+				}
+			}
+		}
+
 		var wasChangeSuccessful = true;
 		
 		Spider.requestFromServer
 		(
 			{
 				'request'       : 'removeAttribute',
-				'signId'        : reading.attr('signId'), // TODO likely not necessary
-				'signCharId'    : reading.attr('signCharId'),
-				'signCharReadingDataId': reading.attr('signCharReadingDataId'), // might be null
-				'signPositionId': reading.attr('signPositionId'), // might be null
-				// TODO support level of position
 				'attributeName' : attribute,
+				'signCharId'    : signData['signCharId'],
+				'signCharReadingDataId': signData['signCharReadingDataId'], // might be null
+				'signPositionId': signPositionId, // might be null
 				'SCROLLVERSION' : Spider.current_version_id
 			},
 			function(json) // on result
@@ -505,26 +567,19 @@ function SingleSignEditor(richTextEditor)
 					
 					return;
 				}
-				
-				const signData = self.richTextEditor.originalText['lines'][iLine]['signs'][iSign];
-				
-				const ids =
-				[
-				 	'signCharId',
-				 	'signCharReadingDataId',
-				 	'signPositionId'
-				];
-				for (var i in ids)
+
+				wasChangeSuccessful = self.textModel.removeAttribute
+				(
+					json,
+					signData,
+					attribute,
+					value
+				);
+
+				if (wasChangeSuccessful)
 				{
-					if (json[ids[i]] != null)
-					{
-						$('#reading' + iReading).attr(ids[i], json[ids[i]]);
-						
-						signData[ids[i]] = json[ids[i]]; // save to text model
-					}
+					self.showCharChange(iReading);
 				}
-				
-				self.notifySignChange(iReading);
 			},
 			function()
 			{
@@ -538,88 +593,64 @@ function SingleSignEditor(richTextEditor)
 		}
 		
 		
-		/** adapt attribute entry */
-		
-		$('#' + currentAttributeId.replace('currentAttribute', 'possibleAttribute')).show();
+		/** adapt visualization */
 
-		ca.hide();
-		
-		
-		/** adapt previews and data */
-		
-		const signData = self.richTextEditor.originalText['lines'][iLine]['signs'][iSign];
-		
 		if (attribute == 'position')
 		{
-			if (value == 'aboveLine'
-			||  value == 'belowLine')
+			self.signVisualisation.repositionChar(iLine, iSign, signData['position'], $('.chosenSignInLine'));
+
+			const previousText = ca.text();
+			const amountIndex = previousText.indexOf('^'); // assumes there is no ^ in position value name
+
+			if (amountIndex == -1) // was chosen exactly once so far
+			{
+				ca.hide();
+			}
+			else // was chosen more than once already
+			{
+				const newExponent = (1 * previousText.substr(amountIndex + 1)) - 1;
+
+				if (newExponent == 1) // from ^2 to no exponent
+				{
+					ca.text(previousText.substr(0, amountIndex));
+				}
+				else
+				{
+					ca.text(previousText.substr(0, amountIndex + 1) + newExponent);
+				}
+			}
+		}
+		else
+		{
+			if (attribute == 'corrected')
 			{
 				$('.chosenSign').removeClass(value);
 			}
-			else // leftMargin / rightMargin => try to add at original place in regular line part
+			else
 			{
-				const signsOnRegularLine = $('#regularLinePart' + iLine).children();
-				var inserted = false;
-				
-				for (var i in signsOnRegularLine)
-				{
-					if (signsOnRegularLine[i]['attributes']['isign']['nodeValue'] * 1 > iSign)
-					{
-						linePreview.insertBefore('#' + signsOnRegularLine[i]['id']);
-						inserted = true;
-						
-						break;
-					}
-				}
-				
-				if (!inserted) // iSign is higher than any in line
-				{
-					linePreview.appendTo('#regularLinePart' + iLine);		
-				}
+				$('.chosenSign').removeClass(attribute);
 			}
 
-			signData['position'] = null;
-		}
-		else if (attribute == 'corrected')
-		{
-			$('.chosenSign').removeClass(value); // both preview signs in single sign editor
-			
-			if (typeof signData['corrected'] == 'string') // just one correction
-			{
-				signData['corrected'] = [];
-			}
-			else if (typeof signData['corrected'] == 'object') // multiple corrections
-			{
-				const removalIndex = signData[attribute].indexOf(value);
-				if (removalIndex != -1)
-				{
-					signData[attribute] = signData[attribute].slice(0, removalIndex).concat(signData[attribute].slice(removalIndex + 1));
-				}
-			}
-		}
-		else // other attributes
-		{
-			$('.chosenSign').removeClass(attribute); // both preview signs in single sign editor
-			
-			signData[attribute] = null;
+			ca.hide();
+			$('#' + currentAttributeId.replace('currentAttribute', 'possibleAttribute')).show();
 		}
 	};
 	
-	this.createSignElement = function(iReading, mainSignId, signData, isMainSign)
+	this.showReading = function(iReading, iLine, iSign, isMainSign, signReadings)
 	{
 		const signElement =
 		$('<span></span>')
 		.attr('id', 'reading' + iReading)
-		.attr('signId', signData['signId'])
-		.attr('signCharId', signData['signCharId'])
-		.attr('signCharReadingDataId', signData['signCharReadingDataId'])
-		.attr('mainSignId', mainSignId)
-		.addClass('alternativeSign')
+		.attr('iLine', iLine)
+		.attr('iSign', iSign)
+		.addClass('reading')
 		.click(function(event)
 		{
 			self.switchReading(event.target['id'].replace('reading', ''));
 		});
-		
+
+		const signData = this.text[iLine][iSign];
+
 		if (signData['type'] == null) // letter
 		{
 			signElement.text(signData['sign']);
@@ -638,14 +669,23 @@ function SingleSignEditor(richTextEditor)
 			signElement.addClass('someSpaceToTheLeft');
 			signElement.addClass('otherSign');
 		}
-		
-		if (signData['position'] != null)
-		{
-			signElement.attr('signPositionId', signData['position'][0]['signPositionId']); // TODO support multiple levels
-		}
-		
-		return signElement;
-	}
+
+		const descriptionText =
+		(
+			isMainSign
+			? '(default)'
+			: '(alternative)'
+		);
+
+		const description =
+		$('<span></span>')
+		.addClass('signDescription')
+		.text(descriptionText);
+
+		signReadings
+		.append(signElement)
+		.append(description);
+	};
 	
 	this.createAttributesDiv = function(iReading)
 	{
@@ -670,7 +710,7 @@ function SingleSignEditor(richTextEditor)
 		}
 		
 		return attributesDiv;
-	}
+	};
 	
 	this.createAuthorsDiv = function(iReading, signData)
 	{
@@ -707,14 +747,55 @@ function SingleSignEditor(richTextEditor)
 //		.val(commentary)
 //		.change(function(event)
 //		{
-//			self.notifySignChange(event.target['id'].replace('commentInput', ''));
+//			self.showCharChange(event.target['id'].replace('commentInput', ''));
 //		})
 //		.appendTo(commentsDiv);
 		
 		return signAuthorData;
-	}
-	
-	this.createCorrectionLists = function(iReading, currentAttributesDiv, potentialAttributesDiv, signData)
+	};
+
+	this.createPositionLists = function(iReading, currentAttributesDiv, potentialAttributesDiv)
+	{
+		const positionDropDown =
+		$('<div></div>')
+		.attr('id', 'positionDropDown' + iReading)
+		.addClass('greyBordered')
+		.hide()
+		.appendTo(potentialAttributesDiv);
+
+		for (var iPosition in self.possiblePositions)
+		{
+			$('<div></div>')
+			.attr('id', 'currentAttribute_3_' + iPosition + '_' + iReading) // TODO replace overly static _3_
+			.attr('attribute', 'position')
+			.attr('value', self.possiblePositions[iPosition]['jsonValue'])
+			.attr('iReading', iReading)
+			.addClass('attribute')
+			.text(self.possiblePositions[iPosition]['displayName'])
+			.click(function(event)
+			{
+				self.removeAttribute(event.target['id']);
+			})
+			.hide()
+			.appendTo(currentAttributesDiv);
+
+			$('<div></div>')
+			.attr('id', 'possibleAttribute_3_' + iPosition + '_'+ iReading) // TODO replace overly static _3_
+			.attr('attribute', 'position')
+			.attr('value', self.possiblePositions[iPosition]['jsonValue'])
+			.attr('iReading', iReading)
+			.addClass('attribute')
+			.text(self.possiblePositions[iPosition]['displayName'])
+			.click(function(event)
+			{
+				self.addAttribute(event.target['id'], true);
+				$('#positionDropDown' + iReading).hide(); // TODO works for iReading != 0 ?
+			})
+			.appendTo(positionDropDown);
+		}
+	};
+
+	this.createCorrectionLists = function(iReading, currentAttributesDiv, potentialAttributesDiv)
 	{
 		const correctionDropDown =
 		$('<div></div>')
@@ -723,15 +804,15 @@ function SingleSignEditor(richTextEditor)
 		.hide()
 		.appendTo(potentialAttributesDiv);	
 		
-		for (var i in self.possibleCorrections)
+		for (var iCorrection in self.possibleCorrections)
 		{
 			$('<div></div>')
-			.attr('id', 'currentAttribute_6_' + i + '_' + iReading)
+			.attr('id', 'currentAttribute_4_' + iCorrection + '_' + iReading) // TODO replace overly static _4_
 			.attr('attribute', 'corrected')
-			.attr('value', self.possibleCorrections[i]['jsonValue'])
+			.attr('value', self.possibleCorrections[iCorrection]['jsonValue'])
 			.attr('iReading', iReading)
 			.addClass('attribute')
-			.text(self.possibleCorrections[i]['displayName'])
+			.text(self.possibleCorrections[iCorrection]['displayName'])
 			.click(function(event)
 			{
 				self.removeAttribute(event.target['id']);
@@ -740,21 +821,21 @@ function SingleSignEditor(richTextEditor)
 			.appendTo(currentAttributesDiv);
 			
 			$('<div></div>')
-			.attr('id', 'possibleAttribute_6_' + i + '_'+ iReading)
+			.attr('id', 'possibleAttribute_4_' + iCorrection + '_'+ iReading) // TODO replace overly static _4_
 			.attr('attribute', 'corrected')
-			.attr('value', self.possibleCorrections[i]['jsonValue'])
+			.attr('value', self.possibleCorrections[iCorrection]['jsonValue'])
 			.attr('iReading', iReading)
 			.addClass('attribute')
-			.text(self.possibleCorrections[i]['displayName'])
+			.text(self.possibleCorrections[iCorrection]['displayName'])
 			.click(function(event)
 			{
 				self.addAttribute(event.target['id'], false); // TODO change to true once gui works
-				$('#correctionDropDown' + iReading).hide();
+				$('#correctionDropDown' + iReading).hide(); // TODO works for iReading != 0 ?
 			})
 			.appendTo(correctionDropDown);
 		}
-	}
-	
+	};
+
 	this.createAttributesLists = function(iReading, signData)
 	{
 		const attributeChoiceContainer =
@@ -762,7 +843,7 @@ function SingleSignEditor(richTextEditor)
 		.attr('id', 'attributeChoiceDiv' + iReading);
 			
 		$('<span></span>')
-		.text('Sign width: ')
+		.text('Sign size: ')
 		.appendTo(attributeChoiceContainer);
 		
 		var width = '';
@@ -771,15 +852,19 @@ function SingleSignEditor(richTextEditor)
 			width = signData['width'];
 		}
 		
-		const widthInput =
-		$('<input></input>')
+		$('<input>')
 		.attr('id', 'widthInput' + iReading)
 		.attr('placeholder', 'Leave empty for standard size')
 		.val(width)
-		.keypress(function(event)
+		.change(function(event)
 		{
-			self.saveWidthChange(event.target);
+			self.changeWidth(event.target);
 		})
+		.appendTo(attributeChoiceContainer);
+
+		$('<button>')
+		.addClass('someSpaceToTheLeft')
+		.text('Apply')
 		.appendTo(attributeChoiceContainer);
 		
 		
@@ -828,7 +913,7 @@ function SingleSignEditor(richTextEditor)
 		for (var iPa in this.possibleAttributes)
 		{
 			const pa = this.possibleAttributes[iPa];
-			
+
 			$('<div></div>')
 			.attr('id', 'currentAttribute_' + iPa + '_' + iReading)
 			.attr('attribute', pa['jsonAttribute'])
@@ -842,7 +927,7 @@ function SingleSignEditor(richTextEditor)
 			})
 			.hide()
 			.appendTo(currentAttributesDiv);
-			
+
 			$('<div></div>')
 			.attr('id', 'possibleAttribute_' + iPa + '_' + iReading)
 			.attr('attribute', pa['jsonAttribute'])
@@ -856,8 +941,12 @@ function SingleSignEditor(richTextEditor)
 				self.addAttribute(event.target['id'], true);
 			})
 			.appendTo(potentialAttributesDiv);
-			
-			if (pa['jsonAttribute'] == 'corrected')
+
+			if (pa['jsonAttribute'] == 'position')
+			{
+				self.createPositionLists(iReading, currentAttributesDiv, potentialAttributesDiv);
+			}
+			else if (pa['jsonAttribute'] == 'corrected')
 			{
 				self.createCorrectionLists(iReading, currentAttributesDiv, potentialAttributesDiv);
 			}
@@ -870,50 +959,51 @@ function SingleSignEditor(richTextEditor)
 				for (var iPa in self.possibleAttributes)
 				{
 					const pa = self.possibleAttributes[iPa];
-					
-					if (signData['position'] != null
-					&&  pa['jsonAttribute'] == 'position')
+					const attribute = pa['jsonAttribute'];
+
+					if (attribute == 'position'
+					||  attribute == 'corrected') // treatment for them see below
 					{
-						if (signData['position'][0]['position'] == pa['jsonValue']) // according to JSON attribute is set
-						{
-							self.addAttribute('possibleAttribute_' + iPa + '_' + iReading, false); 
-						}
+						continue;
 					}
-					else // attribute other than position
+
+					if (signData[attribute] == pa['jsonValue']) // according to JSON attribute is set
 					{
-						if (signData[pa['jsonAttribute']] == pa['jsonValue']) // according to JSON attribute is set
-						{
-							self.addAttribute('possibleAttribute_' + iPa + '_' + iReading, false); 
-						}
+						self.addAttribute('possibleAttribute_' + iPa + '_' + iReading, false);
 					}
 				}
-				
-				if (signData['corrected'] != null)
+
+				const posData = signData['position'];
+				if (posData != null)
 				{
-					if (typeof signData['corrected'] == 'string')
+					for (var iPos in posData)
 					{
-						for (var i in self.possibleCorrections) // one correction
+						for (var iPp in self.possiblePositions)
 						{
-							if (signData['corrected'] == self.possibleCorrections[i]['jsonValue'])
+							console.log("posData[iPos]['position'] " + posData[iPos]['position']);
+							console.log("self.possiblePositions[iPa]['jsonValue'] " + self.possiblePositions[iPp]['jsonValue']);
+							if (posData[iPos]['position'] == self.possiblePositions[iPp]['jsonValue'])
 							{
-								self.addAttribute('possibleAttribute_6_' + i + '_' + iReading, false);
-								
+								self.addAttribute('possibleAttribute_3_' + iPp + '_' + iReading, false); // TODO replace overly static _3_
+
 								break;
 							}
 						}
 					}
-					else if (typeof signData['corrected'] == 'object') // multiple corrections
+				}
+
+				const corrData = signData['corrected'];
+				if (corrData != null)
+				{
+					for (var iCorr in corrData)
 					{
-						for (var i in self.possibleCorrections)
+						for (var iPc in self.possibleCorrections)
 						{
-							for (var j in signData['corrected'])
+							if (corrData[iCorr] == self.possibleCorrections[iPc]['jsonValue'])
 							{
-								if (signData['corrected'][j] == self.possibleCorrections[i]['jsonValue'])
-								{
-									self.addAttribute('possibleAttribute_6_' + i + '_' + iReading, false);
-									
-									break;
-								}
+								self.addAttribute('possibleAttribute_4_' + iPc + '_' + iReading, false); // TODO replace overly static _4_
+
+								break;
 							}
 						}
 					}
@@ -924,19 +1014,19 @@ function SingleSignEditor(richTextEditor)
 		);
 		
 		return attributeChoiceContainer;
-	}
+	};
 	
-	this.displaySingleSignSpan = function(model, spanId)
+	this.displaySingleSign = function(spanId)
 	{
 		const span = $('#' + spanId);
 		const iLine  = span.attr('iLine');
-		const iSign  = span.attr('iSign');
-		const signId = span.attr('signId');
-		
+		const iSign  = 1 * span.attr('iSign');
+
 		
 		/** line context */
 		
-		const signContext = $('#signContext'); // .empty(); // remove previous line context
+		const signContext = $('#signContext');
+		// .empty(); // TODO necessary when switching fragment while SSE is active, but not when switching sign within preview line
 		
 		$('.chosenSignInLine')
 		.removeClass('chosenSign')
@@ -952,102 +1042,67 @@ function SingleSignEditor(richTextEditor)
 			.addClass('chosenSignInLine');
 		}
 		
-		// TODO smoothen reset code?
-		
+		const signReadings = $('#signReadings');
+		const addReadingPseudoButton = $('#addReadingPseudoButton');
+		const finishSingleSignChangesButton = $('#finishSingleSignChangesButton');
+
 		$('#hidePanel')
-		.append($('#signContext'))
-		.append($('#signReadings'))
-		.append($('#addReadingPseudoButton'))
-		.append($('#finishSingleSignChangesButton')); // protect these elements from deletion by empty()
+		.append(signContext)
+		.append(signReadings)
+		.append(addReadingPseudoButton)
+		.append(finishSingleSignChangesButton); // protect these elements from deletion by empty()
 		
 		const container =
 		$('#singleSignContainer')
 		.empty()
-		.append($('#signContext'))
-		.append($('#signReadings'));
-		// buttons will be readded later, at the end of their parent elements
+		.append(signContext)
+		.append(signReadings);
+		// buttons will be re-added later, at the end of their parent elements
 		
-		const signsDiv =
-		$('#signReadings')
-		.empty(); // reset displayed main sign & variants
-		
-		const signData = model['lines'][iLine]['signs'][iSign];
-		
-		
-		/** main sign & variants */
-		
-		this.createSignElement
+		const iSignArray = this.textModel.getAlternativeReadings
 		(
-			0, // TODO maybe keep position in line for saving, same for variants
-			signId,
-			signData,
-			true
-		)
-		.appendTo(signsDiv);
-		
-		$('<span></span>')
-		.addClass('signDescription')
-		.text('(default)')
-		.appendTo(signsDiv);
-		
-		var attributesDiv = this.createAttributesDiv(0);
-		attributesDiv.show();
-		
-		this.createAuthorsDiv
-		(
-			0,
-			signData
-		)
-		.appendTo(attributesDiv);
-		
-		this.createAttributesLists
-		(
-			0,
-			signData
-		)
-		.appendTo(attributesDiv);
-		
-		// TODO sign owner list
-		
-		if (signData['alternatives'] != null)
+			iLine,
+			iSign
+		);
+
+		signReadings.empty(); // reset displayed main sign & variants
+
+		for (var i in iSignArray) // create divs for main sign & variants
 		{
-			for (var iVariant in signData['alternatives'])
+			var signData = this.text[iLine][iSign];
+
+			this.showReading
+			(
+				i,
+				iLine,
+				iSignArray[i],
+				(signData['isVariant'] != 1),
+				signReadings
+			);
+
+			var attributesDiv = this.createAttributesDiv(i);
+
+			this.createAuthorsDiv
+			(
+				i,
+				signData
+			)
+			.appendTo(attributesDiv);
+
+			this.createAttributesLists
+			(
+				i,
+				signData
+			)
+			.appendTo(attributesDiv);
+
+			if (iSign == iSignArray[i])
 			{
-				this.createSignElement
-				(
-					iVariant + 1,
-					signId,
-					signData['alternatives'][iVariant],
-					false
-				)
-				.appendTo(signsDiv);
-				
-				$('<span></span>')
-				.addClass('signDescription')
-				.text('(alternative)')
-				.appendTo(signsDiv);
-				
-				attributesDiv = this.createAttributesDiv(iVariant + 1);
-				
-				this.createAuthorsDiv
-				(
-					iVariant + 1,
-					signData['alternatives'][iVariant]
-				)
-				.appendTo(attributesDiv);
-				
-				this.createAttributesLists
-				(
-					iVariant + 1,
-					signData['alternatives'][iVariant]
-				)
-				.appendTo(attributesDiv);
-				
-				// TODO sign owner list
+				this.switchReading(i);
 			}
 		}
-		
-		$('#addReadingPseudoButton').appendTo(signsDiv);
+
+        addReadingPseudoButton.appendTo(signReadings);
 		
 //			if (signData['comment'] != null)
 //			{
@@ -1059,8 +1114,6 @@ function SingleSignEditor(richTextEditor)
 //			}
 		
 		
-		/** add Done button at the bottom */
-		
-		container.append($('#finishSingleSignChangesButton'));
+		container.append(finishSingleSignChangesButton); // add Done button at the bottom
 	}
 }
