@@ -1,5 +1,7 @@
 function SignVisualisation()
 {
+	this.fontSize = 20; // TODO move all of rte's dependence on font size to here
+
 	this.signType2Visualisation =
 	{
 		2: ' ',
@@ -30,7 +32,7 @@ function SignVisualisation()
 		}
 		
 		return placeholder;
-	}
+	};
 
 	this.typeName = function(typeId)
 	{
@@ -41,10 +43,20 @@ function SignVisualisation()
 		}
 		
 		return typeName;
-	}
+	};
 
 	// TODO reconstructed etc.
 	// TODO sign attributes including corrections?
+
+	this.changeWidth = function(iLine, iSign, width)
+	{
+		$('#span_' + iLine + '_' + iSign)
+		.css
+		({
+			'transform': 'scaleX(' + width + ')'
+			//'font-size': Math.ceil(this.fontSize * width) + 'px'
+		});
+	};
 
 	this.repositionChar = function(iLine, iSign, positionData, span)
 	{
@@ -112,34 +124,32 @@ function SignVisualisation()
 			}
 		}
 
-			// const signsOnRegularLine = $('#regularLinePart' + iLine).children();
-			// var inserted = false;
-			//
-			// for (var i in signsOnRegularLine)
-			// {
-			// 	if (signsOnRegularLine[i]['attributes']['isign']['nodeValue'] * 1 > iSign)
-			// 	{
-			// 		linePreview.insertBefore('#' + signsOnRegularLine[i]['id']);
-			// 		inserted = true;
-			//
-			// 		break;
-			// 	}
-			// }
-			//
-			// if (!inserted) // iSign is higher than any in line
-			// {
-			// 	linePreview.appendTo('#regularLinePart' + iLine);
-			// }
+		if (horizontalMargin == null
+		&&  verticalMargin == null)
+		{
+			const signsOnRegularLine = $('#regularLinePart' + iLine).children();
+			var inserted = false;
+
+			for (var i in signsOnRegularLine)
+			{
+				if (i == 'length') // length follows after actual children
+				{
+					break;
+				}
+
+				if (signsOnRegularLine[i]['attributes']['iSign']['value'] * 1 > iSign)
+				{
+					span.insertBefore('#' + signsOnRegularLine[i]['id']);
+					inserted = true;
+
+					break;
+				}
+			}
+
+			if (!inserted) // iSign is higher than any in line
+			{
+				span.appendTo('#regularLinePart' + iLine);
+			}
+		}
 	};
-
-
-
-
-
-
-
-
-
-
-
-};
+}
