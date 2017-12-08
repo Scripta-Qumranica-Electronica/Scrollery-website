@@ -1,45 +1,45 @@
 function FragmentTextModel()
 {
 	this.lineNames = [];
-	this.signs = [];
+	this.text = [];
 
 	this.setFragment = function(json) // transform JSON to object with less hierarchy
 	{
 		this.fragmentName = json.fragmentName;
 		this.lineNames.length = 0; // emptying allows other objects to keep their reference to lineNames
-		this.signs.length = 0;
+		this.text.length = 0;
 
 		const lines = json['lines'];
 		for (var iLine in lines)
 		{
 			const line = lines[iLine];
 			this.lineNames.push(line['lineName']);
-			this.signs.push([]);
+			this.text.push([]);
 
 			for (var iSign in line['signs'])
 			{
 				const sign = line['signs'][iSign];
-				this.signs[iLine].push({});
+				this.text[iLine].push({});
 
 				for (var attribute in sign)
 				{
 					if (attribute == 'corrected'
 					&&  typeof sign[attribute] == 'string') // happens for a single correction => normalize to array
 					{
-						this.signs[iLine][iSign][attribute] = [sign[attribute]];
+						this.text[iLine][iSign][attribute] = [sign[attribute]];
 					}
 					else
 					{
-						this.signs[iLine][iSign][attribute] = sign[attribute];
+						this.text[iLine][iSign][attribute] = sign[attribute];
 					}
 				}
 			}
 		}
 	};
 
-	this.getAlternativeReadings = function(iLine, iSign)
+	this.getAlternativeReadings = function(iLine, iSign) // TODO move main sign to begin
 	{
-		const line = this.signs[iLine];
+		const line = this.text[iLine];
 		const signId = line[iSign]['signId'];
 		const alternatives = [];
 
@@ -56,7 +56,7 @@ function FragmentTextModel()
 
 		alternatives.push(iSign);
 
-		for (var i = iSign + 1; i < line.length; i++) // check for later variant readings
+		for (var i = iSign + 1; i < line.length; i++) // check for later variant readings & main sign
 		{
 			if (line[i]['signId'] != signId)
 			{
@@ -66,24 +66,46 @@ function FragmentTextModel()
 			alternatives.push(i);
 		}
 
+		for (var iAlternative in alternatives) // put main sign's iSign as first entry
+		{
+			if (this.text[iLine][alternatives[iAlternative]]['isVariant'] == null)
+			{
+				const mainSignIndex = alternatives[iAlternative];
+				for (var iArray = iAlternative - 1; iArray >= 0; iArray--)
+				{
+					alternatives[iArray + 1] = alternatives[iArray];
+				}
+				alternatives[0] = mainSignIndex;
+
+				break;
+			}
+		}
+
 		return alternatives;
 	};
 
-	this.addAttribute = function(json, signData, attribute, value)
+	this.changeWidth = function(iLine, iSign, signCharId, width)
 	{
+		this.text[iLine][iSign]['signCharId'] = signCharId;
+		this.text[iLine][iSign]['width'] =
+		(
+			width == 1
+			? null
+			: width
+		);
+	};
+
+	this.addAttribute = function(json, iLine, iSign, attribute, value)
+	{
+		const signData = this.text[iLine][iSign];
+
 		if (attribute == 'position')
 		{
-			if (json['signPositionId'] == null
-			||  json['level'] == null)
-			{
-				return false;
-			}
-
 			if (signData[attribute] == null)
 			{
-				signData[attribute] = [];
+				this.text[iLine][iSign][attribute] = []; // change from null to [] means losing reference to signData
 			}
-			signData[attribute].push
+			this.text[iLine][iSign][attribute].push
 			({
 				'signPositionId': json['signPositionId'],
 				'level'         : json['level'],
@@ -92,11 +114,6 @@ function FragmentTextModel()
 		}
 		else if (attribute == 'corrected')
 		{
-			if (json['signCharReadingDataId'] == null)
-			{
-				return false;
-			}
-
 			signData['signCharReadingDataId'] = json['signCharReadingDataId'];
 
 			if (signData[attribute] == null)
@@ -118,12 +135,12 @@ function FragmentTextModel()
 
 			signData[attribute] = value;
 		}
-
-		return true;
 	};
 
-	this.removeAttribute = function(json, signData, attribute, value)
+	this.removeAttribute = function(json, iLine, iSign, attribute, value)
 	{
+		const signData = this.text[iLine][iSign];
+
 		if (attribute == 'position')
 		{
 			const posData = signData[attribute];
@@ -140,10 +157,10 @@ function FragmentTextModel()
 			}
 			if (posArrayIndex == -1)
 			{
-				return false;
+				return;
 			}
 
-			signData[attribute] = Array.concat
+			this.text[iLine][iSign][attribute] = Array.concat
 			(
 				signData[attribute].slice(0, posArrayIndex),
 				signData[attribute].slice(posArrayIndex + 1)
@@ -154,8 +171,11 @@ function FragmentTextModel()
 			const removalIndex = signData[attribute].indexOf(value);
 			if (removalIndex != -1)
 			{
-				signData[attribute] = signData[attribute].slice(0, removalIndex).concat(
-									  signData[attribute].slice(removalIndex + 1));
+				signData[attribute] = Array.concat
+				(
+					signData[attribute].slice(0, removalIndex),
+					signData[attribute].slice(removalIndex + 1)
+				);
 			}
 		}
 		else
@@ -171,20 +191,15 @@ function FragmentTextModel()
 
 			signData[attribute] = null;
 		}
-
-		return true;
 	};
 
 	this.addSignAfter = function(signData, iLine, iSign)
 	{
-		const line = this.signs[iLine];
+		const line = this.text[iLine];
 		for (var i = line.length - 1; i > iSign; i--)
 		{
 			line[i + 1] = line[i];
 		}
-		line[iSign] = signData;
+		line[iSign + 1] = signData;
 	};
-
-
-	// TODO delete sign method
 }

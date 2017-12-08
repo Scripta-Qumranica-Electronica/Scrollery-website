@@ -1,7 +1,7 @@
 function RichTextEditor()
 {
 	this.textModel = new FragmentTextModel();
-	this.text = this.textModel.signs;
+	this.text = this.textModel.text;
 	this.signVisualisation = new SignVisualisation();
 
 	this.fontSize = 20;
@@ -228,7 +228,7 @@ function RichTextEditor()
 			{
 				span.css
 				({
-					'font-size': Math.ceil(this.fontSize * w) + 'px'
+					// 'font-size': Math.ceil(this.fontSize * w) + 'px'
 				});
 			}
 		}
@@ -316,15 +316,14 @@ function RichTextEditor()
 		if (attributes['isVariant'] == 1)
 		{
 			span.hide();
-			// TODO reference to main sign? reference from it?
 		}
 		
-		if ((attributes['retraced']) == 1) // 6.2
+		if (attributes['retraced'] == 1) // 6.2
 		{
 			span.addClass('retraced');
 		}
 		
-		if ((attributes['readability']) != null) // 9
+		if (attributes['readability'] != null) // 9
 		{
 			if ((attributes['readability']) == 'INCOMPLETE_AND_NOT_CLEAR')
 			{
@@ -336,23 +335,16 @@ function RichTextEditor()
 			}
 		}
 		
-		if ((attributes['reconstructed']) == 1) // 10
+		if (attributes['reconstructed'] == 1) // 10
 		{
 			span.addClass('reconstructed');
 		}
 		
-		if ((attributes['corrected']) != null) // 11
+		if (attributes['corrected'] != null) // 11
 		{
-			if (typeof attributes['corrected'] == 'string') // one correction only
+			for (var i in attributes['corrected'])
 			{
-				span.addClass(attributes['corrected'].toLowerCase());
-			}
-			else if (typeof attributes['corrected'] == 'object') // multiple
-			{
-				for (var i in attributes['corrected'])
-				{
-					span.addClass(attributes['corrected'].toLowerCase());
-				}
+				span.addClass(attributes['corrected'][i].toLowerCase());
 			}
 		}
 		
@@ -383,6 +375,8 @@ function RichTextEditor()
 				event.target['id']
 			);
 		});
+
+		return span;
 	};
 
     this.addVerticalMargin = function(position)
@@ -417,10 +411,7 @@ function RichTextEditor()
     this.displayModel = function(json)
 	{
 		this.textModel.setFragment(json);
-		this.text = this.textModel['signs'];
-
 		const lineNames = this.textModel['lineNames'];
-		const text = this.text;
 
         const container = $('#richTextContainer');
 		container.appendTo('#RichTextPanel'); // switch back from single sign editor, if necessary
@@ -439,11 +430,9 @@ function RichTextEditor()
 		this.addVerticalMargin('upperMargin');
         const lowerMargin = this.addVerticalMargin('lowerMargin'); // must be created before normal lines so signs can be added
 
-		var lastMainSign = null;
-
-        for (var iLine in text)
+        for (var iLine in this.text)
 		{
-			const line = text[iLine];
+			const line = this.text[iLine];
 
 			this.addTextLine(iLine, lineNames[iLine]);
 
@@ -451,23 +440,6 @@ function RichTextEditor()
 			{
 				const sign = line[iSign];
 
-				if (sign['isVariant'] == 1)
-				{
-					if (lastMainSign != null) // null shouldn't happen, but for safety 
-					{
-						if (lastMainSign['alternatives'] == null) // first variant of this sign
-						{
-							lastMainSign['alternatives'] = [];
-						}
-						
-						lastMainSign['alternatives'].push(sign);
-					}
-				}
-				else
-				{
-					lastMainSign = sign;
-				}
-				
 				this.addSign
 				(
 					sign,
@@ -477,9 +449,9 @@ function RichTextEditor()
 			}
 		}
 
-		if (text.length > 0) // at least 1 text line
+		if (this.text.length > 0) // at least 1 text line
         {
-            lowerMargin.insertAfter('#line' + (text.length - 1));
+            lowerMargin.insertAfter('#line' + (this.text.length - 1));
         }
 
 		buttons.appendTo(container);
