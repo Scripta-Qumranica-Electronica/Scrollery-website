@@ -22,31 +22,6 @@ Other specialized types of editors may be devised in the course of the project, 
 ## Setting up a development environment
 Most development on this repository will require a local LAMP/MAMP/WAMP setup.  The SQE website is currently hosted on an Apache server and makese heavy use of Perl CGI scripts to transport data to and from our MariaDB database.  I assume that those who will want to assist in development already have or know how to set up the relevant Apache + Perl CGI server and a MariaDB server on their local host.
 
-Developers must configure their Apache server settings to enable the running of perl CGI scripts in the resources/cgi-bin of their local instance of this repository.  All Perl CGI files that access the database should acquire their DBH via the method get_dbh in a helper module file installed in /home/perl_libs.  That helper file should be named "SQE_database.pm" and have the following contents:
-```perl
-package SQE_database;
-use strict;
-use warnings FATAL => 'all';
-use DBI;
-
-use Exporter 'import';
-my @EXPORT = qw(get_dbh);
-
-sub get_dbh {
-    my $dsn      = "dbi:mysql:SQE_A:localhost:3306"; #Change this to the connection details of your local MariaDB server
-    my $username = "user"; #Change this to your local MariaDB username
-    my $password = 'password'; #Change this to your local MariaDB password
-    my %attr     = (
-        PrintError => 0,
-        RaiseError => 1
-    );         
-    my $dbh = DBI->connect( $dsn, $username, $password, \%attr );
-
-    return $dbh;
-}
-
-1;
-```
-Be sure to update the variable $dsn, $username, and $password to match the settings of your local MariaDB instance.
+Developers must configure their Apache server settings to enable the running of perl CGI scripts in the resources/cgi-bin of their local instance of this repository.  Access to the SQE database should be accomplished through the API hosted at https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API.  The files from the project should be placed in /home/perl_libs.  Make sure to add a SQE_RESTRICTED.pm file there as well in accordance with the documentation in the project's README.md.  All Perl CGI files that access the database should acquire their DBH via the method get_dbh in that API.
 
 The latest database dump from our SQE database is hosted in the GitHub repository https://github.com/Scripta-Qumranica-Electronica/Data-files with the name SQE_A.sql.  This file must be imported into the local MariaDB instance.
