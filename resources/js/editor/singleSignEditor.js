@@ -182,7 +182,10 @@ function SingleSignEditor(richTextEditor)
 
 		const iLinePrev = previouslyChosenReading.attr('iLine');
 		const iSignPrev = previouslyChosenReading.attr('iSign');
-		$('#span_' + iLinePrev + '_' + iSignPrev).hide();
+		$('#span_' + iLinePrev + '_' + iSignPrev)
+		.hide()
+		.removeClass('chosenSign')
+		.removeClass('chosenSignInLine');
 
 		const nowChosenReading =
 		$('#reading' + readingId)
@@ -191,7 +194,10 @@ function SingleSignEditor(richTextEditor)
 
 		const iLineNow = nowChosenReading.attr('iLine');
 		const iSignNow = nowChosenReading.attr('iSign');
-		$('#span_' + iLineNow + '_' + iSignNow).show();
+		$('#span_' + iLineNow + '_' + iSignNow)
+		.addClass('chosenSign')
+		.addClass('chosenSignInLine')
+		.show();
 	};
 	
 	this.showCharChange = function(index)
@@ -413,10 +419,14 @@ function SingleSignEditor(richTextEditor)
 		const iSign = reading.attr('iSign');
 		var signData = this.text[iLine][iSign];
 
-		var wasChangeSuccessful = true;
-
 		if (doSave)
 		{
+			var signCharReadingDataId = signData['signCharReadingDataId'];
+			if (signCharReadingDataId == null)
+			{
+				signCharReadingDataId = - 1;
+			}
+
 			Spider.requestFromServer
 			(
 				{
@@ -425,14 +435,14 @@ function SingleSignEditor(richTextEditor)
 					'attributeValue': value,
 					'signId'        : signData['signId'],
 					'signCharId'    : signData['signCharId'],
-					'signCharReadingDataId': signData['signCharReadingDataId'], // might be null
+					'signCharReadingDataId': signCharReadingDataId,
 					'SCROLLVERSION' : Spider.current_version_id
 				},
 				function(json) // on result
 				{
 					if (json['error'] != null)
 					{
-						wasChangeSuccessful = false;
+						console.log("json['error'] " + json['error']);
 
 						return;
 					}
@@ -446,78 +456,31 @@ function SingleSignEditor(richTextEditor)
 						value
 					);
 
-					self.showCharChange(iReading);
-				},
-				function()
-				{
-					wasChangeSuccessful = false;
-				}
-			);
-		}
+					self.showCharChange(iReading); // TODO move to visualization
 
-		if (!wasChangeSuccessful)
-		{
-			return;
-		}
-
-
-		/** adapt visualization */
-
-		if (attribute == 'position') // TODO have this part twice: once in JSON reply, once in !doSave, both without timeout
-		{
-			setTimeout // model access must be delayed since model change (different .js) happens concurrently
-			(
-				function()
-				{
-					console.log('iSign ' + iSign);
-
-					self.signVisualisation.repositionChar
+					self.signVisualisation.addAttribute
 					(
 						iLine,
 						iSign,
-						self.text[iLine][iSign]['position'], // must reload from model because fragmentText.js might replace null by []
-						$('.chosenSignInLine')
+						attribute,
+						value,
+						self.text[iLine][iSign]['position'],
+						possibleAttributeId
 					);
-				},
-
-				250
+				}
 			);
-
-			var ca = $('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute'));
-			if (ca.is(':visible')) // this position was already chosen at least once
-			{
-				const previousText = ca.text();
-				const amountIndex = previousText.indexOf('^'); // assumes there is no ^ in position value name
-
-				if (amountIndex == -1) // was chosen exactly once so far
-				{
-					ca.text(previousText + '^2');
-				}
-				else // was chosen more than once already
-				{
-					const newIndex = (1 * previousText.substr(amountIndex + 1)) + 1;
-
-					ca.text(previousText.substr(0, amountIndex + 1) + newIndex);
-				}
-			}
-			else
-			{
-				ca.show();
-			}
 		}
-		else if (attribute == 'corrected')
+		else // for initial text display don't save anything to the DB
 		{
-			$('.chosenSign').addClass(value);
-
-			pa.hide();
-			$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
-		}
-		else // any attribute but position or corrected
-		{
-			$('.chosenSign').addClass(attribute);
-
-			pa.hide();
-			$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
+			self.signVisualisation.addAttribute
+			(
+				iLine,
+				iSign,
+				attribute,
+				value,
+				self.text[iLine][iSign]['position'],
+				possibleAttributeId
+			);
 		}
 	};
 	
@@ -565,7 +528,7 @@ function SingleSignEditor(richTextEditor)
 			{
 				'request'       : 'removeAttribute',
 				'attributeName' : attribute,
-				'value'			: value, // only relevant for corrections
+				'attributeValue': value, // only relevant for corrections
 				'signCharId'    : signData['signCharId'],
 				'signCharReadingDataId': signData['signCharReadingDataId'], // might be null
 				'signPositionId': signPositionId, // might be null

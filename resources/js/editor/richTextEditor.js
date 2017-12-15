@@ -226,10 +226,11 @@ function RichTextEditor()
 			if (w != null
 			&&  w != 1)
 			{
-				span.css
-				({
-					// 'font-size': Math.ceil(this.fontSize * w) + 'px'
-				});
+				this.signVisualisation.changeWidthOfSpan
+				(
+					span,
+					w
+				);
 			}
 		}
 		else // not a letter
