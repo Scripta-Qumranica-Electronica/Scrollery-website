@@ -348,46 +348,27 @@ sub add_char
 		$scroll_version_id = 1;
 	}
 	$dbh->set_scrollversion($scroll_version_id);
-	if ($scroll_version_id == 1)
-	{
-		$cgi->print('{"error":"QWB scroll"}');
 
-		return;
-	}
-
-	query_SQE
+	my @result = $dbh->add_value
 	(
-		$cgi,
-		'none',
-
-		<<'MYSQL',
-		INSERT INTO sign_char
-		SET sign_id = ?,
-			is_variant = 1,
-			sign = ?
-MYSQL
-
+		'sign_char',
+		0,
+		'sign_id',
 		scalar $cgi->param('mainSignId'),
+		'is_variant',
+		1,
+		'sign',
 		scalar $cgi->param('sign')
 	);
-	my $sign_char_id = lastInsertedId_SQE($cgi);
 
-	query_SQE
-	(
-		$cgi,
-		'none',
-
-		<<'MYSQL',
-		INSERT INTO sign_char_owner
-		SET sign_char_id = ?,
-			scroll_version_id = ?
-MYSQL
-
-		$sign_char_id,
-		$scroll_version_id
-	);
-
-	$cgi->print('{"signCharId":'.$sign_char_id.'}');
+	if (defined $result[0])
+	{
+		$cgi->print('{"signCharId":'.$result[0].'}');
+	}
+	elsif (defined $result[1])
+	{
+		$cgi->print('{"error":"'.${$result[1]}[1].'"}');
+	}
 }
 
 sub change_width
@@ -395,12 +376,12 @@ sub change_width
 	my $cgi = shift;
 	my $dbh = $cgi->dbh;
 	
-#	my $scroll_version_id = $cgi->param('SCROLLVERSION');
-#	if (!defined $scroll_version_id)
-#	{
-#		$scroll_version_id = 1;
-#	}
-#	$dbh->set_scrollversion($scroll_version_id);
+	my $scroll_version_id = $cgi->param('SCROLLVERSION');
+	if (!defined $scroll_version_id)
+	{
+		$scroll_version_id = 1;
+	}
+	$dbh->set_scrollversion($scroll_version_id);
 	
 	my @result = $dbh->change_value
 	(
@@ -443,7 +424,7 @@ sub _add_position
 	# determine new level
 
 	my $level = 1;
-	my @previous_max_level = query_SQE
+	my @previous_max_level = query_SQE # TODO can result in multiple positions with same level, if added A, removed A, added B, ...
 	(
 		$cgi,
 		'all',
@@ -496,7 +477,7 @@ sub _add_correction
 	my $correction = uc(shift);
 
 	my @result;
-	if (defined $reading_data_id)
+	if ($reading_data_id != -1)
 	{
 		my $existing_corrections = query_SQE
 		(
@@ -512,11 +493,9 @@ MYSQL
 		);
 
 		if (defined $existing_corrections
-		&&	scalar $existing_corrections > 0)
+		&&	length $existing_corrections > 0)
 		{
 			$correction = $existing_corrections.','.$correction;
-			$cgi->print('{"correction_concatenation":"'.$correction.'"}');
-			return;
 		}
 
 		@result = $dbh->change_value
@@ -530,11 +509,11 @@ MYSQL
 	else
 	{
 		@result = $dbh->add_value
-		# TODO returns lowest id of existing entry with this correction
-		# if no such entry: DBD::mysql::st execute failed: Field 'sign_char_id' doesn't have a default value at /home/perl_libs/SQE_DBI.pm line 417.
 		(
 			'sign_char_reading_data',
 			0,
+			'sign_char_id',
+			scalar $cgi->param('signCharId'),
 			'correction',
 			$correction
 		);
@@ -555,9 +534,15 @@ sub add_attribute
 	my $cgi = shift;
 	my $dbh = $cgi->dbh;
 	
+	my $scroll_version_id = $cgi->param('SCROLLVERSION');
+	if (!defined $scroll_version_id)
+	{
+		$scroll_version_id = 1;
+	}
+	$dbh->set_scrollversion($scroll_version_id);
+
 	my $attribute_name = $cgi->param('attributeName');
 	my $attribute_value = $cgi->param('attributeValue');
-	my $scroll_version_id = $cgi->param('SCROLLVERSION');
 
 	my @result;
 	if ($attribute_name eq 'mightBeWider')
@@ -598,7 +583,7 @@ sub add_attribute
 		my $value = 1;
 
 		my $id = $cgi->param('signCharReadingDataId');
-		if (defined $id)
+		if ($id != -1)
 		{
 			@result = $dbh->change_value
 			(
@@ -608,7 +593,7 @@ sub add_attribute
 				$value
 			);
 		}
-		else
+		else # no sign_char_reading_data entry yet
 		{
 			@result = $dbh->add_value
 			(
@@ -633,6 +618,81 @@ sub add_attribute
 	}
 }
 
+sub _remove_correction
+{
+	my $cgi = shift;
+	my $dbh = $cgi->dbh;
+	my $reading_data_id = scalar $cgi->param('signCharReadingDataId');
+
+	my $existing_corrections = query_SQE
+	(
+		$cgi,
+		'first_value',
+
+		<<'MYSQL',
+		SELECT correction FROM sign_char_reading_data
+		WHERE sign_char_reading_data_id = ?
+MYSQL
+
+		$reading_data_id
+	);
+
+	if (!defined $existing_corrections
+	||  length $existing_corrections == 0)
+	{
+		$cgi->print('{"error":"Could not remove correction"}');
+	}
+	else
+	{
+		my $correction_to_remove = uc($cgi->param('attributeValue'));
+		my $correction_index = index($existing_corrections, $correction_to_remove);
+
+		if ($correction_index == -1) # not found (shouldn't happen)
+		{
+			$cgi->print('{"error":"Could not remove correction"}');
+		}
+		else
+		{
+			my $new_correction_string;
+
+			if ($correction_index > 0)
+			{
+				$new_correction_string =
+				substr($existing_corrections, 0, $correction_index - 1) # before entry to be removed and its leading comma
+				.substr($existing_corrections, $correction_index + length $correction_to_remove); # after entry to be removed
+			}
+			else # entry to be removed is located at begin
+			{
+				if ($correction_to_remove eq $existing_corrections)
+				{
+					$new_correction_string = '';
+				}
+				else # remove entry and trailing comma
+				{
+					$new_correction_string = substr($existing_corrections, length($correction_to_remove) + 1);
+				}
+			}
+
+			my @result = $dbh->change_value
+			(
+				'sign_char_reading_data',
+				$reading_data_id,
+				'correction',
+				$new_correction_string
+			);
+
+			if (defined $result[0])
+			{
+				$cgi->print('{"signCharReadingDataId":'.$result[0].'}');
+			}
+			elsif (defined $result[1])
+			{
+				$cgi->print('{"error":"'.${$result[1]}[1].'"}');
+			}
+		}
+	}
+}
+
 sub remove_attribute
 {
 	my $cgi = shift;
@@ -646,7 +706,7 @@ sub remove_attribute
 	$dbh->set_scrollversion($scroll_version_id);
 	
 	my $attribute_name = $cgi->param('attributeName');
-	
+
 	my @result;
 	if ($attribute_name eq 'mightBeWider')
 	{
@@ -678,20 +738,7 @@ sub remove_attribute
 	}
 	elsif ($attribute_name eq 'corrected')
 	{
-		# TODO read existing corrections, remove only the one given by parameter
-
-		@result = $dbh->change_value
-		(
-			'sign_char_reading_data',
-			scalar $cgi->param('signCharReadingDataId'),
-			'correction',
-			''
-		);
-		
-		if (defined $result[0])
-		{
-			$cgi->print('{"signCharReadingDataId":'.$result[0].'}');
-		}
+		_remove_correction($cgi);
 	}
 	else # reconstructed / retraced
 	{

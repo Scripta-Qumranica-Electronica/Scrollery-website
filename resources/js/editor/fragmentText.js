@@ -23,10 +23,17 @@ function FragmentTextModel()
 
 				for (var attribute in sign)
 				{
-					if (attribute == 'corrected'
-					&&  typeof sign[attribute] == 'string') // happens for a single correction => normalize to array
+					if (attribute == 'corrected')
 					{
-						this.text[iLine][iSign][attribute] = [sign[attribute]];
+						const split = sign[attribute].split(',');
+
+						const correctedArray = [];
+						for (var iSplit in split)
+						{
+							correctedArray.push(split[iSplit]);
+						}
+
+						this.text[iLine][iSign][attribute] = correctedArray;
 					}
 					else
 					{
@@ -168,6 +175,8 @@ function FragmentTextModel()
 		}
 		else if (attribute == 'corrected')
 		{
+			signData['signCharReadingDataId'] = json['signCharReadingDataId'];
+
 			const removalIndex = signData[attribute].indexOf(value);
 			if (removalIndex != -1)
 			{

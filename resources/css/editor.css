@@ -488,12 +488,12 @@
 
 .line_below
 {
-	text-decoration: underline;
+	border-bottom: 1px solid black;
 }
 
 .line_above
 {
-	text-decoration: overline;
+	border-top: 1px solid black;
 }
 
 .boxed

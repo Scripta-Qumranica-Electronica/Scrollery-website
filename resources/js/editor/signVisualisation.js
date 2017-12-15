@@ -48,14 +48,18 @@ function SignVisualisation()
 	// TODO reconstructed etc.
 	// TODO sign attributes including corrections?
 
+	this.changeWidthOfSpan = function(span, width)
+	{
+		span.css
+		({
+			// 'transform': 'scaleX(' + width + ')'
+			'font-size': Math.ceil(this.fontSize * width) + 'px'
+		});
+	};
+
 	this.changeWidth = function(iLine, iSign, width)
 	{
-		$('#span_' + iLine + '_' + iSign)
-		.css
-		({
-			'transform': 'scaleX(' + width + ')'
-			//'font-size': Math.ceil(this.fontSize * width) + 'px'
-		});
+		this.changeWidthOfSpan($('#span_' + iLine + '_' + iSign), width);
 	};
 
 	this.repositionChar = function(iLine, iSign, positionData, span)
@@ -150,6 +154,56 @@ function SignVisualisation()
 			{
 				span.appendTo('#regularLinePart' + iLine);
 			}
+		}
+	};
+
+	this.addAttribute = function(iLine, iSign, attribute, value, positionData, possibleAttributeId)
+	{
+		if (attribute == 'position')
+		{
+			this.repositionChar
+			(
+				iLine,
+				iSign,
+				positionData,
+				$('.chosenSignInLine')
+			);
+
+			var ca = $('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute'));
+			if (ca.is(':visible')) // this position was already chosen at least once
+			{
+				const previousText = ca.text();
+				const amountIndex = previousText.indexOf('^'); // assumes there is no ^ in position value name
+
+				if (amountIndex == -1) // was chosen exactly once so far
+				{
+					ca.text(previousText + '^2');
+				}
+				else // was chosen more than once already
+				{
+					const newIndex = (1 * previousText.substr(amountIndex + 1)) + 1;
+
+					ca.text(previousText.substr(0, amountIndex + 1) + newIndex);
+				}
+			}
+			else
+			{
+				ca.show();
+			}
+		}
+		else if (attribute == 'corrected')
+		{
+			$('.chosenSign').addClass(value);
+
+			$('#' + possibleAttributeId).hide();
+			$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
+		}
+		else // any attribute but position or corrected
+		{
+			$('.chosenSign').addClass(attribute);
+
+			$('#' + possibleAttributeId).hide();
+			$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
 		}
 	};
 }
