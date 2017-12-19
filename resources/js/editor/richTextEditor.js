@@ -170,7 +170,7 @@ function RichTextEditor()
 
 		$('<td></td>')
 		.attr('id', 'regularLinePart' + number)
-		.attr('contentEditable', 'false') // TODO reactivate later, also for margins
+		.attr('contentEditable', 'false') // TODO reactivate later, also for margins (including upper & lower)
 		.addClass('lineSection')
 		.addClass('normalBottomBorder')
 		.appendTo(line);
@@ -264,56 +264,16 @@ function RichTextEditor()
 				});
 			}
 		}
-		
-		var destination = $('#regularLinePart' + iLine);
-		if (attributes['position'] != null) // chapter 5
-		{
-            var isVerticalPositionInLineSet = false;
-			var isHorizontalMarginSet = false;
-			var isVerticalMarginSet = false;
 
-			for (var iPos in attributes['position'])
-			{
-				var pos = attributes['position'][iPos]['position'];
+		this.signVisualisation.repositionChar
+		(
+			iLine,
+			iSign,
+			attributes['position'],
+			span,
+			true
+		);
 
-				if (!isVerticalPositionInLineSet)
-				{
-                    if (pos == 'aboveLine'
-					||  pos == 'belowLine')
-                    {
-                        span.addClass(pos);
-                        isVerticalPositionInLineSet = true;
-                    }
-				}
-
-				if (!isHorizontalMarginSet)
-				{
-					if (pos == 'margin')
-					{
-						pos = 'leftMargin';
-					}
-
-					if (pos == 'leftMargin'
-					||  pos == 'rightMargin')
-					{
-                        destination = $('#' + pos + iLine);
-                        isHorizontalMarginSet = true;
-					}
-				}
-
-				if (!isVerticalMarginSet) // TODO combination of horizontal & vertical margin?
-				{
-                    if (pos == 'upperMargin'
-                    ||  pos == 'lowerMargin')
-                    {
-                        destination = $('#regularLinePart_' + pos);
-                        isVerticalMarginSet = true;
-                    }
-				}
-			}
-		}
-		span.appendTo(destination);
-		
 		if (attributes['isVariant'] == 1)
 		{
 			span.hide();
@@ -398,7 +358,7 @@ function RichTextEditor()
 
         $('<td></td>')
 		.attr('id', 'regularLinePart_' + position)
-		.attr('contentEditable', 'false') // TODO reactivate later, also for margins
+		.attr('contentEditable', 'false') // TODO reactivate later, also for margins (including upper & lower)
 		.appendTo(margin);
 
         $('<td></td>')

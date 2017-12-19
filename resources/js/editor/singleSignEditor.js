@@ -202,11 +202,6 @@ function SingleSignEditor(richTextEditor)
 	
 	this.showCharChange = function(index)
 	{
-		if (Spider.unlocked == false)
-		{
-			return;
-		}
-		
 		$('#reading' + index).addClass('modifiedSign'); // TODO remove it once it's back to initial attributes
 	};
 
@@ -266,7 +261,8 @@ function SingleSignEditor(richTextEditor)
 					{
 						'sign': newReading,
 						'signId': mainSignId,
-						'signCharId': json['signCharId']
+						'signCharId': json['signCharId'],
+						'isVariant': 1
 					},
 					iLineMain,
 					iSign - 1
@@ -290,7 +286,6 @@ function SingleSignEditor(richTextEditor)
 					false,
 					$('#signReadings')
 				);
-				self.switchReading(iReading);
 
 				const span = self.richTextEditor.addSign
 				(
@@ -310,6 +305,8 @@ function SingleSignEditor(richTextEditor)
 					)
 				)
 				.show();
+
+				self.switchReading(iReading);
 
 				$('#addReadingDiv').appendTo('#hidePanel');
 				$('#addReadingPseudoButton').appendTo('#signReadings');
@@ -456,12 +453,13 @@ function SingleSignEditor(richTextEditor)
 						value
 					);
 
-					self.showCharChange(iReading); // TODO move to visualization
+					self.showCharChange(iReading); // TODO move to visualization, as boolean?
 
 					self.signVisualisation.addAttribute
 					(
 						iLine,
 						iSign,
+						iReading,
 						attribute,
 						value,
 						self.text[iLine][iSign]['position'],
@@ -476,6 +474,7 @@ function SingleSignEditor(richTextEditor)
 			(
 				iLine,
 				iSign,
+				iReading,
 				attribute,
 				value,
 				self.text[iLine][iSign]['position'],
@@ -603,7 +602,7 @@ function SingleSignEditor(richTextEditor)
 		);
 	};
 	
-	this.showReading = function(iReading, iLine, iSign, isMainSign, signReadings)
+	this.showReading = function(iReading, iLine, iSign, isMainSign, signReadings) // TODO visualizes all attributes of variants on main sign
 	{
 		const signElement =
 		$('<span></span>')
