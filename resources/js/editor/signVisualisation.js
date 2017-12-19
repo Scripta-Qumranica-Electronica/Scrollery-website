@@ -45,9 +45,6 @@ function SignVisualisation()
 		return typeName;
 	};
 
-	// TODO reconstructed etc.
-	// TODO sign attributes including corrections?
-
 	this.changeWidthOfSpan = function(span, width)
 	{
 		span.css
@@ -62,7 +59,7 @@ function SignVisualisation()
 		this.changeWidthOfSpan($('#span_' + iLine + '_' + iSign), width);
 	};
 
-	this.repositionChar = function(iLine, iSign, positionData, span)
+	this.repositionChar = function(iLine, iSign, positionData, span, addToEndOfLine)
 	{
 		var verticalPositionInLine = null;
 		var horizontalMargin = null;
@@ -131,34 +128,44 @@ function SignVisualisation()
 		if (horizontalMargin == null
 		&&  verticalMargin == null)
 		{
-			const signsOnRegularLine = $('#regularLinePart' + iLine).children();
-			var inserted = false;
-
-			for (var i in signsOnRegularLine)
-			{
-				if (i == 'length') // length follows after actual children
-				{
-					break;
-				}
-
-				if (signsOnRegularLine[i]['attributes']['iSign']['value'] * 1 > iSign)
-				{
-					span.insertBefore('#' + signsOnRegularLine[i]['id']);
-					inserted = true;
-
-					break;
-				}
-			}
-
-			if (!inserted) // iSign is higher than any in line
+			if (addToEndOfLine != null
+			&&  addToEndOfLine == true)
 			{
 				span.appendTo('#regularLinePart' + iLine);
+			}
+			else
+			{
+				const signsOnRegularLine = $('#regularLinePart' + iLine).children();
+				var inserted = false;
+
+				for (var i in signsOnRegularLine)
+				{
+					if (i == 'length') // length follows after actual children
+					{
+						break;
+					}
+
+					if (signsOnRegularLine[i]['attributes']['iSign']['value'] * 1 > iSign)
+					{
+						span.insertBefore('#' + signsOnRegularLine[i]['id']);
+						inserted = true;
+
+						break;
+					}
+				}
+
+				if (!inserted) // iSign is higher than any in line
+				{
+					span.appendTo('#regularLinePart' + iLine);
+				}
 			}
 		}
 	};
 
-	this.addAttribute = function(iLine, iSign, attribute, value, positionData, possibleAttributeId)
+	this.addAttribute = function(iLine, iSign, iReading, attribute, value, positionData, possibleAttributeId)
 	{
+		const charInLine = $('#span_' + iLine + '_' + iSign);
+
 		if (attribute == 'position')
 		{
 			this.repositionChar
@@ -166,7 +173,7 @@ function SignVisualisation()
 				iLine,
 				iSign,
 				positionData,
-				$('.chosenSignInLine')
+				charInLine
 			);
 
 			var ca = $('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute'));
@@ -193,17 +200,21 @@ function SignVisualisation()
 		}
 		else if (attribute == 'corrected')
 		{
-			$('.chosenSign').addClass(value);
+			charInLine.addClass(value);
+			$('#reading' + iReading).addClass(value);
 
 			$('#' + possibleAttributeId).hide();
 			$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
 		}
 		else // any attribute but position or corrected
 		{
-			$('.chosenSign').addClass(attribute);
+			charInLine.addClass(attribute);
+			$('#reading' + iReading).addClass(attribute);
 
 			$('#' + possibleAttributeId).hide();
 			$('#' + possibleAttributeId.replace('possibleAttribute', 'currentAttribute')).show();
 		}
 	};
+
+	// TODO reconstructed, corrections etc.
 }
