@@ -1,40 +1,17 @@
-$(document).ready(function()
-{
-	$('#notification')
-	.hide();
-	
-	const triggerButtonAtReturn = function(e)
-	{
-	    if (e.keyCode == 13)
-	    {
-	    	$('#confirmLogin').click();
-	    }
-	}
-	$("#userNameInput").on('keyup', triggerButtonAtReturn);
-	$("#passwordInput").on('keyup', triggerButtonAtReturn);
 
-	$('#confirmLogin').click
-	(
-		function()
-		{
-			Spider.requestFromServer
-			(
-				{
+	$('#confirmLogin').click(function() {
+			Spider.requestFromServer({
 					'request':		'login',
 					'USER_NAME':	$('#userNameInput').val(),
 					'PASSWORD':		$('#passwordInput').val(),
 					'SCROLLVERSION': 1
 				},
-				function(response) // on success
-				{
-					if (response['errorCode'] == 2)
-					{
+				function(response) {
+					if (response['errorCode'] == 2) {
 						$('#notification')
 						.text('Invalid user and / or password.')
 						.show();
-					}
-					else
-					{
+					} else {
 						Spider.session_id = response['SESSION_ID'];
 						Spider.user_id = response['USER_ID'];
 						Spider.user = $('#userNameInput').val();
@@ -53,13 +30,9 @@ $(document).ready(function()
 						//window.location = 'index.html?session=' + response + '&user=' + $('#userNameInput').val();
 					}
 				},
-				function(response) // on failure
-				{
-					$('#notification')
-					.text('Could not connect to server.')
-					.show();
+				function(response) {
+					$('#notification').text('Could not connect to server.').show();
 				}
 			);
 		}
 	);
-});

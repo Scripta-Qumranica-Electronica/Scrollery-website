@@ -1,0 +1,34 @@
+{
+  "name": "sqe",
+  "description": "Scripta Qumranica Electronica - Digital Tools for the Dead Sea Scrolls",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "webpack --config webpack.dev.js",
+    "prod": "webpack --config webpack.prod.js",
+    "start": "webpack-dev-server --config webpack.server.js"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^0.1.17",
+    "css-loader": "^0.28.9",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "imperavi-kube": "^6.5.2",
+    "sass-loader": "^6.0.6",
+    "style-loader": "^0.19.1",
+    "uglifyjs-webpack-plugin": "^1.1.6",
+    "vue": "^2.5.13",
+    "vue-loader": "^13.7.0",
+    "vue-template-compiler": "^2.5.13",
+    "webpack": "^3.10.0",
+    "webpack-build-notifier": "^0.1.22",
+    "webpack-dev-server": "^2.11.0",
+    "webpack-merge": "^4.1.1",
+    "webpack-notifier": "^1.5.1"
+  },
+  "dependencies": {
+    "@babel/core": "^7.0.0-beta.38",
+    "@babel/preset-env": "^7.0.0-beta.38",
+    "axios": "^0.17.1",
+    "babel-loader": "8.0.0-beta.0",
+    "vue-router": "^3.0.1"
+  }
+}

@@ -7,11 +7,6 @@ html, body {
 
 @-webkit-keyframes bugfix { from {padding:0;} to {padding:0;} }
 
-#login {
-	padding: 10px;
-  border: 1px solid lightgray;
-	text-align: center;
-}
 
 #site {
   position: relative;

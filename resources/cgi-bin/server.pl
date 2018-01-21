@@ -6,7 +6,7 @@ use warnings;
 use feature qw(say);
 use Data::Dumper;
 
-use lib qw(/home/perl_libs);
+use lib qw(/usr/local/perl_libs/SQE_DB_API);
 use SQE_CGI;
 use SQE_DBI;
 use SQE_API::Queries;
