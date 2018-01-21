@@ -2,7 +2,7 @@ var verticalDivide;
 var horizontalDivide;
 var transitionDuration = '.6s ease all';
 
-function whichTransitionEvent() {
+window.whichTransitionEvent = function whichTransitionEvent() {
   var t,
     el = document.createElement("fakeelement");
 
@@ -63,7 +63,7 @@ $(document).ready(function () {
 });
 
 //Function to hide/show side menu
-function toggleNav() {
+window.toggleNav = function toggleNav() {
   $('#show-menu').toggleClass("is-active");
   if ($('#site').css('margin-left') == '-300px') {
     $('#site').css('margin-left', '0');
@@ -84,7 +84,7 @@ $(document).keyup(function (e) {
 
 // Function to handle logic of various panel configurations (any combination of
 // panes can be hidden or shown).
-function togglePane() {
+window.togglePane = function togglePane() {
   $('.main-container').css('transition', transitionDuration); //Set transition duration and type
   $('.pane-menu img').attr('src', 'resources/images/Fullscreen.png'); //Reset fullscreen icon and 'alt'
   $('.pane-menu img').attr('alt', 'Full Screen');
@@ -147,7 +147,7 @@ function togglePane() {
 }
 
 //Function to set one panel to fullscreen
-function fullScreenToggle(event) {
+window.fullScreenToggle = function fullScreenToggle(event) {
   $('.main-container').css('transition', transitionDuration);//Set transition duration and type
 
   //This routine calls the function fullScreen(event) and passes the event
@@ -172,7 +172,7 @@ function fullScreenToggle(event) {
 }
 
 //Function to set the pane containing the triggering event to full screen.
-function fullScreenPane(event) {
+window.fullScreenPane = function fullScreenPane(event) {
   var container = $(event.target).parent().parent().attr('id');
   if (container == 'single-image-container') { //Set single-image-container to fullscreen
     $('#single-image-container').css('width', '100%');
@@ -196,29 +196,29 @@ function fullScreenPane(event) {
 }
 
 //Function for getting the width of an element in percent of its parent
-function getCssWidth(childSelector) {
+window.getCssWidth = function getCssWidth(childSelector) {
   return 100 * $(childSelector).width() / $(childSelector).offsetParent().width();
 }
 
 //Function for getting the height of an element in percent of its parent
-function getCssHeight(childSelector) {
+window.getCssHeight = function getCssHeight(childSelector) {
   return 100 * $(childSelector).height() / $(childSelector).offsetParent().height();
 }
 
 //Adjust panels to conform to a change in the vertical divider
-function resizeHight(event) {
+window.resizeHight = function resizeHight(event) {
   verticalDivide = 100 * (event.clientY / $('#editing-panes').height());
   resizePanels('vertical')
 }
 
 //Adjust panels to conform to a change in the horizontal divider
-function resizeWidth(event) {
+window.resizeWidth = function resizeWidth(event) {
   horizontalDivide = 100 * ((event.clientX - $('#editing-panes').offset().left) / $('#editing-panes').width());
   resizePanels('horizontal')
 }
 
 //Set panels back to the last stored values on either the vertical or horizontal axis
-function resizePanels(axis) {
+window.resizePanels = function resizePanels(axis) {
   if (axis == 'horizontal') {
     if (horizontalDivide > 5 && horizontalDivide < 95) {
       $('#single-image-container').css('width', horizontalDivide + '%');

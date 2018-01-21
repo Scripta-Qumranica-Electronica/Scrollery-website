@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use JSON::XS;
 use MIME::Base64;
-use lib qw(/usr/local/perl_libs/SQE_DB_API);
+use lib qw(/home/perl_libs);
 #use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
 use SQE_CGI;
 

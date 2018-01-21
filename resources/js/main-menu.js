@@ -1,11 +1,11 @@
-var listing_type = {'lv_1': 'institution',
-                    'lv_2': 'catalog_plate',
-                    'lv_3': 'catalog_fragment',
-                    'ref': 'image_catalog_id'
-                };
-var current_lvl;
+var listing_type = window.listing_type = {'lv_1': 'institution',
+    'lv_2': 'catalog_plate',
+    'lv_3': 'catalog_fragment',
+    'ref': 'image_catalog_id'
+};
+window.current_lvl;
 
-function login(){
+window.login = function login(){
     $(".collapsible").click(function(){show_item(this);});
     $("#new-combination").css("visibility", "visible");
     $(".accordion-title").css("visibility", "visible");
@@ -58,14 +58,14 @@ function login(){
     populate_fragments();
 }
 
-function show_item(item){
+window.show_item = function show_item(item){
     $(".collapsible").next().css("visibility", "hidden");
     $(".collapsible").next().css("max-height", "0vh");
     $(item).next().css("max-height", "25vh");
     $(item).next().css("visibility", "visible");
 }
 
-function loadMenuScroll(item) {
+window.loadMenuScroll = function loadMenuScroll(item) {
     var $scroll = $(item);
     if (Spider.current_combination != $scroll.data("id") || Spider.current_version_id != $scroll.data("scroll-version")) {
         Spider.unlocked = $scroll.data("user") == "default" ? false : true;
@@ -76,7 +76,7 @@ function loadMenuScroll(item) {
     }
 }
 
-function load_fragment_text(selected_frag)
+window.load_fragment_text = function load_fragment_text(selected_frag)
 {
     Spider.requestFromServer
           (
@@ -97,7 +97,7 @@ function load_fragment_text(selected_frag)
           );
 }
 
-function load_fragment_image(selected_frag){
+window.load_fragment_image = function load_fragment_image(selected_frag){
     data_form = new FormData();
     data_form.append('transaction', 'getIAAEdID');
     data_form.append('discCanRef', selected_frag);
@@ -108,7 +108,7 @@ function load_fragment_image(selected_frag){
     });
 }
 
-function new_combination(){
+window.new_combination = function new_combination(){
     data_form = new FormData();
     data_form.append('transaction', 'newCombination');
     data_form.append("SESSION_ID", Spider.session_id);
@@ -122,7 +122,7 @@ function new_combination(){
     });
 }
 
-function rename_combination(comb){
+window.rename_combination = function rename_combination(comb){
     data_form = new FormData();
     data_form.append('transaction', 'nameCombination');
     data_form.append("SESSION_ID", Spider.session_id);
@@ -135,7 +135,7 @@ function rename_combination(comb){
     });
 }
 
-function add_art_to_comb(art){
+window.add_art_to_comb = function add_art_to_comb(art){
     if (Spider.current_combination){
         data_form = new FormData();
         data_form.append('transaction', 'addArtToComb');
@@ -151,7 +151,7 @@ function add_art_to_comb(art){
     }
 }
 
-function populate_combinations(user) {
+window.populate_combinations = function populate_combinations(user) {
     var menu = user == 0 ? '#default-combination-listings' : '#user-combination-listings';
     var username = user == 0 ? "default" : Spider.user;
     $(menu).jstree({
@@ -215,7 +215,7 @@ function populate_combinations(user) {
     });
 }
 
-function populate_fragments() {
+window.populate_fragments = function populate_fragments() {
     $('#unused-fragments-listing').jstree({
         "core" : {
             "themes":{
@@ -306,7 +306,7 @@ function populate_fragments() {
     });
 }
 
-function get_database_data(data_form, callback) {
+window.get_database_data = function get_database_data(data_form, callback) {
 	data_form.append('SESSION_ID', Spider['session_id']);
     jQuery.ajax({
         url: 'resources/cgi-bin/GetImageData.pl',
@@ -322,7 +322,7 @@ function get_database_data(data_form, callback) {
     });
 }
 
-function toRoman(num) {  
+window.toRoman = function toRoman(num) {  
   var result = '';
   var decimal = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
   var roman = ["M", "CM","D","CD","C", "XC", "L", "XL", "X","IX","V","IV","I"];

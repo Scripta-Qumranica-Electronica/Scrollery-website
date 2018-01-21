@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapMutations } from 'vuex'
 
 export default {
   data() {
@@ -35,6 +35,11 @@ export default {
     }
   },
   methods: {
+    ...mapMutations([
+      'setSessionID',
+      'setUserID',
+      'setUsername'
+    ]),
     onSubmit(e) {
       e.preventDefault()
 
@@ -65,17 +70,20 @@ export default {
       }
     },
     attemptLogin() {
-      axios.get('resources/cgi-bin/server.pl', {
-        'request':		'login',
-        'USER_NAME':	this.username.trim(),
-        'PASSWORD':		this.password.trim(),
-        'SCROLLVERSION': 1
+      this.$post('resources/cgi-bin/server.pl', {
+        USER_NAME: this.username.trim(),
+        PASSWORD: this.password.trim(),
+        request: 'login',
+        SCROLLVERSION: 1
       })
       .then(res => {
-        if (res.data) {
+        if (res.data && res.data.error) {
           console.error(res.data)
           this.errMsg = res.data.error
         } else {
+          this.setSessionID(res.data.SESSION_ID)
+          this.setUserID(res.data.USER_ID)
+          this.setUsername(this.username.trim())
 
           // success!
           this.$router.push({name: 'workbench'})
@@ -89,13 +97,7 @@ export default {
 }
 </script>
 
-<style>
-html, body, #app {
-  font-size: 20px;
-  width: 100%;
-  height: 100%;
-}
-
+<style scoped>
 label {
   font-weight: 600;
 }

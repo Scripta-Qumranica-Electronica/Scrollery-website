@@ -1,4 +1,4 @@
-function SingleSignEditor(richTextEditor)
+window.SingleSignEditor = function SingleSignEditor(richTextEditor)
 {
 	this.richTextEditor = richTextEditor;
 	this.textModel = richTextEditor.textModel;

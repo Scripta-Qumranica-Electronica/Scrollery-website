@@ -117,3 +117,49 @@
     </div>
   </div>
 </template>
+
+<script>
+
+import { mapGetters } from 'vuex'
+
+export default {
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (!vm.sessionID.length || vm.userID === -1) {
+        vm.$router.push({path: '/'})
+      }
+    })
+  },
+  computed: {
+    ...mapGetters([
+      'userID', 'sessionID', 'username'
+    ])
+  },
+  mounted() {
+    require([
+      "./messageSpider.js",
+      "./layout-control.js",
+      "./editor/fragmentText.js",
+      "./editor/signVisualisation.js",
+      "./editor/singleSignEditor.js",
+      "./editor/richTextEditor.js",
+      "./single-image-control.js",
+      "./combination-control.js",
+      "./main-menu.js"
+    ], () => {
+      Spider.session_id = this.sessionID;
+      Spider.user_id = this.userID;
+      Spider.user = this.username;
+      $('#editing-panes').css('visibility', 'visible');
+      new SingleImageController($("#single-image-container"), 1);
+      new CombinationController($("#combination-container"), 1);
+      toggleNav(); //Show side menu
+      $('.pane-button').prop('checked', true); //Set each pane to visible
+      togglePane(); //Refresh panes so they appear
+      login();
+      Spider.addRichTextEditor();
+    })
+  }
+}
+
+</script>

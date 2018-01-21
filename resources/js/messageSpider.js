@@ -1,4 +1,4 @@
-function Spider() // singleton central component communication system
+var Spider = function Spider() // singleton central component communication system
 {
 	/** constructor */
 	
@@ -126,4 +126,4 @@ function Spider() // singleton central component communication system
 }
 
 // initialize right here
-var Spider = new Spider();
+var Spider = window.Spider = new Spider();

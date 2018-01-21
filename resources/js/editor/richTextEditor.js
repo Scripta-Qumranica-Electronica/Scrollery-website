@@ -1,4 +1,4 @@
-function RichTextEditor()
+window.RichTextEditor = function RichTextEditor()
 {
 	this.textModel = new FragmentTextModel();
 	this.text = this.textModel.text;
