@@ -1,7 +1,7 @@
 <template>
   <div class="col col-6 push-middle push-center login-wrapper">
     <div class="header"><h2>Login</h2></div>
-    <form id="login" class="form left" @submit="onSubmit">
+    <form id="login" class="form left" @submit.prevent="onSubmit">
         <div class="error" v-show='errMsg.length'>
           {{ errMsg }}
         </div>
@@ -40,9 +40,7 @@ export default {
       'setUserID',
       'setUsername'
     ]),
-    onSubmit(e) {
-      e.preventDefault()
-
+    onSubmit() {
       const isUserValid = this.validateUsername();
       const isPasswordValid = this.validatePassword()
       if (isUserValid && isPasswordValid) {
@@ -97,7 +95,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="sass" scoped>
 label {
   font-weight: 600;
 }
