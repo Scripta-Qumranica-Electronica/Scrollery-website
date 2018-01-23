@@ -1,7 +1,7 @@
 <template>
   <div id="main-menu" class='top-level'>
     <div >
-        <span>Combinations</span><button id="new-combination" type="button">add new</button>
+        <span>{{ $i18n.str("Combinations") }}</span><button id="new-combination" type="button">add new</button>
         <ul class="combination-menu">
             <li v-for="combination in combinations" :key="combination.scroll_data_id + combination.version">
               <combinaton-menu-item

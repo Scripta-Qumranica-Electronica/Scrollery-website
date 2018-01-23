@@ -14,6 +14,14 @@
           <input type="password" placeholder="Your password" class="small" :class='{"error": passwordErr.length}' v-model='password'>
         </div>
         <div class="form-item">
+          <label>Language / Sprache / שפה</label>
+          <select v-model="language">
+            <option value="en">English</option>
+            <option value="de">Deutsche</option>
+            <option value="hb">עברית</option>
+          </select>
+        </div>
+        <div class="form-item">
           <button type="submit">Submit</button>
           <a href="mailto:martin.schroeter@theologie.uni-goettingen.de?subject=Forgot%20password">Forgot my login</a>
         </div>
@@ -31,14 +39,16 @@ export default {
       password: '',
       errMsg: '',
       usernameErr: '',
-      passwordErr: ''
+      passwordErr: '',
+      language: 'en'
     }
   },
   methods: {
     ...mapMutations([
       'setSessionID',
       'setUserID',
-      'setUsername'
+      'setUsername',
+      'setLanguage'
     ]),
     onSubmit() {
       const isUserValid = this.validateUsername();
@@ -82,7 +92,7 @@ export default {
           this.setSessionID(res.data.SESSION_ID)
           this.setUserID(res.data.USER_ID)
           this.setUsername(this.username.trim())
-
+          this.setLanguage(this.language)
           // success!
           this.$router.push({name: 'workbench'})
         }

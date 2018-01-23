@@ -1,14 +1,14 @@
 // Styles - these will be extracted and loaded above the fold
 import '../sass/index.scss'
-//import '@/node_modules/imperavi-kube/dist/css/kube.min.css'
+import '@/node_modules/imperavi-kube/dist/css/kube.min.css'
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
-import i18n from './i18n'
-import ajax from './ajax'
+import i18n from './plugins/i18n'
+import ajax from './plugins/ajax'
 import routes from './routes'
-import makeStore from './store'
+import makeStore from './store/make'
 
 // Router
 Vue.use(VueRouter)
@@ -19,11 +19,12 @@ Vue.use(Vuex)
 const store = makeStore(Vuex)
 
 // Localization
-Vue.use(i18n)
+Vue.use(i18n, { store })
 
 // AJAX
 Vue.use(ajax)
 
+// Turn on the lights
 const app = new Vue({
   router,
   store

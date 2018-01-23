@@ -3,12 +3,16 @@ export default function(Vuex) {
     state: {
       sessionID: '',
       userID: -1,
-      username: ''
+      username: '',
+      language: 'en',
+      languages: {}
     },
     getters: {
       sessionID: state => state.sessionID,
       userID: state => state.userID,
-      username: state => state.username
+      username: state => state.username,
+      language: state => state.language,
+      languages: state => state.languages
     },
     mutations: {
       setSessionID(state, sessionID) {
@@ -19,6 +23,12 @@ export default function(Vuex) {
       },
       setUsername(state, name) {
         state.username = name
+      },
+      setLanguage(state, language) {
+        state.language = language
+      },
+      loadLanguage(state, {key, data}) {
+        state.languages[key] = data
       }
     }
   })

@@ -1,4 +1,4 @@
-import App from './App.vue'
+import App from '~/components/App.vue'
 
 export default [
   { 
@@ -9,7 +9,7 @@ export default [
     path: '/workbench',
     name: 'workbench',
     component: () => {
-      return new Promise(resolve => require(['./LegacyWorkbench.vue'], resolve))
+      return new Promise(resolve => require(['~/components/LegacyWorkbench.vue'], resolve))
     }
   }
 ]

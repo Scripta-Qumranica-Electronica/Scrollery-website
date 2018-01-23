@@ -4,24 +4,15 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 module.exports = {
-  entry: path.resolve(__dirname, 'resources', 'js', 'index.js'),
+  entry: path.resolve(__dirname, 'src', 'js', 'index.js'),
 
   output: {
-    // options related to how webpack emits results
-
-    path: path.resolve(__dirname, "dist"), // string
-    // the target directory for all output files
-    // must be an absolute path (use the Node.js path module)
-
-    filename: "bundle.[name].js", // string
-    // the filename template for entry chunks
-
-    publicPath: "dist/", // string
-    // the url to the output directory resolved relative to the HTML page
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.[name].js",
+    publicPath: "dist/",
   },
 
   module: {
-    // `module.rules` is the same as `module.loaders` in 1.x
     rules: [
       {
         test: /\.js$/,
@@ -63,7 +54,8 @@ module.exports = {
     alias: {
       vue: 'vue/dist/vue.js',
       "@": path.resolve(__dirname),
-      "~": path.resolve(__dirname, "resources", "js")
+      "~": path.resolve(__dirname, "src", "js"),
+      "legacy": path.resolve(__dirname, "resources", "js")
     }
   },
 

@@ -94,17 +94,30 @@ export default {
       'userID', 'sessionID', 'username'
     ])
   },
+  methods: {
+    loadLegacyCode() {
+      return new Promise(resolve => {
+        require([
+          "legacy/messageSpider.js",
+          "legacy/layout-control.js",
+          "legacy/editor/fragmentText.js",
+          "legacy/editor/signVisualisation.js",
+          "legacy/editor/singleSignEditor.js",
+          "legacy/editor/richTextEditor.js",
+          "legacy/single-image-control.js",
+          "legacy/combination-control.js",
+        ], resolve)
+      })
+    },
+    loadLanguage() {
+      return this.$i18n.load()
+    }
+  },
   mounted() {
-    require([
-      "./messageSpider.js",
-      "./layout-control.js",
-      "./editor/fragmentText.js",
-      "./editor/signVisualisation.js",
-      "./editor/singleSignEditor.js",
-      "./editor/richTextEditor.js",
-      "./single-image-control.js",
-      "./combination-control.js",
-    ], () => {
+    Promise.all([
+      this.loadLegacyCode(),
+      this.loadLanguage()
+    ]).then(() => {
       Spider.session_id = this.sessionID;
       Spider.user_id = this.userID;
       Spider.user = this.username;

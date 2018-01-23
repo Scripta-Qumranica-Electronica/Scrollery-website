@@ -1,4 +1,6 @@
-
+/**
+ * @deprecated
+ */
 	$('#confirmLogin').click(function() {
 			Spider.requestFromServer({
 					'request':		'login',
