@@ -47,16 +47,21 @@ export default {
               require(['~/lang/en.js', '~/lang/hb.js'], (en, hb) => {
                 store.commit("loadLanguage", {key: 'en', data: en})
                 store.commit("loadLanguage", {key: 'hb', data: hb})
+                resolve()
               })
               break;
             case 'de':
               require(['~/lang/en.js', '~/lang/de'], (en, de) => {
                 store.commit("loadLanguage", {key: 'en', data: en})
                 store.commit("loadLanguage", {key: 'de', data: de})
+                resolve()
               })
               break
             default:
-              require(['~/lang/en.js'], en => store.commit("loadLanguage", {key: 'en', data: en}))
+              require(['~/lang/en.js'], en => {
+                store.commit("loadLanguage", {key: 'en', data: en})
+                resolve()
+              })
           }
         })
       }
