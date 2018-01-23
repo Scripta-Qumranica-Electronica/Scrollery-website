@@ -1,7 +1,6 @@
 export default {
   install(Vue, { store }) {
     const {
-      language,
       languages
     } = store.getters
 
@@ -13,7 +12,7 @@ export default {
        */
       str(key, args = {}) {
         let str;
-        let data = languages[language]
+        let data = languages[store.getters.language]
         if (!data || !data[key]) {
           // fallback to English
           data = languages['en']
@@ -42,7 +41,7 @@ export default {
       },
       load() {
         return new Promise(resolve => {
-          switch (language) {
+          switch (store.getters.language) {
             case 'hb':
               require(['~/lang/en.js', '~/lang/hb.js'], (en, hb) => {
                 store.commit("loadLanguage", {key: 'en', data: en})

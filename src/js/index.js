@@ -22,7 +22,7 @@ const store = makeStore(Vuex)
 Vue.use(i18n, { store })
 
 // AJAX
-Vue.use(ajax)
+Vue.use(ajax, { store })
 
 // Turn on the lights
 const app = new Vue({

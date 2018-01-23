@@ -92,12 +92,22 @@ export default {
                   && res.data.SESSION_ID 
                   &&  res.data.USER_ID 
           ) {
-              this.setSessionID(res.data.SESSION_ID)
-              this.setUserID(res.data.USER_ID)
-              this.setUsername(this.username.trim())
-              this.setLanguage(this.language)
+
+            // Set store state
+            this.setSessionID(res.data.SESSION_ID)
+            this.setUserID(res.data.USER_ID)
+            this.setUsername(this.username.trim())
+            this.setLanguage(this.language)
+
+            // Load language files
+            this.$i18n.load().then(() => {
+
               // success!
               this.$router.push({name: 'workbench'})
+            })
+            .catch(() => {
+              this.errMsg = 'Service unavailable at this time'
+            })
         } else {
           this.errMsg = 'Unexpected response'
         }

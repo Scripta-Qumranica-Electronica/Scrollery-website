@@ -101,16 +101,11 @@ export default {
           "legacy/combination-control.js",
         ], resolve)
       })
-    },
-    loadLanguage() {
-      return this.$i18n.load()
     }
   },
   mounted() {
-    Promise.all([
-      this.loadLegacyCode(),
-      this.loadLanguage()
-    ]).then(() => {
+    this.loadLegacyCode()
+    .then(() => {
       Spider.session_id = this.sessionID;
       Spider.user_id = this.userID;
       Spider.user = this.username;
