@@ -18,5 +18,26 @@ export default [
     component: () => {
       return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
     }
+  },
+  {
+    path: '/workbench/:scrollID',
+    name: 'workbenchScroll',
+    component: () => {
+      return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
+    }
+  },
+  {
+    path: '/workbench/:scrollID/:scrollVersionID',
+    name: 'workbenchScrollVersion',
+    component: () => {
+      return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
+    }
+  },
+  {
+    path: '/workbench/:scrollID/:scrollVersionID/:colID',
+    name: 'workbenchScrollVersionCol',
+    component: () => {
+      return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
+    }
   }
 ]

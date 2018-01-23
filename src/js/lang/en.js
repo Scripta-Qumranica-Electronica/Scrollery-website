@@ -3,5 +3,6 @@ module.exports = {
   "Combinations": "Combinations",
   "Artifact": "Artifact",
   "Fragment": "Fragment",
-  "User.LoggedInMessage": "Logged in as: :name:"
+  "User.LoggedInMessage": "Logged in as: :name:",
+  "Logout": "Logout"
 };

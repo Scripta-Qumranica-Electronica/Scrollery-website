@@ -3470,6 +3470,10 @@ lodash.memoize@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
 
+lodash.merge@^4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.0.tgz#69884ba144ac33fe699737a6086deffadd0f89c5"
+
 lodash.mergewith@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.mergewith/-/lodash.mergewith-4.6.0.tgz#150cf0a16791f5903b8891eab154609274bdea55"
@@ -6010,6 +6014,10 @@ vue-loader@^13.7.0:
     vue-style-loader "^3.0.0"
     vue-template-es2015-compiler "^1.6.0"
 
+vue-openseadragon@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/vue-openseadragon/-/vue-openseadragon-0.1.1.tgz#346eb4ca93eca861a5ab778d030d0d6d8e6d6713"
+
 vue-router@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.0.1.tgz#d9b05ad9c7420ba0f626d6500d693e60092cc1e9"
@@ -6035,6 +6043,12 @@ vue-template-es2015-compiler@^1.6.0:
 vue@^2.5.13:
   version "2.5.13"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.13.tgz#95bd31e20efcf7a7f39239c9aa6787ce8cf578e1"
+
+vuex-persist@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/vuex-persist/-/vuex-persist-1.1.1.tgz#dc3875fa17d5a5881a526276608bdfc8001ed0c1"
+  dependencies:
+    lodash.merge "^4.6.0"
 
 vuex@^3.0.1:
   version "3.0.1"
