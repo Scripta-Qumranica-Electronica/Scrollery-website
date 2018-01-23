@@ -2,5 +2,6 @@ module.exports = {
   "Loading": "Loading",
   "Combinations": "Combinations",
   "Artifact": "Artifact",
-  "Fragment": "Fragment"
+  "Fragment": "Fragment",
+  "User.LoggedInMessage": "Logged in as: :name:"
 };

@@ -27,10 +27,10 @@ export default {
         str = data[key]
 
         // process vars
-        const re = /\:(\w+)(\=\w*)?:/
-        let matches = null;
+        const re = /(\:(\w+)(\=[^\:]+)?\:)/
+        let matches;
         while ((matches = re.exec(str)) !== null) {
-          str.replace(matches[0], args[matches[1]] || matches[2] || matches[1])
+          str = str.replace(matches[0], args[matches[2]] || matches[3] || matches[2])
         }
 
         // finish

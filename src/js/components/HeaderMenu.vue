@@ -5,7 +5,7 @@
     </div>
     <div class="col col-6"></div>
     <div class="col col-3">
-      <span> Logged in as: {{ username }}</span>
+      <span> {{ $i18n.str('User.LoggedInMessage', {name: username}) }}</span>
       <button class="button secondary outline" @click="onLogout">{{ $i18n.str('Logout') }}</button>
     </div>
   </div>
