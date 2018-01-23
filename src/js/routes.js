@@ -1,15 +1,22 @@
-import App from '~/components/App.vue'
+import Login from '~/components/Login.vue'
 
 export default [
   { 
     path: '/',
-    component: App
+    redirect: {
+      name: 'login'
+    }
+  },
+  { 
+    path: '/login',
+    name: 'login',
+    component: Login
   },
   {
     path: '/workbench',
     name: 'workbench',
     component: () => {
-      return new Promise(resolve => require(['~/components/LegacyWorkbench.vue'], resolve))
+      return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
     }
   }
 ]

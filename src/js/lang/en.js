@@ -1,5 +1,5 @@
 module.exports = {
-  "Login": "Login",
+  "Loading": "Loading",
   "Combinations": "Combinations",
   "Artifact": "Artifact",
   "Fragment": "Fragment"

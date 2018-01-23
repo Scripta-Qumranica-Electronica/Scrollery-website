@@ -79,13 +79,6 @@ import { mapGetters } from 'vuex'
 import MainMenu from './MainMenu.vue'
 
 export default {
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      if (!vm.sessionID.length || vm.userID === -1) {
-        vm.$router.push({path: '/'})
-      }
-    })
-  },
   components: {
     'main-menu': MainMenu
   },

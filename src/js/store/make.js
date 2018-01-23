@@ -15,6 +15,10 @@ export default function(Vuex) {
       languages: state => state.languages
     },
     mutations: {
+      logout(state) {
+        state.sessionID = ""
+        state.userID = ""
+      },
       setSessionID(state, sessionID) {
         state.sessionID = sessionID
       },
