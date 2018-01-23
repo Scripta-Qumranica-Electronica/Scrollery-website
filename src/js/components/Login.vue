@@ -88,13 +88,18 @@ export default {
         if (res.data && res.data.error) {
           console.error(res.data)
           this.errMsg = res.data.error
+        } else if (res.data 
+                  && res.data.SESSION_ID 
+                  &&  res.data.USER_ID 
+          ) {
+              this.setSessionID(res.data.SESSION_ID)
+              this.setUserID(res.data.USER_ID)
+              this.setUsername(this.username.trim())
+              this.setLanguage(this.language)
+              // success!
+              this.$router.push({name: 'workbench'})
         } else {
-          this.setSessionID(res.data.SESSION_ID)
-          this.setUserID(res.data.USER_ID)
-          this.setUsername(this.username.trim())
-          this.setLanguage(this.language)
-          // success!
-          this.$router.push({name: 'workbench'})
+          this.errMsg = 'Unexpected response'
         }
       })
       .catch(({ response }) => {
