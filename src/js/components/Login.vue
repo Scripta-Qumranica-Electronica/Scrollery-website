@@ -6,11 +6,11 @@
           {{ errMsg }}
         </div>
         <div class="form-item">
-          <label>User name <span class="req">*</span> <span class="error">{{ usernameErr }}</span></label>
+          <label>User name <span class="req"></span> <span class="error">{{ usernameErr }}</span></label>
           <input type="text" placeholder="Your login name" class="small" :class='{"error": usernameErr.length}' v-model='username'>
         </div>
         <div class="form-item">
-          <label>Password <span class="req">*</span> <span class="error">{{ passwordErr }}</span></label>
+          <label>Password <span class="req"></span> <span class="error">{{ passwordErr }}</span></label>
           <input type="password" placeholder="Your password" class="small" :class='{"error": passwordErr.length}' v-model='password'>
         </div>
         <div class="form-item">

@@ -5,13 +5,20 @@
     </div>
     <div class="col col-6"></div>
     <div class="col col-3">
+      <span> Logged in as: {{ username }}</span>
       <button class="button secondary outline" @click="onLogout">{{ $i18n.str('Logout') }}</button>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
+  computed: {
+    ...mapGetters(['username'])
+  },
+
   methods: {
     onLogout() {
       this.$store.commit('logout')

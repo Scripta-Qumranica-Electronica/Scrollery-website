@@ -19,11 +19,14 @@ module.exports = merge(common, {
     index: resolve(__dirname, 'index.html'),
     contentBase: __dirname,
     publicPath: "/dist/",
-    port: 9000,
+    port: 9090,
     hot: true,
     overlay: true,
     proxy: {
-      "/resources/cgi-bin": process.env.APP_PORT ?  `http://localhost:${parseInt(process.env.APP_PORT)}` : `http://localhost`
+      "/resources/cgi-bin": {
+        target: "http://localhost/~bronson/Spencer/Scrollery-website",
+        secure: false
+      }
     }
   }
 })

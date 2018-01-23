@@ -2,8 +2,9 @@
   <div id="main-menu" class='top-level'>
     <div >
         <span>{{ $i18n.str("Combinations") }}</span><button id="new-combination" type="button">add new</button>
-        <ul class="combination-menu">
-            <li v-for="combination in combinations" :key="combination.scroll_data_id + combination.version">
+        <input v-model="queryString">
+        <ul class="combination-menu" placeholder="Search for scroll">
+            <li v-for="combination in filterCombinations">
               <combinaton-menu-item
                 @artifact-selected="onArtifactSelected"
                 :count="combination.count"
@@ -15,13 +16,13 @@
               />
             </li>
         </ul>
-    </div>
-    <div class="accordion-panel open_first">
-        <div id="login-title" class="accordion-title collapsible">Login</div>
-        <div id="login-menu" class="accordion-content">
+        <div id="gui" class="accordion-content">
+          <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
+          <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
+          <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
         </div>
     </div>
-    <div class="accordion-panel">
+    <!-- <div class="accordion-panel">
         <div class="accordion-title">
           Combinations
           <button id="new-combination" type="button">add new</button>
@@ -42,15 +43,15 @@
         <div id="fragments" class="accordion-content">
           <div id="unused-fragments-listing" class="main-menu-listing"></div>
         </div>
-    </div>
-    <div class="accordion-panel">
+    </div> -->
+    <!-- <div class="accordion-panel">
         <div class="accordion-title collapsible">GUI</div>
         <div id="gui" class="accordion-content">
           <li><input type="checkbox" id="single-image-button" class="pane-button" reference="single-image-container">Single-Image</input></li>
           <li><input type="checkbox" id="signs-button" class="pane-button" reference="signs-container">Sign</input></li>
           <li><input type="checkbox" id="combination-button" class="pane-button" reference="combination-container">Combination</input></li>
         </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -402,11 +403,19 @@ export default {
     'combinaton-menu-item': CombinationMenuItem
   },
   computed: {
-    ...mapGetters(['userID', 'sessionID'])
+    ...mapGetters(['userID', 'sessionID']),
+    filterCombinations() {
+        return this.queryString.length 
+            ?   this.combinations.filter((combination) => {
+                    return combination.name.indexOf(this.queryString) != -1
+                })
+            : this.combinations
+    }
   },
   data() {
     return {
-      combinations: []
+      combinations: [],
+      queryString: ''
     }
   },
   methods: {
@@ -442,6 +451,9 @@ export default {
 .combination-menu {
   margin: 0;
   padding: 0 10px;
+  height: 70vh;
+  min-height: 70vh;
+  overflow: auto;
 }
 
 .combination-menu li {
