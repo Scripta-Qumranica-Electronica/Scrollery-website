@@ -4,7 +4,7 @@
         <span>{{ $i18n.str("Combinations") }}</span><button id="new-combination" type="button">add new</button>
         <input v-model="queryString">
         <ul class="combination-menu" placeholder="Search for scroll">
-            <li v-for="combination in filterCombinations">
+            <li v-for="combination in filterCombinations" :key="combination.version_id">
               <combinaton-menu-item
                 @artifact-selected="onArtifactSelected"
                 :count="combination.count"
@@ -407,7 +407,7 @@ export default {
     filterCombinations() {
         return this.queryString.length 
             ?   this.combinations.filter((combination) => {
-                    return combination.name.indexOf(this.queryString) != -1
+                    return combination.name.toLowerCase().indexOf(this.queryString.toLowerCase()) != -1
                 })
             : this.combinations
     }
