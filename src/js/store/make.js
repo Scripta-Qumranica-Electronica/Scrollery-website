@@ -12,7 +12,10 @@ export default function(Vuex) {
       userID: state => state.userID,
       username: state => state.username,
       language: state => state.language,
-      languages: state => state.languages
+      languages: state => state.languages,
+      scrollID: state => state.scrollID,
+      scrollVersionID: state => state.scrollVersionID,
+      colID: state => state.colID
     },
     mutations: {
       logout(state) {

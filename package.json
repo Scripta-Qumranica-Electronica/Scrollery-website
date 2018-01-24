@@ -39,8 +39,10 @@
     "formidable": "^1.1.1",
     "imperavi-kube": "^6.5.2",
     "vue": "^2.5.13",
+    "vue-openseadragon": "^0.1.1",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
+    "vuex-persist": "^1.1.1",
     "webpack-karma-jasmine": "^1.0.4"
   }
 }

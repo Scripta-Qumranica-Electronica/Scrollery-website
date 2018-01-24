@@ -33,8 +33,12 @@ export default {
   },
   methods: {
     fetchChildren() {
+      this.$router.push({ name: 'workbenchScrollVersion',
+                          params: { scrollID: this.scrollID, 
+                                    scrollVersionID: this.versionID }
+      })
 
-      // we'll lazy load children, but cache tehm
+      // we'll lazy load children, but cache them
       if (this.children.length) {
 
         // toggle show children
@@ -64,6 +68,11 @@ export default {
       // Spider.current_version_id = $(scroll).data("scroll-version");
       // load_fragment_text($(this).data("id"));
       // load_fragment_image($(this).data("id"));
+      this.$router.push({ name: 'workbenchScrollVersionCol',
+                          params: { scrollID: this.scrollID, 
+                                    scrollVersionID: this.versionID,
+                                    colID: colID }
+      })
 
       this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: 'getFragsOfCol',
