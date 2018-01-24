@@ -1,86 +1,57 @@
 <template>
   <div id="site">
     <main-menu></main-menu>
+    <div class="editing-window">
+      <split-pane v-on:resize="resize" :min-percent='20' :default-percent='30' split="horizontal">
+        <template slot="paneL">
+          <split-pane split="vertical">
+            <template slot="paneL">
+              <single-image class="pane-content"></single-image>
+            </template>
+            <template slot="paneR">
+              <div class="pane-content">Text Editor</div>
+            </template>
+          </split-pane>
+        </template>
+        <template slot="paneR">
+          <div class="pane-content">Combination Pane</div>
+        </template>
+      </split-pane>
+    </div>
 
-    <!-- editing panes -->
-    <div id="editing-panes" class='top-level'>
-
-      <!-- single-image-container -->
-      <div id="single-image-container" class="main-container"></div>
-
-      <!-- signs-container -->
-      <div id="signs-container" class="main-container">
-        <div id="signs-pane" class="main-pane">
-          <div id="singleSignContainer" class="hidden fillingMostHeight contentField">
-            <div id="signContext" dir="rtl"></div>
-            <div id="signReadings" class="scrollable">
-              <span id="addReadingPseudoButton" class="someSpaceToTheLeft pointerMouse">+</span>
-            </div>
-            <button id="finishSingleSignChangesButton" class="someSpaceAbove">Done</button>    
-          </div>
-
-          <div id="RichTextPanel" class="frame">
-            <div id="richTextContainer" class="contentField" dir="rtl">
-              <span id="fragmentName" class="fragmentName"></span>
-            </div>
-          </div>
-          
-          <div id="hidePanel" class="hidden">
-            <div id="richTextButtons" class="someSpaceAbove richTextButtons" dir="rtl">
-              <button id="richTextLineManager">Manage lines</button>
-            </div>
-        
-            <div id="addReadingDiv">
-              <input id="addReadingInput" maxlength="1" size="1" />
-              <button id="confirmAddReadingButton">Ok</button>
-              <button id="cancelAddReadingButton">Cancel</button>
-            </div>
-            <button id="confirmSingleSignChangesButton" class="someSpaceAbove">Ok</button>  
-            <button id="cancelSingleSignChangesButton" class="someSpaceAbove">Cancel</button>
-          </div>
-        </div>
-
-        <!-- horizontal divider -->
-        <div id="horizontal-divider" class="pane-size"></div>
-
-        <!-- pane menu -->
-        <div class="pane-menu">
-          <img src="resources/images/Fullscreen.png" alt="Full Screen" height="15">
-        </div>
-
-      <!-- /signs-container -->
-      </div>
-        
-      <!-- combination container -->
-      <div id="combination-container" class="main-container">
-        <div id="combination-pane" class="main-pane"></div>
-        <div id="vertical-divider" class="pane-size"></div>
-        <div class="pane-menu"><img src="resources/images/Fullscreen.png" alt="Full Screen" height="15"></div>
-      </div>
-      <!-- /combination container -->
-
-      <!-- main-osd -->
-      <div id="main-osd">
-        <button id="show-menu" class="hamburger hamburger--arrow toggle-nav" type="button">
-          <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-          </span>
-        </button>
-      </div>
-      <!-- /main-osd -->
-    
-    </div><!-- /editing panes -->  
+    <!-- main-osd -->
+    <div id="main-osd">
+      <button id="show-menu" class="hamburger hamburger--arrow toggle-nav" type="button">
+        <span class="hamburger-box">
+          <span class="hamburger-inner"></span>
+        </span>
+      </button>
+    </div>
+    <!-- /main-osd --> 
   </div>
 </template>
+
+<style lang="sass" scoped>
+  .editing-window {
+    width: calc(100vw - 300px);
+    height: calc(100vh - 50px);
+    float: right;
+  }
+</style>
+
 
 <script>
 
 import { mapGetters } from 'vuex'
 import MainMenu from './MainMenu.vue'
+import splitPane from 'vue-splitpane'
+import SingleImage from './SingleImage.vue'
 
 export default {
   components: {
-    'main-menu': MainMenu
+    'main-menu': MainMenu,
+    'split-pane': splitPane,
+    'single-image': SingleImage
   },
   computed: {
     ...mapGetters([

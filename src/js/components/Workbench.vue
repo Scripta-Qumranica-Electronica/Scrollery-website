@@ -3,7 +3,6 @@
     <header-menu></header-menu>
     <div class="row app">
         <component v-bind:is="view"></component>
-        <single-image></single-image>
     </div>
   </div>
 </template>
@@ -15,7 +14,6 @@ import { mapGetters } from 'vuex'
 import HeaderMenu from './HeaderMenu.vue'
 import Loading from './Loading.vue'
 import LegacyWorkbench from './LegacyWorkbench.vue'
-import SingleImage from './SingleImage.vue'
 
 export default {
   /**
@@ -32,8 +30,7 @@ export default {
   components: {
     'header-menu': HeaderMenu,
     'loading': Loading,
-    'legacy-work-bench': LegacyWorkbench,
-    'single-image': SingleImage
+    'legacy-work-bench': LegacyWorkbench
   },
 
   data() {

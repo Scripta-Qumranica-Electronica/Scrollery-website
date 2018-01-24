@@ -200,10 +200,12 @@ SELECT 	SQE_image.filename AS filename,
 	SQE_image.is_master,
 		  image_urls.url AS url
 FROM SQE_image
-	INNER JOIN image_urls ON image_urls.id = SQE_image.url_code
-	INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id
-	INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id
-WHERE image_to_edition_catalog.edition_id = ?
+	JOIN image_urls ON image_urls.id = SQE_image.url_code
+	JOIN edition_catalog on edition_catalog.edition_catalog_id = SQE_image.edition_id
+	JOIN edition_catalog_to_discrete_reference ON edition_catalog_to_discrete_reference.edition_id = edition_catalog.edition_catalog_id
+	JOIN discrete_canonical_references ON discrete_canonical_references.discrete_canonical_reference_id = edition_catalog_to_discrete_reference.disc_can_ref_id
+WHERE edition_catalog.edition_side=0
+      AND discrete_canonical_references.column_of_scroll_id = ?
 MYSQL
 	} elsif ($idType eq 'institution') {
 		$getImagesOfFragmentQuery = <<'MYSQL';
