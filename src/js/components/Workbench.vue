@@ -13,7 +13,7 @@ import { mapGetters } from 'vuex'
 // components
 import HeaderMenu from './HeaderMenu.vue'
 import Loading from './Loading.vue'
-import LegacyWorkbench from './LegacyWorkbench.vue'
+import AppBody from './AppBody.vue'
 
 export default {
   /**
@@ -30,7 +30,7 @@ export default {
   components: {
     'header-menu': HeaderMenu,
     'loading': Loading,
-    'legacy-work-bench': LegacyWorkbench
+    'app-body': AppBody,
   },
 
   data() {
@@ -50,7 +50,7 @@ export default {
     // This provides us an async latch to do some async work on initialization.
     // To be utilized later
     setTimeout(() => {
-      this.view = 'legacy-work-bench'
+      this.view = 'app-body'
     }, 700)
   }
 }

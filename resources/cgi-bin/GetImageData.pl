@@ -439,7 +439,25 @@ sub getScrollArtefacts {
 	my $scroll_id = $cgi->param('scroll_id');
 	my $version_id = $cgi->param('scroll_version_id');
 	my $getScrollArtefactsQuery = <<'MYSQL';
-		CALL getScrollVersionArtefacts(?, ?)
+SELECT DISTINCT artefact_position.artefact_id AS id,
+                ST_AsText(ST_Envelope(artefact.region_in_master_image)) AS rect,
+                ST_AsText(artefact.region_in_master_image) AS poly,
+                ST_AsText(artefact_position.position_in_scroll) AS pos,
+                image_urls.url AS url,
+                image_urls.suffix AS suffix,
+                SQE_image.filename AS filename,
+                SQE_image.dpi AS dpi,
+                artefact_position.rotation AS rotation
+FROM artefact_position_owner
+	JOIN artefact_position USING (artefact_position_id)
+	JOIN artefact USING(artefact_id)
+	JOIN scroll_version USING(scroll_version_id)
+	INNER JOIN SQE_image ON SQE_image.sqe_image_id = artefact.master_image_id
+	INNER JOIN image_urls ON image_urls.id = SQE_image.url_code
+	INNER JOIN image_catalog USING(image_catalog_id)
+WHERE artefact_position.scroll_id=?
+      AND artefact_position_owner.scroll_version_id = ?
+      AND image_catalog.catalog_side=0
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollArtefactsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;

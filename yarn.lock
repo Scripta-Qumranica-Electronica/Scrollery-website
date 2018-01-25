@@ -5109,10 +5109,6 @@ vue-loader@^13.7.0:
     vue-style-loader "^3.0.0"
     vue-template-es2015-compiler "^1.6.0"
 
-vue-openseadragon@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/vue-openseadragon/-/vue-openseadragon-0.1.1.tgz#346eb4ca93eca861a5ab778d030d0d6d8e6d6713"
-
 vue-router@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.0.1.tgz#d9b05ad9c7420ba0f626d6500d693e60092cc1e9"

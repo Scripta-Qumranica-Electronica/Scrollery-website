@@ -1,9 +1,9 @@
 <template>
   <div>
-    <span @click="fetchChildren">{{ name }} - {{ username }} - v. {{ version }}</span>
+    <span class="clickable-menu-item" @click="fetchChildren">{{ name }} - {{ username }} - v. {{ version }}</span>
     <div class="children" v-show="showChildren">
         <ul>
-          <li v-for="frg in children" :key="frg.col_id" @click="loadArtefact(frg.col_id)">{{ frg.name }} ({{ frg.col_id }})</li>
+          <li class="clickable-menu-item" v-for="frg in children" :key="frg.col_id" @click="loadArtefact(frg.col_id)">{{ frg.name }} ({{ frg.col_id }})</li>
         </ul>
     </div>
   </div>
@@ -103,3 +103,9 @@ export default {
   }
 }
 </script>
+
+<style lang="sass" scoped>
+  .clickable-menu-item {
+    cursor: pointer;
+  }
+</style>

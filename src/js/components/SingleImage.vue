@@ -1,7 +1,7 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <div :id="navPanel" style="{width: 20vw; height 20vh;}"></div>
-    <div style="{width: 100%; height: 80%;}">
+    <div :id="navPanel" style="{width: 100%; height 50px;}"></div>
+    <div style="{width: 100%; height: calc(100% - 50px);}">
       <open-seadragon 
         :tile-sources="filename"
         :ajax-with-credentials="false"
@@ -29,16 +29,15 @@ export default {
       selectedImageUrls: [],
       filename: 'https://www.qumranica.org/cgi-bin/iipsrv.fcgi?IIIF=P998-Fg005-R-C01-R01-D14112013-T105221-LR445__ColorCalData_IAA_Left_CC110304_110702.tif/info.json',
       navPanel: 'seadragonNavPanel'
-}
+    }
   },
   computed: {
   },
   methods: {
-    
   },
   watch: {
     '$route' (to, from) {
-      if (to.params.colID) {
+      if (to.params.colID && to.params.colID !== from.params.colID) {
         this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: 'imagesOfFragment',
         idType: 'composition',

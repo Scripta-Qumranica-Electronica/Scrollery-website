@@ -17,7 +17,7 @@ export default {
     },
     prefixUrl: {
       type: String,
-      default: '../../../node_modules/openseadragon/build/openseadragon/images/'
+      default: '/node_modules/openseadragon/build/openseadragon/images/'
     },
     maxZoomLevel: {
       type: Number
