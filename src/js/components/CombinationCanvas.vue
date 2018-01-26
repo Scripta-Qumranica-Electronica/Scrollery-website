@@ -1,10 +1,16 @@
 <template>
     <div :style="dimensions">
-        <svg id="combination-canvas" :viewBox="viewBox">
+        <svg id="combination-canvas" 
+            :width="scrollWidth" 
+            :height="scrollHeight" 
+            :viewBox="viewBox" 
+            :transform="'translate(' + (scrollWidth / 2) * (globalScale - 1) 
+            + ' ' + (scrollHeight / 2) * (globalScale - 1) 
+            + ') scale(' + globalScale +  ')'">
             <artefact v-for="artefact in artefacts" 
                 :key="artefact.id" 
                 :artefact-data="artefact"
-                :scale-factor="globalScale"></artefact>
+                :base-d-p-i="baseDPI"></artefact>
         </svg>
     </div>
 </template>
@@ -27,6 +33,7 @@ export default {
         scrollWidth: 10000,
         scrollHeight: 1500,
         artefacts: [],
+        baseDPI: 1215,
     }
   },
   computed: {
@@ -38,16 +45,16 @@ export default {
           }
       },
       canvasWidth() {
-          return `${this.scrollWidth * this.globalScale}px`
+          return `${this.scrollWidth * this.globalScale}`
       },
       canvasHeight() {
-          return `${this.scrollHeight * this.globalScale}px`
+          return `${this.scrollHeight * this.globalScale}`
       },
       viewBox() {
-          return `0 0 ${this.scrollWidth * this.globalScale} ${this.scrollHeight * this.globalScale}`
+          return `0 0 ${this.scrollWidth} ${this.scrollHeight}`
       },
       dimensions() {
-          return `width: ${this.scrollWidth * this.globalScale}px; height: ${this.scrollHeight * this.globalScale}px;`
+          return `width: ${this.canvasWidth}px; height: ${this.canvasHeight}px;`
       }
   },
   methods: {

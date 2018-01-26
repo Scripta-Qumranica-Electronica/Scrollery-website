@@ -1,4 +1,10 @@
+import VuexPersist from 'vuex-persist'
+
 export default function(Vuex) {
+  const vuexLocalStorage = new VuexPersist({
+    key: 'vuex',
+  storage: window.localStorage,
+  })
   return new Vuex.Store({
     state: {
       sessionID: '',
@@ -37,6 +43,7 @@ export default function(Vuex) {
       loadLanguage(state, {key, data}) {
         state.languages[key] = data
       }
-    }
+    },
+    plugins: [vuexLocalStorage.plugin]
   })
 }

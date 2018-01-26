@@ -19,6 +19,7 @@ sub processCGI {
 
 	my $transaction = $cgi->param('transaction') || 'unspecified';
 	my %action = (
+		'validateSession' => \&validateSession,
 		'getCombs' => \&getCombs,
 		'getColOfComb' => \&getColOfComb,
 		'getFragsOfCol' => \&getFragsOfCol,
@@ -89,6 +90,14 @@ sub handleDBError {
 }
 
 # Various data return methods, see %action for hash table.
+sub validateSession {
+	my $cgi = shift;
+	my $dbh = $cgi->dbh;
+
+	$cgi->print('{"SESSION_ID":"'.$cgi->session_id.'", "USER_ID":'.$dbh->user_id.'}');
+	return;
+}
+
 sub getCombs {
 	my $cgi = shift;
 	my $userID = $cgi->param('user');

@@ -7,7 +7,7 @@
         </div>
         <div class="form-item">
           <label>User name <span class="req"></span> <span class="error">{{ usernameErr }}</span></label>
-          <input type="text" placeholder="Your login name" class="small" :class='{"error": usernameErr.length}' v-model='username'>
+          <input type="text" placeholder="Your login name" class="small" :class='{"error": usernameErr.length}' v-model='user'>
         </div>
         <div class="form-item">
           <label>Password <span class="req"></span> <span class="error">{{ passwordErr }}</span></label>
@@ -30,17 +30,27 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
   data() {
     return {
-      username: '',
+      user: '',
       password: '',
       errMsg: '',
       usernameErr: '',
       passwordErr: '',
       language: 'en'
+    }
+  },
+  computed: {
+    ...mapGetters(['username',
+                    'sessionID'])
+  },
+  created() {
+    this.user = this.username
+    if (this.sessionID) {
+      this.validateSession()
     }
   },
   methods: {
@@ -60,7 +70,7 @@ export default {
       }
     },
     validateUsername() {
-      if (!this.username.trim()) {
+      if (!this.user.trim()) {
         this.usernameErr = 'Username is required'
         return false
       } else {
@@ -77,44 +87,60 @@ export default {
         return true
       }
     },
+    validateSession() {
+      this.$post('resources/cgi-bin/GetImageData.pl', {
+        SESSION_ID: this.sessionID,
+        transaction: 'validateSession',
+        SCROLLVERSION: 1
+      })
+      .then(res => {
+        this.validateLogin(res)
+      })
+      .catch(({ response }) => {
+        this.errMsg = 'Unable to connect to the server. Please retry another time.'
+      });
+    },
     attemptLogin() {
       this.$post('resources/cgi-bin/server.pl', {
-        USER_NAME: this.username.trim(),
+        USER_NAME: this.user.trim(),
         PASSWORD: this.password.trim(),
         request: 'login',
         SCROLLVERSION: 1
       })
       .then(res => {
-        if (res.data && res.data.error) {
-          console.error(res.data)
-          this.errMsg = res.data.error
-        } else if (res.data 
-                  && res.data.SESSION_ID 
-                  &&  res.data.USER_ID 
-          ) {
-
-            // Set store state
-            this.setSessionID(res.data.SESSION_ID)
-            this.setUserID(res.data.USER_ID)
-            this.setUsername(this.username.trim())
-            this.setLanguage(this.language)
-
-            // Load language files
-            this.$i18n.load().then(() => {
-
-              // success!
-              this.$router.push({name: 'workbench'})
-            })
-            .catch(() => {
-              this.errMsg = 'Service unavailable at this time'
-            })
-        } else {
-          this.errMsg = 'Unexpected response'
-        }
+        this.validateLogin(res)
       })
       .catch(({ response }) => {
         this.errMsg = 'Unable to connect to the server. Please retry another time.'
       });
+    },
+    validateLogin(res) {
+      if (res.data && res.data.error) {
+        console.error(res.data)
+        this.errMsg = res.data.error
+      } else if (res.data 
+                && res.data.SESSION_ID 
+                &&  res.data.USER_ID 
+        ) {
+
+          // Set store state
+          this.setSessionID(res.data.SESSION_ID)
+          this.setUserID(res.data.USER_ID)
+          this.setUsername(this.user.trim())
+          this.setLanguage(this.language)
+
+          // Load language files
+          this.$i18n.load().then(() => {
+
+            // success!
+            this.$router.push({name: 'workbench'})
+          })
+          .catch(() => {
+            this.errMsg = 'Service unavailable at this time'
+          })
+      } else {
+        this.errMsg = 'Unexpected response'
+      }
     }
   }
 }

@@ -1,8 +1,8 @@
 <template>
-    <g :transform="'translate(' + location.x * scaleFactor 
-        + ' ' + location.y * scaleFactor + ')' 
-        + ' scale(' + scaleFactor + ')'
-        + ' rotate(' + artefactData.rotation + ' ' + pathRect.width/2 + ' ' + pathRect.height/2 + ')'">
+    <g :transform="'translate(' + location.x * scale
+        + ' ' + location.y * scale + ')' 
+        + ' scale(' + scale + ')'
+        ">
         <defs>
             <path :d="clipPath" :id="'path' + artefactData.id" />
             <clipPath :id="'clip' + artefactData.id">
@@ -27,9 +27,9 @@ import {geoJsonPolygonToSvg, geoJsonPointToSvg, geoJsonParseRect} from '../utils
 export default {
     props: {
         artefactData: {},
-        scaleFactor: {
+        baseDPI: {
             type: Number,
-            default: 1.0,
+            default: 1215,
         },
     },
   components: {
@@ -48,6 +48,9 @@ export default {
       location() {
           return geoJsonPointToSvg(this.artefactData.pos)
       },
+      scale() {
+          return this.baseDPI / this.artefactData.dpi
+      }
   },
   methods: {
   },

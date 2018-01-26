@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   computed: {
@@ -21,7 +21,15 @@ export default {
   },
 
   methods: {
+    ...mapMutations([
+      'setSessionID',
+      'setUsername',
+      'setUserID',
+    ]),
     onLogout() {
+      this.setSessionID('')
+      this.setUserID('')
+      this.setUsername('')
       this.$store.commit('logout')
       this.$router.push({name: 'login'})
     }
