@@ -1,8 +1,11 @@
 <template>
-    <g :transform="'translate(' + location.x 
-        + ' ' + location.y + ')' 
-        + ' scale(' + scale + ')'
-        ">
+    <g :transform="'translate(' + currentLocation.x 
+        + ' ' + currentLocation.y + ')' 
+        + ' scale(' + scale + ')'"
+        ref="currentGroup"
+        @mousedown="mousedown"
+        @mousemove="mousemove"
+        @mouseup="mouseup">
         <defs>
             <path :d="clipPath" :id="'path' + artefactData.id" />
             <clipPath :id="'clip' + artefactData.id">
@@ -36,6 +39,8 @@ export default {
   },
   data() {
     return {
+        clickOrigin: undefined,
+        currentLocation: undefined,
     }
   },
   computed: {
@@ -50,9 +55,42 @@ export default {
       },
       scale() {
           return this.baseDPI / this.artefactData.dpi
-      }
+      },
+      parentSVG() {
+          return this.$refs['currentGroup'].parentElement
+      },
+  },
+  beforeMount() {
+      this.currentLocation = this.location
   },
   methods: {
+      mousedown(event) {
+          this.clickOrigin = this.pointInSvg(event.clientX, event.clientY)
+      },
+      mousemove(event) {
+          if (this.clickOrigin) {
+              const currentLoc = this.pointInSvg(event.clientX, event.clientY)
+              this.$refs['currentGroup'].setAttribute('transform', `translate(${this.location.x
+              + currentLoc.x 
+              - this.clickOrigin.x} ${this.location.y
+              + currentLoc.y 
+              - this.clickOrigin.y}) scale(${this.scale})`)
+          }
+      },
+      mouseup(event) {
+          if (this.clickOrigin) {
+            const currentLoc = this.pointInSvg(event.clientX, event.clientY)
+            this.currentLocation.x += currentLoc.x - this.clickOrigin.x
+            this.currentLocation.y += currentLoc.y - this.clickOrigin.y
+            this.clickOrigin = undefined
+          }
+      },
+      pointInSvg(x, y) {
+        const pt = this.parentSVG.createSVGPoint();
+        pt.x = x;
+        pt.y = y;
+        return pt.matrixTransform(this.parentSVG.getScreenCTM().inverse());
+    },
   },
   watch: {
   }
