@@ -3,7 +3,7 @@ import VuexPersist from 'vuex-persist'
 export default function(Vuex) {
   const vuexLocalStorage = new VuexPersist({
     key: 'vuex',
-  storage: window.localStorage,
+    storage: window.localStorage,
   })
   return new Vuex.Store({
     state: {

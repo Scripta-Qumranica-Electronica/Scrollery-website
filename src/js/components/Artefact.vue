@@ -1,6 +1,6 @@
 <template>
-    <g :transform="'translate(' + location.x * scale
-        + ' ' + location.y * scale + ')' 
+    <g :transform="'translate(' + location.x 
+        + ' ' + location.y + ')' 
         + ' scale(' + scale + ')'
         ">
         <defs>

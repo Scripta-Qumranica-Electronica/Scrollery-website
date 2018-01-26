@@ -1,6 +1,6 @@
 <template>
     <div :style="dimensions">
-        <svg id="combination-canvas" 
+        <svg class="combination-canvas" 
             :width="scrollWidth" 
             :height="scrollHeight" 
             :viewBox="viewBox" 
@@ -109,5 +109,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-
+    .combination-canvas {
+        max-height: initial;
+    }
 </style>
