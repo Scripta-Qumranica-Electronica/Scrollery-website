@@ -118,7 +118,7 @@ export default {
             this.selectedArtefactIndex = event.target.dataset.index
             this.selectedArtefactLoc = this.artefacts[this.selectedArtefactIndex].pos
             this.clickOrigin = this.pointInSvg(event.clientX, event.clientY)
-            window.addEventListener('mouseup',this.mouseup);
+            window.addEventListener('mouseup',this.mouseup); // Attach listener to window.
           }
       },
       mousemove(event) {
