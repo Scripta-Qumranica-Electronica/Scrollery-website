@@ -448,7 +448,7 @@ sub getScrollArtefacts {
 	my $scroll_id = $cgi->param('scroll_id');
 	my $version_id = $cgi->param('scroll_version_id');
 	my $getScrollArtefactsQuery = <<'MYSQL';
-SELECT DISTINCT artefact_position.artefact_id AS id,
+SELECT DISTINCT artefact_position.artefact_position_id AS id,
                 ST_AsText(ST_Envelope(artefact.region_in_master_image)) AS rect,
                 ST_AsText(artefact.region_in_master_image) AS poly,
                 ST_AsText(artefact_position.position_in_scroll) AS pos,
@@ -543,14 +543,12 @@ sub nameCombination {
 
 sub setArtPosition {
 	my $cgi = shift;
-	my $user_id = $cgi->dbh->user_id;
-	my $scroll_id = $cgi->param('scroll_id');
 	my $version_id = $cgi->param('version_id');
 	$cgi->dbh->set_scrollversion($version_id);
-	my $art_id = $cgi->param('art_id');
+	my $artefact_position_id = $cgi->param('art_id');
 	my $x = $cgi->param('x') * 1;
 	my $y = $cgi->param('y') * 1;
-	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $art_id, "position_in_scroll", ['POINT', $x, $y]);
+	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $artefact_position_id, "position_in_scroll", ['POINT', $x, $y]);
 	handleDBError ($new_id, $error);
 	return;
 }

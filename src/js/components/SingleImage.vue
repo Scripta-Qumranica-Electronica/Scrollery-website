@@ -27,7 +27,7 @@ export default {
     return {
       imageElements: [],
       selectedImageUrls: [],
-      filename: 'https://www.qumranica.org/cgi-bin/iipsrv.fcgi?IIIF=P998-Fg005-R-C01-R01-D14112013-T105221-LR445__ColorCalData_IAA_Left_CC110304_110702.tif/info.json',
+      filename: '',
       navPanel: 'seadragonNavPanel'
     }
   },

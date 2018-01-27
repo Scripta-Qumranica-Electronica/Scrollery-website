@@ -62,7 +62,7 @@ const serveWebpack = middleware(compiler, {
   publicPath: "/dist/",
 });
 app.get(/.*/, (req, res, next) => {
-  if (/\/vendors/.test(req.url) || /\/resources/.test(req.url)) {
+  if (/\/vendors/.test(req.url) || /\/resources/.test(req.url) || /\/node_modules/.test(req.url)) {
     res.sendFile(resolve.apply(null, [__dirname].concat(req.url.replace(/\?.*$/, '').split("/"))))
    } else {
     serveWebpack(req, res, next)
