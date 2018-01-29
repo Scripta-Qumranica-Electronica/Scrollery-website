@@ -1,8 +1,18 @@
 <template>
-  <div class='top-level'>
+  <div>
     <span>{{ $i18n.str("Combinations") }}</span><button id="new-combination" type="button">add new</button>
-    <input v-model="queryString">
-    <ul class="combination-menu" placeholder="Search for scroll">
+    <div>
+      <el-switch
+        v-model="menuDisplayInstitutional"
+        active-text="Institutional Image"
+        inactive-text="Canonical Text">
+      </el-switch>
+    </div>
+    <div>
+      <el-input placeholder="Enter search string" v-model="queryString"></el-input>
+    </div>
+    <div>
+      <ul class="combination-menu" placeholder="Search for scroll">
         <li v-for="combination in filterCombinations" :key="combination.version_id">
             <combinaton-menu-item
             @artifact-selected="onArtifactSelected"
@@ -14,7 +24,8 @@
             :versionID="combination.version_id"
             />
         </li>
-    </ul>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -40,7 +51,8 @@ export default {
   data() {
     return {
       combinations: [],
-      queryString: ''
+      queryString: '',
+      menuDisplayInstitutional: true,
     }
   },
   methods: {

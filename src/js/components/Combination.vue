@@ -7,13 +7,12 @@
                 min="0.01" 
                 max="1.0" 
                 step="0.01" 
-                v-model="scale">
+                v-model="scale" />
     </div>
     <div style="{width: 100%; height: calc(100% - 50px); overflow: auto;}">
         <combination-canvas :global-scale="globalScale"></combination-canvas>
     </div>
   </div>
-    
 </template>
 
 <script>
@@ -32,10 +31,6 @@ export default {
           return Number(this.scale)
       }
   },
-  methods: {
-  },
-  watch: {
-  }
 }
 </script>
 

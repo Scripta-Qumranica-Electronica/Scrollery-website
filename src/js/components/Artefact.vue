@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import {geoJsonPolygonToSvg, geoJsonPointToSvg, geoJsonParseRect} from '../utils/VectorFactory'
 export default {
     props: {
         artefactData: {},
@@ -34,19 +33,10 @@ export default {
     },
   components: {
   },
-  data() {
-    return {
-    }
-  },
   computed: {
       scale() {
           return this.baseDPI / this.artefactData.dpi
       },
   },
-  methods: {
-  },
 }
 </script>
-
-<style lang="sass" scoped>
-</style>

@@ -36,7 +36,7 @@ Open up `http://localhost:9000` after running the command. Note that this proxie
 
 `APP_PORT=9020 npm start` (substituting whatever port you wish to use for `9020`)
 
-### `npm run prop`
+### `npm run prod`
 
 For production builds—which minify the assets, remove source maps, etc.—run ```npm run prod```. This is not suitable for development purposes.
 

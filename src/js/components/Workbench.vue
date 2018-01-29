@@ -1,9 +1,9 @@
 <template>
   <div class="col col-12">
     <header-menu></header-menu>
-    <div class="row app">
+    <!-- <div class="row app"> -->
         <component v-bind:is="view"></component>
-    </div>
+    <!-- </div> -->
   </div>
 </template>
 

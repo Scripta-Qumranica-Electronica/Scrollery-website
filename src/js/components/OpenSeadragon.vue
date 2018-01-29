@@ -19,6 +19,7 @@ export default {
       type: String,
       default: '/node_modules/openseadragon/build/openseadragon/images/'
     },
+    zoom: '',
     maxZoomLevel: {
       type: Number
     },
@@ -87,29 +88,25 @@ export default {
             ...this.zoomInButton && {zoomInButton: this.zoomInButton},
             ...this.zoomOutButton && {zoomOutButton: this.zoomOutButton},
             ...this.homeButton && {homeButton: this.homeButton},
-            ...this.fullPageButton && {fullPageButton: this.fullPageButton}
+            ...this.fullPageButton && {fullPageButton: this.fullPageButton},
+            showZoomControl: false,
+            showHomeControl: false,
+            showFullPageControl: false,
         }
       }
   },
   mounted() {
-    this.setup()
+    this.viewer = OpenSeadragon(this.seaDragonSettings)
   },
   watch: {
-      tileSources(newVal, oldVal){
-          if (newVal !== oldVal) {
+      tileSources(newVal, oldVal) {
+          if (this.viewer && newVal !== oldVal) {
               this.viewer.open(this.tileSources)
           }
+      },
+      zoom(newVal, oldVal) {
+        this.viewer.viewport.zoomTo(newVal)
       }
   },
-  methods: {
-    setup() {
-        if (!this.viewer && this.seaDragonSettings) {
-            this.viewer = OpenSeadragon(this.seaDragonSettings)
-        }
-    }
-  }
 }
 </script>
-
-<style lang="sass" scoped>
-</style>

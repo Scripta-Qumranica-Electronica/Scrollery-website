@@ -206,7 +206,7 @@ sub getImagesOfFragment {
 SELECT 	SQE_image.filename AS filename,
 		  SQE_image.wavelength_start AS start,
 		  SQE_image.wavelength_end AS end,
-	SQE_image.is_master,
+		  SQE_image.is_master,
 		  image_urls.url AS url
 FROM SQE_image
 	JOIN image_urls ON image_urls.id = SQE_image.url_code
@@ -380,7 +380,7 @@ sub getInstitutionArtefacts {
 		SELECT DISTINCT artefact.artefact_id,
 			user_id
 		FROM artefact
-			JOIN SQE_image ON SQE_image.sqe_image_id = artefact.master_image_id
+			JOIN SQE_image ON SQE_image.sqe_image_id = artefact.sqe_image_id
 			JOIN artefact_owner USING(artefact_id)
 			JOIN scroll_version USING(scroll_version_id)
 		WHERE SQE_image.image_catalog_id = ?
@@ -461,7 +461,7 @@ FROM artefact_position_owner
 	JOIN artefact_position USING (artefact_position_id)
 	JOIN artefact USING(artefact_id)
 	JOIN scroll_version USING(scroll_version_id)
-	INNER JOIN SQE_image ON SQE_image.sqe_image_id = artefact.master_image_id
+	INNER JOIN SQE_image ON SQE_image.sqe_image_id = artefact.sqe_image_id
 	INNER JOIN image_urls ON image_urls.id = SQE_image.url_code
 	INNER JOIN image_catalog USING(image_catalog_id)
 WHERE artefact_position.scroll_id=?

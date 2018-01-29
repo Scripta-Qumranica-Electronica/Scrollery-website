@@ -63,11 +63,6 @@ export default {
     },
 
     loadArtefact(colID) {
-      // var scroll = $(this).parents("[id^=lvl_1]:first").find(".scroll_select:first");
-      // Spider.current_version = $(scroll).data("version");
-      // Spider.current_version_id = $(scroll).data("scroll-version");
-      // load_fragment_text($(this).data("id"));
-      // load_fragment_image($(this).data("id"));
       this.$router.push({ name: 'workbenchScrollVersionCol',
                           params: { scrollID: this.scrollID, 
                                     scrollVersionID: this.versionID,

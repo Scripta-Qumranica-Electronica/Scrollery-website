@@ -1,6 +1,5 @@
 <template>
   <div class="row">
-    <!-- <a href="#" data-component="offcanvas" data-target="#main-menu">Menu</a> -->
     <div class="col col-3">
         <h3>SQE</h3>
     </div>

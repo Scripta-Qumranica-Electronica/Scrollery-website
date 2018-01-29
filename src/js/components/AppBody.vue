@@ -2,6 +2,9 @@
   <div id="site" class="row">
     <main-menu id="main-menu" class="col-2"></main-menu>
     <div id="editing-window" class="col-10">
+      <!-- We currently use two nested "split-panes" to hold the individual components.
+      Perhaps update to some more advanced system to manage organization
+      and display of these components -->
       <split-pane :min-percent='20' :default-percent='30' split="horizontal">
         <template slot="paneL">
           <split-pane split="vertical">
@@ -22,35 +25,20 @@
 </template>
 
 <style lang="sass" scoped>
-  #site {
-    width: 100vw;
-    height: calc(100vh - 50px);
-    min-height: calc(100vh - 50px);
-  }
-
-#main-menu {
-  // width: 300px;
-  // height: calc(100vh - 50px);
-  background: #1c86f2;
-  color: white;
-  // -webkit-transform: translate3d(0, 0, 0);
-  //         transform: translate3d(0, 0, 0);
-	// -webkit-backface-visibility: hidden;
-  // backface-visibility: hidden;
-  // float: left;
+#site {
+  width: 100vw;
+  height: calc(100vh - 50px);
+  min-height: calc(100vh - 50px);
 }
 
-  #editing-window {
-    // width: calc(100vw - 300px);
-    // height: calc(100vh - 50px);
-    // float: right;
-  }
+#main-menu {
+  background: #1c86f2;
+  color: white;
+}
 </style>
 
 
 <script>
-
-import { mapGetters } from 'vuex'
 import MainMenu from './MainMenu.vue'
 import splitPane from 'vue-splitpane'
 import SingleImage from './SingleImage.vue'
@@ -63,15 +51,5 @@ export default {
     'single-image': SingleImage,
     'combination': Combination,
   },
-  computed: {
-    ...mapGetters([
-      'userID', 'sessionID', 'username'
-    ])
-  },
-  methods: {
-  },
-  mounted() {
-  }
 }
-
 </script>
