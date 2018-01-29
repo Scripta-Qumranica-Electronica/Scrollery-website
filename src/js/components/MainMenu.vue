@@ -2,13 +2,6 @@
   <div>
     <span>{{ $i18n.str("Combinations") }}</span><button id="new-combination" type="button">add new</button>
     <div>
-      <el-switch
-        v-model="menuDisplayInstitutional"
-        active-text="Institutional Image"
-        inactive-text="Canonical Text">
-      </el-switch>
-    </div>
-    <div>
       <el-input placeholder="Enter search string" v-model="queryString"></el-input>
     </div>
     <div>
@@ -78,11 +71,11 @@ export default {
 
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 
 .combination-menu {
   margin: 0;
-  padding: 0 10px;
+  // padding: 0 10px;
   height: 70vh;
   min-height: 70vh;
   overflow: auto;

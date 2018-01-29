@@ -21,6 +21,8 @@ sub processCGI {
 	my %action = (
 		'validateSession' => \&validateSession,
 		'getCombs' => \&getCombs,
+		'getArtOfComb' => \&getArtOfComb,
+		'getImgOfComb' => \&getImgOfComb,
 		'getColOfComb' => \&getColOfComb,
 		'getFragsOfCol' => \&getFragsOfCol,
 		'getColOfScrollID' => \&getColOfScrollID,
@@ -125,17 +127,60 @@ MYSQL
 	return;
 }
 
+sub getArtOfComb {
+	my $cgi = shift;
+	my $userID = $cgi->param('user');
+	my $version_id = $cgi->param('version_id');
+	my $combID = $cgi->param('combID');
+	my $getColOfCombQuery = <<'MYSQL';
+SELECT DISTINCT artefact_position.artefact_id AS id
+FROM artefact_position
+	JOIN artefact_position_owner USING(artefact_position_id)
+WHERE artefact_position.scroll_id = ?
+      AND artefact_position_owner.scroll_version_id = ?
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
+		"Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($combID, $version_id);
+	readResults($sql);
+	return;
+}
+
+sub getImgOfComb {
+	my $cgi = shift;
+	my $userID = $cgi->param('user');
+	my $version_id = $cgi->param('version_id');
+	my $combID = $cgi->param('combID');
+	my $getColOfCombQuery = <<'MYSQL';
+SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
+       image_catalog.catalog_number_2 AS lvl2,
+	image_catalog.institution,
+	   image_catalog.image_catalog_id AS id
+FROM image_catalog
+	JOIN image_to_edition_catalog USING (image_catalog_id)
+	JOIN edition_catalog_to_discrete_reference USING (edition_catalog_id)
+	JOIN discrete_canonical_references USING (discrete_canonical_reference_id)
+WHERE discrete_canonical_references.scroll_id = ?
+ORDER BY lvl1, lvl2
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
+		"Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($combID);
+	readResults($sql);
+	return;
+}
+
 sub getColOfComb {
 	my $cgi = shift;
 	my $userID = $cgi->param('user');
 	my $version_id = $cgi->param('version_id');
 	my $combID = $cgi->param('combID');
 	my $getColOfCombQuery = <<'MYSQL';
-		SELECT col_data.name AS name,
-			   col_data.col_id AS col_id,
+		SELECT DISTINCT col_data.name AS name,
+			   col_data.col_id AS id,
 			   (SELECT COUNT(*)
 					FROM discrete_canonical_references
-					WHERE discrete_canonical_references.column_of_scroll_id = col_id)
+					WHERE discrete_canonical_references.column_of_scroll_id = id)
 				   AS count
 		FROM col_data
 			JOIN col_data_owner USING(col_data_id)
@@ -209,10 +254,10 @@ SELECT 	SQE_image.filename AS filename,
 		  SQE_image.is_master,
 		  image_urls.url AS url
 FROM SQE_image
-	JOIN image_urls ON image_urls.id = SQE_image.url_code
-	JOIN edition_catalog on edition_catalog.edition_catalog_id = SQE_image.edition_id
-	JOIN edition_catalog_to_discrete_reference ON edition_catalog_to_discrete_reference.edition_id = edition_catalog.edition_catalog_id
-	JOIN discrete_canonical_references ON discrete_canonical_references.discrete_canonical_reference_id = edition_catalog_to_discrete_reference.disc_can_ref_id
+	JOIN image_urls USING(image_urls_id)
+	JOIN edition_catalog USING(edition_catalog_id)
+	JOIN edition_catalog_to_discrete_reference USING(edition_catalog_id)
+	JOIN discrete_canonical_references USING(discrete_canonical_reference_id)
 WHERE edition_catalog.edition_side=0
       AND discrete_canonical_references.column_of_scroll_id = ?
 MYSQL
@@ -237,7 +282,7 @@ sub getIAAEdID {
 		SELECT edition_catalog_to_discrete_reference.edition_id
 		FROM edition_catalog_to_discrete_reference
 			INNER JOIN edition_catalog
-				ON edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id
+				USING(edition_catalog_id)
 		WHERE edition_catalog.edition_side=0
 			  AND edition_catalog_to_discrete_reference.disc_can_ref_id = ?
 MYSQL
@@ -461,8 +506,8 @@ FROM artefact_position_owner
 	JOIN artefact_position USING (artefact_position_id)
 	JOIN artefact USING(artefact_id)
 	JOIN scroll_version USING(scroll_version_id)
-	INNER JOIN SQE_image ON SQE_image.sqe_image_id = artefact.sqe_image_id
-	INNER JOIN image_urls ON image_urls.id = SQE_image.url_code
+	INNER JOIN SQE_image USING(sqe_image_id)
+	INNER JOIN image_urls USING(image_urls_id)
 	INNER JOIN image_catalog USING(image_catalog_id)
 WHERE artefact_position.scroll_id=?
       AND artefact_position_owner.scroll_version_id = ?

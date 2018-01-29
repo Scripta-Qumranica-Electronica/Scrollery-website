@@ -93,7 +93,7 @@ export default {
     },
 
     loadSelection(id) {
-      this.$router.push({ name: 'workbenchScrollVersionCol',
+      this.$router.push({ name: 'workbenchScrollVersion',
                           params: { scrollID: this.scrollID,
                                     scrollVersionID: this.versionID, }
       })

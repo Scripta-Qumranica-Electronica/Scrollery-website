@@ -56,7 +56,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .app {
   height: calc(100% - 50px);
 }

@@ -69,11 +69,11 @@ export default {
   },
   watch: {
     '$route' (to, from) {
-      if (to.params.colID && to.params.colID !== from.params.colID) {
+      if (to.params.selectionType === 'col' && to.params.id !== from.params.id) {
         this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: 'imagesOfFragment',
         idType: 'composition',
-        id: to.params.colID,
+        id: to.params.id,
         SESSION_ID: this.$store.getters.sessionID
       })
         .then(res => {
@@ -88,7 +88,7 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 #singleImageMenu {
   width: 100%; 
   height: 50px; 

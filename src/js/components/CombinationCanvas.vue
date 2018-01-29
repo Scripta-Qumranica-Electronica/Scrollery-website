@@ -168,7 +168,7 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
     .combination-canvas {
         max-height: initial;
     }

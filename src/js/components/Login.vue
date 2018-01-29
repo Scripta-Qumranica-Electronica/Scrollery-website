@@ -146,7 +146,7 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 label {
   font-weight: 600;
 }

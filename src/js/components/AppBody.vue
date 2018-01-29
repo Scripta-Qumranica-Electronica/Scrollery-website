@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 #site {
   width: 100vw;
   height: calc(100vh - 50px);
