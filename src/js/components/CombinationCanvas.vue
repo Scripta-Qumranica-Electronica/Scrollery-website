@@ -11,7 +11,7 @@
             @mousedown="mousedown"
             ref="svgCanvas">
             <artefact v-for="(artefact, index) in artefacts" 
-                :key="artefact.id" 
+                :key="'combination-art-' + artefact.id" 
                 :artefact-data="artefact"
                 :base-d-p-i="baseDPI"
                 :index="index"

@@ -1,41 +1,17 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
     <div id="singleImageMenu" class="row align-middle">
-      <!-- <el-popover
-        ref="popover"
-        placement="bottom-start"
-        width="400"
-        trigger="click">
-        <div v-for="image in filenames" :key="image.filename" class="row align-middle image-select-box">
-          <span class="drag-handle col-1 image-select-entry" style="float: left">☰</span>
-          <span class="col-3 image-select-entry">
-            &nbsp;{{ image.start === image.end ? image.start : image.start + '–' + image.end}}nm
-          </span>
-          <span v-if="image.filename.indexOf('RRIR') !== -1" class="col-1 image-select-entry">&nbsp;RR</span>
-          <span v-if="image.filename.indexOf('RLIR') !== -1" class="col-1 image-select-entry">&nbsp;RL</span>
-          <input class="col-3 image-select-entry"
-                  type="range" 
-                  min="0" 
-                  max="1.0" 
-                  step="0.01" />
-          <i class="fa fa-eye col-1 image-select-entry" :style="{color: image.visible ? 'green' : 'red'}" @click="image.visible = !image.visible"></i>
-        </div>
-      </el-popover>
-      <el-button v-popover:popover class="col-2">Images</el-button> -->
-        
       <el-select v-model="selectedImage" placeholder="Select" multiple>
         <el-option
           v-for="image in filenames"
-          :key="image.filename"
-          :label="image.filename"
-          :value="image.url + image.filename">
+          :key="'selector-' + image.filename"
+          :label="image | formatImageType"
+          :value="image | formatImageType">
           <div class="row align-middle image-select-box">
             <span class="drag-handle col-1 image-select-entry" style="float: left">☰</span>
             <span class="col-3 image-select-entry">
-              &nbsp;{{ image.start === image.end ? image.start : image.start + '–' + image.end}}nm
+              &nbsp;{{image | formatImageType}}
             </span>
-            <span v-if="image.filename.indexOf('RRIR') !== -1" class="col-1 image-select-entry">&nbsp;RR</span>
-            <span v-if="image.filename.indexOf('RLIR') !== -1" class="col-1 image-select-entry">&nbsp;RL</span>
             <input class="col-3 image-select-entry"
                     type="range" 
                     min="0" 
@@ -55,21 +31,27 @@
       </el-select>
       <input  class="col-2" 
                 type="range" 
-                min="0.5" 
-                max="11.0" 
-                step="0.1" 
+                min="0.1" 
+                max="1.0" 
+                step="0.05" 
                 v-model="zoom" />
       <!-- <div id="seadragonNavCont" class="col-2">
         <div :id="navPanel"></div>
       </div> -->
+      <el-button @click="delSelectedRoi">Del ROI</el-button>
     </div>
     <div style="{width: 100%; height: calc(100% - 50px); overflow: auto; position: relative;}">
       <img v-for="filename in filenames" 
-          :key="filename" 
+          :key="'img-' + filename.filename" 
           v-show="filename.visible"
           :src="filename.url + filename.filename + '/full/pct:20/0/default.jpg'" 
-          class="overlay-image"
-          :style="{opacity: filename.opacity}"/>
+          class="overlay-image avoid-clicks"
+          :style="{opacity: filename.opacity, transform: 'scale(' + zoom + ')'}"/>
+      <roi-canvas class="overlay-image" 
+                  :width="7215"
+                  :height="5410"
+                  :zoom-level="1.0"
+                  ref="currentRoiCanvas"></roi-canvas>
       <!-- <open-seadragon 
         :tile-sources="filenames[0]"
         :ajax-with-credentials="false"
@@ -88,11 +70,13 @@
 </template>
 
 <script>
-import OpenSeadragon from './OpenSeadragon.vue'
+// import OpenSeadragon from './OpenSeadragon.vue'
+import RoiCanvas from './RoiCanvas.vue'
 
 export default {
   components: {
-    'open-seadragon': OpenSeadragon,
+    // 'open-seadragon': OpenSeadragon,
+    'roi-canvas': RoiCanvas,
   },
   data() {
     return {
@@ -100,7 +84,7 @@ export default {
       selectedImageUrls: [],
       filenames: [],
       navPanel: 'seadragonNavPanel',
-      zoom: Number,
+      zoom: 1.0,
       translatePoint: {
         x: 0,
         y: 0,
@@ -109,29 +93,8 @@ export default {
     }
   },
   methods: {
-    move(dir) {
-      console.log(dir)
-      if (dir === 'left') {
-        this.translatePoint = {
-          x: this.translatePoint.x - 10,
-          y: this.translatePoint.y,
-        }
-      } else if (dir === 'right') {
-        this.translatePoint = {
-          x: this.translatePoint.x + 10,
-          y: this.translatePoint.y,
-        }
-      } else if (dir === 'up') {
-        this.translatePoint = {
-          x: this.translatePoint.x,
-          y: this.translatePoint.y - 10,
-        }
-      } else if (dir === 'down') {
-        this.translatePoint = {
-          x: this.translatePoint.x,
-          y: this.translatePoint.y + 10,
-        }
-      }
+    delSelectedRoi() {
+      this.$refs.currentRoiCanvas.deleteSelectedRoi()
     },
   },
   watch: {
@@ -159,6 +122,18 @@ export default {
             }
         })
       }
+    }
+  },
+  filters: {
+    formatImageType(value) {
+      if (!value) return ''
+      let formattedString = value.start === value.end ? value.start : value.start + '–' + value.end
+      if (value.filename.indexOf('RRIR') !== -1) {
+        formattedString += ' RR'
+      } else if (value.filename.indexOf('RLIR') !== -1) {
+        formattedString += ' RL'
+      }
+      return formattedString
     }
   }
 }

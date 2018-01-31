@@ -10,14 +10,14 @@
     </div>
     <div class="children" v-show="open">
         <ul>
-          <li v-show="menuType === 'art'" v-for="child in children" :key="menuType + child.id">
+          <li v-show="menuType === 'art'" v-for="child in children">
             <art-menu-item :data-id="child.id"></art-menu-item>
           </li>
-          <li v-show="menuType === 'col'" v-for="child in children" :key="menuType + child.id">
+          <li v-show="menuType === 'col'" v-for="child in children">
             <col-menu-item :data-id="child.id"
                             :name="child.name"></col-menu-item>
           </li>
-          <li v-show="menuType === 'img'" v-for="child in children" :key="menuType + child.id">
+          <li v-show="menuType === 'img'" v-for="child in children">
             <img-menu-item :data-id="child.id"
                             :institution="child.institution"
                             :plate="child.lvl1"
