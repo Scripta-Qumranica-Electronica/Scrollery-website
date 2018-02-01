@@ -1,7 +1,10 @@
 <template>
   <div>
-    <span class="clickable-menu-item" @click="open = !open">{{ name }} - {{ username }} - v. {{ version }}</span>
-    <div v-if="open">
+    <span class="clickable-menu-item" @click="open = !open">{{name}}{{user ? ` - ${username} - v. ${version}` : ''}}</span>
+    <i class="fa fa-clone" @click="cloneScroll"></i>
+    <i v-show="locked" class="fa fa-lock" style="color: red"></i>
+    <i v-show="!locked" class="fa fa-unlock" style="color: green"></i>
+    <div v-if="open && user">
       <el-radio-group v-model="menuType" size="mini">
         <el-radio-button label="art"></el-radio-button>
         <el-radio-button label="col"></el-radio-button>
@@ -42,7 +45,9 @@ export default {
     scrollDataID: 0,
     scrollID: 0,
     version: 0,
-    versionID: 0
+    versionID: 0,
+    user: 0,
+    locked: "",
   },
   components: {
     'art-menu-item': ArtMenuItem,
@@ -81,15 +86,15 @@ export default {
         user: this.userID,
         version_id: this.versionID,
         SESSION_ID: this.sessionID
-      })
-      .then(res => {
-        if (res.status === 200 && res.data) {
-          this.children = res.data.results
-          this.lastFetch = this.requestType[this.menuType]
+        })
+        .then(res => {
+          if (res.status === 200 && res.data) {
+            this.children = res.data.results
+            this.lastFetch = this.requestType[this.menuType]
+          }
+        })
+        .catch(console.error)
         }
-      })
-      .catch(console.error)
-      }
     },
 
     loadSelection(id) {
@@ -123,6 +128,20 @@ export default {
       //   alert("Unable to load artefact.")
       //   console.error(res)
       // })
+    }, 
+    cloneScroll(){
+      this.$post('resources/cgi-bin/GetImageData.pl', {
+        transaction: 'copyCombination',
+        scroll_id: this.scrollDataID,
+        scroll_version_id: this.versionID,
+        SESSION_ID: this.sessionID
+      })
+      .then(res => {
+        if (res.status === 200 && res.data.scroll_clone === 'success') {
+          console.log('Cloned scroll')
+        }
+      })
+      .catch(console.error)
     }
   },
   watch: {

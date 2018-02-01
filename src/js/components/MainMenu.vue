@@ -6,7 +6,7 @@
     </div>
     <div>
       <ul class="combination-menu" placeholder="Search for scroll">
-        <li v-for="combination in filterCombinations" :key="combination.version_id">
+        <li v-for="combination in filterCombinations" :key="combination.scroll_id + '-' + combination.version_id">
             <combinaton-menu-item
             @artifact-selected="onArtifactSelected"
             :count="combination.count"
@@ -15,6 +15,8 @@
             :scrollID="combination.scroll_id"
             :version="combination.version"
             :versionID="combination.version_id"
+            :user="combination.user_id"
+            :locked="combination.locked"
             />
         </li>
       </ul>
