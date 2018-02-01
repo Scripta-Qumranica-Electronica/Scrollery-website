@@ -1,11 +1,13 @@
 <template>
     <svg    ref="roiSvg"
             :width="width / 5"
-            :height="height / 5" 
+            :height="height / 5"
+            :viewbox="'0 0 ' + width / 5 + ' ' + height / 5" 
             @mousemove="moveROI($event)" 
             @mousedown="newROI($event)"
             @mouseup="deselectROI()"
-            :transform="'scale(' + 1.0 + ')'">
+            :transform="'scale(' + zoomLevel + ')'"
+            >
     <!-- <defs>
       <path id="Clip-path" d="${poly}" transform="scale(${scale})"></path>
     </defs>
@@ -20,6 +22,17 @@
     <!-- <g clip-path="url(#Clipping-outline)" pointer-events="visiblePainted" style="opacity: 1;">
       <image class="clippedImg" draggable="false" xlink:href="${image}" width="${width}" height="${height}"></image>
     </g> -->
+    <g pointer-events="none">
+      <image v-for="image of images" 
+            :key="'svg-image-' + image.filename"
+            class="clippedImg" 
+            draggable="false" 
+            :xlink:href="image.url + image.filename + '/full/pct:20/0/default.jpg'"
+            :width="width / 5"
+            :height="height / 5"
+            :opacity="image.opacity"
+            :visibility="image.visible ? 'visible' : 'hidden'"></image>
+    </g>
     <g v-for="box of boxes">
       <rect :x="box.x * zoom" 
             :y="box.y * zoom" 
@@ -76,7 +89,11 @@ export default {
     props: {
         width: Number,
         height: Number,
-        zoomLevel: Number,
+        zoomLevel: String,
+        images: {
+            type: Array,
+            default: [],
+        }
     },
     data() {
         return {
@@ -84,7 +101,7 @@ export default {
             selectedBox: undefined,
             mouseMoveType: undefined,
             oldMousePos: undefined,
-            zoom: 1.0,
+            zoom: '1.0',
             scale: 1.0,
             click: false,
         }
@@ -169,6 +186,17 @@ export default {
             pt.y = y;
             return pt.matrixTransform(this.$refs.roiSvg.getScreenCTM().inverse());
         },
+    },
+    watch: {
+        images() {
+            console.log('changed opacity')
+        }
     }
 }
 </script>
+
+<style lang="scss" scoped>
+svg {
+    max-height: initial;
+}
+</style>

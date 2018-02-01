@@ -1,9 +1,9 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
     <div id="singleImageMenu" class="row align-middle">
-      <el-select v-model="selectedImage" placeholder="Select" multiple>
+      <el-select v-model="selectedImage"placeholder="Select" multiple>
         <el-option
-          v-for="image in filenames"
+          v-for="(image, index) in filenames"
           :key="'selector-' + image.filename"
           :label="image | formatImageType"
           :value="image | formatImageType">
@@ -17,7 +17,7 @@
                     min="0" 
                     max="1.0" 
                     step="0.01"
-                    @input="image.opacity = $event.target.value" />
+                    @input="setOpacity(index, $event.target.value)" />
             <!-- <div class="block col-3">
               <el-slider v-model="image.opacity" 
                           min="0" 
@@ -25,7 +25,7 @@
                           step="0.01" 
                           :show-tooltip="false"></el-slider>
             </div> -->
-            <i class="fa fa-eye col-1 image-select-entry" :style="{color: image.visible ? 'green' : 'red'}" @click="image.visible = !image.visible"></i>
+            <i class="fa fa-eye col-1 image-select-entry" :style="{color: image.visible ? 'green' : 'red'}" @click="toggleVisible(index)"></i>
           </div>
         </el-option>
       </el-select>
@@ -33,7 +33,7 @@
                 type="range" 
                 min="0.1" 
                 max="1.0" 
-                step="0.05" 
+                step="0.01" 
                 v-model="zoom" />
       <!-- <div id="seadragonNavCont" class="col-2">
         <div :id="navPanel"></div>
@@ -41,16 +41,17 @@
       <el-button @click="delSelectedRoi">Del ROI</el-button>
     </div>
     <div style="{width: 100%; height: calc(100% - 50px); overflow: auto; position: relative;}">
-      <img v-for="filename in filenames" 
+      <!-- <img v-for="filename in filenames" 
           :key="'img-' + filename.filename" 
           v-show="filename.visible"
           :src="filename.url + filename.filename + '/full/pct:20/0/default.jpg'" 
           class="overlay-image avoid-clicks"
-          :style="{opacity: filename.opacity, transform: 'scale(' + zoom + ')'}"/>
-      <roi-canvas class="overlay-image" 
+          :style="{opacity: filename.opacity, transform: 'scale(' + zoom + ')', height: 7215 / 5, width: 5410 / 5}"> -->
+      <roi-canvas class="overlay-image"
                   :width="7215"
                   :height="5410"
-                  :zoom-level="1.0"
+                  :zoom-level="zoom"
+                  :images="filenames"
                   ref="currentRoiCanvas"></roi-canvas>
       <!-- <open-seadragon 
         :tile-sources="filenames[0]"
@@ -84,17 +85,22 @@ export default {
       selectedImageUrls: [],
       filenames: [],
       navPanel: 'seadragonNavPanel',
-      zoom: 1.0,
-      translatePoint: {
-        x: 0,
-        y: 0,
-      },
+      zoom: '1.0',
+      scale: 0.2,
       selectedImage: undefined,
     }
   },
   methods: {
     delSelectedRoi() {
       this.$refs.currentRoiCanvas.deleteSelectedRoi()
+    },
+    setOpacity(idx, val) {
+      this.$set(this.filenames[idx], 'opacity', val)
+      this.$set(this.filenames, idx, this.filenames[idx])
+    },
+    toggleVisible(idx) {
+      this.$set(this.filenames[idx], 'visible', !this.filenames[idx].visible)
+      this.$set(this.filenames, idx, this.filenames[idx])
     },
   },
   watch: {
@@ -162,6 +168,6 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  opacity: 0.5;
+  transform-origin: top left;
 }
 </style>

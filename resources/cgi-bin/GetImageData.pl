@@ -252,6 +252,8 @@ SELECT 	SQE_image.filename AS filename,
 		  SQE_image.wavelength_start AS start,
 		  SQE_image.wavelength_end AS end,
 		  SQE_image.is_master,
+		  SQE_image.width AS width,
+		  SQE_image.height AS height,
 		  image_urls.url AS url
 FROM SQE_image
 	JOIN image_urls USING(image_urls_id)
