@@ -4,7 +4,7 @@
     <i class="fa fa-clone" @click="cloneScroll"></i>
     <i v-show="locked" class="fa fa-lock" style="color: red"></i>
     <i v-show="!locked" class="fa fa-unlock" style="color: green"></i>
-    <div v-if="open && user">
+    <div v-if="open">
       <el-radio-group v-model="menuType" size="mini">
         <el-radio-button label="art"></el-radio-button>
         <el-radio-button label="col"></el-radio-button>

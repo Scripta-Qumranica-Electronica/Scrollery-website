@@ -159,8 +159,8 @@ SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
 FROM image_catalog
 	JOIN image_to_edition_catalog USING (image_catalog_id)
 	JOIN edition_catalog_to_discrete_reference USING (edition_catalog_id)
-	JOIN discrete_canonical_references USING (discrete_canonical_reference_id)
-WHERE discrete_canonical_references.scroll_id = ?
+	JOIN discrete_canonical_reference USING (discrete_canonical_reference_id)
+WHERE discrete_canonical_reference.scroll_id = ?
 ORDER BY lvl1, lvl2
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
@@ -179,8 +179,8 @@ sub getColOfComb {
 		SELECT DISTINCT col_data.name AS name,
 			   col_data.col_id AS id,
 			   (SELECT COUNT(*)
-					FROM discrete_canonical_references
-					WHERE discrete_canonical_references.column_of_scroll_id = id)
+					FROM discrete_canonical_reference
+					WHERE discrete_canonical_reference.column_of_scroll_id = id)
 				   AS count
 		FROM col_data
 			JOIN col_data_owner USING(col_data_id)
@@ -202,15 +202,15 @@ sub getFragsOfCol {
 	my $version = $cgi->param('version');
 	my $colID = $cgi->param('colID');
 	my $getFragsOfColQuery = <<'MYSQL';
-		SELECT discrete_canonical_references.discrete_canonical_reference_id,
-			discrete_canonical_references.column_name,
-			discrete_canonical_references.fragment_name,
-			discrete_canonical_references.sub_fragment_name,
-			discrete_canonical_references.fragment_column,
-			discrete_canonical_references.side,
-			discrete_canonical_references.column_of_scroll_id
-		FROM discrete_canonical_references
-		WHERE discrete_canonical_references.column_of_scroll_id = ?
+		SELECT discrete_canonical_reference.discrete_canonical_reference_id,
+			discrete_canonical_reference.column_name,
+			discrete_canonical_reference.fragment_name,
+			discrete_canonical_reference.sub_fragment_name,
+			discrete_canonical_reference.fragment_column,
+			discrete_canonical_reference.side,
+			discrete_canonical_reference.column_of_scroll_id
+		FROM discrete_canonical_reference
+		WHERE discrete_canonical_reference.column_of_scroll_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getFragsOfColQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
@@ -225,12 +225,12 @@ sub getColOfScrollID {
 	my $getColOfScrollIDQuery = <<'MYSQL';
 		SELECT scroll.name AS scroll_name,
 			   column_of_scroll.name as col_name
-		FROM discrete_canonical_references
+		FROM discrete_canonical_reference
 			INNER JOIN scroll
-				ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id
+				ON scroll.scroll_id = discrete_canonical_reference.discrete_canonical_name_id
 			INNER JOIN column_of_scroll
-				ON column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id
-		WHERE discrete_canonical_references.discrete_canonical_reference_id = ?
+				ON column_of_scroll.column_of_scroll_id = discrete_canonical_reference.column_of_scroll_id
+		WHERE discrete_canonical_reference.discrete_canonical_reference_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfScrollIDQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
@@ -259,9 +259,9 @@ FROM SQE_image
 	JOIN image_urls USING(image_urls_id)
 	JOIN edition_catalog USING(edition_catalog_id)
 	JOIN edition_catalog_to_discrete_reference USING(edition_catalog_id)
-	JOIN discrete_canonical_references USING(discrete_canonical_reference_id)
+	JOIN discrete_canonical_reference USING(discrete_canonical_reference_id)
 WHERE edition_catalog.edition_side=0
-      AND discrete_canonical_references.column_of_scroll_id = ?
+      AND discrete_canonical_reference.column_of_scroll_id = ?
 MYSQL
 	} elsif ($idType eq 'institution') {
 		$getImagesOfFragmentQuery = <<'MYSQL';
@@ -358,9 +358,9 @@ sub getScrollColNameFromDiscCanRef {
 				ON scroll_data.scroll_id = scroll_to_col.scroll_id
 			INNER JOIN col_data
 				ON col_data.col_id = scroll_to_col.col_id
-			INNER JOIN discrete_canonical_references
-				ON discrete_canonical_references.column_of_scroll_id = scroll_to_col.col_id
-		WHERE discrete_canonical_references.discrete_canonical_reference_id = ?
+			INNER JOIN discrete_canonical_reference
+				ON discrete_canonical_reference.column_of_scroll_id = scroll_to_col.col_id
+		WHERE discrete_canonical_reference.discrete_canonical_reference_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollColNameFromDiscCanRefQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
