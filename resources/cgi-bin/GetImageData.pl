@@ -8,6 +8,7 @@ use MIME::Base64;
 use lib qw(/home/perl_libs);
 #use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
 use SQE_CGI;
+use Encode;
 
 sub processCGI {
 	my ($cgi, $error) = SQE_CGI->new;
@@ -26,6 +27,7 @@ sub processCGI {
 		'getColOfComb' => \&getColOfComb,
 		'getFragsOfCol' => \&getFragsOfCol,
 		'getColOfScrollID' => \&getColOfScrollID,
+		'getSignStreamOfColumn' => \&getSignStreamOfColumn,
 		'imagesOfFragment' => \&getImagesOfFragment,
 		'getIAAEdID' => \&getIAAEdID,
 		'canonicalCompositions' => \&getCanonicalCompositions,
@@ -71,7 +73,7 @@ sub readResults {
        	push @fetchedResults, $result;
     }
     if (scalar(@fetchedResults) > 0) {
- 		print encode_json({results => \@fetchedResults});
+ 		print Encode::decode('utf8', encode_json({results => \@fetchedResults}));
  	} else {
     	print 'No results found.';
  	}
@@ -235,6 +237,53 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfScrollIDQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($discCanRef);
+	readResults($sql);
+	return;
+}
+
+sub getSignStreamOfColumn {
+	my $cgi = shift;
+	my $colId = $cgi->param('colId');
+	my $scrollVersion = $cgi->param('SCROLL_VERSION');
+	my $getScrollsQuery = << 'MYSQL';
+SELECT
+	col_data.name AS col_name,
+	col_data.col_id AS col_id,
+	line_data.name AS line_name,
+	line_data.line_id AS line_id,
+	parent.sign_id AS prev_sign_id,
+	child.sign_id AS sign_id,
+	child.next_sign_id AS next_sign_id,
+	sign_char.is_variant,
+	sign_char.break_type,
+	sign_char.sign,
+	sign_char_reading_data.is_reconstructed,
+	sign_char_reading_data.readability,
+	sign_char_reading_data.is_retraced
+FROM position_in_stream_owner
+	JOIN position_in_stream AS parent
+		ON position_in_stream_owner.position_in_stream_id = parent.next_sign_id
+	JOIN position_in_stream AS child
+		ON parent.next_sign_id = child.sign_id
+	JOIN line_to_sign ON line_to_sign.sign_id = child.sign_id
+	Join line_to_sign_owner USING(line_to_sign_id)
+	JOIN line_data USING(line_id)
+	JOIN col_to_line USING(line_id)
+	JOIN col_to_line_owner USING (col_to_line_id)
+	JOIN col_data USING (col_id)
+	JOIN sign_char
+		ON sign_char.sign_id = child.sign_id
+	JOIN sign_char_owner USING(sign_char_id)
+	LEFT JOIN sign_char_reading_data USING(sign_char_id)
+WHERE col_to_line.col_id = ?
+	AND position_in_stream_owner.scroll_version_id = ?
+	AND line_to_sign_owner.scroll_version_id = ?
+	AND col_to_line_owner.scroll_version_id = ?
+	AND sign_char_owner.scroll_version_id = ?
+MYSQL
+	my $sql = $cgi->dbh->prepare($getScrollsQuery) or die
+		"Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($colId, $scrollVersion, $scrollVersion, $scrollVersion, $scrollVersion);
 	readResults($sql);
 	return;
 }

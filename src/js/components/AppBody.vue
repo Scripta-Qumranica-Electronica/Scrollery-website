@@ -12,7 +12,7 @@
               <single-image class="pane-content"></single-image>
             </template>
             <template slot="paneR">
-              <div class="pane-content">Text Editor</div>
+              <editor class="pane-content"></editor>
             </template>
           </split-pane>
         </template>
@@ -31,6 +31,10 @@
   min-height: calc(100vh - 50px);
 }
 
+.pane-content {
+  height: 100%;
+}
+
 #main-menu {
   background: #1c86f2;
   color: white;
@@ -42,6 +46,7 @@
 import MainMenu from './MainMenu.vue'
 import splitPane from 'vue-splitpane'
 import SingleImage from './SingleImage.vue'
+import Editor from './Editor.vue'
 import Combination from './Combination.vue'
 
 export default {
@@ -49,6 +54,7 @@ export default {
     'main-menu': MainMenu,
     'split-pane': splitPane,
     'single-image': SingleImage,
+    'editor': Editor,
     'combination': Combination,
   },
 }
