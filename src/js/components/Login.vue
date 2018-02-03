@@ -1,3 +1,4 @@
+// TODO: check if the session is valid before trying to login with locatdata
 <template>
   <div class="col col-6 push-middle push-center login-wrapper">
     <div class="header"><h2>Login</h2></div>

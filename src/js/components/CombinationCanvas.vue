@@ -46,13 +46,6 @@ export default {
     }
   },
   computed: {
-      combCanvasStyle(){
-          return {
-              width: `${this.scrollWidth * this.globalScale}px`,
-              height: `${this.scrollHeight * this.globalScale}px`,
-              background: 'maroon',
-          }
-      },
       canvasWidth() {
           return `${this.scrollWidth * this.globalScale}`
       },
@@ -75,7 +68,7 @@ export default {
         transaction: 'getScrollWidth',
         scroll_id: scrollID,
         scroll_version_id: versionID,
-        SESSION_ID: this.$store.getters.sessionID
+        SESSION_ID: this.$store.getters.sessionID,
         })
         .then(res => {
             if (res.status === 200 && res.data.results) {
@@ -97,12 +90,12 @@ export default {
       },
       loadFragments(scrollID, versionID) {
           this.$post('resources/cgi-bin/GetImageData.pl', {
-        transaction: 'getScrollArtefacts',
-        scroll_id: scrollID,
-        scroll_version_id: versionID,
-        SESSION_ID: this.$store.getters.sessionID
-        })
-        .then(res => {
+            transaction: 'getScrollArtefacts',
+            scroll_id: scrollID,
+            scroll_version_id: versionID,
+            SESSION_ID: this.$store.getters.sessionID
+            })
+            .then(res => {
             if (res.status === 200 && res.data.results) {
                 this.artefacts = res.data.results
                 this.artefacts.forEach(artefact => {

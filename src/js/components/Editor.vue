@@ -65,6 +65,7 @@ export default {
                                                         'next_sign_id')
                     .then( formattedNodes => {
                         this.currentText = formattedNodes
+                        console.log(this.currentText)
                     })
                 }
             })

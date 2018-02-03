@@ -3,13 +3,13 @@ export function geoJsonPolygonToSvg(geoJSON, boundingRect) {
     if (geoJSON.substring(0, 9) === 'POLYGON((') {
         svg = ''
         const polygons = geoJSON.split("\),\(")
-        polygons.forEach(function(polygon) {
+        polygons.forEach(polygon => {
             svg += 'M'
             polygon = polygon.replace(/POLYGON/g, "")
             polygon = polygon.replace(/\(/g, "")
             polygon = polygon.replace(/\)/g, "")
             var points = polygon.split(",")
-            points.forEach(function(point) {
+            points.forEach(point => {
                 if (svg.slice(-1) !== 'M'){
                     svg += 'L'
                 }

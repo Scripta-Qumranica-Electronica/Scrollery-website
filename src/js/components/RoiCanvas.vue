@@ -187,11 +187,6 @@ export default {
             return pt.matrixTransform(this.$refs.roiSvg.getScreenCTM().inverse());
         },
     },
-    watch: {
-        images() {
-            console.log('changed opacity')
-        }
-    }
 }
 </script>
 

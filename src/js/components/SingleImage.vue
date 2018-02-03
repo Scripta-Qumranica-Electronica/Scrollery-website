@@ -113,7 +113,7 @@ export default {
         SESSION_ID: this.$store.getters.sessionID
       })
         .then(res => {
-            if (res.status === 200 && res.data) {
+            if (res.status === 200 && res.data.results) {
                 this.imageElements = res.data.results
                 this.filenames = []
                 res.data.results.forEach((result, index) => {

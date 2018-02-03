@@ -554,14 +554,14 @@ SELECT DISTINCT artefact_position.artefact_position_id AS id,
                 SQE_image.dpi AS dpi,
                 artefact_position.rotation AS rotation
 FROM artefact_position_owner
-	JOIN artefact_position USING (artefact_position_id)
+	JOIN artefact_position USING(artefact_position_id)
 	JOIN artefact USING(artefact_id)
 	JOIN scroll_version USING(scroll_version_id)
 	INNER JOIN SQE_image USING(sqe_image_id)
 	INNER JOIN image_urls USING(image_urls_id)
 	INNER JOIN image_catalog USING(image_catalog_id)
 WHERE artefact_position.scroll_id=?
-      AND artefact_position_owner.scroll_version_id = ?
+      AND artefact_position_owner.scroll_version_id=?
       AND image_catalog.catalog_side=0
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollArtefactsQuery)
