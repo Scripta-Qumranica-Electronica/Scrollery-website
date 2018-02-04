@@ -1,12 +1,11 @@
 <template>
-  <div class="row">
+  <div class="header row">
     <div class="col col-3">
         <h3>SQE</h3>
     </div>
-    <div class="col col-6"></div>
-    <div class="col col-3">
-      <span> {{ $i18n.str('User.LoggedInMessage', {name: username}) }}</span>
-      <button class="button secondary outline" @click="onLogout">{{ $i18n.str('Logout') }}</button>
+    <div class="col col-9 right">
+        <span> {{ $i18n.str('User.LoggedInMessage', {name: username}) }}</span>
+        <button class="button outline" @click="onLogout">{{ $i18n.str('Logout') }}</button>
     </div>
   </div>
 </template>
@@ -38,13 +37,32 @@ export default {
 
 <style lang="scss" scoped>
 
-div {
-  height: 50px;
+@import "~sass-vars";
+
+.header {
+  height: #{$header};
+  padding: #{$spacer};
+  overflow: hidden;
+  background-color: #{$ltBlue};
   border-bottom: 1px solid rgba(#999, 0.2);
 }
 
-h3 {
-  line-height: 50px;
+.right {
+  text-align: right;
+}
+
+h3, span {
+  color: #fff;
+  line-height: calc(#{$header} - #{$spacer * 2});
+}
+
+.button {
+  min-height: calc(#{$header} - #{$spacer * 2});
+  padding: 5px 10px;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 2px;
+  transition: all 300ms;
 }
 
 </style>

@@ -25,9 +25,17 @@ module.exports = {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
-          loaders: {
-            sass: 'vue-style-loader!css-loader!sass-loader',
-          }
+          scss: [
+            'vue-style-loader',
+            'css-loader',
+            'sass-loader',
+            {
+              loader: 'sass-resources-loader',
+              options: {
+                resources: path.resolve(__dirname, 'src/sass/_variables.scss')
+              }
+            }
+          ],
         }
       },
       {
@@ -56,9 +64,11 @@ module.exports = {
 
   resolve: {
     alias: {
-      vue: 'vue/dist/vue.js',
+      "vue": 'vue/dist/vue.js',
       "@": path.resolve(__dirname),
       "~": path.resolve(__dirname, "src", "js"),
+      "sass": path.resolve(__dirname, "src", "sass"),
+      "sass-vars$": path.resolve(__dirname, "src", "sass", "_variables.scss"),
       "legacy": path.resolve(__dirname, "resources", "js")
     }
   },

@@ -1,9 +1,6 @@
 <template>
   <div class="col col-12">
-    <header-menu></header-menu>
-    <!-- <div class="row app"> -->
-        <component v-bind:is="view"></component>
-    <!-- </div> -->
+    <component v-bind:is="view"></component>
   </div>
 </template>
 
@@ -11,7 +8,7 @@
 import { mapGetters } from 'vuex'
 
 // components
-import HeaderMenu from './HeaderMenu.vue'
+
 import Loading from './Loading.vue'
 import AppBody from './AppBody.vue'
 
@@ -28,7 +25,6 @@ export default {
   },
 
   components: {
-    'header-menu': HeaderMenu,
     'loading': Loading,
     'app-body': AppBody,
   },
@@ -55,9 +51,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.app {
-  height: calc(100% - 50px);
-}
-</style>
