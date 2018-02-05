@@ -10,6 +10,8 @@ import ajax from './plugins/ajax'
 import routes from './routes'
 import makeStore from './store/make'
 import ElementUI from 'element-ui'
+import locale from 'element-ui/lib/locale'
+
 import 'element-ui/lib/theme-chalk/index.css'
 
 // Router
@@ -22,6 +24,9 @@ const store = makeStore(Vuex)
 
 // Localization
 Vue.use(i18n, { store })
+
+// element localization
+locale.use('en')
 
 // AJAX
 Vue.use(ajax, { store })

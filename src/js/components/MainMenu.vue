@@ -1,36 +1,42 @@
 <template>
-  <section id="side-menu" @mouseenter="$emit('mouseenter')" @mouseleave="$emit('mouseleave')">
+  <section id="side-menu" :class='{"open": open, "keep-open": keepOpen}' @mouseenter="$emit('mouseenter')" @mouseleave="$emit('mouseleave')">
     
     <!-- menu header -->
     <div class="header">
-      <label for="show-hide-menu"><i class="fa fa-bars"></i></label>
+      <label for="show-hide-menu" :title="menuBarsTooltip"><i class="fa fa-bars"></i></label>
     </div>
 
     <!-- menu body -->
     <div class="menu-body" :class='{"open": open}'>
-      <div>
-        <span>{{ $i18n.str("Combinations") }}</span><button id="new-combination" type="button">add new</button>
-        <div>
-          <el-input placeholder="Enter search string" v-model="queryString"></el-input>
+
+      <sidebar-menu-item
+        :open='open'
+        :title='combinationsTitle'
+      >
+        <span slot="icon"><i class="fa fa-hashtag"></i></span>
+        <div slot="body">
+          <div>
+            <el-input placeholder="Enter search string" v-model="queryString"></el-input>
+          </div>
+          <div>
+            <ul class="combination-menu" placeholder="Search for scroll">
+              <li v-for="combination in filterCombinations" :key="combination.scroll_id + '-' + combination.version_id">
+                  <combinaton-menu-item
+                  @artifact-selected="onArtifactSelected"
+                  :count="combination.count"
+                  :name="combination.name"
+                  :scrollDataID="combination.scroll_data_id"
+                  :scrollID="combination.scroll_id"
+                  :version="combination.version"
+                  :versionID="combination.version_id"
+                  :user="combination.user_id"
+                  :locked="combination.locked"
+                  />
+              </li>
+            </ul>
+          </div>
         </div>
-        <div>
-          <ul class="combination-menu" placeholder="Search for scroll">
-            <li v-for="combination in filterCombinations" :key="combination.scroll_id + '-' + combination.version_id">
-                <combinaton-menu-item
-                @artifact-selected="onArtifactSelected"
-                :count="combination.count"
-                :name="combination.name"
-                :scrollDataID="combination.scroll_data_id"
-                :scrollID="combination.scroll_id"
-                :version="combination.version"
-                :versionID="combination.version_id"
-                :user="combination.user_id"
-                :locked="combination.locked"
-                />
-            </li>
-          </ul>
-        </div>
-      </div>
+      </sidebar-menu-item>
     </div>
   </section>
 </template>
@@ -51,17 +57,26 @@
       line-height: calc(#{$header} - #{$spacer * 2});
       font-size: 2em;
       color: #fff;
+      transition: color 300ms;
+
+      &:hover {
+        color: $tan;
+      }
     }
   }
+}
+
+#side-menu.keep-open .header label i {
+  color: $tan;
 }
 
 .menu-body {
   min-width: calc(100% - #{$spacer * 2});
   height: calc(100% - #{$header});
-  padding: #{$spacer};
   background: rgba($gray, .2);
-  text-align: center;
+  text-align: right;
   overflow-x: hidden;
+  font-size: 18px;
 }
 
 .combination-menu {
@@ -84,16 +99,17 @@
 .combination-menu li {
   display: block;
 }
-
 </style>
 
 <script>
 import { mapGetters } from 'vuex'
 import CombinationMenuItem from './CombinationMenuItem.vue'
+import SidebarMenuItem from './SidebarMenuItem.vue'
 
 export default {
   components: {
-    'combinaton-menu-item': CombinationMenuItem
+    'combinaton-menu-item': CombinationMenuItem,
+    'sidebar-menu-item': SidebarMenuItem
   },
   computed: {
     ...mapGetters(['userID', 'sessionID']),
@@ -106,11 +122,14 @@ export default {
     }
   },
   props: {
-    open: Boolean
+    open: Boolean,
+    keepOpen: Boolean
   },
   data() {
     return {
+      combinationsTitle: "",
       combinations: [],
+      menuBarsTooltip: "",
       queryString: '',
       menuDisplayInstitutional: true,
     }
@@ -120,6 +139,10 @@ export default {
     }
   },
   mounted() {
+    // i18n
+    this.combinationsTitle = this.$i18n.str("Combinations");
+    this.menuBarsTooltip = this.$i18n.str("Menu.Bars.Tooltip")
+
     if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
       this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: 'getCombs',

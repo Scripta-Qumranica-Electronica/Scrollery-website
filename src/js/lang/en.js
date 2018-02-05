@@ -3,6 +3,11 @@ module.exports = {
   "Combinations": "Combinations",
   "Artifact": "Artifact",
   "Fragment": "Fragment",
+  
+  // Auth
+  "Logout": "Logout",
   "User.LoggedInMessage": "Logged in as: :name:",
-  "Logout": "Logout"
+
+  // Menu
+  "Menu.Bars.Tooltip": "Click to keep menu open"
 };

@@ -2,17 +2,18 @@
   <div id="site">
 
     <!-- toggle for expanding/collapsing menu -->
-    <input type="checkbox" id="show-hide-menu" class="hidden" v-model="menuOpen" />
+    <input type="checkbox" id="show-hide-menu" class="hidden" v-model="keepMenuOpen" />
 
     <!-- main menu in sidebar -->
     <main-menu
       :open="menuOpen"
-      @mouseenter='menuOpen = true'
-      @mouseleave='menuOpen = false'
+      :keepOpen="keepMenuOpen"
+      @mouseenter='mouseOver = true'
+      @mouseleave='mouseOver = false'
     />
 
     <!-- editing panes -->
-    <div id="editing-window">
+    <div id="editing-window" :class='{"open": menuOpen}'>
       <header-menu></header-menu>
       
       <!-- We currently use two nested "split-panes" to hold the individual components.
@@ -59,25 +60,23 @@
 
 #show-hide-menu {
   display: none;
+}
 
-  & ~ #side-menu {
-    width: 50px;
-    overflow-x: hidden;
-    transition: width 300ms;
+#side-menu {
+  width: 50px;
+  overflow-x: hidden;
+  transition: width 300ms;
+
+  &.open {
+    width: 200px;
   }
-  & ~ #editing-window {
-    width: calc(100% - 50px);
-    transition: width 300ms;
-  }
+}
+#editing-window {
+  width: calc(100% - 50px);
+  transition: width 300ms;
 
-  &:checked {
-    & ~ #side-menu {
-      width: 200px;
-    }
-
-    & ~ #editing-window {
-      width: calc(100% - 200px);
-    }
+  &.open {
+    width: calc(100% - 200px);
   }
 }
 
@@ -110,7 +109,13 @@ export default {
   },
   data() {
     return {
-      menuOpen: false
+      keepMenuOpen: false,
+      mouseOver: false
+    }
+  },
+  computed: {
+    menuOpen() {
+      return this.mouseOver || this.keepMenuOpen
     }
   }
 }
