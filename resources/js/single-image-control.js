@@ -1,4 +1,4 @@
-var SingleImageController = (function () {
+var SingleImageController = window.SingleImageController =  (function () {
 
     // Constructor
     function SingleImageController ($cont, idx) {

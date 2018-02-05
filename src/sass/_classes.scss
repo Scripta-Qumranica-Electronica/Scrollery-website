@@ -1,0 +1,11 @@
+.hidden {
+  display: none;
+}
+
+.req:after {
+  content: '*'
+}
+
+.avoid-clicks {
+  pointer-events: none;
+}

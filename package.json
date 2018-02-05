@@ -1,0 +1,51 @@
+{
+  "name": "sqe",
+  "description": "Scripta Qumranica Electronica - Digital Tools for the Dead Sea Scrolls",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "webpack --config webpack.dev.js",
+    "prod": "webpack --config webpack.prod.js",
+    "start": "node ./dev-server.js",
+    "test": "karma start --config karma.conf.js"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "clean-webpack-plugin": "^0.1.17",
+    "css-loader": "^0.28.9",
+    "express": "^4.16.2",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "karma-webpack": "^2.0.9",
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.6",
+    "sass-resources-loader": "^1.3.2",
+    "style-loader": "^0.19.1",
+    "uglifyjs-webpack-plugin": "^1.1.6",
+    "vue-loader": "^13.7.0",
+    "vue-template-compiler": "^2.5.13",
+    "webpack": "^3.10.0",
+    "webpack-build-notifier": "^0.1.22",
+    "webpack-dev-middleware": "^2.0.4",
+    "webpack-hot-middleware": "^2.21.0",
+    "webpack-merge": "^4.1.1",
+    "webpack-notifier": "^1.5.1"
+  },
+  "dependencies": {
+    "@babel/core": "^7.0.0-beta.38",
+    "@babel/plugin-proposal-object-rest-spread": "7.0.0-beta.37",
+    "@babel/preset-env": "^7.0.0-beta.38",
+    "@vue/test-utils": "^1.0.0-beta.10",
+    "axios": "^0.17.1",
+    "babel-loader": "8.0.0-beta.0",
+    "element-ui": "^2.0.11",
+    "formidable": "^1.1.1",
+    "imperavi-kube": "^6.5.2",
+    "openseadragon": "^2.3.1",
+    "url-loader": "^0.6.2",
+    "vue": "^2.5.13",
+    "vue-router": "^3.0.1",
+    "vue-splitpane": "^1.0.2",
+    "vuex": "^3.0.1",
+    "vuex-persist": "^1.1.1",
+    "webpack-karma-jasmine": "^1.0.4"
+  }
+}

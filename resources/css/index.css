@@ -5,19 +5,20 @@ html, body {
 	-webkit-animation: bugfix infinite 1s;
 }
 
+html, body, #app {
+  font-size: 20px;
+  width: 100%;
+  height: 100%;
+}
+
 @-webkit-keyframes bugfix { from {padding:0;} to {padding:0;} }
 
-#login {
-	padding: 10px;
-  border: 1px solid lightgray;
-	text-align: center;
-}
 
 #site {
   position: relative;
   overflow: hidden;
-  width: auto;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 	margin-left: -300px;
 	-webkit-box-sizing:border-box;
 	        box-sizing:border-box;

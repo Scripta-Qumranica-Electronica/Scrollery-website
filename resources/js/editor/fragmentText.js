@@ -1,4 +1,4 @@
-function FragmentTextModel()
+window.FragmentTextModel = function FragmentTextModel()
 {
 	this.lineNames = [];
 	this.text = [];

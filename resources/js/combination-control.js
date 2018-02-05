@@ -1,4 +1,4 @@
-var CombinationController = (function () {
+var CombinationController = window.CombinationController = (function () {
     
     // Constructor
     function CombinationController ($cont, idx) {

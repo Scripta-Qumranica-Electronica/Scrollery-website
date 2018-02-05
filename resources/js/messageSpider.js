@@ -1,4 +1,4 @@
-function Spider() // singleton central component communication system
+var Spider = function Spider() // singleton central component communication system
 {
 	/** constructor */
 	
@@ -47,36 +47,26 @@ function Spider() // singleton central component communication system
 	{
 //		console.log('before request ' + new Date().getTime());
 		
-		if (this.session_id !== '')
-		{
+		if (this.session_id !== '') {
 			parameters['SESSION_ID'] = this.session_id;
 		}
 		
-		if (this.doShowRequests)
-		{
+		if (this.doShowRequests) {
 			console.log('Request');
-			for (var key in parameters)
-			{
-				if (key != 'PASSWORD')
-				{
+			for (var key in parameters) {
+				if (key != 'PASSWORD') {
 					console.log('* ' + key + ': ' + parameters[key]);
-				}
-				else
-				{
+				} else {
 					console.log('* ' + key + ': ***');
 				}
 			}
 		}
 		
-		$.post
-		(
+		$.post(
 			'resources/cgi-bin/server.pl', // connection to perl works only if same server ('same origin')
 			parameters
-		)
-		.done
-		(
-			function(data)
-			{
+		).done(
+			function(data) {
 				if (onSuccess) // first method was provided as parameter 
 				{
 					onSuccess(data);
@@ -136,4 +126,4 @@ function Spider() // singleton central component communication system
 }
 
 // initialize right here
-var Spider = new Spider();
+var Spider = window.Spider = new Spider();

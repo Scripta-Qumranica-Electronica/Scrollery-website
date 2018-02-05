@@ -1,4 +1,4 @@
-function SignVisualisation()
+window.SignVisualisation = function SignVisualisation()
 {
 	this.fontSize = 20; // TODO move all of rte's dependence on font size to here
 

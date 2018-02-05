@@ -8,6 +8,7 @@ use MIME::Base64;
 use lib qw(/home/perl_libs);
 #use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
 use SQE_CGI;
+use Encode;
 
 sub processCGI {
 	my ($cgi, $error) = SQE_CGI->new;
@@ -19,10 +20,14 @@ sub processCGI {
 
 	my $transaction = $cgi->param('transaction') || 'unspecified';
 	my %action = (
+		'validateSession' => \&validateSession,
 		'getCombs' => \&getCombs,
+		'getArtOfComb' => \&getArtOfComb,
+		'getImgOfComb' => \&getImgOfComb,
 		'getColOfComb' => \&getColOfComb,
 		'getFragsOfCol' => \&getFragsOfCol,
 		'getColOfScrollID' => \&getColOfScrollID,
+		'getSignStreamOfColumn' => \&getSignStreamOfColumn,
 		'imagesOfFragment' => \&getImagesOfFragment,
 		'getIAAEdID' => \&getIAAEdID,
 		'canonicalCompositions' => \&getCanonicalCompositions,
@@ -68,7 +73,7 @@ sub readResults {
        	push @fetchedResults, $result;
     }
     if (scalar(@fetchedResults) > 0) {
- 		print encode_json({results => \@fetchedResults});
+ 		print Encode::decode('utf8', encode_json({results => \@fetchedResults}));
  	} else {
     	print 'No results found.';
  	}
@@ -89,29 +94,80 @@ sub handleDBError {
 }
 
 # Various data return methods, see %action for hash table.
+sub validateSession {
+	my $cgi = shift;
+	my $dbh = $cgi->dbh;
+
+	$cgi->print('{"SESSION_ID":"'.$cgi->session_id.'", "USER_ID":'.$dbh->user_id.'}');
+	return;
+}
+
 sub getCombs {
 	my $cgi = shift;
 	my $userID = $cgi->param('user');
 	my $getCombsQuery = <<'MYSQL';
-		select scroll_data.scroll_id as scroll_id,
-			   scroll_data.name as name,
-			   scroll_version.version as version,
-			   scroll_version.scroll_version_id as version_id,
-			   scroll_data.scroll_data_id as scroll_data_id,
-			   (SELECT COUNT(*)
-					FROM scroll_to_col_owner
-					WHERE scroll_to_col_owner.scroll_version_id = version_id) as count
-		from scroll_version
-			join scroll_data_owner using(scroll_version_id)
-			join scroll_data using(scroll_data_id)
-		where scroll_version.user_id = ?
-		order by LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
-			LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"),
-			scroll_version.version
+SELECT scroll_data.scroll_id as scroll_id,
+       scroll_data.name AS name,
+       scroll_version.version AS version,
+       scroll_version.scroll_version_id AS version_id,
+       scroll_data.scroll_data_id AS scroll_data_id,
+       scroll_version.locked,
+       scroll_version.user_id
+FROM scroll_version
+	JOIN scroll_data_owner using(scroll_version_id)
+	JOIN scroll_data using(scroll_data_id)
+WHERE scroll_version.user_id = ?
+      OR scroll_version.user_id = 0
+ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
+	LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"),
+	scroll_version.version
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($userID);
+	readResults($sql);
+	return;
+}
+
+sub getArtOfComb {
+	my $cgi = shift;
+	my $userID = $cgi->param('user');
+	my $version_id = $cgi->param('version_id');
+	my $combID = $cgi->param('combID');
+	my $getColOfCombQuery = <<'MYSQL';
+SELECT DISTINCT artefact_position.artefact_id AS id
+FROM artefact_position
+	JOIN artefact_position_owner USING(artefact_position_id)
+WHERE artefact_position.scroll_id = ?
+      AND artefact_position_owner.scroll_version_id = ?
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
+		"Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($combID, $version_id);
+	readResults($sql);
+	return;
+}
+
+sub getImgOfComb {
+	my $cgi = shift;
+	my $userID = $cgi->param('user');
+	my $version_id = $cgi->param('version_id');
+	my $combID = $cgi->param('combID');
+	my $getColOfCombQuery = <<'MYSQL';
+SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
+       image_catalog.catalog_number_2 AS lvl2,
+	image_catalog.institution,
+	   image_catalog.image_catalog_id AS id
+FROM image_catalog
+	JOIN image_to_edition_catalog USING (image_catalog_id)
+	JOIN edition_catalog_to_discrete_reference USING (edition_catalog_id)
+	JOIN discrete_canonical_reference USING (discrete_canonical_reference_id)
+WHERE discrete_canonical_reference.scroll_id = ?
+ORDER BY lvl1, lvl2
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
+		"Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($combID);
 	readResults($sql);
 	return;
 }
@@ -122,11 +178,11 @@ sub getColOfComb {
 	my $version_id = $cgi->param('version_id');
 	my $combID = $cgi->param('combID');
 	my $getColOfCombQuery = <<'MYSQL';
-		SELECT col_data.name AS name,
-			   col_data.col_id AS col_id,
+		SELECT DISTINCT col_data.name AS name,
+			   col_data.col_id AS id,
 			   (SELECT COUNT(*)
-					FROM discrete_canonical_references
-					WHERE discrete_canonical_references.column_of_scroll_id = col_id)
+					FROM discrete_canonical_reference
+					WHERE discrete_canonical_reference.column_of_scroll_id = id)
 				   AS count
 		FROM col_data
 			JOIN col_data_owner USING(col_data_id)
@@ -148,15 +204,15 @@ sub getFragsOfCol {
 	my $version = $cgi->param('version');
 	my $colID = $cgi->param('colID');
 	my $getFragsOfColQuery = <<'MYSQL';
-		SELECT discrete_canonical_references.discrete_canonical_reference_id,
-			discrete_canonical_references.column_name,
-			discrete_canonical_references.fragment_name,
-			discrete_canonical_references.sub_fragment_name,
-			discrete_canonical_references.fragment_column,
-			discrete_canonical_references.side,
-			discrete_canonical_references.column_of_scroll_id
-		FROM discrete_canonical_references
-		WHERE discrete_canonical_references.column_of_scroll_id = ?
+		SELECT discrete_canonical_reference.discrete_canonical_reference_id,
+			discrete_canonical_reference.column_name,
+			discrete_canonical_reference.fragment_name,
+			discrete_canonical_reference.sub_fragment_name,
+			discrete_canonical_reference.fragment_column,
+			discrete_canonical_reference.side,
+			discrete_canonical_reference.column_of_scroll_id
+		FROM discrete_canonical_reference
+		WHERE discrete_canonical_reference.column_of_scroll_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getFragsOfColQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
@@ -171,16 +227,63 @@ sub getColOfScrollID {
 	my $getColOfScrollIDQuery = <<'MYSQL';
 		SELECT scroll.name AS scroll_name,
 			   column_of_scroll.name as col_name
-		FROM discrete_canonical_references
+		FROM discrete_canonical_reference
 			INNER JOIN scroll
-				ON scroll.scroll_id = discrete_canonical_references.discrete_canonical_name_id
+				ON scroll.scroll_id = discrete_canonical_reference.discrete_canonical_name_id
 			INNER JOIN column_of_scroll
-				ON column_of_scroll.column_of_scroll_id = discrete_canonical_references.column_of_scroll_id
-		WHERE discrete_canonical_references.discrete_canonical_reference_id = ?
+				ON column_of_scroll.column_of_scroll_id = discrete_canonical_reference.column_of_scroll_id
+		WHERE discrete_canonical_reference.discrete_canonical_reference_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfScrollIDQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($discCanRef);
+	readResults($sql);
+	return;
+}
+
+sub getSignStreamOfColumn {
+	my $cgi = shift;
+	my $colId = $cgi->param('colId');
+	my $scrollVersion = $cgi->param('SCROLL_VERSION');
+	my $getScrollsQuery = << 'MYSQL';
+SELECT
+	col_data.name AS col_name,
+	col_data.col_id AS col_id,
+	line_data.name AS line_name,
+	line_data.line_id AS line_id,
+	parent.sign_id AS prev_sign_id,
+	child.sign_id AS sign_id,
+	child.next_sign_id AS next_sign_id,
+	sign_char.is_variant,
+	sign_char.break_type,
+	sign_char.sign,
+	sign_char_reading_data.is_reconstructed,
+	sign_char_reading_data.readability,
+	sign_char_reading_data.is_retraced
+FROM position_in_stream_owner
+	JOIN position_in_stream AS parent
+		ON position_in_stream_owner.position_in_stream_id = parent.next_sign_id
+	JOIN position_in_stream AS child
+		ON parent.next_sign_id = child.sign_id
+	JOIN line_to_sign ON line_to_sign.sign_id = child.sign_id
+	Join line_to_sign_owner USING(line_to_sign_id)
+	JOIN line_data USING(line_id)
+	JOIN col_to_line USING(line_id)
+	JOIN col_to_line_owner USING (col_to_line_id)
+	JOIN col_data USING (col_id)
+	JOIN sign_char
+		ON sign_char.sign_id = child.sign_id
+	JOIN sign_char_owner USING(sign_char_id)
+	LEFT JOIN sign_char_reading_data USING(sign_char_id)
+WHERE col_to_line.col_id = ?
+	AND position_in_stream_owner.scroll_version_id = ?
+	AND line_to_sign_owner.scroll_version_id = ?
+	AND col_to_line_owner.scroll_version_id = ?
+	AND sign_char_owner.scroll_version_id = ?
+MYSQL
+	my $sql = $cgi->dbh->prepare($getScrollsQuery) or die
+		"Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($colId, $scrollVersion, $scrollVersion, $scrollVersion, $scrollVersion);
 	readResults($sql);
 	return;
 }
@@ -197,13 +300,17 @@ sub getImagesOfFragment {
 SELECT 	SQE_image.filename AS filename,
 		  SQE_image.wavelength_start AS start,
 		  SQE_image.wavelength_end AS end,
-	SQE_image.is_master,
+		  SQE_image.is_master,
+		  SQE_image.native_width AS width,
+		  SQE_image.native_height AS height,
 		  image_urls.url AS url
 FROM SQE_image
-	INNER JOIN image_urls ON image_urls.id = SQE_image.url_code
-	INNER JOIN image_catalog ON image_catalog.image_catalog_id = SQE_image.image_catalog_id
-	INNER JOIN image_to_edition_catalog on image_to_edition_catalog.catalog_id = image_catalog.image_catalog_id
-WHERE image_to_edition_catalog.edition_id = ?
+	JOIN image_urls USING(image_urls_id)
+	JOIN edition_catalog USING(edition_catalog_id)
+	JOIN edition_catalog_to_discrete_reference USING(edition_catalog_id)
+	JOIN discrete_canonical_reference USING(discrete_canonical_reference_id)
+WHERE edition_catalog.edition_side=0
+      AND discrete_canonical_reference.column_of_scroll_id = ?
 MYSQL
 	} elsif ($idType eq 'institution') {
 		$getImagesOfFragmentQuery = <<'MYSQL';
@@ -226,7 +333,7 @@ sub getIAAEdID {
 		SELECT edition_catalog_to_discrete_reference.edition_id
 		FROM edition_catalog_to_discrete_reference
 			INNER JOIN edition_catalog
-				ON edition_catalog.edition_catalog_id = edition_catalog_to_discrete_reference.edition_id
+				USING(edition_catalog_id)
 		WHERE edition_catalog.edition_side=0
 			  AND edition_catalog_to_discrete_reference.disc_can_ref_id = ?
 MYSQL
@@ -300,9 +407,9 @@ sub getScrollColNameFromDiscCanRef {
 				ON scroll_data.scroll_id = scroll_to_col.scroll_id
 			INNER JOIN col_data
 				ON col_data.col_id = scroll_to_col.col_id
-			INNER JOIN discrete_canonical_references
-				ON discrete_canonical_references.column_of_scroll_id = scroll_to_col.col_id
-		WHERE discrete_canonical_references.discrete_canonical_reference_id = ?
+			INNER JOIN discrete_canonical_reference
+				ON discrete_canonical_reference.column_of_scroll_id = scroll_to_col.col_id
+		WHERE discrete_canonical_reference.discrete_canonical_reference_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollColNameFromDiscCanRefQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
@@ -369,7 +476,7 @@ sub getInstitutionArtefacts {
 		SELECT DISTINCT artefact.artefact_id,
 			user_id
 		FROM artefact
-			JOIN SQE_image ON SQE_image.sqe_image_id = artefact.master_image_id
+			JOIN SQE_image ON SQE_image.sqe_image_id = artefact.sqe_image_id
 			JOIN artefact_owner USING(artefact_id)
 			JOIN scroll_version USING(scroll_version_id)
 		WHERE SQE_image.image_catalog_id = ?
@@ -437,7 +544,25 @@ sub getScrollArtefacts {
 	my $scroll_id = $cgi->param('scroll_id');
 	my $version_id = $cgi->param('scroll_version_id');
 	my $getScrollArtefactsQuery = <<'MYSQL';
-		CALL getScrollVersionArtefacts(?, ?)
+SELECT DISTINCT artefact_position.artefact_position_id AS id,
+                ST_AsText(ST_Envelope(artefact.region_in_master_image)) AS rect,
+                ST_AsText(artefact.region_in_master_image) AS poly,
+                ST_AsText(artefact_position.position_in_scroll) AS pos,
+                image_urls.url AS url,
+                image_urls.suffix AS suffix,
+                SQE_image.filename AS filename,
+                SQE_image.dpi AS dpi,
+                artefact_position.rotation AS rotation
+FROM artefact_position_owner
+	JOIN artefact_position USING(artefact_position_id)
+	JOIN artefact USING(artefact_id)
+	JOIN scroll_version USING(scroll_version_id)
+	INNER JOIN SQE_image USING(sqe_image_id)
+	INNER JOIN image_urls USING(image_urls_id)
+	INNER JOIN image_catalog USING(image_catalog_id)
+WHERE artefact_position.scroll_id=?
+      AND artefact_position_owner.scroll_version_id=?
+      AND image_catalog.catalog_side=0
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollArtefactsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
@@ -514,14 +639,12 @@ sub nameCombination {
 
 sub setArtPosition {
 	my $cgi = shift;
-	my $user_id = $cgi->dbh->user_id;
-	my $scroll_id = $cgi->param('scroll_id');
 	my $version_id = $cgi->param('version_id');
 	$cgi->dbh->set_scrollversion($version_id);
-	my $art_id = $cgi->param('art_id');
+	my $artefact_position_id = $cgi->param('art_id');
 	my $x = $cgi->param('x') * 1;
 	my $y = $cgi->param('y') * 1;
-	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $art_id, "position_in_scroll", ['POINT', $x, $y]);
+	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $artefact_position_id, "position_in_scroll", ['POINT', $x, $y]);
 	handleDBError ($new_id, $error);
 	return;
 }
