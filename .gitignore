@@ -1,5 +1,9 @@
 .vstags
 .vscode
 .idea
+
 node_modules
 dist
+
+coverage/
+.coveralls.yml

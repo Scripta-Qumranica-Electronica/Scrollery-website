@@ -6,20 +6,20 @@ import Login from '~/components/Login.vue'
 describe("Login", function() {
     let wrapper, vm
 
-    beforeAll(() => {
+    beforeEach(() => {
       wrapper = mount(Login)
       vm = wrapper.vm
     })
 
     it('has a button', () => {
-      expect(wrapper.contains('button')).toBe(true)
+      expect(wrapper.contains('button')).to.equal(true)
     })
 
     it('has a select dropdown', () => {
-      expect(wrapper.contains('select')).toBe(true)
+      expect(wrapper.contains('select')).to.equal(true)
     })
 
     it('has the initial language set to English', () => {
-      expect(vm.language).toBe('en')
+      expect(vm.language).to.equal('en')
     })
 })

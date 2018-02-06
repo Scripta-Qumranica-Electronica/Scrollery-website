@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/Scripta-Qumranica-Electronica/Scrollery-website/badge.svg?branch=master)](https://coveralls.io/github/Scripta-Qumranica-Electronica/Scrollery-website?branch=master)
+
 # Scrollery-website
 This is a develpoment space for the SQE website.  It is currently in its earliest stages of development, but we hope that hosting it here will streamline the process of development.
 
