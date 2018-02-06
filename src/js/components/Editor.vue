@@ -50,25 +50,28 @@ export default {
     },
     watch: {
         '$route' (to, from) {
-            if (to.params.selectionType === 'col' && to.params.id !== from.params.id) {
-                this.$post('resources/cgi-bin/GetImageData.pl', {
-                transaction: 'getSignStreamOfColumn',
-                SCROLL_VERSION: to.params.scrollVersionID,
-                colId: to.params.id,
-                SESSION_ID: this.$store.getters.sessionID
-            })
-            .then(res => {
-                if (res.status === 200 && res.data) {
-                    this.ssp.streamToTree(res.data.results, 
-                                                        'prev_sign_id',
-                                                        'sign_id',
-                                                        'next_sign_id')
-                    .then( formattedNodes => {
-                        this.currentText = formattedNodes
-                        console.log(this.currentText)
+            if (to.params.colID !== from.params.colID) {
+                if (to.params.colID > -1) {
+                    this.$post('resources/cgi-bin/GetImageData.pl', {
+                        transaction: 'getSignStreamOfColumn',
+                        SCROLL_VERSION: to.params.scrollVersionID,
+                        colId: to.params.colID,
+                        SESSION_ID: this.$store.getters.sessionID
                     })
+                    .then(res => {
+                        if (res.status === 200 && res.data) {
+                            this.ssp.streamToTree(res.data.results, 
+                                                                'prev_sign_id',
+                                                                'sign_id',
+                                                                'next_sign_id')
+                            .then( formattedNodes => {
+                                this.currentText = formattedNodes
+                            })
+                        }
+                    })
+                } else {
+                    this.currentText = []
                 }
-            })
             }
         }
     }

@@ -30,6 +30,7 @@
                   :version="combination.version"
                   :versionID="combination.version_id"
                   :user="combination.user_id"
+                  :menu-type="menu"
                   :locked="combination.locked"
                   />
               </li>
@@ -132,6 +133,7 @@ export default {
       menuBarsTooltip: "",
       queryString: '',
       menuDisplayInstitutional: true,
+      menu: 'col',
     }
   },
   methods: {

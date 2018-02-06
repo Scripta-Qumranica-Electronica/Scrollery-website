@@ -20,22 +20,8 @@ export default [
     }
   },
   {
-    path: '/workbench/:scrollID/:scrollVersionID',
-    name: 'workbenchScrollVersion',
-    component: () => {
-      return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
-    }
-  },
-  {
-    path: '/workbench/:scrollID/:scrollVersionID/:selectionType/:id',
-    name: 'workbenchScrollVersionTypeId',
-    component: () => {
-      return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
-    }
-  },
-  {
-    path: '/workbench/:scrollID/:scrollVersionID/:selectionType/:plate/:fragment',
-    name: 'workbenchScrollVersionPlateFragment',
+    path: '/workbench/scroll-id/:scrollID/scroll-version-id/:scrollVersionID/image-id/:imageID/col-id/:colID/art-id/:artID',
+    name: 'workbenchAddress',
     component: () => {
       return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
     }

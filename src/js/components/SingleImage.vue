@@ -105,28 +105,32 @@ export default {
   },
   watch: {
     '$route' (to, from) {
-      if (to.params.selectionType === 'col' && to.params.id !== from.params.id) {
-        this.$post('resources/cgi-bin/GetImageData.pl', {
-        transaction: 'imagesOfFragment',
-        idType: 'composition',
-        id: to.params.id,
-        SESSION_ID: this.$store.getters.sessionID
-      })
-        .then(res => {
-            if (res.status === 200 && res.data.results) {
-                this.imageElements = res.data.results
-                this.filenames = []
-                res.data.results.forEach((result, index) => {
-                  // this.filenames.push(`${result.url}${result.filename}/info.json`)
-                  if (result.filename.indexOf('ColorCalData') !== -1) {
-                    result.visible = true
-                  }
-                  result.opacity = 1.0
-                  this.filenames.push(result)
-                })
-                // this.filename = `${res.data.results[0].url}${res.data.results[0].filename}/info.json`
-            }
-        })
+      if (to.params.colID !== from.params.colID) {
+        if (to.params.colID > -1) {
+          this.$post('resources/cgi-bin/GetImageData.pl', {
+            transaction: 'imagesOfFragment',
+            idType: 'composition',
+            id: to.params.colID,
+            SESSION_ID: this.$store.getters.sessionID
+          })
+          .then(res => {
+              if (res.status === 200 && res.data.results) {
+                  this.imageElements = res.data.results
+                  this.filenames = []
+                  res.data.results.forEach((result, index) => {
+                    // this.filenames.push(`${result.url}${result.filename}/info.json`)
+                    if (result.filename.indexOf('ColorCalData') !== -1) {
+                      result.visible = true
+                    }
+                    result.opacity = 1.0
+                    this.filenames.push(result)
+                  })
+                  // this.filename = `${res.data.results[0].url}${res.data.results[0].filename}/info.json`
+              }
+          })
+        } else {
+          this.filenames = []
+        }
       }
     }
   },

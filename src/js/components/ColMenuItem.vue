@@ -25,11 +25,6 @@ export default {
 
       // we'll lazy load children, but cache them
       if (this.lastFetch !== this.requestType[this.menuType]) {
-        this.$router.push({ name: 'workbenchScrollVersion',
-                            params: { scrollID: this.scrollID, 
-                                      scrollVersionID: this.versionID }
-        })
-
         this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: this.requestType[this.menuType],
         combID: this.scrollDataID,
@@ -48,11 +43,12 @@ export default {
     },
 
     setRouter() {
-        this.$router.push({ name: 'workbenchScrollVersionTypeId',
+        this.$router.push({ name: 'workbenchAddress',
                           params: { scrollID: this.$route.params.scrollID,
                                     scrollVersionID: this.$route.params.scrollVersionID,
-                                    selectionType: 'col',
-                                    id: this.dataId, }
+                                    colID: this.dataId,
+                                    imageID: this.$route.params.imageID ? this.$route.params.imageID : '-1',
+                                    artID: this.$route.params.artID ? this.$route.params.artID : '-1'}
       })
     },
   },
