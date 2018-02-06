@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Scripta-Qumranica-Electronica/Scrollery-website.svg?branch=master)](https://travis-ci.org/Scripta-Qumranica-Electronica/Scrollery-website)
 [![Coverage Status](https://coveralls.io/repos/github/Scripta-Qumranica-Electronica/Scrollery-website/badge.svg?branch=master)](https://coveralls.io/github/Scripta-Qumranica-Electronica/Scrollery-website?branch=master)
 
 # Scrollery-website
