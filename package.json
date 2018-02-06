@@ -6,7 +6,8 @@
     "dev": "webpack --config webpack.dev.js",
     "prod": "webpack --config webpack.prod.js",
     "start": "node ./dev-server.js",
-    "test": "karma start --config karma.conf.js"
+    "test": "karma start --config karma.conf.js",
+    "test_travis": "./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=PhantomJS,Firefox"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
