@@ -1,12 +1,22 @@
 <template>
-  <span class="clickable-menu-item" @click="setRouter">
-    {{institution}}: {{plate}}, {{fragment}} ({{dataId}})
-  </span>
+  <div>
+    <span class="clickable-menu-item" @click="setRouter">
+      {{institution}}: {{plate}}, {{fragment}} ({{dataId}})
+    </span>
+    <div class="children" v-show="open">
+        <ul>
+          <li v-for="child in children">
+            <art-menu-item :data-id="child.artefact_id"></art-menu-item>
+          </li>
+        </ul>
+    </div>
+  </div>
 </template>
 
 <script>
 
 import { mapGetters } from 'vuex'
+import ArtMenuItem from './ArtMenuItem.vue'
 
 export default {
   props: {
@@ -14,9 +24,15 @@ export default {
     plate: '',
     fragment: '',
     institution: '',
+    versionID: '',
+  },
+  components: {
+    'art-menu-item': ArtMenuItem,
   },
   data() {
     return {
+      children: [],
+      open: false,
     }
   },
   computed: {
@@ -24,39 +40,36 @@ export default {
   },
   methods: {
     fetchChildren() {
-
+      this.children = []
       // we'll lazy load children, but cache them
-      if (this.lastFetch !== this.requestType[this.menuType]) {
-        this.$router.push({ name: 'workbenchScrollVersionPlateFragment',
-                            params: { scrollID: this.scrollID, 
-                                      scrollVersionID: this.versionID }
-        })
-
-        this.$post('resources/cgi-bin/GetImageData.pl', {
-        transaction: this.requestType[this.menuType],
-        combID: this.scrollDataID,
-        user: this.userID,
+      this.$post('resources/cgi-bin/GetImageData.pl', {
+        transaction: 'getArtOfImage',
+        image_id: this.dataId,
         version_id: this.versionID,
         SESSION_ID: this.sessionID
       })
       .then(res => {
         if (res.status === 200 && res.data) {
           this.children = res.data.results
-          this.lastFetch = this.requestType[this.menuType]
         }
       })
       .catch(console.error)
-      }
     },
 
     setRouter() {
-        this.$router.push({ name: 'workbenchScrollVersionPlateFragment',
+      this.open = !this.open
+      if (this.open) {
+        this.$router.push({ name: 'workbenchAddress',
                           params: { scrollID: this.$route.params.scrollID,
                                     scrollVersionID: this.$route.params.scrollVersionID,
-                                    selectionType: 'img',
-                                    plate: this.plate,
-                                    fragment: this.fragment, }
-      })
+                                    colID: this.$route.params.colID ? this.$route.params.colID : '-1',
+                                    imageID: this.dataId,
+                                    artID: this.$route.params.artID ? this.$route.params.artID : '-1' }
+        })
+        if (!this.children.length) {
+          this.fetchChildren()
+        }
+      }
     },
   },
   watch: {

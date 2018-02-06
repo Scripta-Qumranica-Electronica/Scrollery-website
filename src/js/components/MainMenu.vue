@@ -15,6 +15,13 @@
       >
         <span slot="icon"><i class="fa fa-hashtag"></i></span>
         <div slot="body">
+            <span>Listing type:</span>
+            <!-- <button @click="setMenu('text')">Text</button>
+            <button @click="setMenu('image')">Image</button> -->
+            <el-radio-group v-model="menuDisplay" size="mini">
+              <el-radio-button label="image">Image</el-radio-button>
+              <el-radio-button label="text">Text</el-radio-button>
+            </el-radio-group>
           <div>
             <el-input placeholder="Enter search string" v-model="queryString"></el-input>
           </div>
@@ -30,7 +37,7 @@
                   :version="combination.version"
                   :versionID="combination.version_id"
                   :user="combination.user_id"
-                  :menu-type="menu"
+                  :menu-type="menuDisplay"
                   :locked="combination.locked"
                   />
               </li>
@@ -133,31 +140,34 @@ export default {
       menuBarsTooltip: "",
       queryString: '',
       menuDisplayInstitutional: true,
-      menu: 'col',
+      menuDisplay: 'text',
     }
   },
   methods: {
     onArtifactSelected(args) {
+    },
+    loadCombinations() {
+      if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
+        this.combinations = []
+        this.$post('resources/cgi-bin/GetImageData.pl', {
+          transaction: 'getCombs',
+          user: this.$store.getters.userID,
+          SESSION_ID: this.$store.getters.sessionID
+        })
+        .then(res => {
+          if (res.status === 200 && res.data) {
+            this.combinations = res.data.results
+          }
+        })
+        .catch(console.log)
+      }
     }
   },
   mounted() {
     // i18n
     this.combinationsTitle = this.$i18n.str("Combinations");
     this.menuBarsTooltip = this.$i18n.str("Menu.Bars.Tooltip")
-
-    if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
-      this.$post('resources/cgi-bin/GetImageData.pl', {
-        transaction: 'getCombs',
-        user: this.$store.getters.userID,
-        SESSION_ID: this.$store.getters.sessionID
-      })
-      .then(res => {
-        if (res.status === 200 && res.data) {
-          this.combinations = res.data.results
-        }
-      })
-      .catch(console.log)
-    }
+    this.loadCombinations()
   }
 }
 

@@ -116,8 +116,8 @@ export default {
             const point = this.pointInSvg(event.clientX, event.clientY);
             const box = { x: point.x / this.scale,
                 y: point.y / this.scale,
-                width: 2,
-                height: 2,
+                width: 10,
+                height: 10,
                 color: 'purple'};
             this.boxes.push(box);
             this.selectROI(event, box, 'resizeWH');
