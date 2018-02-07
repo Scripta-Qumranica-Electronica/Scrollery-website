@@ -5,6 +5,7 @@ import '@/node_modules/imperavi-kube/dist/css/kube.min.css'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
+import VuexPersist from 'vuex-persist'
 import i18n from './plugins/i18n'
 import ajax from './plugins/ajax'
 import routes from './routes'
@@ -19,8 +20,14 @@ Vue.use(VueRouter)
 const router = new VueRouter({ routes })
 
 // Store
+const vuexLocalStorage = new VuexPersist({
+  key: 'vuex',
+  storage: window.localStorage,
+})
 Vue.use(Vuex)
-const store = makeStore(Vuex)
+const store = makeStore(Vuex, [
+  vuexLocalStorage.plugin
+])
 
 // Localization
 Vue.use(i18n, { store })

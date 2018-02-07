@@ -20,31 +20,31 @@ export default class SignStreamProcessor {
         for (let i = 0; i < stream.length; i++) {
             let entry = stream[i]
             if (entry.col_name != column) {
-            if (object.cols.length > 0) {
-                columnNode++
-            }
-            column = entry.col_name
-            object.cols.push({col: column, lines: []})
-            lineNode = 0
-            line = entry.line_name
-            object.cols[columnNode].lines.push({line: line, lineId: entry.line_id, signs: []})
+                if (object.cols.length > 0) {
+                    columnNode++
+                }
+                column = entry.col_name
+                object.cols.push({col: column, lines: []})
+                lineNode = 0
+                line = entry.line_name
+                object.cols[columnNode].lines.push({line: line, lineId: entry.line_id, signs: []})
             } else if (entry.line_name != line) {
-            if (object.cols.length > 0) {
-                lineNode++
-            }
-            line = entry.line_name
-            object.cols[columnNode].lines.push({line: line, lineId: entry.line_id, signs: []})
+                if (object.cols.length > 0) {
+                    lineNode++
+                }
+                line = entry.line_name
+                object.cols[columnNode].lines.push({line: line, lineId: entry.line_id, signs: []})
             }
             object.cols[columnNode].lines[lineNode].signs.push({
-            id: entry[mainKey],
-            is_variant: entry.is_variant,
-            break_type: entry.break_type,
-            sign: entry.sign == '' ? '·' : entry.sign,
-            is_reconstructed: entry.is_reconstructed,
-            readability: entry.readability,
-            is_retraced: entry.is_retraced,
-            prev_sign: entry[prevKey],
-            next_sign: entry[nextKey],
+                id: entry[mainKey],
+                is_variant: entry.is_variant,
+                break_type: entry.break_type,
+                sign: entry.sign == '' ? '·' : entry.sign,
+                is_reconstructed: entry.is_reconstructed,
+                readability: entry.readability,
+                is_retraced: entry.is_retraced,
+                prev_sign: entry[prevKey],
+                next_sign: entry[nextKey],
             })
         }
         return object

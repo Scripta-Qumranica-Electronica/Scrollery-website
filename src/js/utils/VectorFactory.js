@@ -34,16 +34,11 @@ export function geoJsonParseRect(geoJSON) {
     if (geoJSON.substring(0, 9) === 'POLYGON((') {
         const rect = geoJSON.replace('POLYGON((', '')
         const coords = rect.split(',')
-        const x = coords[0].split(' ')[0]
-        const y = coords[0].split(' ')[1]
-        const width = coords[2].split(' ')[0] - x
-        const height = coords[2].split(' ')[1] - y
-        svg = {
-            x: x,
-            y: y,
-            width: width,
-            height: height,
-        }
+        const x = parseInt(coords[0].split(' ')[0])
+        const y = parseInt(coords[0].split(' ')[1])
+        const width = parseInt(coords[2].split(' ')[0]) - x
+        const height = parseInt(coords[2].split(' ')[1]) - y
+        svg = { x, y, width, height }
     }
     return svg
 }
