@@ -7,7 +7,7 @@ const common = require('./webpack.common.js')
 delete common.entry
 
 module.exports = merge(common, {
-  devtool: '#inline-source-map',
+  devtool: 'inline-source-map',
   resolve: {
     alias: {
       "@test": resolve(__dirname, 'tests/.utils')
