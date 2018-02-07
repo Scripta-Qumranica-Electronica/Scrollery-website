@@ -7,15 +7,15 @@
     <div class="children" v-show="open">
         <ul>
           <li v-if="menuType === 'text'" v-for="child in children">
-            <col-menu-item :data-id="child.id"
-                            :name="child.name"></col-menu-item>
+            <column-menu-item :data-id="child.id"
+                            :name="child.name"></column-menu-item>
           </li>
           <li v-if="menuType === 'image'" v-for="child in children">
-            <img-menu-item :data-id="child.id"
+            <image-menu-item :data-id="child.id"
                             :institution="child.institution"
                             :plate="child.lvl1"
                             :fragment="child.lvl2"
-                            :version-i-d="versionID"></img-menu-item>
+                            :version-i-d="versionID"></image-menu-item>
           </li>
         </ul>
     </div>
@@ -25,9 +25,8 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import ArtMenuItem from './ArtMenuItem.vue'
-import ColMenuItem from './ColMenuItem.vue'
-import ImgMenuItem from './ImgMenuItem.vue'
+import ColumnMenuItem from './ColumnMenuItem.vue'
+import ImageMenuItem from './ImageMenuItem.vue'
 
 export default {
   props: {
@@ -42,9 +41,8 @@ export default {
     locked: "",
   },
   components: {
-    'art-menu-item': ArtMenuItem,
-    'col-menu-item': ColMenuItem,
-    'img-menu-item': ImgMenuItem,
+    'column-menu-item': ColumnMenuItem,
+    'image-menu-item': ImageMenuItem,
   },
   data() {
     return {

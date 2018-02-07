@@ -6,7 +6,7 @@
     <div class="children" v-show="open">
         <ul>
           <li v-for="child in children">
-            <art-menu-item :data-id="child.artefact_id"></art-menu-item>
+            <artefact-menu-item :data-id="child.artefact_id"></artefact-menu-item>
           </li>
         </ul>
     </div>
@@ -16,7 +16,7 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import ArtMenuItem from './ArtMenuItem.vue'
+import ArtefactMenuItem from './ArtefactMenuItem.vue'
 
 export default {
   props: {
@@ -27,7 +27,7 @@ export default {
     versionID: '',
   },
   components: {
-    'art-menu-item': ArtMenuItem,
+    'artefact-menu-item': ArtefactMenuItem,
   },
   data() {
     return {
