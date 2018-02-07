@@ -15,12 +15,13 @@
       >
         <span slot="icon"><i class="fa fa-hashtag"></i></span>
         <div slot="body">
-            <span>Listing type:</span>
-            <!-- <button @click="setMenu('text')">Text</button>
-            <button @click="setMenu('image')">Image</button> -->
+            <!-- These two buttons switch the listing mode to display either QWB -->
+            <!-- cataloguing according to the DJD text editions, or the institutional -->
+            <!-- cataloguing of the images.  Is there better terminology than -->
+            <!-- Text/Image that would make this referencing distinction more clear? -->
             <el-radio-group v-model="menuDisplay" size="mini">
-              <el-radio-button label="image">Image</el-radio-button>
-              <el-radio-button label="text">Text</el-radio-button>
+              <el-radio-button label="image">{{$i18n.str('Image')}}</el-radio-button>
+              <el-radio-button label="text">{{$i18n.str('Text')}}</el-radio-button>
             </el-radio-group>
           <div>
             <el-input placeholder="Enter search string" v-model="queryString"></el-input>
