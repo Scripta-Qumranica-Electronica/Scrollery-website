@@ -1,3 +1,5 @@
-module.exports = {
-  mount: require("./mount.js")
+import mount from './mount.js'
+
+export {
+  mount
 }
