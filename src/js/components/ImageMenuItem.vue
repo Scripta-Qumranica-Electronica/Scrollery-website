@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <span class="clickable-menu-item" @click="setRouter">
+  <div class="clickable-menu-item">
+    <span @click="setRouter">
       {{institution}}: {{plate}}, {{fragment}} ({{dataId}})
     </span>
     <div class="children" v-show="open">
@@ -46,7 +46,6 @@ export default {
         transaction: 'getArtOfImage',
         image_id: this.dataId,
         version_id: this.versionID,
-        SESSION_ID: this.sessionID
       })
       .then(res => {
         if (res.status === 200 && res.data) {
@@ -59,12 +58,15 @@ export default {
     setRouter() {
       this.open = !this.open
       if (this.open) {
-        this.$router.push({ name: 'workbenchAddress',
-                          params: { scrollID: this.$route.params.scrollID,
-                                    scrollVersionID: this.$route.params.scrollVersionID,
-                                    colID: this.$route.params.colID ? this.$route.params.colID : '-1',
-                                    imageID: this.dataId,
-                                    artID: this.$route.params.artID ? this.$route.params.artID : '-1' }
+        this.$router.push({ 
+          name: 'workbenchAddress',
+          params: {
+            scrollID: this.$route.params.scrollID,
+            scrollVersionID: this.$route.params.scrollVersionID,
+            colID: this.$route.params.colID ? this.$route.params.colID : '-1',
+            imageID: this.dataId,
+            artID: this.$route.params.artID ? this.$route.params.artID : '-1',
+          }
         })
         if (!this.children.length) {
           this.fetchChildren()

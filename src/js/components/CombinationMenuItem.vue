@@ -67,7 +67,6 @@ export default {
         combID: this.scrollDataID,
         user: this.userID,
         version_id: this.versionID,
-        SESSION_ID: this.sessionID
         })
         .then(res => {
           if (res.status === 200 && res.data) {
@@ -83,7 +82,6 @@ export default {
         transaction: 'copyCombination',
         scroll_id: this.scrollDataID,
         scroll_version_id: this.versionID,
-        SESSION_ID: this.sessionID
       })
       .then(res => {
         if (res.status === 200 && res.data.scroll_clone === 'success') {
@@ -97,12 +95,15 @@ export default {
     open(newVal, prevVal){
       if (this.open) {
         console.log(this.scrollID + ' ' + this.versionID)
-        this.$router.push({ name: 'workbenchAddress',
-                            params: { scrollID: this.scrollID, 
-                                      scrollVersionID: this.versionID,
-                                      imageID: -1,
-                                      colID: -1,
-                                      artID: -1 }
+        this.$router.push({
+          name: 'workbenchAddress',
+          params: {
+            scrollID: this.scrollID, 
+            scrollVersionID: this.versionID,
+            imageID: -1,
+            colID: -1,
+            artID: -1
+          }
         })
         this.fetchChildren();
       }

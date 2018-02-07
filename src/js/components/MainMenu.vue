@@ -93,6 +93,7 @@
   height: 70vh;
   min-height: 70vh;
   overflow: auto;
+  text-align: left;
 }
 
 #side-menu,
@@ -152,7 +153,6 @@ export default {
         this.$post('resources/cgi-bin/GetImageData.pl', {
           transaction: 'getCombs',
           user: this.$store.getters.userID,
-          SESSION_ID: this.$store.getters.sessionID
         })
         .then(res => {
           if (res.status === 200 && res.data) {

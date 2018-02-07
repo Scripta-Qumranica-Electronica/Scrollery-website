@@ -30,7 +30,6 @@ export default {
         combID: this.scrollDataID,
         user: this.userID,
         version_id: this.versionID,
-        SESSION_ID: this.sessionID
       })
       .then(res => {
         if (res.status === 200 && res.data) {
@@ -43,12 +42,15 @@ export default {
     },
 
     setRouter() {
-        this.$router.push({ name: 'workbenchAddress',
-                          params: { scrollID: this.$route.params.scrollID,
-                                    scrollVersionID: this.$route.params.scrollVersionID,
-                                    colID: this.dataId,
-                                    imageID: this.$route.params.imageID ? this.$route.params.imageID : '-1',
-                                    artID: this.$route.params.artID ? this.$route.params.artID : '-1'}
+      this.$router.push({
+        name: 'workbenchAddress',
+        params: {
+          scrollID: this.$route.params.scrollID,
+          scrollVersionID: this.$route.params.scrollVersionID,
+          colID: this.dataId,
+          imageID: this.$route.params.imageID ? this.$route.params.imageID : '-1',
+          artID: this.$route.params.artID ? this.$route.params.artID : '-1'
+        }
       })
     },
   },
