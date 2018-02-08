@@ -4,5 +4,7 @@ module.exports = {
     "Artifact": "Artefakt",
     "Fragment": "Fragment",
     "User.LoggedInMessage": "Angemeldet als: :name:",
-    "Logout": "Abmelden"
+    "Logout": "Abmelden",
+    "Image": "Bild",
+    "Text": "Text"
 }

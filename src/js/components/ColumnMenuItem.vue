@@ -1,6 +1,6 @@
 <template>
   <span class="clickable-menu-item" @click="setRouter">
-    {{institution}}: {{plate}}, {{fragment}} ({{dataId}})
+    {{name}} ({{dataId}})
   </span>
 </template>
 
@@ -11,9 +11,7 @@ import { mapGetters } from 'vuex'
 export default {
   props: {
     dataId: Number,
-    plate: '',
-    fragment: '',
-    institution: '',
+    name: String,
   },
   data() {
     return {
@@ -27,17 +25,11 @@ export default {
 
       // we'll lazy load children, but cache them
       if (this.lastFetch !== this.requestType[this.menuType]) {
-        this.$router.push({ name: 'workbenchScrollVersionPlateFragment',
-                            params: { scrollID: this.scrollID, 
-                                      scrollVersionID: this.versionID }
-        })
-
         this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: this.requestType[this.menuType],
         combID: this.scrollDataID,
         user: this.userID,
         version_id: this.versionID,
-        SESSION_ID: this.sessionID
       })
       .then(res => {
         if (res.status === 200 && res.data) {
@@ -50,12 +42,15 @@ export default {
     },
 
     setRouter() {
-        this.$router.push({ name: 'workbenchScrollVersionPlateFragment',
-                          params: { scrollID: this.$route.params.scrollID,
-                                    scrollVersionID: this.$route.params.scrollVersionID,
-                                    selectionType: 'img',
-                                    plate: this.plate,
-                                    fragment: this.fragment, }
+      this.$router.push({
+        name: 'workbenchAddress',
+        params: {
+          scrollID: this.$route.params.scrollID,
+          scrollVersionID: this.$route.params.scrollVersionID,
+          colID: this.dataId,
+          imageID: this.$route.params.imageID ? this.$route.params.imageID : '-1',
+          artID: this.$route.params.artID ? this.$route.params.artID : '-1'
+        }
       })
     },
   },

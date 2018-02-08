@@ -23,6 +23,7 @@ sub processCGI {
 		'validateSession' => \&validateSession,
 		'getCombs' => \&getCombs,
 		'getArtOfComb' => \&getArtOfComb,
+		'getArtOfImage' => \&getArtOfImage,
 		'getImgOfComb' => \&getImgOfComb,
 		'getColOfComb' => \&getColOfComb,
 		'getFragsOfCol' => \&getFragsOfCol,
@@ -148,6 +149,25 @@ MYSQL
 	return;
 }
 
+sub getArtOfImage {
+	my $cgi = shift;
+	my $image_id = $cgi->param('image_id');
+	my $version_id = $cgi->param('version_id');
+	my $getArtOfImageQuery = <<'MYSQL';
+SELECT DISTINCT artefact.artefact_id
+FROM artefact
+JOIN artefact_owner USING(artefact_id)
+WHERE artefact.sqe_image_id = ?
+AND artefact_owner.scroll_version_id = ?
+MYSQL
+	print($image_id);
+	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
+		"Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($image_id, $version_id);
+	readResults($sql);
+	return;
+}
+
 sub getImgOfComb {
 	my $cgi = shift;
 	my $userID = $cgi->param('user');
@@ -157,11 +177,12 @@ sub getImgOfComb {
 SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
        image_catalog.catalog_number_2 AS lvl2,
 	image_catalog.institution,
-	   image_catalog.image_catalog_id AS id
+	   SQE_image.sqe_image_id AS id
 FROM image_catalog
 	JOIN image_to_edition_catalog USING (image_catalog_id)
 	JOIN edition_catalog_to_discrete_reference USING (edition_catalog_id)
 	JOIN discrete_canonical_reference USING (discrete_canonical_reference_id)
+	JOIN SQE_image USING(image_catalog_id)
 WHERE discrete_canonical_reference.scroll_id = ?
 ORDER BY lvl1, lvl2
 MYSQL

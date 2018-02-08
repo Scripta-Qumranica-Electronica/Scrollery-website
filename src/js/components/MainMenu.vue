@@ -15,6 +15,14 @@
       >
         <span slot="icon"><i class="fa fa-hashtag"></i></span>
         <div slot="body">
+            <!-- These two buttons switch the listing mode to display either QWB -->
+            <!-- cataloguing according to the DJD text editions, or the institutional -->
+            <!-- cataloguing of the images.  Is there better terminology than -->
+            <!-- Text/Image that would make this referencing distinction more clear? -->
+            <el-radio-group v-model="menuDisplay" size="mini">
+              <el-radio-button label="image">{{$i18n.str('Image')}}</el-radio-button>
+              <el-radio-button label="text">{{$i18n.str('Text')}}</el-radio-button>
+            </el-radio-group>
           <div>
             <el-input placeholder="Enter search string" v-model="queryString"></el-input>
           </div>
@@ -30,7 +38,7 @@
                   :version="combination.version"
                   :versionID="combination.version_id"
                   :user="combination.user_id"
-                  :menu-type="menu"
+                  :menu-type="menuDisplay"
                   :locked="combination.locked"
                   />
               </li>
@@ -86,6 +94,7 @@
   height: 70vh;
   min-height: 70vh;
   overflow: auto;
+  text-align: left;
 }
 
 #side-menu,
@@ -133,31 +142,33 @@ export default {
       menuBarsTooltip: "",
       queryString: '',
       menuDisplayInstitutional: true,
-      menu: 'col',
+      menuDisplay: 'text',
     }
   },
   methods: {
     onArtifactSelected(args) {
+    },
+    loadCombinations() {
+      if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
+        this.combinations = []
+        this.$post('resources/cgi-bin/GetImageData.pl', {
+          transaction: 'getCombs',
+          user: this.$store.getters.userID,
+        })
+        .then(res => {
+          if (res.status === 200 && res.data) {
+            this.combinations = res.data.results
+          }
+        })
+        .catch(console.log)
+      }
     }
   },
   mounted() {
     // i18n
     this.combinationsTitle = this.$i18n.str("Combinations");
     this.menuBarsTooltip = this.$i18n.str("Menu.Bars.Tooltip")
-
-    if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
-      this.$post('resources/cgi-bin/GetImageData.pl', {
-        transaction: 'getCombs',
-        user: this.$store.getters.userID,
-        SESSION_ID: this.$store.getters.sessionID
-      })
-      .then(res => {
-        if (res.status === 200 && res.data) {
-          this.combinations = res.data.results
-        }
-      })
-      .catch(console.log)
-    }
+    this.loadCombinations()
   }
 }
 

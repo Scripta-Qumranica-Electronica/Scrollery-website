@@ -4,27 +4,18 @@
     <i class="fa fa-clone" @click="cloneScroll"></i>
     <i v-show="locked" class="fa fa-lock" style="color: red"></i>
     <i v-show="!locked" class="fa fa-unlock" style="color: green"></i>
-    <!-- <div v-if="open">
-      <el-radio-group v-model="menuType" size="mini">
-        <el-radio-button label="art"></el-radio-button>
-        <el-radio-button label="col"></el-radio-button>
-        <el-radio-button label="img"></el-radio-button>
-      </el-radio-group>
-    </div> -->
     <div class="children" v-show="open">
         <ul>
-          <!-- <li v-show="menuType === 'art'" v-for="child in children">
-            <art-menu-item :data-id="child.id"></art-menu-item>
-          </li> -->
-          <li v-show="menuType === 'col'" v-for="child in children">
-            <col-menu-item :data-id="child.id"
-                            :name="child.name"></col-menu-item>
+          <li v-if="menuType === 'text'" v-for="child in children">
+            <column-menu-item :data-id="child.id"
+                            :name="child.name"></column-menu-item>
           </li>
-          <li v-show="menuType === 'img'" v-for="child in children">
-            <img-menu-item :data-id="child.id"
+          <li v-if="menuType === 'image'" v-for="child in children">
+            <image-menu-item :data-id="child.id"
                             :institution="child.institution"
                             :plate="child.lvl1"
-                            :fragment="child.lvl2"></img-menu-item>
+                            :fragment="child.lvl2"
+                            :version-i-d="versionID"></image-menu-item>
           </li>
         </ul>
     </div>
@@ -34,9 +25,8 @@
 <script>
 
 import { mapGetters } from 'vuex'
-import ArtMenuItem from './ArtMenuItem.vue'
-import ColMenuItem from './ColMenuItem.vue'
-import ImgMenuItem from './ImgMenuItem.vue'
+import ColumnMenuItem from './ColumnMenuItem.vue'
+import ImageMenuItem from './ImageMenuItem.vue'
 
 export default {
   props: {
@@ -51,18 +41,16 @@ export default {
     locked: "",
   },
   components: {
-    'art-menu-item': ArtMenuItem,
-    'col-menu-item': ColMenuItem,
-    'img-menu-item': ImgMenuItem,
+    'column-menu-item': ColumnMenuItem,
+    'image-menu-item': ImageMenuItem,
   },
   data() {
     return {
       children: [],
       open: false,
       requestType: {
-        art: 'getArtOfComb',
-        col: 'getColOfComb',
-        img: 'getImgOfComb',
+        'text': 'getColOfComb',
+        'image': 'getImgOfComb',
       },
       lastFetch: '',
     }
@@ -72,23 +60,13 @@ export default {
   },
   methods: {
     fetchChildren() {
-
       // we'll lazy load children, but cache them
       if (this.lastFetch !== this.requestType[this.menuType]) {
-        this.$router.push({ name: 'workbenchAddress',
-                            params: { scrollID: this.scrollID, 
-                                      scrollVersionID: this.versionID,
-                                      imageID: -1,
-                                      colID: -1,
-                                      artID: -1 }
-        })
-
         this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: this.requestType[this.menuType],
         combID: this.scrollDataID,
         user: this.userID,
         version_id: this.versionID,
-        SESSION_ID: this.sessionID
         })
         .then(res => {
           if (res.status === 200 && res.data) {
@@ -104,7 +82,6 @@ export default {
         transaction: 'copyCombination',
         scroll_id: this.scrollDataID,
         scroll_version_id: this.versionID,
-        SESSION_ID: this.sessionID
       })
       .then(res => {
         if (res.status === 200 && res.data.scroll_clone === 'success') {
@@ -117,11 +94,24 @@ export default {
   watch: {
     open(newVal, prevVal){
       if (this.open) {
+        console.log(this.scrollID + ' ' + this.versionID)
+        this.$router.push({
+          name: 'workbenchAddress',
+          params: {
+            scrollID: this.scrollID, 
+            scrollVersionID: this.versionID,
+            imageID: -1,
+            colID: -1,
+            artID: -1
+          }
+        })
         this.fetchChildren();
       }
     },
     menuType(newVal, prevVal) {
-      this.fetchChildren();
+      if (this.open && newVal !== prevVal) {
+        this.fetchChildren();
+      }
     },
   }
 }

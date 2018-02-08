@@ -1,7 +1,7 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
     <div id="singleImageMenu" class="row align-middle">
-      <el-select v-model="selectedImage"placeholder="Select" multiple>
+      <el-select v-model="selectedImage" placeholder="Select" multiple>
         <el-option
           v-for="(image, index) in filenames"
           :key="'selector-' + image.filename"
