@@ -1,7 +1,5 @@
 <template>
-  <span class="clickable-menu-item" @click="setRouter">
-    Artefact: {{dataId}}
-  </span>
+  <span class="clickable-menu-item" @click="setRouter">Artefact: {{dataId}}</span>
 </template>
 
 <script>
@@ -9,12 +7,6 @@
 export default {
   props: {
     dataId: Number,
-  },
-  data() {
-    return {
-    }
-  },
-  computed: {
   },
   methods: {
     setRouter() {

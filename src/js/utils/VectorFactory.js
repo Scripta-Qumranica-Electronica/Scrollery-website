@@ -43,11 +43,12 @@ export function geoJsonParseRect(geoJSON) {
     return svg
 }
 
-export function svgPolygonToGeoJson(svg) {
-    let geoJson
-    return geoJson
-}
+// The following functions might be written later.
+// export function svgPolygonToGeoJson(svg) {
+//     let geoJson
+//     return geoJson
+// }
 
-export function clipCanvas(canvas) {
-    return canvas
-}
+// export function clipCanvas(canvas) {
+//     return canvas
+// }
