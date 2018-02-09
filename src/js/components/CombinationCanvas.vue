@@ -101,7 +101,6 @@ export default {
                 this.artefacts.forEach(artefact => {
                     artefact.rect = geoJsonParseRect(artefact.rect)
                     artefact.poly = geoJsonPolygonToSvg(artefact.poly, artefact.rect)
-                    console.log(artefact.poly)
                     artefact.pos = geoJsonPointToSvg(artefact.pos)
                 })
             }
