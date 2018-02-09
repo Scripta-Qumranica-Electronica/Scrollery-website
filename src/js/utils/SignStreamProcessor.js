@@ -6,17 +6,19 @@ export default class SignStreamProcessor {
     // name of the key for column of each respective ID.
     constructor(){
     }
+
     streamToTree(stream, prevKey, mainKey, nextKey) {
       return new Promise(resolve=> {
         resolve(this._colToTree(stream, prevKey, mainKey, nextKey))
       });
     }
+
     _colToTree(stream, prevKey, mainKey, nextKey){
         stream = this._sortSignStream(stream, mainKey, nextKey)
-        var object = {cols: []}
-        var columnNode = 0
-        var column, line
-        var lineNode = 0
+        let object = {cols: []}
+        let columnNode = 0
+        let column, line
+        let lineNode = 0
         for (let i = 0; i < stream.length; i++) {
             let entry = stream[i]
             if (entry.col_name != column) {
@@ -28,7 +30,7 @@ export default class SignStreamProcessor {
                 lineNode = 0
                 line = entry.line_name
                 object.cols[columnNode].lines.push({line: line, lineId: entry.line_id, signs: []})
-            } else if (entry.line_name != line) {
+            } else if (entry.line_name !== line) {
                 if (object.cols.length > 0) {
                     lineNode++
                 }
@@ -60,7 +62,7 @@ export default class SignStreamProcessor {
             if (sortedLinkedList[i][nextKey] == stream[i+1][mainKey]){
                 sortedLinkedList.push(stream[i+1])
             } else {
-                var found =  false
+                let found =  false
                 for (let n = 0, sll = sortedLinkedList.length; n < sll; n++) {
                     if (sortedLinkedList[n][mainKey] == stream[i+1][nextKey]) {
                         sortedLinkedList.splice(n, 0, stream[i+1])
