@@ -85,9 +85,10 @@ Utilizes `webpack-dev-server` to achieve hot module reloading. All files are wat
 
 Open up `http://localhost:9090` after running the command. This will run all requests to the Perl CGI scripts, bypassing your localhost.
 
-### `npm run prod`
+##### `npm run prod`
 
 For production builds—which minify the assets, remove source maps, etc.—run ```npm run prod```. This is not suitable for development purposes.
 
+### Testing in Browser
 
-
+After starting the development server with `npm run dev` or `npm start` and launching the SQE database Docker container, you can access the website at localhost:9090.  A default user for testing has already been installed to the database; the user name is `test` and the password is `asdf`.
