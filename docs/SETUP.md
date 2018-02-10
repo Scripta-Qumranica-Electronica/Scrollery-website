@@ -59,7 +59,7 @@ From the root of this repository, run the following command to locally install a
 yarn --pure-lockfile
 ```
 
-From the resources/cgi-bin folder of this repository, run the following command to locally install all perl dependencies:
+From the `resources/cgi-bin` folder of this repository, run the following command to locally install all perl dependencies:
 
 ```bash
 (sudo) carton install
