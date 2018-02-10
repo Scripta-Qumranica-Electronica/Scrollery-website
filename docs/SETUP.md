@@ -8,7 +8,11 @@ The SQE Scrollery website depends on three components to function fully:
 
 ## Server Side
 
-**Prequisites**
+**Perquisites**
+
+You will need a woking Docker installation to spin up the SQE database.
+
+### Build Server Side Code
 
 Install the SQE database Docker Image:
 
@@ -47,9 +51,11 @@ git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API /home/perl
 
 * Recent version of Perl5 (tested working on 5.18.2 and 5.22.1)
 * Depending on your system settings for Perl, you may need to run the following commands as sudo.
-* The perl package Carton http://search.cpan.org/~miyagawa/Carton-v1.0.28/, installed via:
-    * `(sudo) cpan Carton`, or
+* You will need the MySQL client and developer libraries in order to compile the Perl database connector DBI::mysql.  The installation procedure varies by operating system.
+* You will need the perl package Carton http://search.cpan.org/~miyagawa/Carton-v1.0.28/, installed via:
+    * `(sudo) cpan Carton`
     * `(sudo) cpanm Carton`
+    * Or in Ubuntu `sudo apt install carton`
 
 ### Install Dependencies
 
