@@ -1,14 +1,39 @@
 # Setup
 
+The SQE Scrollery website depends on three components to function fully:
+
+1. A local instance on the SQE MariaDB database.
+2. A local installation of the perl modules that provide a low level API to that database.
+3. A local installation of the Scrollery website maintained in this repository.
+
 ## Server Side
 
 **Prequisites**
 
-Most development on this repository will require a local LAMP/MAMP/WAMP setup.  The SQE website is currently hosted on an Apache server and makese heavy use of Perl CGI scripts to transport data to and from our MariaDB database. I assume that those who will want to assist in development already have or know how to set up the relevant Apache + Perl CGI server and a MariaDB server on their local host.
+Install the SQE database Docker Image:
 
-Developers must configure their Apache server settings to enable the running of perl CGI scripts in the resources/cgi-bin of their local instance of this repository. Access to the SQE database should be accomplished through the API hosted at https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API. The files from the project should be placed in /home/perl_libs.  Make sure to add a SQE_RESTRICTED.pm file there as well in accordance with the documentation in the project's README.md. All Perl CGI files that access the database should acquire their DBH via the method get_dbh in that API.
+```bash
+# clone this repository
+git clone https://github.com/Scripta-Qumranica-Electronica/Data-files.git
 
-The latest database dump from our SQE database is hosted in the GitHub repository https://github.com/Scripta-Qumranica-Electronica/Data-files with the name SQE_A.sql. This file must be imported into the local MariaDB instance.
+# Cd into the directory
+cd Data-files
+
+# Build the image
+docker build -t sqe-maria:latest .
+
+# start the container
+docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 sqe-maria:latest
+
+# import the data
+docker exec -i SQE_Database /tmp/import-docker.sh
+```
+
+Install the SQE API to `/home/perl_libs`:
+
+```bash
+git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API /home/perl_libs
+``` 
 
 ## Client
 
@@ -20,12 +45,24 @@ The latest database dump from our SQE database is hosted in the GitHub repositor
 
 (Once npm is installed, run `npm install -g yarn` to install Yarn.)
 
+* Recent version of Perl5 (tested working on 5.18.2 and 5.22.1)
+* Depending on your system settings for Perl, you may need to run the following commands as sudo.
+* The perl package Carton http://search.cpan.org/~miyagawa/Carton-v1.0.28/, installed via:
+    * `(sudo) cpan Carton`, or
+    * `(sudo) cpanm Carton`
+
 ### Install Dependencies
 
-From the root of this repository, run the following command to install all dependencies:
+From the root of this repository, run the following command to locally install all npm dependencies:
 
 ```bash
 yarn --pure-lockfile
+```
+
+From the resources/cgi-bin folder of this repository, run the following command to locally install all perl dependencies:
+
+```bash
+(sudo) carton install
 ```
 
 ### Build Client-Side Code

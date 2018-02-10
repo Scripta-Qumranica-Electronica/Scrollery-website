@@ -26,7 +26,7 @@ const perl = (req, res) => {
       var bodyStr = Object.keys(fields).reduce((acc, key) => {
         return acc + `${acc.length ? "&" : ""}${key}=${fields[key]}`
       }, "")
-      exec(`perl ${file} "${bodyStr}"`, {maxBuffer: Infinity}, (err, stdout, stderr) => {
+      exec(`carton exec ${file} "${bodyStr}"`, {cwd: file.substring(0, file.lastIndexOf("/")), maxBuffer: Infinity}, (err, stdout, stderr) => {
         try {
           if (err) {
             console.error(err)
