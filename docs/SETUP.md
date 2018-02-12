@@ -3,24 +3,24 @@
 The SQE Scrollery website depends on three components to function fully:
 
 1. A local instance on the SQE MariaDB database.
-2. A local installation of the perl modules that provide a low level API to that database.
+2. A local installation of the Perl modules that provide a low level API to that database.
 3. A local installation of the Scrollery website maintained in this repository.
 
 ## Server Side
 
-**Perquisites**
+**Prerequisites**
 
-You will need a woking Docker installation to spin up the SQE database.
+You will need a working Docker installation to spin up the SQE database.
 
 ### Build Server Side Code
 
 Install the SQE database Docker Image:
 
 ```bash
-# clone this repository
+# clone the data repository
 git clone https://github.com/Scripta-Qumranica-Electronica/Data-files.git
 
-# Cd into the directory
+# cd into the directory
 cd Data-files
 
 # Build the image
@@ -38,6 +38,8 @@ Install the SQE API to `/home/perl_libs`:
 ```bash
 git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API /home/perl_libs
 ``` 
+
+If you're on a Mac, you'll likely need to follow the steps [here](https://stackoverflow.com/questions/1362703/how-can-i-use-the-home-directory-on-mac-os-x) in order to use the `/home` directory.
 
 ## Client
 
@@ -77,18 +79,20 @@ You have a few options, depending on your workflow:
 
 ##### `npm run dev`
 
+In order to use this option, you must first configure an Apache server that to serve the `index.html` file at the root of this project and is capable of serving Perl CGI scripts from `resources/cgi-bin`. If you don't want to this this, consider using the following option instead (`npm start`).
+
 All files are watched for changes and rebuilt on changes. Open up the application from wherever you configured your server (e.g., `http://localhost`).
 
 ##### `npm start`
 
-Utilizes `webpack-dev-server` to achieve hot module reloading. All files are watched and code rebuilt on changes; the changes will show up immediately without needing to refresh the browser.
+Utilizes `webpack-hot-middleware` to achieve hot module reloading for all client-side assets. All files are watched and code rebuilt on changes; the changes will show up as soon as the Webpack build completes, without needing to refresh the browser.
 
-Open up `http://localhost:9090` after running the command. This will run all requests to the Perl CGI scripts, bypassing your localhost.
+Open up `http://localhost:9090` after running the command. This will run all requests to the Perl CGI scripts, bypassing your localhost (thus, it is not necessary to configure an Apache server!).
 
 ##### `npm run prod`
 
-For production builds—which minify the assets, remove source maps, etc.—run ```npm run prod```. This is not suitable for development purposes.
+For production builds—which minify the assets, remove source maps, etc.—run `npm run prod`. This is not suitable for development purposes.
 
 ### Testing in Browser
 
-After starting the development server with `npm run dev` or `npm start` and launching the SQE database Docker container, you can access the website at localhost:9090.  A default user for testing has already been installed to the database; the user name is `test` and the password is `asdf`.
+After starting the development server with `npm run dev` or `npm start` and launching the SQE database Docker container, you can access the website at `localhost:9090`.  A default user for testing has already been installed to the database; the user name is `test` and the password is `asdf`.
