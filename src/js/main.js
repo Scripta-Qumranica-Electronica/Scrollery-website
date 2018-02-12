@@ -21,7 +21,7 @@ const router = new VueRouter({ routes })
 
 // Store
 const vuexLocalStorage = new VuexPersist({
-  key: 'vuex',
+  key: 'sqe',
   storage: window.localStorage,
 })
 Vue.use(Vuex)
