@@ -26,7 +26,7 @@ The development environment consists of the following components:
 
 **Prerequisites**
 
-You will need a working Docker installation to spin up the SQE database.
+You will need a working [Docker installation](https://docs.docker.com/install/) to spin up the SQE database.
 
 ### Build Server Side Code
 
@@ -58,9 +58,9 @@ Install the SQE API to `/home/perl_libs`:
 git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API /home/perl_libs
 ``` 
 
-If you're on a Mac, you'll likely need to follow the steps [here](https://stackoverflow.com/questions/1362703/how-can-i-use-the-home-directory-on-mac-os-x) in order to use the `/home` directory.
+If you're on a Mac, you'll likely need to follow the steps [here](https://stackoverflow.com/questions/1362703/how-can-i-use-the-home-directory-on-mac-os-x) in order to use the `/home` directory.  If you are on Linux you may need to run git clone as sudo, then `sudo chown -R $USER: /home/perl_libs`
 
-By default, the library is configured to connect to the Docker container automatically. However, if you need, you can create a file `home/perl_libs/SQE_DB_APA/SQE_Restricted.pm` with the database credentials. Consult the [documentation for that repository](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API) for details on how to do this.
+By default, the library is configured to connect to the Docker container automatically. However, if you need, you can modify the file `/home/perl_libs/SQE_DB_APA/SQE_Restricted.pm` with your custom database credentials. Consult the [documentation for that repository](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API) for details on how to do this.
 
 ## Client
 
@@ -74,7 +74,7 @@ By default, the library is configured to connect to the Docker container automat
 
 * Recent version of Perl5 (tested working on 5.18.2 and 5.22.1)
 * Depending on your system settings for Perl, you may need to run the following commands as sudo.
-* You will need the MySQL client and developer libraries in order to compile the Perl database connector DBI::mysql.  The installation procedure varies by operating system.
+* You will need the MySQL client and developer libraries in order to compile the Perl database connector DBI::mysql.  The installation procedure for those libraries varies by operating system, most MAriaDB installation methods will install the necessary files; on Linux you must install the client and the development package (e.g., in Ubuntu `sudo apt install libmysqlclient-dev` should work if you do not already have MariaDB/Mysql client/dev libraries), on Mac `brew install mariadb` should work if you use homebrew).
 * You will need the perl package Carton http://search.cpan.org/~miyagawa/Carton-v1.0.28/, installed via:
     * `(sudo) cpan Carton`
     * `(sudo) cpanm Carton`
