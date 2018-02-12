@@ -6,6 +6,22 @@ The SQE Scrollery website depends on three components to function fully:
 2. A local installation of the Perl modules that provide a low level API to that database.
 3. A local installation of the Scrollery website maintained in this repository.
 
+## Summary
+
+These instructions will walk you through installing the following on your development machine:
+* Node 8.9.4
+* Npm 5+
+* Yarn
+* Perl 5.18+
+* Carton
+* Docker
+
+The development environment consists of the following components:
+
+* A Docker container with a MariaDB instance and clean database dump.
+* Perl CGI scripts to connect to the database
+* Node HTTP server + Webpack build process
+
 ## Server Side
 
 **Prerequisites**
@@ -29,6 +45,9 @@ docker build -t sqe-maria:latest .
 # start the container
 docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 sqe-maria:latest
 
+# Wait a minute or so to ensure the container is started, and the DB process is initialized
+
+# ... then
 # import the data
 docker exec -i SQE_Database /tmp/import-docker.sh
 ```
@@ -40,6 +59,8 @@ git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API /home/perl
 ``` 
 
 If you're on a Mac, you'll likely need to follow the steps [here](https://stackoverflow.com/questions/1362703/how-can-i-use-the-home-directory-on-mac-os-x) in order to use the `/home` directory.
+
+By default, the library is configured to connect to the Docker container automatically. However, if you need, you can create a file `home/perl_libs/SQE_DB_APA/SQE_Restricted.pm` with the database credentials. Consult the [documentation for that repository](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API) for details on how to do this.
 
 ## Client
 
@@ -58,6 +79,8 @@ If you're on a Mac, you'll likely need to follow the steps [here](https://stacko
     * `(sudo) cpan Carton`
     * `(sudo) cpanm Carton`
     * Or in Ubuntu `sudo apt install carton`
+
+Once installed, it should be available on your PATH: running `carton -v` should produce `carton v1.0.28` (or similar).
 
 ### Install Dependencies
 
