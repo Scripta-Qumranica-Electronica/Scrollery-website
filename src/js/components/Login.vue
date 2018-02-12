@@ -51,7 +51,7 @@ export default {
   created() {
     this.user = this.username
     if (this.sessionID) {
-      this.validateSession()
+      this.validateSession(window.localStorage ? window.localStorage : null)
     }
   },
   methods: {
@@ -88,17 +88,29 @@ export default {
         return true
       }
     },
-    validateSession() {
+    validateSession(storage) {
       this.$post('resources/cgi-bin/GetImageData.pl', {
         SESSION_ID: this.sessionID,
         transaction: 'validateSession',
         SCROLLVERSION: 1
       })
       .then(res => {
-        this.validateLogin(res)
+        if (res.data && res.data.error) {
+
+          // blow away localStorage on session error
+          this.errMsg = ''
+          storage.removeItem('sqe')
+          
+        } else if (res.data) {
+          this.validateLogin(res)
+        }
       })
       .catch(({ response }) => {
-        this.errMsg = 'Unable to connect to the server. Please retry another time.'
+
+        // The Session is invalid, so clear out local Vuex storage but
+        // no error message required.
+        this.errMsg = ''
+        storage && storage.removeItem('sqe')
       });
     },
     attemptLogin() {
@@ -108,17 +120,15 @@ export default {
         request: 'login',
         SCROLLVERSION: 1
       })
-      .then(res => {
-        this.validateLogin(res)
-      })
+      .then(res => this.validateLogin(res))
       .catch(({ response }) => {
-        this.errMsg = 'Unable to connect to the server. Please retry another time.'
+        this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
       });
     },
     validateLogin(res) {
       if (res.data && res.data.error) {
-        console.error(res.data)
         this.errMsg = res.data.error
+        console.error(res.data)
       } else if (res.data 
                 && res.data.SESSION_ID 
                 &&  res.data.USER_ID 
@@ -137,10 +147,10 @@ export default {
             this.$router.push({name: 'workbench'})
           })
           .catch(() => {
-            this.errMsg = 'Service unavailable at this time'
+            this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
           })
       } else {
-        this.errMsg = 'Unexpected response'
+        this.errMsg = this.$i18n.str('Errors.Unknown')
       }
     }
   }
