@@ -1,0 +1,12 @@
+requires "JSON::XS", "3.02";
+requires "MIME::Base64", "3.15";
+requires "Encode", "2.95";
+requires "strict", "1.07";
+requires "warnings", "1.18";
+requires "Data::UUID", "1.221";
+requires "Scalar::Util", "1.49";
+requires "DBI", "1.640";
+requires "DBD::mysql", "4.046";
+requires "Package::Constants", "0.06";
+requires "Ref::Util", "0.203";
+requires "CGI", "4.38";
