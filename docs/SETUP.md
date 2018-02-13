@@ -84,7 +84,13 @@ Once installed, it should be available on your PATH: running `carton -v` should 
 
 ### Install Dependencies
 
-From the root of this repository, run the following command to locally install all npm dependencies:
+# clone the data repository (if not already done)
+
+```bash
+git clone https://github.com/Scripta-Qumranica-Electronica/Scrollery-website.git
+```
+
+From the root of this repository (Scrollery-website), run the following command to locally install all npm dependencies:
 
 ```bash
 yarn --pure-lockfile
@@ -118,4 +124,8 @@ For production builds—which minify the assets, remove source maps, etc.—run 
 
 ### Testing in Browser
 
-After starting the development server with `npm run dev` or `npm start` and launching the SQE database Docker container, you can access the website at `localhost:9090`.  A default user for testing has already been installed to the database; the user name is `test` and the password is `asdf`.
+After starting the development server with `npm run dev` or `npm start` and launching the SQE database Docker container (`docker start SQE-Databse`), you can access the website at `localhost:9090`.  A default user for testing has already been installed to the database; the user name is `test` and the password is `asdf`.
+
+### Note
+
+One should shutdown the SQE database Docker after usage with `docker stop SQE-Database`. If not shut down properly, one will run into problems to restart the Docker after logging out. In this case, one may clean up the system using `docker rm $(docker ps -q -f status=exited)`.
