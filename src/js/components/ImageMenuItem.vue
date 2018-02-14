@@ -1,6 +1,6 @@
 <template>
   <div class="clickable-menu-item">
-    <span @click="setRouter">
+    <span @click="selectImage">
       {{institution}}: {{plate}}, {{fragment}} ({{dataId}})
     </span>
     <div class="children" v-show="open">
@@ -15,7 +15,6 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
 import ArtefactMenuItem from './ArtefactMenuItem.vue'
 
 export default {
@@ -35,12 +34,10 @@ export default {
       open: false,
     }
   },
-  computed: {
-    ...mapGetters(['username', 'sessionID', 'userID'])
-  },
   methods: {
     fetchChildren() {
       this.children = []
+      // let children = []
       // we'll lazy load children, but cache them
       this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: 'getArtOfImage',
@@ -50,24 +47,29 @@ export default {
       .then(res => {
         if (res.status === 200 && res.data) {
           this.children = res.data.results
+          // children = res.data.results
         }
       })
       .catch(console.error)
     },
 
     setRouter() {
+      this.$router.push({ 
+        name: 'workbenchAddress',
+        params: {
+          scrollID: this.$route.params.scrollID,
+          scrollVersionID: this.$route.params.scrollVersionID,
+          colID: this.$route.params.colID ? this.$route.params.colID : '~',
+          imageID: this.dataId,
+          artID: this.$route.params.artID ? this.$route.params.artID : '~',
+        }
+      })
+    },
+
+    selectImage() {
       this.open = !this.open
       if (this.open) {
-        this.$router.push({ 
-          name: 'workbenchAddress',
-          params: {
-            scrollID: this.$route.params.scrollID,
-            scrollVersionID: this.$route.params.scrollVersionID,
-            colID: this.$route.params.colID ? this.$route.params.colID : '-1',
-            imageID: this.dataId,
-            artID: this.$route.params.artID ? this.$route.params.artID : '-1',
-          }
-        })
+        this.setRouter()
         if (!this.children.length) {
           this.fetchChildren()
         }

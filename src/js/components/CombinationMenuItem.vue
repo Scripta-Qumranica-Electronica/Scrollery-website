@@ -1,16 +1,16 @@
 <template>
   <div>
-    <span class="clickable-menu-item" @click="open = !open">{{name}}{{user ? ` - ${username} - v. ${version}` : ''}}</span>
+    <span class="clickable-menu-item" @click="selectCombination">{{name}}{{user ? ` - ${username} - v. ${version}` : ''}}</span>
     <i class="fa fa-clone" @click="cloneScroll"></i>
     <i v-show="locked" class="fa fa-lock" style="color: red"></i>
     <i v-show="!locked" class="fa fa-unlock" style="color: green"></i>
     <div class="children" v-show="open">
         <ul>
-          <li v-if="menuType === 'text'" v-for="child in children">
+          <li v-if="menuType === 'text'" v-for="child in children[menuType]">
             <column-menu-item :data-id="child.id"
                             :name="child.name"></column-menu-item>
           </li>
-          <li v-if="menuType === 'image'" v-for="child in children">
+          <li v-if="menuType === 'image'" v-for="child in children[menuType]">
             <image-menu-item :data-id="child.id"
                             :institution="child.institution"
                             :plate="child.lvl1"
@@ -46,7 +46,10 @@ export default {
   },
   data() {
     return {
-      children: [],
+      children: {
+        'text': [],
+        'image': [],
+      },
       open: false,
       requestType: {
         'text': 'getColOfComb',
@@ -61,7 +64,7 @@ export default {
   methods: {
     fetchChildren() {
       // we'll lazy load children, but cache them
-      if (this.lastFetch !== this.requestType[this.menuType]) {
+      if (this.children[this.menuType].length < 1) {
         this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: this.requestType[this.menuType],
         combID: this.scrollDataID,
@@ -70,14 +73,35 @@ export default {
         })
         .then(res => {
           if (res.status === 200 && res.data) {
-            this.children = res.data.results
-            this.lastFetch = this.requestType[this.menuType]
+            this.children[this.menuType] = res.data.results
           }
         })
         .catch(console.error)
-        }
+      }
     },
-    cloneScroll(){
+
+    setRouter() {
+      this.$router.push({
+        name: 'workbenchAddress',
+        params: {
+          scrollID: this.scrollID, 
+          scrollVersionID: this.versionID,
+          imageID: '~',
+          colID: '~',
+          artID: '~'
+        }
+      })
+    },
+
+    selectCombination() {
+      this.open = !this.open
+      if (this.open) {
+        this.setRouter()
+        this.fetchChildren()
+      }
+    },
+
+    cloneScroll() {
       this.$post('resources/cgi-bin/GetImageData.pl', {
         transaction: 'copyCombination',
         scroll_id: this.scrollDataID,
@@ -85,34 +109,19 @@ export default {
       })
       .then(res => {
         if (res.status === 200 && res.data.scroll_clone === 'success') {
-          console.log('Cloned scroll')
+          // Please emit message to parent to either reload 
+          // all combinations or add the one just created.
         }
       })
       .catch(console.error)
     }
   },
   watch: {
-    open(newVal, prevVal){
+    menuType() {
       if (this.open) {
-        console.log(this.scrollID + ' ' + this.versionID)
-        this.$router.push({
-          name: 'workbenchAddress',
-          params: {
-            scrollID: this.scrollID, 
-            scrollVersionID: this.versionID,
-            imageID: -1,
-            colID: -1,
-            artID: -1
-          }
-        })
-        this.fetchChildren();
+        this.fetchChildren()
       }
-    },
-    menuType(newVal, prevVal) {
-      if (this.open && newVal !== prevVal) {
-        this.fetchChildren();
-      }
-    },
+    }
   }
 }
 </script>

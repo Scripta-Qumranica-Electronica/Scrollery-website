@@ -15,8 +15,8 @@ export default {
         params: {
           scrollID: this.$route.params.scrollID,
           scrollVersionID: this.$route.params.scrollVersionID,
-          colID: this.$route.params.colID ? this.$route.params.colID : '-1',
-          imageID: this.$route.params.imageID ? this.$route.params.imageID : '-1',
+          colID: this.$route.params.colID ? this.$route.params.colID : '~',
+          imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
           artID: this.dataId
         }
       })
