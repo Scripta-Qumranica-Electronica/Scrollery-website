@@ -9,8 +9,9 @@ module.exports = {
   "User.LoggedInMessage": "Logged in as: :name:",
 
   // Errors
+  "Errors.Login": "Please correct errors and resubmit.",
   "Errors.Unknown": "Unexpected response.",
-  "Errors.ServiceUnavailable": 'Unable to connect to the server. Please retry another time.',
+  "Errors.ServiceUnavailable": "Unable to connect to the server. Please retry another time.",
 
   // Menu
   "Menu.Bars.Tooltip": "Click to keep menu open"

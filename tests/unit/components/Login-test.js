@@ -1,6 +1,7 @@
 "use strict"
 
 import { mount } from '@test'
+import sinon from 'sinon'
 import Login from '~/components/Login.vue'
 
 describe("Login", function() {
@@ -86,4 +87,105 @@ describe("Login", function() {
       vm.setSessionID(sessionID)
       vm.validateSession()
     })
+
+
+    describe('validations: ', () => {
+      it('reject login attempts with no username', () => {
+        const user = '';
+        wrapper.setData({ user })
+
+        const spy = sinon.spy(vm, 'validateUsername')
+  
+        // trigger form submission
+        wrapper.find('form').trigger('submit')
+
+        // assertions
+        expect(spy.called).to.equal(true)
+        expect(vm.errMsg.length).to.be.greaterThan(1)
+        expect(vm.usernameErr.length).to.be.greaterThan(1)
+      })
+
+      it('reject login attempts with whitespace usernames', () => {
+        const user = '  ';
+        wrapper.setData({ user })
+
+        const spy = sinon.spy(vm, 'validateUsername')
+  
+        // trigger form submission
+        wrapper.find('form').trigger('submit')
+
+        // assertions
+        expect(spy.called).to.equal(true)
+        expect(vm.errMsg.length).to.be.greaterThan(1)
+        expect(vm.usernameErr.length).to.be.greaterThan(1)
+      })
+
+      it('reject login attempts with no password', () => {
+        const password = '';
+        wrapper.setData({ password })
+
+        const spy = sinon.spy(vm, 'validatePassword')
+  
+        // trigger form submission
+        wrapper.find('form').trigger('submit')
+
+        // assertions
+        expect(spy.called).to.equal(true)
+        expect(vm.errMsg.length).to.be.greaterThan(1)
+        expect(vm.passwordErr.length).to.be.greaterThan(1)
+      })
+
+      it('reject login attempts with whitespace passwords', () => {
+        const user = '  ';
+        wrapper.setData({ user })
+
+        const spy = sinon.spy(vm, 'validatePassword')
+  
+        // trigger form submission
+        wrapper.find('form').trigger('submit')
+
+        // assertions
+        expect(spy.called).to.equal(true)
+        expect(vm.errMsg.length).to.be.greaterThan(1)
+        expect(vm.passwordErr.length).to.be.greaterThan(1)
+      })
+
+      it('require a non-empty, non-whitespace password and username to pass', () => {
+        const user = 'name';
+        const password = 'password';
+        wrapper.setData({ user, password })
+
+        const spy = sinon.spy()
+        vm.attemptLogin = spy;
+
+        // trigger form submission
+        wrapper.find('form').trigger('submit')
+
+        // assertions
+        expect(spy.called).to.equal(true)
+        expect(vm.errMsg.length).to.equal(0)
+      })
+
+    })
+
+    it('should attempt login on form submit', done => {
+      const user = 'name';
+      const password = 'password';
+      wrapper.setData({ user, password })
+
+      // patch in method for assertions
+      vm.$post = function(url, data) {
+        expect(data.USER_NAME).to.equal(user)
+        expect(data.PASSWORD).to.equal(password)
+        expect(data.request).to.equal('login')
+        done()
+
+        // adhere to interface
+        return new Promise(() => {})
+      }.bind(vm)
+
+      // trigger form submission
+      wrapper.find('form').trigger('submit')
+    })
+
 })
