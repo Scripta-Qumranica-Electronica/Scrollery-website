@@ -67,7 +67,7 @@ export default {
       if (isUserValid && isPasswordValid) {
         this.attemptLogin()
       } else {
-        this.errMsg = 'Please correct errors and resubmit.'
+        this.errMsg = this.$i18n.str('Errors.Login')
       }
     },
     validateUsername() {
