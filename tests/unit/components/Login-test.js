@@ -181,7 +181,7 @@ describe("Login", function() {
         done()
 
         // adhere to interface
-        return new Promise()
+        return new Promise(() => {})
       }.bind(vm)
 
       // trigger form submission

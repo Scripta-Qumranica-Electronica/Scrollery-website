@@ -3,7 +3,7 @@ import i18n from '~/plugins/i18n'
 import { shallow, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 
-export default (Component, mocks = {}) => {
+export default (Component, opt = {}) => {
   const localVue = createLocalVue()
 
   // Vuex
@@ -13,7 +13,13 @@ export default (Component, mocks = {}) => {
   // i18n
   localVue.use(i18n, { store })
 
-  return shallow(Component, {
-    store, localVue, mocks
-  })
+  // create args
+  const args = {
+    ...{
+      store, localVue
+    },
+    ...opt
+  }
+
+  return shallow(Component, args)
 }
