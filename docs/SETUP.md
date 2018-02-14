@@ -74,7 +74,7 @@ By default, the library is configured to connect to the Docker container automat
 
 * Recent version of Perl5 (tested working on 5.18.2 and 5.22.1)
 * Depending on your system settings for Perl, you may need to run the following commands as sudo.
-* You will need the MySQL client and developer libraries in order to compile the Perl database connector DBI::mysql.  The installation procedure for those libraries varies by operating system, most MAriaDB installation methods will install the necessary files; on Linux you must install the client and the development package (e.g., in Ubuntu `sudo apt install libmysqlclient-dev` should work if you do not already have MariaDB/Mysql client/dev libraries), on Mac `brew install mariadb` should work if you use homebrew).
+* You will need the MySQL client and developer libraries in order to compile the Perl database connector DBI::mysql.  The installation procedure for those libraries varies by operating system, most MySQL installation methods will create the necessary files; on Linux you must install the client and the development package (e.g., in Ubuntu `sudo apt install libmysqlclient-dev` should work if you do not already have MariaDB/Mysql client dev libraries installed), on Mac `brew install mariadb` should work if you use homebrew).  If DBI::mysql fails to compile or exits with errors when the cgi scripts are run, this may be due to an incompatability between DBI::mysql and the MariaDB client dev libs, please try installing Mysql (not MariaDB) dev libs and running `(sudo) carton install` again in the `resources/cgi-bin` folder.
 * You will need the perl package Carton http://search.cpan.org/~miyagawa/Carton-v1.0.28/, installed via:
     * `(sudo) cpan Carton`
     * `(sudo) cpanm Carton`
@@ -84,7 +84,7 @@ Once installed, it should be available on your PATH: running `carton -v` should 
 
 ### Install Dependencies
 
-# clone the data repository (if not already done)
+# clone the Scrollery-website repository (if not already done)
 
 ```bash
 git clone https://github.com/Scripta-Qumranica-Electronica/Scrollery-website.git
@@ -106,17 +106,17 @@ From the `resources/cgi-bin` folder of this repository, run the following comman
 
 You have a few options, depending on your workflow:
 
-##### `npm run dev`
-
-In order to use this option, you must first configure an Apache server that to serve the `index.html` file at the root of this project and is capable of serving Perl CGI scripts from `resources/cgi-bin`. If you don't want to this this, consider using the following option instead (`npm start`).
-
-All files are watched for changes and rebuilt on changes. Open up the application from wherever you configured your server (e.g., `http://localhost`).
-
 ##### `npm start`
 
 Utilizes `webpack-hot-middleware` to achieve hot module reloading for all client-side assets. All files are watched and code rebuilt on changes; the changes will show up as soon as the Webpack build completes, without needing to refresh the browser.
 
 Open up `http://localhost:9090` after running the command. This will run all requests to the Perl CGI scripts, bypassing your localhost (thus, it is not necessary to configure an Apache server!).
+
+##### `npm run dev`
+
+In order to use this option, you must first configure an Apache server to serve the `index.html` file at the root of this project and is capable of serving Perl CGI scripts from `resources/cgi-bin`. If you don't want to this this, simply use the previous option instead (`npm start`).
+
+All files are watched for changes and rebuilt on changes. Open up the application from wherever you configured your server (e.g., `http://localhost/Scrollery-website`).
 
 ##### `npm run prod`
 
@@ -124,7 +124,7 @@ For production builds—which minify the assets, remove source maps, etc.—run 
 
 ### Testing in Browser
 
-After starting the development server with `npm run dev` or `npm start` and launching the SQE database Docker container (`docker start SQE-Databse`), you can access the website at `localhost:9090`.  A default user for testing has already been installed to the database; the user name is `test` and the password is `asdf`.
+After starting the development server with `npm start` or `npm run dev` and launching the SQE database Docker container (`docker start SQE-Database`), you can access the website at `localhost:9090`.  A default user for testing has already been installed to the database; the user name is `test` and the password is `asdf`.
 
 ### Note
 
