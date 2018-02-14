@@ -92,7 +92,7 @@ describe("Login", function() {
     describe('validations: ', () => {
       it('reject login attempts with no username', () => {
         const user = '';
-        wrapper.setData( {user })
+        wrapper.setData({ user })
 
         const spy = sinon.spy(vm, 'validateUsername')
   
@@ -137,7 +137,7 @@ describe("Login", function() {
 
       it('reject login attempts with whitespace passwords', () => {
         const user = '  ';
-        wrapper.setData( {user })
+        wrapper.setData({ user })
 
         const spy = sinon.spy(vm, 'validatePassword')
   
@@ -153,7 +153,7 @@ describe("Login", function() {
       it('require a non-empty, non-whitespace password and username to pass', () => {
         const user = 'name';
         const password = 'password';
-        wrapper.setData( {user, password})
+        wrapper.setData({ user, password })
 
         const spy = sinon.spy()
         vm.attemptLogin = spy;
@@ -168,13 +168,10 @@ describe("Login", function() {
 
     })
 
-    it('should attempt login on button press', done => {
+    it('should attempt login on form submit', done => {
       const user = 'name';
       const password = 'password';
-      const data = {
-        success: true
-      }
-      wrapper.setData( {user, password})
+      wrapper.setData({ user, password })
 
       // patch in method for assertions
       vm.$post = function(url, data) {
