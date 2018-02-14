@@ -90,7 +90,7 @@ Once installed, it should be available on your PATH: running `carton -v` should 
 git clone https://github.com/Scripta-Qumranica-Electronica/Scrollery-website.git
 ```
 
-From the root of this repository (Scrollery-website), run the following command to locally install all npm dependencies:
+From the root of this repository `./Scrollery-website`, run the following command to locally install all npm dependencies:
 
 ```bash
 yarn --pure-lockfile
