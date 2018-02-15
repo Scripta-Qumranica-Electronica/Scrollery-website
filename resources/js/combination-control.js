@@ -62,7 +62,7 @@ var CombinationController = window.CombinationController = (function () {
             scroll_data.append('scroll_version_id', scroll_version_id);
             scroll_data.append('SESSION_ID', Spider.session_id);
             jQuery.ajax({
-                url: 'resources/cgi-bin/GetImageData.pl',
+                url: 'resources/cgi-bin/scrollery-cgi.pl',
                 context: this,
                 data: scroll_data,
                 cache: false,
@@ -80,7 +80,7 @@ var CombinationController = window.CombinationController = (function () {
                         scroll_data.append('scroll_version_id', scroll_version_id);
                         scroll_data.append('SESSION_ID', Spider.session_id);
                         jQuery.ajax({
-                            url: 'resources/cgi-bin/GetImageData.pl',
+                            url: 'resources/cgi-bin/scrollery-cgi.pl',
                             context: this,
                             data: scroll_data,
                             cache: false,
@@ -100,7 +100,7 @@ var CombinationController = window.CombinationController = (function () {
                                     scroll_data.append('scroll_version_id', scroll_version_id);
                                     scroll_data.append('SESSION_ID', Spider.session_id);
                                     jQuery.ajax({
-                                        url: 'resources/cgi-bin/GetImageData.pl',
+                                        url: 'resources/cgi-bin/scrollery-cgi.pl',
                                         context: this,
                                         data: scroll_data,
                                         cache: false,
@@ -334,7 +334,7 @@ var CombinationController = window.CombinationController = (function () {
                 scroll_data.append('rotation', rot_angle);
                 scroll_data.append("SESSION_ID", Spider.session_id);
                 jQuery.ajax({
-                    url: 'resources/cgi-bin/GetImageData.pl',
+                    url: 'resources/cgi-bin/scrollery-cgi.pl',
                     context: this,
                     data: scroll_data,
                     cache: false,
@@ -419,7 +419,7 @@ var CombinationController = window.CombinationController = (function () {
                 scroll_data.append('y', parseInt($frag_cont.css('top')) / zoom_factor);
                 scroll_data.append("SESSION_ID", Spider.session_id);
                 jQuery.ajax({
-                    url: 'resources/cgi-bin/GetImageData.pl',
+                    url: 'resources/cgi-bin/scrollery-cgi.pl',
                     context: this,
                     data: scroll_data,
                     cache: false,

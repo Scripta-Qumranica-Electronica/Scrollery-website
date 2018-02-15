@@ -52,7 +52,7 @@ export default {
         '$route' (to, from) {
             if (to.params.colID !== from.params.colID) {
                 if (to.params.colID > -1) {
-                    this.$post('resources/cgi-bin/GetImageData.pl', {
+                    this.$post('resources/cgi-bin/scrollery-cgi.pl', {
                         transaction: 'getSignStreamOfColumn',
                         SCROLL_VERSION: to.params.scrollVersionID,
                         colId: to.params.colID,

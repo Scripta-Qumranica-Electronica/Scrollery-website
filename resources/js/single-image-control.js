@@ -52,7 +52,7 @@ var SingleImageController = window.SingleImageController =  (function () {
 			image_data.append('id', id);
 			image_data.append('SESSION_ID', Spider.session_id);
 			jQuery.ajax({
-				url: 'resources/cgi-bin/GetImageData.pl',
+				url: 'resources/cgi-bin/scrollery-cgi.pl',
 				context: this,
 				data: image_data,
 				cache: false,

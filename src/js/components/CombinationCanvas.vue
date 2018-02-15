@@ -64,7 +64,7 @@ export default {
   },
   methods: {
       setScrollDimensions(scrollID, versionID) {
-        this.$post('resources/cgi-bin/GetImageData.pl', {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getScrollWidth',
         scroll_id: scrollID,
         scroll_version_id: versionID,
@@ -75,7 +75,7 @@ export default {
                 this.scrollWidth = res.data.results[0].max_x
             }
         })
-        this.$post('resources/cgi-bin/GetImageData.pl', {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getScrollHeight',
         scroll_id: scrollID,
         scroll_version_id: versionID,
@@ -89,7 +89,7 @@ export default {
         this.loadFragments(scrollID, versionID)
       },
       loadFragments(scrollID, versionID) {
-          this.$post('resources/cgi-bin/GetImageData.pl', {
+          this.$post('resources/cgi-bin/scrollery-cgi.pl', {
             transaction: 'getScrollArtefacts',
             scroll_id: scrollID,
             scroll_version_id: versionID,
@@ -127,7 +127,7 @@ export default {
         if (this.clickOrigin  && this.selectedArtefactIndex) {
             this.clickOrigin = this.selectedArtefactLoc = undefined
             window.removeEventListener('mouseup',this.mouseup);
-            this.$post('resources/cgi-bin/GetImageData.pl', {
+            this.$post('resources/cgi-bin/scrollery-cgi.pl', {
             transaction: 'setArtPosition',
             art_id: this.artefacts[this.selectedArtefactIndex].id,
             x: this.artefacts[this.selectedArtefactIndex].pos.x,

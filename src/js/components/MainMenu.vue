@@ -151,7 +151,7 @@ export default {
     loadCombinations() {
       if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
         this.combinations = []
-        this.$post('resources/cgi-bin/GetImageData.pl', {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
           transaction: 'getCombs',
           user: this.$store.getters.userID,
         })

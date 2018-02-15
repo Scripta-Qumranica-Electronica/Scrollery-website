@@ -89,7 +89,7 @@ export default {
       }
     },
     validateSession(storage) {
-      this.$post('resources/cgi-bin/GetImageData.pl', {
+      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         SESSION_ID: this.sessionID,
         transaction: 'validateSession',
         SCROLLVERSION: 1
@@ -114,10 +114,10 @@ export default {
       });
     },
     attemptLogin() {
-      this.$post('resources/cgi-bin/server.pl', {
+      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         USER_NAME: this.user.trim(),
         PASSWORD: this.password.trim(),
-        request: 'login',
+        transaction: 'validateSession',
         SCROLLVERSION: 1
       })
       .then(res => this.validateLogin(res))
