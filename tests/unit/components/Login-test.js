@@ -1,7 +1,6 @@
 "use strict"
 
 import { mount } from '@test'
-import sinon from 'sinon'
 import Login from '~/components/Login.vue'
 
 describe("Login", function() {
