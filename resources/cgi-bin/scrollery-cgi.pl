@@ -569,6 +569,7 @@ SELECT DISTINCT artefact_position.artefact_position_id AS id,
                 ST_AsText(ST_Envelope(artefact.region_in_master_image)) AS rect,
                 ST_AsText(artefact.region_in_master_image) AS poly,
                 ST_AsText(artefact_position.position_in_scroll) AS pos,
+				artefact_position.transform_matrix AS matrix,
                 image_urls.url AS url,
                 image_urls.suffix AS suffix,
                 SQE_image.filename AS filename,
@@ -663,9 +664,8 @@ sub setArtPosition {
 	my $version_id = $cgi->param('version_id');
 	$cgi->dbh->set_scrollversion($version_id);
 	my $artefact_position_id = $cgi->param('art_id');
-	my $x = $cgi->param('x') * 1;
-	my $y = $cgi->param('y') * 1;
-	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $artefact_position_id, "position_in_scroll", ['POINT', $x, $y]);
+	my $matrix = $cgi->param('matrix');
+	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $artefact_position_id, "transform_matrix", $matrix);
 	handleDBError ($new_id, $error);
 	return;
 }

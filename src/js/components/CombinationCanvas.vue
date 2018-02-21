@@ -21,8 +21,17 @@
 </template>
 
 <script>
-import {geoJsonPolygonToSvg, geoJsonPointToSvg, geoJsonParseRect} from '../utils/VectorFactory'
+import {
+    geoJsonPolygonToSvg, 
+    geoJsonPointToSvg, 
+    geoJsonParseRect, 
+    dbMatrixToSVG, 
+    svgMatrixToDB
+} from '../utils/VectorFactory'
 import Artefact from './Artefact.vue'
+// I will use the rematrix package to directly apply
+// rotation to existing artefact matrices.
+import * as Rematrix from 'rematrix'
 
 export default {
   props: {
@@ -102,6 +111,7 @@ export default {
                     artefact.rect = geoJsonParseRect(artefact.rect)
                     artefact.poly = geoJsonPolygonToSvg(artefact.poly, artefact.rect)
                     artefact.pos = geoJsonPointToSvg(artefact.pos)
+                    artefact.matrix = dbMatrixToSVG(JSON.parse(artefact.matrix).matrix)
                 })
             }
         })
@@ -109,7 +119,7 @@ export default {
       mousedown(event) {
           if (event.target.nodeName === 'image') {
             this.selectedArtefactIndex = event.target.dataset.index
-            this.selectedArtefactLoc = this.artefacts[this.selectedArtefactIndex].pos
+            this.selectedArtefactLoc = this.artefacts[this.selectedArtefactIndex].matrix
             this.clickOrigin = this.pointInSvg(event.clientX, event.clientY)
             window.addEventListener('mouseup',this.mouseup); // Attach listener to window.
           }
@@ -117,10 +127,14 @@ export default {
       mousemove(event) {
           if (this.clickOrigin && this.selectedArtefactIndex) {
               const currentLoc = this.pointInSvg(event.clientX, event.clientY)
-              this.artefacts[this.selectedArtefactIndex].pos = {
-                  x: this.selectedArtefactLoc.x + currentLoc.x - this.clickOrigin.x,
-                  y: this.selectedArtefactLoc.y + currentLoc.y - this.clickOrigin.y
-              }
+              this.artefacts[this.selectedArtefactIndex].matrix = [
+                  this.selectedArtefactLoc[0],
+                  this.selectedArtefactLoc[1],
+                  this.selectedArtefactLoc[2],
+                  this.selectedArtefactLoc[3],
+                  this.selectedArtefactLoc[4] + currentLoc.x - this.clickOrigin.x,
+                  this.selectedArtefactLoc[5] + currentLoc.y - this.clickOrigin.y
+              ]
           }
       },
       mouseup(event) {
@@ -130,8 +144,7 @@ export default {
             this.$post('resources/cgi-bin/scrollery-cgi.pl', {
             transaction: 'setArtPosition',
             art_id: this.artefacts[this.selectedArtefactIndex].id,
-            x: this.artefacts[this.selectedArtefactIndex].pos.x,
-            y: this.artefacts[this.selectedArtefactIndex].pos.y,
+            matrix: svgMatrixToDB(this.artefacts[this.selectedArtefactIndex].matrix),
             version_id: this.$route.params.scrollVersionID,
             SESSION_ID: this.$store.getters.sessionID
             })

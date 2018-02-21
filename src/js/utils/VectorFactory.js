@@ -43,6 +43,57 @@ export function geoJsonParseRect(geoJSON) {
     return svg
 }
 
+// This function expects the transform matrix to be in a 2D array:
+// [[a,c,tx],[b,d,ty]]
+export function dbMatrixToSVG(matrix) {
+    return [
+        matrix[0][0],
+        matrix[1][0],
+        matrix[0][1],
+        matrix[1][1],
+        matrix[0][2],
+        matrix[1][2]
+    ]
+}
+
+// This function converts the 16 element SVG transform matrix 
+// to a JSON string for the 2D as stored in the database
+export function svgMatrixToDB(matrix) {
+    return `{\\"matrix\\": [[${matrix[0]},${matrix[2]},${matrix[4]}],[${matrix[1]},${matrix[3]},${matrix[5]}]]}`
+}
+
+export function matrix6To16(matrix) {
+    return [
+        matrix[0],
+        matrix[1],
+        0,
+        0,
+        matrix[2],
+        matrix[3],
+        0,
+        0,
+        matrix[4],
+        matrix[5],
+        1,
+        0,
+        0,
+        0,
+        0,
+        1
+    ]
+}
+
+export function matrix16To6(matrix) {
+    return [
+        matrix[0],
+        matrix[1],
+        matrix[4],
+        matrix[5],
+        matrix[8],
+        matrix[9]
+    ]
+}
+
 // The following functions might be written later.
 // export function svgPolygonToGeoJson(svg) {
 //     let geoJson

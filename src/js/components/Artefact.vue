@@ -1,7 +1,5 @@
 <template>
-    <g :transform="'translate(' + artefactData.pos.x 
-        + ' ' + artefactData.pos.y + ')' 
-        + ' scale(' + scale + ')'">
+    <g :transform="'matrix(' + artefactData.matrix.join(', ') + ')'">
         <defs>
             <path :d="artefactData.poly" :id="'path' + artefactData.id" />
             <clipPath :id="'clip' + artefactData.id">
