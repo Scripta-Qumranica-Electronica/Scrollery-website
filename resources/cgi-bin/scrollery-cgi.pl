@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use JSON::XS;
 use MIME::Base64;
-use lib qw(/home/perl_libs);
+use lib qw(../perl-libs);
 #use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
 use SQE_CGI;
 use Encode;
@@ -568,13 +568,11 @@ sub getScrollArtefacts {
 SELECT DISTINCT artefact_position.artefact_position_id AS id,
                 ST_AsText(ST_Envelope(artefact.region_in_master_image)) AS rect,
                 ST_AsText(artefact.region_in_master_image) AS poly,
-                ST_AsText(artefact_position.position_in_scroll) AS pos,
 				artefact_position.transform_matrix AS matrix,
                 image_urls.url AS url,
                 image_urls.suffix AS suffix,
                 SQE_image.filename AS filename,
-                SQE_image.dpi AS dpi,
-                artefact_position.rotation AS rotation
+                SQE_image.dpi AS dpi
 FROM artefact_position_owner
 	JOIN artefact_position USING(artefact_position_id)
 	JOIN artefact USING(artefact_id)
