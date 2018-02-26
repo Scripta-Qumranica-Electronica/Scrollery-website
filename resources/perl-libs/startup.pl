@@ -30,9 +30,9 @@ use SQE_API::Queries ();
 use SQE_API::Worker ();
 
 
-my $dsn      = "dbi:mysql:SQE:localhost:3306";
-my $username = "SQE";
-my $password = 'saAsC4y92';
+my $dsn      = "dbi:mysql:SQE:localhost:3307";
+my $username = "root";
+my $password = 'none';
 
 my %attr = (
     PrintError => 0,    # turn off error reporting via warn()

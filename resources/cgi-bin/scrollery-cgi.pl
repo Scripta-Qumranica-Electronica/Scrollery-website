@@ -1,5 +1,4 @@
-#! /usr/bin/perl -CS
-# C:\Strawberry\perl\bin\perl.exe
+#! /usr/local/bin/carton exec 
 
 use strict;
 use warnings;

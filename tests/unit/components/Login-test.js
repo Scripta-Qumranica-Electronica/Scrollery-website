@@ -176,7 +176,7 @@ describe("Login", function() {
       vm.$post = function(url, data) {
         expect(data.USER_NAME).to.equal(user)
         expect(data.PASSWORD).to.equal(password)
-        expect(data.request).to.equal('login')
+        expect(data.transaction).to.equal('validateSession')
         done()
 
         // adhere to interface
