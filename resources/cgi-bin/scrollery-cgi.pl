@@ -1,4 +1,4 @@
-#! /usr/local/bin/carton exec 
+#! /usr/bin/perl -CS
 
 use strict;
 use warnings;
@@ -114,8 +114,8 @@ SELECT scroll_data.scroll_id as scroll_id,
        scroll_version.locked,
        scroll_version.user_id
 FROM scroll_version
-	JOIN scroll_data_owner using(scroll_version_id)
-	JOIN scroll_data using(scroll_data_id)
+	JOIN scroll_data using(scroll_id)
+	JOIN scroll_data_owner using(scroll_data_id)
 WHERE scroll_version.user_id = ?
       OR scroll_version.user_id = 0
 ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
@@ -194,22 +194,16 @@ MYSQL
 
 sub getColOfComb {
 	my $cgi = shift;
-	my $userID = $cgi->param('user');
 	my $version_id = $cgi->param('version_id');
 	my $combID = $cgi->param('combID');
 	my $getColOfCombQuery = <<'MYSQL';
 		SELECT DISTINCT col_data.name AS name,
-			   col_data.col_id AS id,
-			   (SELECT COUNT(*)
-					FROM discrete_canonical_reference
-					WHERE discrete_canonical_reference.column_of_scroll_id = id)
-				   AS count
+						col_data.col_id AS id
 		FROM col_data
 			JOIN col_data_owner USING(col_data_id)
 			JOIN scroll_to_col USING(col_id)
-			JOIN scroll_version USING(scroll_version_id)
 		WHERE col_data_owner.scroll_version_id = ?
-			  AND scroll_to_col.scroll_id = ?
+			AND scroll_to_col.scroll_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
@@ -280,17 +274,18 @@ SELECT
 	sign_char_reading_data.is_reconstructed,
 	sign_char_reading_data.readability,
 	sign_char_reading_data.is_retraced
-FROM position_in_stream_owner
+FROM position_in_stream AS child
 	JOIN position_in_stream AS parent
-		ON position_in_stream_owner.position_in_stream_id = parent.next_sign_id
-	JOIN position_in_stream AS child
 		ON parent.next_sign_id = child.sign_id
-	JOIN line_to_sign ON line_to_sign.sign_id = child.sign_id
-	Join line_to_sign_owner USING(line_to_sign_id)
+	JOIN position_in_stream_owner
+		ON position_in_stream_owner.position_in_stream_id = child.position_in_stream_id
+	JOIN line_to_sign 
+		ON line_to_sign.sign_id = child.sign_id
+	JOIN line_to_sign_owner USING(line_to_sign_id)
 	JOIN line_data USING(line_id)
 	JOIN col_to_line USING(line_id)
-	JOIN col_to_line_owner USING (col_to_line_id)
-	JOIN col_data USING (col_id)
+	JOIN col_to_line_owner USING(col_to_line_id)
+	JOIN col_data USING(col_id)
 	JOIN sign_char
 		ON sign_char.sign_id = child.sign_id
 	JOIN sign_char_owner USING(sign_char_id)

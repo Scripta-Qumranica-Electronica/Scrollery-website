@@ -1,17 +1,8 @@
 <template>
   <div class="text-pane">
-    <!-- <div show.bind="sharedState.editingState === 1">
-      <select class="main-menu-select-container" mdc-select-css value.bind="selectedCombinationId" change.delegate="selectCombination($event)">
-        <option
-          repeat.for="combination of combinations"
-          model.bind="combination">${combination.name}</option>
-      </select>
-      <select class="main-menu-select-container" mdc-select-css value.bind="selectedColId">
-        <option
-          repeat.for="col of cols"
-          model.bind="col.id">${col.name}</option>
-      </select>
-    </div> -->
+    <div v-if="!colInRouter">
+      <text-selector @selectedColumn="getText"></text-selector>
+    </div>
     <div class="text-div">
       <div v-for="(column, colIDX) of currentText.cols" 
             :data-col="column.col" 
@@ -40,36 +31,50 @@
 
 <script>
 import SignStreamProcessor from '../utils/SignStreamProcessor.js'
+import TextSelector from './TextSelector.vue'
 
 export default {
+    components: {
+        'text-selector': TextSelector,
+    },
     data() {
         return {
             currentText: [],
             ssp: new SignStreamProcessor(),
+            colInRouter: false,
+        }
+    },
+    methods: {
+        getText(scrollVersionID, colID) {
+            this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+                transaction: 'getSignStreamOfColumn',
+                SCROLL_VERSION: scrollVersionID,
+                colId: colID,
+                SESSION_ID: this.$store.getters.sessionID
+            })
+            .then(res => {
+                if (res.status === 200 && res.data) {
+                    this.ssp.streamToTree(
+                        res.data.results, 
+                        'prev_sign_id',
+                        'sign_id',
+                        'next_sign_id'
+                    )
+                    .then( formattedNodes => {
+                        this.currentText = formattedNodes
+                    })
+                }
+            })
         }
     },
     watch: {
         '$route' (to, from) {
             if (to.params.colID !== from.params.colID) {
-                if (to.params.colID > -1) {
-                    this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-                        transaction: 'getSignStreamOfColumn',
-                        SCROLL_VERSION: to.params.scrollVersionID,
-                        colId: to.params.colID,
-                        SESSION_ID: this.$store.getters.sessionID
-                    })
-                    .then(res => {
-                        if (res.status === 200 && res.data) {
-                            this.ssp.streamToTree(res.data.results, 
-                                                                'prev_sign_id',
-                                                                'sign_id',
-                                                                'next_sign_id')
-                            .then( formattedNodes => {
-                                this.currentText = formattedNodes
-                            })
-                        }
-                    })
+                if (to.params.colID !== '~' && to.params.colID > -1) {
+                    this.colInRouter = true
+                    this.getText(to.params.scrollVersionID, to.params.colID)
                 } else {
+                    this.colInRouter = false
                     this.currentText = []
                 }
             }
