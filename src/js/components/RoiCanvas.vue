@@ -89,7 +89,7 @@ export default {
     props: {
         width: Number,
         height: Number,
-        zoomLevel: String,
+        zoomLevel: '',
         images: {
             type: Array,
             default: [],

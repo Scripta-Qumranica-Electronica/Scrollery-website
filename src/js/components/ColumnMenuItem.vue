@@ -8,7 +8,7 @@
 
 export default {
   props: {
-    dataId: String,
+    dataId: Number,
     name: String,
   },
   methods: {

@@ -29,12 +29,14 @@
           </div>
         </el-option>
       </el-select>
-      <input  class="col-2" 
-                type="range" 
-                min="0.1" 
-                max="1.0" 
-                step="0.01" 
-                v-model="zoom" />
+      <el-slider 
+        class="col-1" 
+        v-model="zoom"
+        :min="0.1"
+        :step="0.01"
+        :max="1.0"
+        :format-tooltip="formatTooltip">
+      </el-slider>
       <!-- <div id="seadragonNavCont" class="col-2">
         <div :id="navPanel"></div>
       </div> -->
@@ -85,7 +87,7 @@ export default {
       selectedImageUrls: [],
       filenames: [],
       navPanel: 'seadragonNavPanel',
-      zoom: '1.0',
+      zoom: 0.5,
       scale: 0.2,
       selectedImage: undefined,
     }
@@ -102,6 +104,9 @@ export default {
       this.$set(this.filenames[idx], 'visible', !this.filenames[idx].visible)
       this.$set(this.filenames, idx, this.filenames[idx])
     },
+    formatTooltip(val) {
+      return (this.zoom * 100).toFixed(2) + '%'
+    }
   },
   watch: {
     '$route' (to, from) {

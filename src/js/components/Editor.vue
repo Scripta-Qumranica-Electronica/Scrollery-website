@@ -15,12 +15,20 @@
           <span class="stop"></span>
           <span>{{column.col}}:{{line.line}}</span>
           <span class="stop">&nbsp;</span>
-          <span v-for="(sign, signIDX) of line.signs"
-                :key="signIDX + sign"
-                :data-id="sign.id"
-                :data-prev-sign="sign.prev_sign"
-                :data-next-sign="sign.next_sign">
-            {{sign.sign}}
+          <span 
+            v-for="(sign, signIDX) of line.signs"
+            class="sign"
+            :class="{ 
+                complete: !sign.is_reconstructed,
+                reconstructed: sign.is_reconstructed, 
+                incomplete_clear: sign.readability === 'INCOMPLETE_BUT_CLEAR',
+                incomplete_not_clear: sign.readability === 'INCOMPLETE_AND_NOT_CLEAR', 
+                }"
+            :key="signIDX + sign"
+            :data-id="sign.id"
+            :data-prev-sign="sign.prev_sign"
+            :data-next-sign="sign.next_sign">
+            {{sign.sign}}{{sign.readability === 'INCOMPLETE_AND_NOT_CLEAR' ? '֯' : ''}}{{sign.readability === 'INCOMPLETE_BUT_CLEAR' ? 'ׄ' : ''}}
           </span>
           <span class="stop"></span>
         </div>
@@ -92,9 +100,47 @@ span {
   display: inline-block;
 }
 
-span.sign.reconstructed-1 {
+span.sign.reconstructed {
   color: #fff;
   text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+  margin-left: 1px;
+  margin-right: 1px;
+}
+
+:before {
+    margin-left: -5px;
+}
+
+.complete+.reconstructed:before {
+    content: '[';
+    color: black;
+    text-shadow: initial;
+}
+
+.stop+.reconstructed:before {
+    content: '[';
+    color: black;
+    text-shadow: initial;
+}
+
+.reconstructed+.complete:before {
+    content: ']';
+    color: black;
+    text-shadow: initial;
+}
+
+.reconstructed+.stop:before {
+    content: ']';
+    color: black;
+    text-shadow: initial;
+}
+
+span.sign.incomplete_clear {
+    color: yellow;
+}
+
+span.sign.incomplete_not_clear {
+    color: red;
 }
 
 @keyframes blink {
