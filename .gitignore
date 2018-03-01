@@ -9,3 +9,4 @@ coverage/
 .coveralls.yml
 
 resources/cgi-bin/local
+resources/perl-libs
