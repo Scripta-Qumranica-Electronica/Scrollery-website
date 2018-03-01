@@ -19,7 +19,7 @@ These instructions will walk you through installing the following on your develo
 The development environment consists of the following components:
 
 * A Docker container with a MariaDB instance and clean database dump.
-* Perl CGI scripts to connect to the database
+* Perl CGI API to connect to the database
 * Node HTTP server + Webpack build process
 
 ## Server Side
@@ -52,16 +52,6 @@ docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 sqe-m
 docker exec -i SQE_Database /tmp/import-docker.sh
 ```
 
-Install the SQE API to `/home/perl_libs`:
-
-```bash
-git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API /home/perl_libs
-``` 
-
-If you're on a Mac, you'll likely need to follow the steps [here](https://stackoverflow.com/questions/1362703/how-can-i-use-the-home-directory-on-mac-os-x) in order to use the `/home` directory.  If you are on Linux you may need to run git clone as sudo, then `sudo chown -R $USER: /home/perl_libs`
-
-By default, the library is configured to connect to the Docker container automatically. However, if you need, you can modify the file `/home/perl_libs/SQE_DB_APA/SQE_Restricted.pm` with your custom database credentials. Consult the [documentation for that repository](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API) for details on how to do this.
-
 ## Client
 
 **Prerequisites:**
@@ -84,11 +74,13 @@ Once installed, it should be available on your PATH: running `carton -v` should 
 
 ### Install Dependencies
 
-# clone the Scrollery-website repository (if not already done)
+#### Clone the Scrollery-website repository (if not already done)
 
 ```bash
 git clone https://github.com/Scripta-Qumranica-Electronica/Scrollery-website.git
 ```
+
+#### Install website dependencies
 
 From the root of this repository `./Scrollery-website`, run the following command to locally install all npm dependencies:
 
@@ -96,31 +88,43 @@ From the root of this repository `./Scrollery-website`, run the following comman
 yarn --pure-lockfile
 ```
 
-From the `resources/cgi-bin` folder of this repository, run the following command to locally install all perl dependencies:
+#### Install SQE_API
+
+From the root of this repository `./Scrollery-website`, install the SQE API to `./Scrollery-website/resources/perl-libs`:
+
+```bash
+git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API resources/perl-libs
+```
+
+By default, the library is configured to connect to the Docker container automatically. However, if you need, you can modify the file `./resources/perl-libs/SQE_Restricted.pm` with your custom database credentials. Consult the [documentation for that repository](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API) for details on how to do this.
+
+#### Build the Perl cgi script dependencies
+
+From the `./Scrollery-website/resources/cgi-bin` folder of this repository, run the following command to locally install all perl dependencies:
 
 ```bash
 (sudo) carton install
 ```
 
-### Build Client-Side Code
+### Starting up the server for development or production
 
 You have a few options, depending on your workflow:
 
 ##### `npm start`
 
-Utilizes `webpack-hot-middleware` to achieve hot module reloading for all client-side assets. All files are watched and code rebuilt on changes; the changes will show up as soon as the Webpack build completes, without needing to refresh the browser.
+This is the easiest approach.  It utilizes `webpack-hot-middleware` to achieve hot module reloading for all client-side assets. All files are watched and code is rebuilt in realtime on changes; the changes will show up as soon as the Webpack rebuild completes, without needing to refresh the browser.
 
 Open up `http://localhost:9090` after running the command. This will run all requests to the Perl CGI scripts, bypassing your localhost (thus, it is not necessary to configure an Apache server!).
 
 ##### `npm run dev`
 
-In order to use this option, you must first configure an Apache server to serve the `index.html` file at the root of this project and is capable of serving Perl CGI scripts from `resources/cgi-bin`. If you don't want to this this, simply use the previous option instead (`npm start`).
+In order to use this option, you must first configure a webserver such as Apache to serve the `index.html` file at the root of this project and to execute the Perl CGI scripts from `resources/cgi-bin`. If you don't want to this this, simply use the previous option instead (`npm start`).
 
 All files are watched for changes and rebuilt on changes. Open up the application from wherever you configured your server (e.g., `http://localhost/Scrollery-website`).
 
 ##### `npm run prod`
 
-For production builds—which minify the assets, remove source maps, etc.—run `npm run prod`. This is not suitable for development purposes.
+For production builds—which minify the assets, remove source maps, etc.—run `npm run prod`. This is not suitable for development purposes.  The compiled files will be in the `dist` folder.  To install these on a web server you will need to copy `index.html`, the `dist` folder, and the `resources` folder into a folder on your webserver.  You will the need to set up the webserver to execute cgi scripts in the `resources/cgi-scripts` folder, and you may need to change line 7 of `scrollery-cgi.pl`, `use lib qw(../perl-libs);`, to point to the absolute path of `resources/perl-libs` on your webserver, and not the relative path that it uses for development mode.
 
 ### Testing in Browser
 
