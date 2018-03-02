@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+# !!!REMINDER!!!: I have removed the secret key, you must
+# put this in line 26 for the script to function.
 
 use strict;
 use warnings;
