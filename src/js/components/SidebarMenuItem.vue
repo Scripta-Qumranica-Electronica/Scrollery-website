@@ -1,13 +1,14 @@
 <template>
   <section class="menu-section" :class='{"open": open}'>
     <div class="header">
-      <div class="title">
-        {{ title }}
-      </div><div class="icon">
+      <div class="icon">
         <slot name="icon"></slot>
       </div>
     </div>
     <div class="body">
+      <div class="title">
+        {{ title }}
+      </div>
       <slot name="body"></slot>
     </div>
   </section>
@@ -21,16 +22,9 @@
   width: 100%;
 }
 
-.title,
-.icon {
-  display: inline-block;
-  text-align: right;
-}
-
 .title {
   overflow: hidden;
   width: 0;
-  transition: width 300ms;
   color: $dkBlue;
   font-weight: 600;
 }
@@ -42,6 +36,7 @@
   width: 50px;
   color: $dkBlue;
   transition: color 300ms;
+  float: right;
 }
 
 .body {
