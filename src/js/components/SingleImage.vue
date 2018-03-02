@@ -1,47 +1,57 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <div id="singleImageMenu" class="row align-middle">
-      <el-select v-model="selectedImage" placeholder="Select" multiple>
-        <el-option
-          v-for="(image, index) in filenames"
-          :key="'selector-' + image.filename"
-          :label="image | formatImageType"
-          :value="image | formatImageType">
-          <div class="row align-middle image-select-box">
-            <span class="drag-handle col-1 image-select-entry" style="float: left">☰</span>
-            <span class="col-3 image-select-entry">
-              &nbsp;{{image | formatImageType}}
-            </span>
-            <input class="col-3 image-select-entry"
-                    type="range" 
-                    min="0" 
-                    max="1.0" 
-                    step="0.01"
-                    @input="setOpacity(index, $event.target.value)" />
-            <!-- <div class="block col-3">
-              <el-slider v-model="image.opacity" 
-                          min="0" 
-                          max="1.0" 
-                          step="0.01" 
-                          :show-tooltip="false"></el-slider>
-            </div> -->
-            <i class="fa fa-eye col-1 image-select-entry" :style="{color: image.visible ? 'green' : 'red'}" @click="toggleVisible(index)"></i>
-          </div>
-        </el-option>
-      </el-select>
-      <el-slider 
-        class="col-1" 
-        v-model="zoom"
-        :min="0.1"
-        :step="0.01"
-        :max="1.0"
-        :format-tooltip="formatTooltip">
-      </el-slider>
+    <el-row id="singleImageMenu" :gutter="10" type="flex" justify="space-around">
+      <el-col :span="12">
+        <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple>
+          <el-option
+            v-for="(image, index) in filenames"
+            :key="'selector-' + image.filename"
+            :label="image | formatImageType"
+            :value="image | formatImageType">
+            <el-row>
+              <el-col :span="2">
+                <span class="drag-handle image-select-entry" style="float: left">☰</span>
+              </el-col>
+              <el-col :span="8">
+                <span class="image-select-entry">
+                  &nbsp;{{image | formatImageType}}
+                </span>
+              </el-col>
+              <el-col :span="10">
+                <input 
+                  class="image-select-entry"
+                  type="range" 
+                  min="0" 
+                  max="1.0" 
+                  step="0.01"
+                  @input="setOpacity(index, $event.target.value)" />
+              </el-col>
+              <el-col :span="4">
+                <i class="fa fa-eye image-select-entry" 
+                  :style="{color: image.visible ? 'green' : 'red'}"
+                  @click="toggleVisible(index)">
+                </i>
+              </el-col>
+            </el-row>
+          </el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="8">
+        <el-slider 
+          v-model="zoom"
+          :min="0.1"
+          :step="0.01"
+          :max="1.0"
+          :format-tooltip="formatTooltip">
+        </el-slider>
+      </el-col>
+      <el-col :span="4">
+        <el-button @click="delSelectedRoi">Del ROI</el-button>
+      </el-col>
       <!-- <div id="seadragonNavCont" class="col-2">
         <div :id="navPanel"></div>
       </div> -->
-      <el-button @click="delSelectedRoi">Del ROI</el-button>
-    </div>
+    </el-row>
     <div style="{width: 100%; height: calc(100% - 50px); overflow: auto; position: relative;}">
       <!-- <img v-for="filename in filenames" 
           :key="'img-' + filename.filename" 
@@ -172,6 +182,9 @@ export default {
 }
 .image-select-box > .image-select-entry {
   padding: 5px;
+}
+.image-select-entry {
+  width: 100%;
 }
 .overlay-image {
   position: absolute;

@@ -24,6 +24,7 @@
 .title,
 .icon {
   display: inline-block;
+  text-align: right;
 }
 
 .title {
@@ -48,6 +49,7 @@
   padding: 0;
   overflow-x: hidden;
   transition: all 300ms;
+  text-align: left;
 }
 
 .menu-section.open {

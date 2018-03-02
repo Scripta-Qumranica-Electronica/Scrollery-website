@@ -1,16 +1,19 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <div class="row align-middle" style="{width: 100%; height 50px;}">
-        <label class="col-1">Zoom</label>
-        <el-slider 
-            class="col-1" 
-            v-model="scale"
-            :min="1"
-            :step="0.5"
-            :max="100"
-            :format-tooltip="formatTooltip">
-        </el-slider>
-    </div>
+    <el-row style="{width: 100%; height 50px;}">
+        <el-col :span="4">
+            <label>Zoom</label>
+        </el-col>
+        <el-col :span="4">
+            <el-slider  
+                v-model="scale"
+                :min="1"
+                :step="0.5"
+                :max="100"
+                :format-tooltip="formatTooltip">
+            </el-slider>
+        </el-col>
+    </el-row>
     <div style="{width: 100%; height: calc(100% - 50px); overflow: auto;}">
         <combination-canvas :global-scale="globalScale"></combination-canvas>
     </div>
