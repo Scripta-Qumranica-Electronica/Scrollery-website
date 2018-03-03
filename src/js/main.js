@@ -1,6 +1,5 @@
 // Styles - these will be extracted and loaded above the fold
 import '../sass/index.scss'
-import '@/node_modules/imperavi-kube/dist/css/kube.min.css'
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'

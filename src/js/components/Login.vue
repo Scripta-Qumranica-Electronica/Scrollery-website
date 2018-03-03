@@ -1,33 +1,31 @@
 // TODO: check if the session is valid before trying to login with locatdata
 <template>
-  <div class="col col-6 push-middle push-center login-wrapper">
-    <div class="header"><h2>Login</h2></div>
-    <form id="login" class="form left" @submit.prevent="onSubmit">
-        <div class="error" v-show='errMsg.length'>
-          {{ errMsg }}
-        </div>
-        <div class="form-item">
-          <label>User name <span class="req"></span> <span class="error">{{ usernameErr }}</span></label>
-          <input type="text" placeholder="Your login name" class="small" :class='{"error": usernameErr.length}' v-model='user'>
-        </div>
-        <div class="form-item">
-          <label>Password <span class="req"></span> <span class="error">{{ passwordErr }}</span></label>
-          <input type="password" placeholder="Your password" class="small" :class='{"error": passwordErr.length}' v-model='password'>
-        </div>
-        <div class="form-item">
-          <label>Language / Sprache / שפה</label>
-          <select v-model="language">
-            <option value="en">English</option>
-            <option value="de">Deutsche</option>
-            <option value="hb">עברית</option>
-          </select>
-        </div>
-        <div class="form-item">
-          <button type="submit">Submit</button>
-          <a href="mailto:martin.schroeter@theologie.uni-goettingen.de?subject=Forgot%20password">Forgot my login</a>
-        </div>
-    </form>
-  </div>
+  <el-card class="loginCard" header="Login" :body-style="{ background: 'white' }">
+    <el-form id="login" @submit.native.prevent="onSubmit" :label-position="labelPosition">
+      <el-form-item class="error warningText" v-show='errMsg.length'>
+        {{ errMsg }}
+      </el-form-item>
+      <el-form-item>
+        <span slot="label">User name <span class="reqired warningText"></span> <span class="error warningText">{{ usernameErr }}</span></span>
+        <el-input class="loginUsername" type="text" placeholder="Your login name" :class='{"error": usernameErr.length}' v-model='user'></el-input>
+      </el-form-item>
+      <el-form-item>
+        <span slot="label">Password <span class="reqired warningText"></span> <span class="error warningText">{{ passwordErr }}</span></span>
+        <el-input class="loginPassword" type="password" placeholder="Your password" :class='{"error": passwordErr.length}' v-model='password'></el-input>
+      </el-form-item>
+      <el-form-item label="Language / Sprache / שפה">
+        <el-select class="langSelect" v-model="language">
+          <el-option value="en">English</el-option>
+          <el-option value="de">Deutsche</el-option>
+          <el-option value="hb">עברית</el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" native-type="submit">Submit</el-button>
+        <a href="mailto:Bronson.Brown-deVost@theologie.uni-goettingen.de?subject=Forgot%20password">Forgot my login</a>
+      </el-form-item>
+    </el-form>
+  </el-card>
 </template>
 
 <script>
@@ -41,7 +39,8 @@ export default {
       errMsg: '',
       usernameErr: '',
       passwordErr: '',
-      language: 'en'
+      language: 'en',
+      labelPosition: 'top',
     }
   },
   computed: {
@@ -89,7 +88,7 @@ export default {
       }
     },
     validateSession(storage) {
-      this.$post('resources/cgi-bin/GetImageData.pl', {
+      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         SESSION_ID: this.sessionID,
         transaction: 'validateSession',
         SCROLLVERSION: 1
@@ -114,10 +113,10 @@ export default {
       });
     },
     attemptLogin() {
-      this.$post('resources/cgi-bin/server.pl', {
+      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         USER_NAME: this.user.trim(),
         PASSWORD: this.password.trim(),
-        request: 'login',
+        transaction: 'validateSession',
         SCROLLVERSION: 1
       })
       .then(res => this.validateLogin(res))
@@ -158,52 +157,23 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-label {
-  font-weight: 600;
+.loginCard {
+  width: 325px;
+  background: #409EFF;
+  color: white;
+  font-size: 20px;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
 }
 
-.login-wrapper {
-  border-radius: 4px;
-  box-shadow: 2px 3px 3px rgba(153, 153, 153, .2);
+.loginUsername {
+  width: 100%;
 }
 
-.form-item {
-  margin-bottom: 10px;
+.loginPassword {
+  width: 100%;
 }
 
-.form-item a {
-  font-size: 16px;
-}
-
-.header {
-  border-radius: 4px 4px 0 0;
-  background-color: #1c86f2;
-  padding: 10px;
-}
-
-.header h2 {
-  color: #fff;
-  text-shadow: .3px .1px 0 #000;
-  margin: 0;
-}
-
-#login {
-  padding: 10px;
-  border: 1px solid lightgray;
-  background-color: #fff;
-  border-radius: 0 0 4px 4px;
-  margin: 0;
-}
-
-.left {
-  text-align: left;
-}
-
-.right {
-  text-align: right;
-}
-
-.center {
-  text-align: center;
+.langSelect {
+  width: 100%;
 }
 </style>

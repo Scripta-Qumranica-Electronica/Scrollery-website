@@ -12,11 +12,11 @@ describe("Login", function() {
     })
 
     it('has a button', () => {
-      expect(wrapper.contains('button')).to.equal(true)
+      expect(wrapper.contains('el-button')).to.equal(true)
     })
 
     it('has a select dropdown', () => {
-      expect(wrapper.contains('select')).to.equal(true)
+      expect(wrapper.contains('el-select')).to.equal(true)
     })
 
     it('has the initial language set to English', () => {
@@ -96,7 +96,7 @@ describe("Login", function() {
         const spy = sinon.spy(vm, 'validateUsername')
   
         // trigger form submission
-        wrapper.find('form').trigger('submit')
+        wrapper.vm.onSubmit()
 
         // assertions
         expect(spy.called).to.equal(true)
@@ -111,7 +111,7 @@ describe("Login", function() {
         const spy = sinon.spy(vm, 'validateUsername')
   
         // trigger form submission
-        wrapper.find('form').trigger('submit')
+        wrapper.vm.onSubmit()
 
         // assertions
         expect(spy.called).to.equal(true)
@@ -126,7 +126,7 @@ describe("Login", function() {
         const spy = sinon.spy(vm, 'validatePassword')
   
         // trigger form submission
-        wrapper.find('form').trigger('submit')
+        wrapper.vm.onSubmit()
 
         // assertions
         expect(spy.called).to.equal(true)
@@ -141,7 +141,7 @@ describe("Login", function() {
         const spy = sinon.spy(vm, 'validatePassword')
   
         // trigger form submission
-        wrapper.find('form').trigger('submit')
+        wrapper.vm.onSubmit()
 
         // assertions
         expect(spy.called).to.equal(true)
@@ -158,7 +158,7 @@ describe("Login", function() {
         vm.attemptLogin = spy;
 
         // trigger form submission
-        wrapper.find('form').trigger('submit')
+        wrapper.vm.onSubmit()
 
         // assertions
         expect(spy.called).to.equal(true)
@@ -176,7 +176,7 @@ describe("Login", function() {
       vm.$post = function(url, data) {
         expect(data.USER_NAME).to.equal(user)
         expect(data.PASSWORD).to.equal(password)
-        expect(data.request).to.equal('login')
+        expect(data.transaction).to.equal('validateSession')
         done()
 
         // adhere to interface
@@ -184,7 +184,7 @@ describe("Login", function() {
       }.bind(vm)
 
       // trigger form submission
-      wrapper.find('form').trigger('submit')
+      wrapper.vm.onSubmit()
     })
 
 })

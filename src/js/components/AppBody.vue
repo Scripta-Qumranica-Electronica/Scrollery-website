@@ -47,6 +47,7 @@
   height: 100vh;
   overflow: hidden;
   font-size: 0;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
 }
 
 #editing-window,
@@ -68,7 +69,7 @@
   transition: width 300ms;
 
   &.open {
-    width: 200px;
+    width: #{$sidebarWidth};
   }
 }
 #editing-window {
@@ -76,7 +77,7 @@
   transition: width 300ms;
 
   &.open {
-    width: calc(100% - 200px);
+    width: calc(100% - #{$sidebarWidth});
   }
 }
 

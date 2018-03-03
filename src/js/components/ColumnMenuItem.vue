@@ -12,11 +12,14 @@ export default {
     name: String,
   },
   methods: {
+
+    /* We will implement this fetchChildren() a bit later 
+    once the server side scripts are taken care of. */
     // fetchChildren() {
 
     //   // we'll lazy load children, but cache them
     //   if (this.lastFetch !== this.requestType[this.menuType]) {
-    //     this.$post('resources/cgi-bin/GetImageData.pl', {
+    //     this.$post('resources/cgi-bin/scrollery-cgi.pl', {
     //     transaction: this.requestType[this.menuType],
     //     combID: this.scrollDataID,
     //     user: this.userID,

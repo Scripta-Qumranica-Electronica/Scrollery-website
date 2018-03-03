@@ -65,7 +65,7 @@ export default {
     fetchChildren() {
       // we'll lazy load children, but cache them
       if (this.children[this.menuType].length < 1) {
-        this.$post('resources/cgi-bin/GetImageData.pl', {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: this.requestType[this.menuType],
         combID: this.scrollDataID,
         user: this.userID,
@@ -102,7 +102,7 @@ export default {
     },
 
     cloneScroll() {
-      this.$post('resources/cgi-bin/GetImageData.pl', {
+      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'copyCombination',
         scroll_id: this.scrollDataID,
         scroll_version_id: this.versionID,

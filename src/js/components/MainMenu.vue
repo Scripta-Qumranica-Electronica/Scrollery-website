@@ -15,6 +15,7 @@
       >
         <span slot="icon"><i class="fa fa-hashtag"></i></span>
         <div slot="body">
+          <div>
             <!-- These two buttons switch the listing mode to display either QWB -->
             <!-- cataloguing according to the DJD text editions, or the institutional -->
             <!-- cataloguing of the images.  Is there better terminology than -->
@@ -23,8 +24,9 @@
               <el-radio-button label="image">{{$i18n.str('Image')}}</el-radio-button>
               <el-radio-button label="text">{{$i18n.str('Text')}}</el-radio-button>
             </el-radio-group>
+          </div>
           <div>
-            <el-input placeholder="Enter search string" v-model="queryString"></el-input>
+            <el-input class="searchBox" autosize placeholder="Enter search string" v-model="queryString"></el-input>
           </div>
           <div>
             <ul class="combination-menu" placeholder="Search for scroll">
@@ -56,11 +58,11 @@
 
 .header {
   height: #{$header};
-  padding: #{$spacer};
   background: #{$dkBlue};
   
   label {
-    float: right;
+    float: left;
+    padding: #{$spacer};
 
     i {
       line-height: calc(#{$header} - #{$spacer * 2});
@@ -109,6 +111,10 @@
 .combination-menu li {
   display: block;
 }
+
+.searchBox {
+  width: 90%;
+}
 </style>
 
 <script>
@@ -151,7 +157,7 @@ export default {
     loadCombinations() {
       if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
         this.combinations = []
-        this.$post('resources/cgi-bin/GetImageData.pl', {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
           transaction: 'getCombs',
           user: this.$store.getters.userID,
         })

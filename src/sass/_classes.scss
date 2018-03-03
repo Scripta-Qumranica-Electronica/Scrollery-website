@@ -2,8 +2,12 @@
   display: none;
 }
 
-.req:after {
-  content: '*'
+.reqired:after {
+  content: '*';
+}
+
+.warningText {
+  color: #F56C6C;
 }
 
 .avoid-clicks {

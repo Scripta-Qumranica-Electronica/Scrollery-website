@@ -1,7 +1,7 @@
 <template>
-  <div class="col col-12">
+  <el-col :span="24">
     <component v-bind:is="view"></component>
-  </div>
+  </el-col>
 </template>
 
 <script>

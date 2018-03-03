@@ -236,6 +236,29 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       XSLoader 0
       perl 5.004
+  Math-Geometry-Planar-1.18-withoutworldwriteables
+    pathname: D/DV/DVDPOL/Math-Geometry-Planar-1.18-withoutworldwriteables.tar.gz
+    provides:
+      Math::Geometry::Planar 1.18
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 0
+      Math::Geometry::Planar::GPC 1.04
+      Math::Geometry::Planar::Offset 1.03
+      POSIX 0
+  Math-Geometry-Planar-GPC-1.04
+    pathname: D/DV/DVDPOL/Math-Geometry-Planar-GPC-1.04.tar.gz
+    provides:
+      Math::Geometry::Planar::GPC 1.04
+    requirements:
+      ExtUtils::MakeMaker 0
+  Math-Geometry-Planar-Offset-1.05
+    pathname: E/EW/EWILHELM/Math-Geometry-Planar-Offset-1.05.tar.gz
+    provides:
+      Math::Geometry::Planar::Offset 1.05
+    requirements:
+      Test::More 0
+      YAML 0
   Package-Constants-0.06
     pathname: B/BI/BINGOS/Package-Constants-0.06.tar.gz
     provides:
@@ -285,6 +308,34 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       common::sense 0
+  YAML-1.24
+    pathname: T/TI/TINITA/YAML-1.24.tar.gz
+    provides:
+      YAML 1.24
+      YAML::Any 1.24
+      YAML::Dumper undef
+      YAML::Dumper::Base undef
+      YAML::Error undef
+      YAML::Loader undef
+      YAML::Loader::Base undef
+      YAML::Marshall undef
+      YAML::Mo undef
+      YAML::Node undef
+      YAML::Tag undef
+      YAML::Type::blessed undef
+      YAML::Type::code undef
+      YAML::Type::glob undef
+      YAML::Type::ref undef
+      YAML::Type::regexp undef
+      YAML::Type::undef undef
+      YAML::Types undef
+      YAML::Warning undef
+      yaml_mapping undef
+      yaml_scalar undef
+      yaml_sequence undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      perl 5.008001
   common-sense-3.74
     pathname: M/ML/MLEHMANN/common-sense-3.74.tar.gz
     provides:

@@ -39,7 +39,7 @@ export default {
       this.children = []
       // let children = []
       // we'll lazy load children, but cache them
-      this.$post('resources/cgi-bin/GetImageData.pl', {
+      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getArtOfImage',
         image_id: this.dataId,
         version_id: this.versionID,

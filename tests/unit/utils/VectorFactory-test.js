@@ -2,11 +2,15 @@ import {
   geoJsonPolygonToSvg,
   geoJsonPointToSvg,
   geoJsonParseRect,
-  svgPolygonToGeoJson,
-  clipCanvas
+  // svgPolygonToGeoJson,
+  // clipCanvas,
+  dbMatrixToSVG,
+  svgMatrixToDB,
+  matrix6To16,
+  matrix16To6,
 } from '~/utils/VectorFactory.js'
 
-describe("geoJsonPolygonToSvg", () => {
+describe("VectorFactory.geoJsonPolygonToSvg", () => {
   it('should return undefined when unrecognized input passed', () => {
     expect(geoJsonPolygonToSvg('INCORRECT')).to.equal(undefined)
   })
@@ -41,7 +45,7 @@ describe("geoJsonPolygonToSvg", () => {
 })
 
 
-describe('geoJsonPointToSvg', () => {
+describe('VectorFactory.geoJsonPointToSvg', () => {
   it('should return undefined when unrecognized input passed', () => {
     expect(geoJsonPointToSvg('INCORRECT')).to.equal(undefined)
   })
@@ -61,7 +65,7 @@ describe('geoJsonPointToSvg', () => {
   })
 })
 
-describe('geoJsonParseRect', () => {
+describe('VectorFactory.geoJsonParseRect', () => {
 
   it('should return undefined when unrecognized input passed', () => {
     expect(geoJsonParseRect('INCORRECT')).to.equal(undefined)
@@ -85,6 +89,80 @@ describe('geoJsonParseRect', () => {
     expect(geoJsonParseRect(polygon)).to.deep.equal(expectedResult)
   })
 
+})
+
+describe('VectorFactory.dbMatrixToSVG', () => {
+  it('should return undefined for incorrectly formatted input', () => {
+    expect(dbMatrixToSVG('INCORRECT')).to.equal(undefined)
+  })
+
+  it('should convert 2D DB matrix to 1D SVG matrix', () => {
+    // setup initial input
+    const dbMatrix = [
+      [1,3,5],
+      [2,4,6],
+    ]
+
+    //define expected result
+    const svgMatrix = [1,2,3,4,5,6]
+
+    // assert expected value
+    expect(dbMatrixToSVG(dbMatrix)).to.deep.equal(svgMatrix)
+  })
+})
+
+describe('VectorFactory.svgMatrixToDB', () => {
+  it('should return undefined for incorrectly formatted input', () => {
+    expect(svgMatrixToDB('INCORRECT')).to.equal(undefined)
+    expect(svgMatrixToDB([0,1,2,3,4,5,6,7])).to.equal(undefined)
+  })
+
+  it('should convert 16 element SVG matrix to a JSON string for the DB matrix', () => {
+    // setup initial input
+    const svgMatrix = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+
+    //define expected result
+    const dbMatrix = '{\\"matrix\\": [[1,3,13],[2,4,14]]}'
+
+    // assert expected value
+    expect(svgMatrixToDB(svgMatrix)).to.equal(dbMatrix)
+  })
+})
+
+describe('VectorFactory.matrix6To16', () => {
+  it('should return undefined for incorrectly formatted input', () => {
+    expect(matrix6To16('INCORRECT')).to.equal(undefined)
+    expect(matrix6To16([0,1,2,3,4,5,6,7])).to.equal(undefined)
+  })
+
+  it('should convert 16 element SVG matrix to a JSON string for the DB matrix', () => {
+    // setup initial input
+    const  matrix6 = [1,2,5,6,13,14]
+
+    //define expected result
+    const matrix16 = [1,2,0,0,5,6,0,0,0,0,1,0,13,14,0,1]
+
+    // assert expected value
+    expect(matrix6To16(matrix6)).to.deep.equal(matrix16)
+  })
+})
+
+describe('VectorFactory.matrix16To6', () => {
+  it('should return undefined for incorrectly formatted input', () => {
+    expect(matrix16To6('INCORRECT')).to.equal(undefined)
+    expect(matrix16To6([0,1,2,3,4,5,6,7])).to.equal(undefined)
+  })
+
+  it('should convert 16 element SVG matrix to a JSON string for the DB matrix', () => {
+    // setup initial input
+    const matrix16 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+
+    //define expected result
+    const matrix6 = [1,2,5,6,13,14]
+
+    // assert expected value
+    expect(matrix16To6(matrix16)).to.deep.equal(matrix6)
+  })
 })
 
 // describe('svgPolygonToGeoJson', () => {

@@ -1,13 +1,17 @@
 <template>
-  <div class="header row">
-    <div class="col col-3">
-        <h3>SQE</h3>
-    </div>
-    <div class="col col-9 right">
+  <el-row class="header" type="flex" justify="space-between">
+    <el-col :span="4">
+      <div>
+          <span>SQE</span>
+      </div>
+    </el-col>
+    <el-col :span="20">
+      <div class="right">
         <span> {{ $i18n.str('User.LoggedInMessage', {name: username}) }}</span>
-        <button class="button outline" @click="onLogout">{{ $i18n.str('Logout') }}</button>
-    </div>
-  </div>
+        <el-button @click="onLogout">{{ $i18n.str('Logout') }}</el-button>
+      </div>
+    </el-col>
+  </el-row>
 </template>
 
 <script>
@@ -54,15 +58,6 @@ export default {
 h3, span {
   color: #fff;
   line-height: calc(#{$header} - #{$spacer * 2});
-}
-
-.button {
-  min-height: calc(#{$header} - #{$spacer * 2});
-  padding: 5px 10px;
-  color: #fff;
-  border: 2px solid #fff;
-  border-radius: 2px;
-  transition: all 300ms;
 }
 
 </style>
