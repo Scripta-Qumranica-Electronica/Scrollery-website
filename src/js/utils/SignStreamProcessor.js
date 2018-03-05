@@ -37,14 +37,19 @@ export default class SignStreamProcessor {
                 line = entry.line_name
                 object.cols[columnNode].lines.push({line: line, lineId: entry.line_id, signs: []})
             }
-            object.cols[columnNode].lines[lineNode].signs.push({
+            /*  We have to "cast" numeric variables with Number() below
+                since we cannot (yet) guarantee that the Perl cgi script will
+                encode them as strings or as numbers.  I am converting the 
+                is_* variables to boolean.  We should check performance since 
+                there may be a way to do this with fewer cycles.*/
+             object.cols[columnNode].lines[lineNode].signs.push({
                 id: entry[mainKey],
-                is_variant: entry.is_variant,
+                is_variant: Number(entry.is_variant) !== 0,
                 break_type: entry.break_type,
                 sign: entry.sign == '' ? '·' : entry.sign,
-                is_reconstructed: entry.is_reconstructed,
+                is_reconstructed: Number(entry.is_reconstructed) !== 0,
                 readability: entry.readability,
-                is_retraced: entry.is_retraced,
+                is_retraced: Number(entry.is_retraced) !== 0,
                 prev_sign: entry[prevKey],
                 next_sign: entry[nextKey],
             })
