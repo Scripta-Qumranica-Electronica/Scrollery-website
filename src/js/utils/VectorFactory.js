@@ -62,12 +62,12 @@ export function dbMatrixToSVG(matrix) {
         undefined
 }
 
-// This function converts the 16 element SVG transform matrix 
+// This function converts the 6 element SVG transform matrix 
 // to a JSON string for the 2D as stored in the database
 export function svgMatrixToDB(matrix) {
-    return Array.isArray(matrix) && matrix.length === 16
+    return Array.isArray(matrix) && matrix.length === 6
     ?
-        `{\\"matrix\\": [[${matrix[0]},${matrix[2]},${matrix[12]}],[${matrix[1]},${matrix[3]},${matrix[13]}]]}`
+        `{\\"matrix\\": [[${matrix[0]},${matrix[2]},${matrix[4]}],[${matrix[1]},${matrix[3]},${matrix[5]}]]}`
     :
         undefined
 }

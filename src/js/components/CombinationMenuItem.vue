@@ -2,8 +2,11 @@
   <div>
     <span class="clickable-menu-item" @click="selectCombination">{{name}}{{user ? ` - ${username} - v. ${version}` : ''}}</span>
     <i class="fa fa-clone" @click="cloneScroll"></i>
-    <i v-show="locked" class="fa fa-lock" style="color: red"></i>
-    <i v-show="!locked" class="fa fa-unlock" style="color: green"></i>
+    <i 
+      class="fa" 
+      :class="{'fa-lock': locked, 'fa-unlock': !locked}" 
+      :style="{color: locked ? 'red' : 'green'}"
+      @click="lockScroll"></i>
     <div class="children" v-show="open">
         <ul>
           <li v-if="menuType === 'text'" v-for="child in children[menuType]">
@@ -59,7 +62,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['username', 'sessionID', 'userID'])
+    ...mapGetters(['username', 'sessionID', 'userID']),
   },
   methods: {
     fetchChildren() {
@@ -111,9 +114,13 @@ export default {
         if (res.status === 200 && res.data.scroll_clone === 'success') {
           // Please emit message to parent to either reload 
           // all combinations or add the one just created.
+          this.$emit('reloadListings', res.data)
         }
       })
       .catch(console.error)
+    },
+    lockScroll() {
+      this.$emit('reloadListings')
     }
   },
   watch: {

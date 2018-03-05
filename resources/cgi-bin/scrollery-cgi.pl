@@ -5,7 +5,6 @@ use warnings;
 use JSON::XS;
 use MIME::Base64;
 use lib qw(../perl-libs);
-#use lib qw(C:/Users/Martin/Desktop/martin/qumran/Entwicklung/Workspace/Scrollery/cgi-bin-ingo/);
 use SQE_CGI;
 use Encode;
 
@@ -106,7 +105,8 @@ sub getCombs {
 	my $cgi = shift;
 	my $userID = $cgi->param('user');
 	my $getCombsQuery = <<'MYSQL';
-SELECT scroll_data.scroll_id as scroll_id,
+SELECT DISTINCT 
+       scroll_data.scroll_id as scroll_id,
        scroll_data.name AS name,
        scroll_version.version AS version,
        scroll_version.scroll_version_id AS version_id,
