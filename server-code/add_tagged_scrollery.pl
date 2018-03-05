@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 
+# TODO: check that the properly versioned SQE_DB_API
+# folder exists.  Update lines 51 and 52 to point to
+# that folder.
+
 use strict;
 use warnings;
 use File::chdir;

@@ -1,4 +1,7 @@
 #!/usr/bin/perl
+
+# TODO: Add support for handling the SQE_DB_API and Data-files packages
+
 # !!!REMINDER!!!: I have removed the secret key, you must
 # put this in line 26 for the script to function.
 
