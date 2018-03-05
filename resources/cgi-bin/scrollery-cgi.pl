@@ -16,8 +16,8 @@ sub processCGI {
 		exit;
 	}
 
-	my $json = decode_json(''.$cgi->param('POSTDATA'));
-	my $transaction = $json->{transaction} || 'unspecified';
+	my $json_post = decode_json(''.$cgi->param('POSTDATA'));
+	my $transaction = $json_post->{transaction} || 'unspecified';
 	my %action = (
 		'validateSession' => \&validateSession,
 		'getCombs' => \&getCombs,
@@ -58,7 +58,7 @@ sub processCGI {
 		print encode_json({'error', "No transaction requested."});
 	} else {
 		if (defined $action{$transaction}) {
-			$action{$transaction}->($cgi);
+			$action{$transaction}->($cgi, $json_post);
 		} else {
 			print encode_json({'error', "Transaction type '" . $transaction . "' not understood."});
 		}
@@ -104,8 +104,7 @@ sub validateSession {
 
 sub getCombs {
 	my $cgi = shift;
-	my $json = decode_json(''.$cgi->param('POSTDATA'));
-	#my $userID = $cgi->param('user');
+	my $json_post = shift;
 	my $getCombsQuery = <<'MYSQL';
 SELECT DISTINCT 
        scroll_data.scroll_id as scroll_id,
@@ -126,16 +125,14 @@ ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json->{user});
+	$sql->execute($json_post->{user});
 	readResults($sql);
 	return;
 }
 
 sub getArtOfComb {
 	my $cgi = shift;
-	my $userID = $cgi->param('user');
-	my $version_id = $cgi->param('version_id');
-	my $combID = $cgi->param('combID');
+	my $json_post = shift;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT artefact_position.artefact_id AS id
 FROM artefact_position
@@ -145,15 +142,14 @@ WHERE artefact_position.scroll_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($combID, $version_id);
+	$sql->execute($json_post->{combID}, $json_post->{version_id});
 	readResults($sql);
 	return;
 }
 
 sub getArtOfImage {
 	my $cgi = shift;
-	my $image_id = $cgi->param('image_id');
-	my $version_id = $cgi->param('version_id');
+	my $json_post = shift;
 	my $getArtOfImageQuery = <<'MYSQL';
 SELECT DISTINCT artefact.artefact_id
 FROM artefact
@@ -161,19 +157,16 @@ JOIN artefact_owner USING(artefact_id)
 WHERE artefact.sqe_image_id = ?
 AND artefact_owner.scroll_version_id = ?
 MYSQL
-	print($image_id);
 	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($image_id, $version_id);
+	$sql->execute($json_post->{image_id}, $json_post->{version_id});
 	readResults($sql);
 	return;
 }
 
 sub getImgOfComb {
 	my $cgi = shift;
-	my $userID = $cgi->param('user');
-	my $version_id = $cgi->param('version_id');
-	my $combID = $cgi->param('combID');
+	my $json_post = shift;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
        image_catalog.catalog_number_2 AS lvl2,
@@ -189,15 +182,14 @@ ORDER BY lvl1, lvl2
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($combID);
+	$sql->execute($json_post->{combID});
 	readResults($sql);
 	return;
 }
 
 sub getColOfComb {
 	my $cgi = shift;
-	my $version_id = $cgi->param('version_id');
-	my $combID = $cgi->param('combID');
+	my $json_post = shift;
 	my $getColOfCombQuery = <<'MYSQL';
 		SELECT DISTINCT col_data.name AS name,
 						col_data.col_id AS id
@@ -209,16 +201,14 @@ sub getColOfComb {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($version_id, $combID);
+	$sql->execute($json_post->{version_id}, $json_post->{combID});
 	readResults($sql);
 	return;
 }
 
 sub getFragsOfCol {
 	my $cgi = shift;
-	my $userID = $cgi->param('user');
-	my $version = $cgi->param('version');
-	my $colID = $cgi->param('colID');
+	my $json_post = shift;
 	my $getFragsOfColQuery = <<'MYSQL';
 		SELECT discrete_canonical_reference.discrete_canonical_reference_id,
 			discrete_canonical_reference.column_name,
@@ -232,14 +222,14 @@ sub getFragsOfCol {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getFragsOfColQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($colID);
+	$sql->execute($json_post->{colID});
 	readResults($sql);
 	return;
 }
 
 sub getColOfScrollID {
 	my $cgi = shift;
-	my $discCanRef = $cgi->param('discCanRef');
+	my $json_post = shift;
 	my $getColOfScrollIDQuery = <<'MYSQL';
 		SELECT scroll.name AS scroll_name,
 			   column_of_scroll.name as col_name
@@ -252,15 +242,14 @@ sub getColOfScrollID {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfScrollIDQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($discCanRef);
+	$sql->execute($json_post->{discCanRef});
 	readResults($sql);
 	return;
 }
 
 sub getSignStreamOfColumn {
 	my $cgi = shift;
-	my $colId = $cgi->param('colId');
-	my $scrollVersion = $cgi->param('SCROLL_VERSION');
+	my $json_post = shift;
 	my $getScrollsQuery = << 'MYSQL';
 SELECT
 	col_data.name AS col_name,
@@ -300,16 +289,16 @@ WHERE col_to_line.col_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare($getScrollsQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($colId, $scrollVersion, $scrollVersion, $scrollVersion, $scrollVersion);
+	$sql->execute($json_post->{colId}, $json_post->{SCROLL_VERSION}, $json_post->{SCROLL_VERSION}, $json_post->{SCROLL_VERSION}, $json_post->{SCROLL_VERSION});
 	readResults($sql);
 	return;
 }
 
 sub getImagesOfFragment {
 	my $cgi = shift;
+	my $json_post = shift;
 	my $sql;
-	my $idType = $cgi->param('idType');
-	my $id = $cgi->param('id');
+	my $idType = $json_post->{idType};
 	my $getImagesOfFragmentQuery;
 
 	if ($idType eq 'composition') {
@@ -338,14 +327,14 @@ MYSQL
 	}
 	$sql = $cgi->dbh->prepare_cached($getImagesOfFragmentQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($id);
+	$sql->execute($json_post->{id});
 	readResults($sql);
 	return;
 }
 
 sub getIAAEdID {
         my $cgi = shift;
-        my $discCanRef = $cgi->param('discCanRef');
+		my $json_post = shift;
 	my $getIAAEdIDQuery = <<'MYSQL';
 		SELECT edition_catalog_to_discrete_reference.edition_id
 		FROM edition_catalog_to_discrete_reference
@@ -356,7 +345,7 @@ sub getIAAEdID {
 MYSQL
         my $sql = $cgi->dbh->prepare_cached($getIAAEdIDQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-        $sql->execute($discCanRef);
+        $sql->execute($json_post->{discCanRef});
         readResults($sql);
         return;
 }
@@ -378,7 +367,7 @@ MYSQL
 
 sub getCanonicalID1 {
 	my $cgi = shift;
-	my $composition = $cgi->param('composition');
+	my $json_post = shift;
 	my $getCanonicalID1Query = <<'MYSQL';
 		SELECT DISTINCT composition,
 			edition_location_1
@@ -389,15 +378,14 @@ sub getCanonicalID1 {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCanonicalID1Query)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($composition);
+	$sql->execute($json_post->{composition});
 	readResults($sql);
 	return;
 }
 
 sub getCanonicalID2 {
 	my $cgi = shift;
-	my $composition = $cgi->param('composition');
-	my $edition_location_1 = $cgi->param('edition_location_1');
+	my $json_post = shift;
 	my $getCanonicalID2Query = <<'MYSQL';
 		SELECT edition_location_2, edition_catalog_id
 		FROM edition_catalog
@@ -408,13 +396,14 @@ sub getCanonicalID2 {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCanonicalID2Query)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($composition, $edition_location_1);
+	$sql->execute($json_post->{composition}, $json_post->{edition_location_1});
 	readResults($sql);
 	return;
 }
 
 sub getScrollColNameFromDiscCanRef {
 	my $cgi = shift;
+	my $json_post = shift;
 	my $frag_id = $cgi->param('frag_id');
 	my $getScrollColNameFromDiscCanRefQuery = <<'MYSQL';
 		SELECT scroll_data.name AS scroll,
@@ -450,7 +439,7 @@ MYSQL
 
 sub getInstitutionPlates {
 	my $cgi = shift;
-	my $institution = $cgi->param('institution');
+	my $json_post = shift;
 	my $getInstitutionPlates = <<'MYSQL';
 		SELECT DISTINCT institution,
 			catalog_number_1 AS catalog_plate
@@ -460,15 +449,14 @@ sub getInstitutionPlates {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionPlates)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($institution);
+	$sql->execute($json_post->{institution});
 	readResults($sql);
 	return;
 }
 
 sub getInstitutionFragments {
 	my $cgi = shift;
-	my $institution = $cgi->param('institution');
-	my $catalog_number_1 = $cgi->param('catalog_number_1');
+	my $json_post = shift;
 	my $getInstitutionFragmentsQuery = <<'MYSQL';
 		SELECT catalog_number_2 AS catalog_fragment,
 			image_catalog_id
@@ -480,15 +468,14 @@ sub getInstitutionFragments {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionFragmentsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($institution, $catalog_number_1);
+	$sql->execute($json_post->{institution}, $json_post->{catalog_number_1});
 	readResults($sql);
 	return;
 }
 
 sub getInstitutionArtefacts {
 	my $cgi = shift;
-	my $catalog_id = $cgi->param('catalog_id');
-	my $user_id = $cgi->param('user_id');
+	my $json_post = shift;
 	my $getInstitutionArtefactsQuery = <<'MYSQL';
 		SELECT DISTINCT artefact.artefact_id,
 			user_id
@@ -501,35 +488,33 @@ sub getInstitutionArtefacts {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionArtefactsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($catalog_id, $user_id);
+	$sql->execute($json_post->{catalog_id}, $json_post->{user_id});
 	readResults($sql);
 	return;
 }
 
 sub getScrollWidth {
 	my $cgi = shift;
-	my $scroll_id =  $cgi->param('scroll_id');
-	my $scroll_version_id =  $cgi->param('scroll_version_id');
+	my $json_post = shift;
 	my $getScrollWidthQuery = <<'MYSQL';
 		CALL getScrollWidth(?,?)
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollWidthQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($scroll_id, $scroll_version_id);
+	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id});
 	readResults($sql);
 	return;
 }
 
 sub getScrollHeight {
 	my $cgi = shift;
-	my $scroll_id =  $cgi->param('scroll_id');
-	my $scroll_version_id =  $cgi->param('scroll_version_id');
+	my $json_post = shift;
 	my $getScrollHeightQuery = <<'MYSQL';
 		CALL getScrollHeight(?,?)
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollHeightQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($scroll_id, $scroll_version_id);
+	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id});
 	readResults($sql);
 	return;
 }
@@ -538,9 +523,8 @@ MYSQL
 # Then I change the scroll_id of the artefact to match the current scroll_id
 sub addArtToComb {
 	my $cgi = shift;
-	my $art_id =  $cgi->param('art_id');
-	my $scroll_id =  $cgi->param('scroll_id');
-	my $scroll_version_id =  $cgi->param('version_id');
+	my $json_post = shift;
+	my $scroll_version_id =  $json_post->{version_id};
 	$cgi->dbh->set_scrollversion($scroll_version_id);
 	my $user_id = $cgi->dbh->user_id;
 	my $addArtToCombQuery = <<'MYSQL';
@@ -549,17 +533,16 @@ sub addArtToComb {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-    $sql->execute($art_id, $scroll_version_id);
+    $sql->execute($json_post->{art_id}, $scroll_version_id);
     $sql->finish;
 
-	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $art_id, "scroll_id", $scroll_id);
+	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $json_post->{art_id}, "scroll_id", $json_post->{scroll_id});
 	handleDBError ($new_scroll_data_id, $error);
 }
 
 sub getScrollArtefacts {
 	my $cgi = shift;
-	my $scroll_id = $cgi->param('scroll_id');
-	my $version_id = $cgi->param('scroll_version_id');
+	my $json_post = shift;
 	my $getScrollArtefactsQuery = <<'MYSQL';
 SELECT DISTINCT artefact_position.artefact_position_id AS id,
                 ST_AsText(ST_Envelope(artefact.region_in_master_image)) AS rect,
@@ -582,15 +565,16 @@ WHERE artefact_position.scroll_id=?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollArtefactsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($scroll_id, $version_id);
+	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id});
 	readResults($sql);
 	return;
 }
 
 sub newCombination {
 	my $cgi = shift;
+	my $json_post = shift;
 	my $user_id = $cgi->dbh->user_id;
-	my $name = $cgi->param('name'); 
+	my $name = $json_post->{name}; 
 
 	my $newScroll = <<'MYSQL';
 		INSERT INTO scroll ()
@@ -633,19 +617,19 @@ MYSQL
 
 sub copyCombination {
 	my $cgi = shift;
-	my $scroll_id = $cgi->param('scroll_id');
-	my $scroll_version_id = $cgi->param('scroll_version_id');
-	$cgi->dbh->add_owner_to_scroll($scroll_id, $scroll_version_id);
+	my $json_post = shift;
+	$cgi->dbh->add_owner_to_scroll($json_post->{scroll_id}, $json_post->{scroll_version_id});
 	print '{"scroll_clone": "success"}';
 	return;
 }
 
 sub nameCombination {
 	my $cgi = shift;
-	my $scroll_id = $cgi->param('scroll_id');
-	my $scroll_data_id = $cgi->param('scroll_data_id');
-	my $version_id = $cgi->param('version_id');
-	my $scroll_name = $cgi->param('name');
+	my $json_post = shift;
+	my $scroll_id = $json_post->{scroll_id};
+	my $scroll_data_id = $json_post->{scroll_data_id};
+	my $version_id = $json_post->{version_id};
+	my $scroll_name = $json_post->{name};
 	$cgi->dbh->set_scrollversion($version_id);
 	my $user_id = $cgi->dbh->user_id;
 	my ($new_scroll_data_id, $error) = $cgi->dbh->change_value("scroll_data", $scroll_data_id, "name", $scroll_name);
@@ -655,24 +639,19 @@ sub nameCombination {
 
 sub setArtPosition {
 	my $cgi = shift;
-	my $version_id = $cgi->param('version_id');
-	$cgi->dbh->set_scrollversion($version_id);
-	my $artefact_position_id = $cgi->param('art_id');
-	my $matrix = $cgi->param('matrix');
-	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $artefact_position_id, "transform_matrix", $matrix);
+	my $json_post = shift;
+	$cgi->dbh->set_scrollversion($json_post->{version_id});
+	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $json_post->{art_id}, "transform_matrix", $json_post->{matrix});
 	handleDBError ($new_id, $error);
 	return;
 }
 
 sub setArtRotation {
 	my $cgi = shift;
+	my $json_post = shift;
 	my $user_id = $cgi->dbh->user_id;
-	my $scroll_id = $cgi->param('scroll_id');
-	my $version_id = $cgi->param('version_id');
-	$cgi->dbh->set_scrollversion($version_id);
-	my $art_id = $cgi->param('art_id');
-	my $rotation = $cgi->param('rotation');
-	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $art_id, "rotation", $rotation);
+	$cgi->dbh->set_scrollversion($json_post->{version_id});
+	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $json_post->{art_id}, "rotation", $json_post->{rotation});
 	handleDBError ($new_id, $error);
 	return;
 }

@@ -9,24 +9,12 @@ export default {
         data.SESSION_ID = store.getters.sessionID
       }
 
-      // For perl to accept the payload, we need to send it as form data
-      // so create a form data object to wrap the data in
-      // const form = new FormData()
-      // Object.keys(data).forEach(key => form.append(key, data[key]))
-
-      // let config = {
-      //   headers: {'Content-Type': 'multipart/form-data' }
-      // }
-      // if (opt) {
-      //   config = {...config, ...opt}
-      // }
-
-      return axios({
-        url,
-        method: 'post',
-        data: data,
-        header: {'Content-Type': 'application/json' }
-      })
+      // return axios({
+      //   url,
+      //   method: 'post',
+      //   data: data,
+      //   header: {'Content-Type': 'application/json' }
+      // })
 
       // make the AJAX request
       return axios.post(url, data, opt)
