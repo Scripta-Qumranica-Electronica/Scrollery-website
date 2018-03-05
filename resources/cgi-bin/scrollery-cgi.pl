@@ -16,7 +16,8 @@ sub processCGI {
 		exit;
 	}
 
-	my $transaction = $cgi->param('transaction') || 'unspecified';
+	my $json = decode_json(''.$cgi->param('POSTDATA'));
+	my $transaction = $json->{transaction} || 'unspecified';
 	my %action = (
 		'validateSession' => \&validateSession,
 		'getCombs' => \&getCombs,
@@ -103,7 +104,8 @@ sub validateSession {
 
 sub getCombs {
 	my $cgi = shift;
-	my $userID = $cgi->param('user');
+	my $json = decode_json(''.$cgi->param('POSTDATA'));
+	#my $userID = $cgi->param('user');
 	my $getCombsQuery = <<'MYSQL';
 SELECT DISTINCT 
        scroll_data.scroll_id as scroll_id,
@@ -124,7 +126,7 @@ ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($userID);
+	$sql->execute($json->{user});
 	readResults($sql);
 	return;
 }
