@@ -117,12 +117,12 @@ describe('VectorFactory.svgMatrixToDB', () => {
     expect(svgMatrixToDB([0,1,2,3,4,5,6,7])).to.equal(undefined)
   })
 
-  it('should convert 16 element SVG matrix to a JSON string for the DB matrix', () => {
+  it('should convert 6 element SVG matrix to a JSON string for the DB matrix', () => {
     // setup initial input
-    const svgMatrix = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+    const svgMatrix = [1,2,3,4,5,6]
 
     //define expected result
-    const dbMatrix = '{\\"matrix\\": [[1,3,13],[2,4,14]]}'
+    const dbMatrix = '{\\"matrix\\": [[1,3,5],[2,4,6]]}'
 
     // assert expected value
     expect(svgMatrixToDB(svgMatrix)).to.equal(dbMatrix)
