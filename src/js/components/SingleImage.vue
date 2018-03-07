@@ -106,7 +106,7 @@ export default {
           this.imageElements = res.data.results
           this.filenames = []
           res.data.results.forEach((result, index) => {
-            if (result.is_master) {
+            if (result.is_master >>> 0) {
               result.visible = true
               this.masterImage = result
             }
@@ -158,9 +158,9 @@ export default {
     formatImageType(value) {
       if (!value) return ''
       let formattedString = value.start === value.end ? value.start : value.start + '–' + value.end
-      if (value.type == 2) {
+      if (value.type >>> 0 == 2) {
         formattedString += ' RL'
-      } else if (value.type == 3) {
+      } else if (value.type >>> 0 == 3) {
         formattedString += ' RR'
       }
       return formattedString

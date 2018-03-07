@@ -1,7 +1,7 @@
 <template>
   <div class="clickable-menu-item">
     <span @click="selectImage">
-      {{institution}}: {{plate}}, {{fragment}} {{side === 0 ? 'recto' : 'verso'}}
+      {{institution}}: {{plate}}, {{fragment}} {{side >>> 0 === 0 ? 'recto' : 'verso'}}
     </span>
     <div class="children" v-show="open">
         <ul>
