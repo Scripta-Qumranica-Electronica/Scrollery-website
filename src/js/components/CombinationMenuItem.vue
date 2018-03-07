@@ -18,7 +18,9 @@
                             :institution="child.institution"
                             :plate="child.lvl1"
                             :fragment="child.lvl2"
-                            :version-i-d="versionID"></image-menu-item>
+                            :version-i-d="versionID"
+                            :side="child.side">
+            </image-menu-item>
           </li>
         </ul>
     </div>

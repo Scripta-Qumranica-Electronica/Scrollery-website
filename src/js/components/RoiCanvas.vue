@@ -1,8 +1,8 @@
 <template>
     <svg    ref="roiSvg"
-            :width="width / 5"
-            :height="height / 5"
-            :viewbox="'0 0 ' + width / 5 + ' ' + height / 5" 
+            :width="width / divisor"
+            :height="height / divisor"
+            :viewbox="'0 0 ' + width / divisor + ' ' + height / divisor" 
             @mousemove="moveROI($event)" 
             @mousedown="newROI($event)"
             @mouseup="deselectROI()"
@@ -27,9 +27,9 @@
             :key="'svg-image-' + image.filename"
             class="clippedImg" 
             draggable="false" 
-            :xlink:href="image.url + image.filename + '/full/pct:20/0/default.jpg'"
-            :width="width / 5"
-            :height="height / 5"
+            :xlink:href="image.url + image.filename + '/full/pct:' + 100 / divisor + '/0/' + image.suffix"
+            :width="width / divisor"
+            :height="height / divisor"
             :opacity="image.opacity"
             :visibility="image.visible ? 'visible' : 'hidden'"></image>
     </g>
@@ -103,6 +103,7 @@ export default {
             oldMousePos: undefined,
             zoom: '1.0',
             scale: 1.0,
+            divisor: 2,
             click: false,
         }
     },

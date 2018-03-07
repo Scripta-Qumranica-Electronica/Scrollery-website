@@ -1,7 +1,7 @@
 <template>
   <div class="clickable-menu-item">
     <span @click="selectImage">
-      {{institution}}: {{plate}}, {{fragment}} ({{dataId}})
+      {{institution}}: {{plate}}, {{fragment}} {{side === 0 ? 'recto' : 'verso'}}
     </span>
     <div class="children" v-show="open">
         <ul>
@@ -24,6 +24,7 @@ export default {
     fragment: '',
     institution: '',
     versionID: '',
+    side: '',
   },
   components: {
     'artefact-menu-item': ArtefactMenuItem,
@@ -61,7 +62,7 @@ export default {
           scrollVersionID: this.$route.params.scrollVersionID,
           colID: this.$route.params.colID ? this.$route.params.colID : '~',
           imageID: this.dataId,
-          artID: this.$route.params.artID ? this.$route.params.artID : '~',
+          artID: '~',
         }
       })
     },

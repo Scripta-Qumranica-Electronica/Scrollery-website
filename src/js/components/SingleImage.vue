@@ -1,7 +1,7 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
     <el-row id="singleImageMenu" :gutter="10" type="flex" justify="space-around">
-      <el-col :span="12">
+      <el-col :span="10">
         <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple>
           <el-option
             v-for="(image, index) in filenames"
@@ -36,7 +36,7 @@
           </el-option>
         </el-select>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-slider 
           v-model="zoom"
           :min="0.1"
@@ -45,64 +45,79 @@
           :format-tooltip="formatTooltip">
         </el-slider>
       </el-col>
-      <el-col :span="4">
+      <el-col v-show="viewMode === 'ROI'" :span="4">
         <el-button @click="delSelectedRoi">Del ROI</el-button>
       </el-col>
-      <!-- <div id="seadragonNavCont" class="col-2">
-        <div :id="navPanel"></div>
-      </div> -->
+      <el-col v-show="viewMode === 'ART'" :span="4">
+        <el-button>Draw</el-button>
+      </el-col>
+      <el-col v-show="viewMode === 'ART'" :span="6">
+        <el-slider>
+        </el-slider>
+      </el-col>
     </el-row>
     <div style="{width: 100%; height: calc(100% - 50px); overflow: auto; position: relative;}">
-      <!-- <img v-for="filename in filenames" 
-          :key="'img-' + filename.filename" 
-          v-show="filename.visible"
-          :src="filename.url + filename.filename + '/full/pct:20/0/default.jpg'" 
-          class="overlay-image avoid-clicks"
-          :style="{opacity: filename.opacity, transform: 'scale(' + zoom + ')', height: 7215 / 5, width: 5410 / 5}"> -->
       <roi-canvas class="overlay-image"
-                  :width="7215"
-                  :height="5410"
+                  :width="masterImage.width"
+                  :height="masterImage.height"
                   :zoom-level="zoom"
                   :images="filenames"
-                  ref="currentRoiCanvas"></roi-canvas>
-      <!-- <open-seadragon 
-        :tile-sources="filenames[0]"
-        :ajax-with-credentials="false"
-        :show-navigator="true"
-        :home-fills-viewer="true"
-        :pan-horizontal="false"
-        :pan-vertical="false"
-        :mouse-nav-enabled="false"
-        :navigator-id="navPanel"
-        :zoom="zoom"
-        :translate-point="translatePoint">
-      </open-seadragon> -->
+                  ref="currentRoiCanvas">
+      </roi-canvas>
+      <!-- <artefact-canvas  v-show="viewMode === 'ART'"
+                        :width="masterImage.width"
+                        :height="masterImage.height"
+                        :scale="zoom"
+                        ref="currentArtCanvas">
+      </artefact-canvas> -->
     </div>
   </div>
-    
 </template>
 
 <script>
-// import OpenSeadragon from './OpenSeadragon.vue'
 import RoiCanvas from './RoiCanvas.vue'
+import ArtefactCanvas from './ArtefactCanvas.vue'
 
 export default {
   components: {
-    // 'open-seadragon': OpenSeadragon,
     'roi-canvas': RoiCanvas,
+    'artefact-canvas': ArtefactCanvas,
   },
   data() {
     return {
       imageElements: [],
       selectedImageUrls: [],
       filenames: [],
-      navPanel: 'seadragonNavPanel',
+      masterImage: {},
       zoom: 0.5,
       scale: 0.2,
       selectedImage: undefined,
+      viewMode: 'none',
     }
   },
   methods: {
+    fetchImages(id) {
+      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+        transaction: 'imagesOfInstFragments',
+        id: id,
+      })
+      .then(res => {
+        if (res.status === 200 && res.data.results) {
+          this.imageElements = res.data.results
+          this.filenames = []
+          res.data.results.forEach((result, index) => {
+            if (result.is_master) {
+              result.visible = true
+              this.masterImage = result
+            }
+            result.opacity = 1.0
+            this.filenames.push(result)
+          })
+          this.masterImage = this.masterImage ? this.masterImage : res.data.results[0]
+          console.log(this.masterImage)
+        }
+      })
+    },
     delSelectedRoi() {
       this.$refs.currentRoiCanvas.deleteSelectedRoi()
     },
@@ -120,32 +135,22 @@ export default {
   },
   watch: {
     '$route' (to, from) {
-      if (to.params.colID !== from.params.colID) {
-        if (to.params.colID > -1) {
-          this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-            transaction: 'imagesOfFragment',
-            idType: 'composition',
-            id: to.params.colID,
-            SESSION_ID: this.$store.getters.sessionID
-          })
-          .then(res => {
-              if (res.status === 200 && res.data.results) {
-                  this.imageElements = res.data.results
-                  this.filenames = []
-                  res.data.results.forEach((result, index) => {
-                    // this.filenames.push(`${result.url}${result.filename}/info.json`)
-                    if (result.filename.indexOf('ColorCalData') !== -1) {
-                      result.visible = true
-                    }
-                    result.opacity = 1.0
-                    this.filenames.push(result)
-                  })
-                  // this.filename = `${res.data.results[0].url}${res.data.results[0].filename}/info.json`
-              }
-          })
-        } else {
-          this.filenames = []
-        }
+      if (
+        to.params.artID !== '~' &&
+        to.params.artID !== from.params.artID &&
+        to.params.imageID === '~'
+      ) {
+        //set up ROI mode
+        this.viewMode = 'ROI'
+        this.fetchImages()
+      } else if (
+        to.params.imageID !== '~' &&
+        to.params.imageID !== from.params.imageID &&
+        to.params.artID === '~'
+      ) {
+        //set up Art mode
+        this.viewMode = 'ART'
+        this.fetchImages(to.params.imageID)
       }
     }
   },
@@ -153,10 +158,10 @@ export default {
     formatImageType(value) {
       if (!value) return ''
       let formattedString = value.start === value.end ? value.start : value.start + '–' + value.end
-      if (value.filename.indexOf('RRIR') !== -1) {
-        formattedString += ' RR'
-      } else if (value.filename.indexOf('RLIR') !== -1) {
+      if (value.type == 2) {
         formattedString += ' RL'
+      } else if (value.type == 3) {
+        formattedString += ' RR'
       }
       return formattedString
     }
@@ -165,31 +170,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#singleImageMenu {
-  width: 100%; 
-  height: 50px; 
-  max-height: 50px;
-}
-#seadragonNavPanel {
-  width: 50px; 
-  height: 50px;
-}
-.fileSelector {
-  border-radius: 15px;
-  background: #E1E1D0;
-  padding: 10px;
-  z-index: 10;
-}
-.image-select-box > .image-select-entry {
-  padding: 5px;
-}
-.image-select-entry {
-  width: 100%;
-}
-.overlay-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform-origin: top left;
-}
+  #singleImageMenu {
+    width: 100%; 
+    height: 50px; 
+    max-height: 50px;
+  }
+  .fileSelector {
+    border-radius: 15px;
+    background: #E1E1D0;
+    padding: 10px;
+    z-index: 10;
+  }
+  .image-select-box > .image-select-entry {
+    padding: 5px;
+  }
+  .image-select-entry {
+    width: 100%;
+  }
+  .overlay-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
+  }
 </style>

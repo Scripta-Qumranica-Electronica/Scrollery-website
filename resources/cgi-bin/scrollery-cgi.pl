@@ -37,6 +37,7 @@ sub processCGI {
 		'institutions' => \&getInstitutions,
 		'institutionPlates' => \&getInstitutionPlates,
 		'institutionFragments' => \&getInstitutionFragments,
+		'imagesOfInstFragments' => \&imagesOfInstFragments,
 		'institutionArtefacts' => \&getInstitutionArtefacts,
 		'addArtToComb' => \&addArtToComb,
 		'getScrollArtefacts' => \&getScrollArtefacts,
@@ -154,7 +155,8 @@ sub getArtOfImage {
 SELECT DISTINCT artefact.artefact_id
 FROM artefact
 JOIN artefact_owner USING(artefact_id)
-WHERE artefact.sqe_image_id = ?
+JOIN SQE_image USING(sqe_image_id)
+WHERE SQE_image.image_catalog_id = ?
 AND artefact_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
@@ -170,15 +172,17 @@ sub getImgOfComb {
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
        image_catalog.catalog_number_2 AS lvl2,
+	   image_catalog.catalog_side AS side,
 	image_catalog.institution,
-	   SQE_image.sqe_image_id AS id
+	   image_catalog.image_catalog_id AS id
 FROM image_catalog
 	JOIN image_to_edition_catalog USING (image_catalog_id)
 	JOIN edition_catalog_to_discrete_reference USING (edition_catalog_id)
 	JOIN discrete_canonical_reference USING (discrete_canonical_reference_id)
 	JOIN SQE_image USING(image_catalog_id)
 WHERE discrete_canonical_reference.scroll_id = ?
-ORDER BY lvl1, lvl2
+	AND SQE_image.is_master = 1
+ORDER BY lvl1, lvl2, side
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
@@ -469,6 +473,32 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionFragmentsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{institution}, $json_post->{catalog_number_1});
+	readResults($sql);
+	return;
+}
+
+sub imagesOfInstFragments {
+	my $cgi = shift;
+	my $json_post = shift;
+	my $getInstitutionFragmentsQuery = <<'MYSQL';
+SELECT 	SQE_image.filename AS filename,
+		  SQE_image.wavelength_start AS start,
+		  SQE_image.wavelength_end AS end,
+		  SQE_image.is_master,
+		  SQE_image.native_width AS width,
+		  SQE_image.native_height AS height,
+		  SQE_image.type AS type,
+		  image_urls.url AS url,
+		  image_urls.suffix AS suffix,
+		  edition_catalog.edition_side
+FROM SQE_image
+	JOIN image_urls USING(image_urls_id)
+	LEFT JOIN edition_catalog USING(edition_catalog_id)
+WHERE image_catalog_id = ?
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getInstitutionFragmentsQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($json_post->{id});
 	readResults($sql);
 	return;
 }
