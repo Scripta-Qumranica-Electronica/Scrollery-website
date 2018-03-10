@@ -87,8 +87,8 @@
 <script>
 export default {
     props: {
-        width: Number,
-        height: Number,
+        width: 0,
+        height: 0,
         zoomLevel: '',
         images: {
             type: Array,

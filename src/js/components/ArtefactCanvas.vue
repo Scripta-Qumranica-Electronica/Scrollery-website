@@ -1,15 +1,18 @@
 <template>
-    <canvas :width="width" :height="height" :style="{transform: `scale(${scale})`}"></canvas>
+  <div :width="width" :height="height" :style="{transform: `scale(${scale})`}">
+    <canvas :width="width" :height="height"></canvas>
+  </div>
 </template>
 
 <script>
 export default {
   props: {
     mask: {},
-    width: '',
-    height: '',
+    width: 0,
+    height: 0,
     scale: '',
-    drawMode: 'draw',
+    drawMode: '',
+    brushSize: 0,
   },
   data() {
     return {
@@ -23,6 +26,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>
 

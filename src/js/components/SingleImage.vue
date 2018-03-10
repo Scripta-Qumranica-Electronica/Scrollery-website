@@ -36,7 +36,7 @@
           </el-option>
         </el-select>
       </el-col>
-      <el-col :span="6">
+      <el-col :span="4">
         <el-slider 
           v-model="zoom"
           :min="0.1"
@@ -45,31 +45,40 @@
           :format-tooltip="formatTooltip">
         </el-slider>
       </el-col>
+      <el-col :span="6">
+        <el-radio-group v-model="viewMode" size="small">
+          <el-radio-button label="ROI">{{$i18n.str('ROI')}}</el-radio-button>
+          <el-radio-button label="ART">{{$i18n.str('ART')}}</el-radio-button>
+        </el-radio-group>
+      </el-col>
       <el-col v-show="viewMode === 'ROI'" :span="4">
         <el-button @click="delSelectedRoi">Del ROI</el-button>
       </el-col>
-      <el-col v-show="viewMode === 'ART'" :span="4">
-        <el-button>Draw</el-button>
+      <el-col v-show="viewMode === 'ART'" :span="2">
+        <el-button @click="toggleDrawingMode" :type="drawingMode === 'draw' ? 'primary' : 'warning'">{{drawingMode === 'draw' ? 'Draw' : 'Erase'}}</el-button>
       </el-col>
-      <el-col v-show="viewMode === 'ART'" :span="6">
-        <el-slider>
+      <el-col v-show="viewMode === 'ART'" :span="4">
+        <el-slider v-model="brushCursorSize">
         </el-slider>
       </el-col>
     </el-row>
     <div style="{width: 100%; height: calc(100% - 50px); overflow: auto; position: relative;}">
       <roi-canvas class="overlay-image"
-                  :width="masterImage.width"
-                  :height="masterImage.height"
+                  :width="masterImage.width ? masterImage.width : 0"
+                  :height="masterImage.height ? masterImage.height : 0"
                   :zoom-level="zoom"
                   :images="filenames"
                   ref="currentRoiCanvas">
       </roi-canvas>
-      <!-- <artefact-canvas  v-show="viewMode === 'ART'"
-                        :width="masterImage.width"
-                        :height="masterImage.height"
+      <artefact-canvas  class="overlay-canvas"
+                        v-show="viewMode === 'ART'"
+                        :width="masterImage.width ? masterImage.width / 2 : 0"
+                        :height="masterImage.height ? masterImage.height / 2 : 0"
                         :scale="zoom"
+                        :draw-mode="drawingMode"
+                        :brush-size="brushCursorSize"
                         ref="currentArtCanvas">
-      </artefact-canvas> -->
+      </artefact-canvas>
     </div>
   </div>
 </template>
@@ -93,6 +102,8 @@ export default {
       scale: 0.2,
       selectedImage: undefined,
       viewMode: 'none',
+      drawingMode: 'draw',
+      brushCursorSize: 20,
     }
   },
   methods: {
@@ -131,6 +142,9 @@ export default {
     },
     formatTooltip(val) {
       return (this.zoom * 100).toFixed(2) + '%'
+    },
+    toggleDrawingMode() {
+      this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
     }
   },
   watch: {
@@ -188,6 +202,12 @@ export default {
     width: 100%;
   }
   .overlay-image {
+    position: static;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
+  }
+  .overlay-canvas {
     position: absolute;
     top: 0;
     left: 0;
