@@ -51,6 +51,9 @@
           <el-radio-button label="ART">{{$i18n.str('ART')}}</el-radio-button>
         </el-radio-group>
       </el-col>
+      <el-col :span="2">
+        <el-button @click="toggleMask">Mask</el-button>
+      </el-col>
       <el-col v-show="viewMode === 'ROI'" :span="4">
         <el-button @click="delSelectedRoi">Del ROI</el-button>
       </el-col>
@@ -58,7 +61,11 @@
         <el-button @click="toggleDrawingMode" :type="drawingMode === 'draw' ? 'primary' : 'warning'">{{drawingMode === 'draw' ? 'Draw' : 'Erase'}}</el-button>
       </el-col>
       <el-col v-show="viewMode === 'ART'" :span="4">
-        <el-slider v-model="brushCursorSize">
+        <el-slider 
+          v-model="brushCursorSize"
+          :min="0"
+          :max="200"
+          :step="1">
         </el-slider>
       </el-col>
     </el-row>
@@ -68,6 +75,9 @@
                   :height="masterImage.height ? masterImage.height : 0"
                   :zoom-level="zoom"
                   :images="filenames"
+                  :divisor="imageShrink"
+                  :clipping-mask="clipMask"
+                  :clip="clippingOn"
                   ref="currentRoiCanvas">
       </roi-canvas>
       <artefact-canvas  class="overlay-canvas"
@@ -77,6 +87,8 @@
                         :scale="zoom"
                         :draw-mode="drawingMode"
                         :brush-size="brushCursorSize"
+                        :divisor="imageShrink"
+                        v-on:mask="setClipMask"
                         ref="currentArtCanvas">
       </artefact-canvas>
     </div>
@@ -98,12 +110,15 @@ export default {
       selectedImageUrls: [],
       filenames: [],
       masterImage: {},
+      imageShrink: 2,
       zoom: 0.5,
       scale: 0.2,
       selectedImage: undefined,
       viewMode: 'none',
       drawingMode: 'draw',
       brushCursorSize: 20,
+      clipMask: '',
+      clippingOn: false,
     }
   },
   methods: {
@@ -125,9 +140,15 @@ export default {
             this.filenames.push(result)
           })
           this.masterImage = this.masterImage ? this.masterImage : res.data.results[0]
-          console.log(this.masterImage)
+          this.clipMask = this.fullImageMask
         }
       })
+    },
+    setClipMask(mask) {
+      this.clipMask = mask
+    },
+    toggleMask() {
+      this.clippingOn = !this.clippingOn
     },
     delSelectedRoi() {
       this.$refs.currentRoiCanvas.deleteSelectedRoi()
