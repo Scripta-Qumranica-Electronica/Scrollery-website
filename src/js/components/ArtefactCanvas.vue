@@ -117,6 +117,14 @@ export default {
   }
   .maskCanvas {
     opacity: 0.3;
+    animation: pulsate 3s ease-out;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes pulsate {
+    0%    { opacity:0;}
+    50%   { opacity:0.3;}
+    100%  { opacity:0;}
   }
   .cursor {
     position: absolute;
