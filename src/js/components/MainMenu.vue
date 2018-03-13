@@ -39,9 +39,9 @@
                   :scrollID="combination.scroll_id"
                   :version="combination.version"
                   :versionID="combination.version_id"
-                  :user="combination.user_id"
+                  :user="combination.user_id >>> 0 /* We have to cast this to int. */"
                   :menu-type="menuDisplay"
-                  :locked="combination.locked"
+                  :locked="combination.locked >>> 0 /* We have to cast this to int. */"
                   />
               </li>
             </ul>
