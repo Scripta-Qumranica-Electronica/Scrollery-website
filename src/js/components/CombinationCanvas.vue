@@ -1,12 +1,7 @@
 <template>
     <div :style="dimensions">
-        <svg class="combination-canvas" 
-            :width="scrollWidth" 
-            :height="scrollHeight" 
-            :viewBox="viewBox" 
-            :transform="'translate(' + (scrollWidth / 2) * (globalScale - 1) 
-            + ' ' + (scrollHeight / 2) * (globalScale - 1) 
-            + ') scale(' + globalScale +  ')'"
+        <svg class="combination-canvas"
+            :viewBox="viewBox"
             @mousemove="mousemove"
             @mousedown="mousedown"
             ref="svgCanvas">

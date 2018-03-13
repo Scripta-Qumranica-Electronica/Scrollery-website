@@ -6,14 +6,14 @@
             @mousemove="moveROI($event)" 
             @mousedown="newROI($event)"
             @mouseup="deselectROI()"
-            :transform="'scale(' + zoomLevel + ')'"
+            :transform="`scale(${zoomLevel})`"
             >
     <defs>
-      <path id="Full-clip-path" :d="fullImageMask" :transform="'scale(' + scale + ')'"></path>
+      <path id="Full-clip-path" :d="fullImageMask" :transform="`scale(${scale})`"></path>
       <clipPath id="Full-clipping-outline">
         <use stroke="none" fill="black" fill-rule="evenodd" href="#Full-clip-path"></use>
       </clipPath>
-      <path id="Clip-path" :d="clippingMask" :transform="'scale(' + scale + ')'"></path>
+      <path id="Clip-path" :d="clippingMask" :transform="`scale(${scale})`"></path>
       <clipPath id="Clipping-outline">
         <use stroke="none" fill="black" fill-rule="evenodd" href="#Clip-path"></use>
       </clipPath>

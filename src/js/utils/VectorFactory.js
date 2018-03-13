@@ -67,7 +67,7 @@ export function dbMatrixToSVG(matrix) {
 export function svgMatrixToDB(matrix) {
     return Array.isArray(matrix) && matrix.length === 6
     ?
-        `{\\"matrix\\": [[${matrix[0]},${matrix[2]},${matrix[4]}],[${matrix[1]},${matrix[3]},${matrix[5]}]]}`
+        `{"matrix": [[${matrix[0]},${matrix[2]},${matrix[4]}],[${matrix[1]},${matrix[3]},${matrix[5]}]]}`
     :
         undefined
 }

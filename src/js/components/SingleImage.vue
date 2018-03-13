@@ -223,7 +223,7 @@ export default {
     width: 100%;
   }
   .overlay-image {
-    position: static;
+    position: absolute;
     top: 0;
     left: 0;
     transform-origin: top left;
