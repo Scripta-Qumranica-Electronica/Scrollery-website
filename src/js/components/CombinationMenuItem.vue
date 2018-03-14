@@ -10,16 +10,19 @@
     <div class="children" v-show="open">
         <ul>
           <li v-if="menuType === 'text'" v-for="child in children[menuType]">
-            <column-menu-item :data-id="child.id"
-                            :name="child.name"></column-menu-item>
+            <column-menu-item 
+              :data-id="child.id >>> 0"
+              :name="child.name">
+            </column-menu-item>
           </li>
           <li v-if="menuType === 'image'" v-for="child in children[menuType]">
-            <image-menu-item :data-id="child.id"
-                            :institution="child.institution"
-                            :plate="child.lvl1"
-                            :fragment="child.lvl2"
-                            :version-i-d="versionID"
-                            :side="child.side">
+            <image-menu-item 
+              :data-id="child.id >>> 0"
+              :institution="child.institution"
+              :plate="child.lvl1"
+              :fragment="child.lvl2"
+              :version-i-d="versionID"
+              :side="child.side">
             </image-menu-item>
           </li>
         </ul>
