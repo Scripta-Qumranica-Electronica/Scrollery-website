@@ -5,6 +5,7 @@
     </span>
     <div class="children" v-show="open">
         <ul>
+          <li @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New Artefact') }}</span></li>
           <li v-for="child in children">
             <artefact-menu-item :data-id="child.artefact_id"></artefact-menu-item>
           </li>
@@ -76,6 +77,10 @@ export default {
         }
       }
     },
+
+      addArtefact() {
+        //Add code to create new artefact with the CGI script
+      }
   },
   watch: {
   }

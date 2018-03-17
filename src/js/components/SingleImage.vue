@@ -1,8 +1,8 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <el-row id="singleImageMenu" :gutter="10" type="flex" justify="space-around">
-      <el-col :span="10">
-        <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple>
+    <el-row id="singleImageMenu" :gutter="4" type="flex" justify="space-around">
+      <el-col :span="8">
+        <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple size="mini">
           <el-option
             v-for="(image, index) in filenames"
             :key="'selector-' + image.filename"
@@ -18,16 +18,16 @@
                 </span>
               </el-col>
               <el-col :span="10">
-                <input 
+                <input
                   class="image-select-entry"
-                  type="range" 
-                  min="0" 
-                  max="1.0" 
+                  type="range"
+                  min="0"
+                  max="1.0"
                   step="0.01"
                   @input="setOpacity(index, $event.target.value)" />
               </el-col>
               <el-col :span="4">
-                <i class="fa fa-eye image-select-entry" 
+                <i class="fa fa-eye image-select-entry"
                   :style="{color: image.visible ? 'green' : 'red'}"
                   @click="toggleVisible(index)">
                 </i>
@@ -36,8 +36,8 @@
           </el-option>
         </el-select>
       </el-col>
-      <el-col :span="4">
-        <el-slider 
+      <el-col :span="2">
+        <el-slider
           v-model="zoom"
           :min="0.1"
           :step="0.01"
@@ -45,23 +45,28 @@
           :format-tooltip="formatTooltip">
         </el-slider>
       </el-col>
-      <el-col :span="6">
-        <el-radio-group v-model="viewMode" size="small">
+      <el-col v-show="artefact"  :span="5">
+        <el-radio-group v-model="viewMode" size="mini">
           <el-radio-button label="ROI">{{$i18n.str('ROI')}}</el-radio-button>
           <el-radio-button label="ART">{{$i18n.str('ART')}}</el-radio-button>
         </el-radio-group>
       </el-col>
-      <el-col :span="2">
-        <el-button @click="toggleMask">Mask</el-button>
+      <el-col v-show="artefact"  :span="3">
+        <el-button @click="toggleMask" size="mini">Mask</el-button>
       </el-col>
-      <el-col v-show="viewMode === 'ROI'" :span="4">
-        <el-button @click="delSelectedRoi">Del ROI</el-button>
+      <el-col v-show="viewMode === 'ROI' && artefact" :span="3">
+        <el-button @click="delSelectedRoi" size="mini">Del ROI</el-button>
       </el-col>
-      <el-col v-show="viewMode === 'ART'" :span="2">
-        <el-button @click="toggleDrawingMode" :type="drawingMode === 'draw' ? 'primary' : 'warning'">{{drawingMode === 'draw' ? 'Draw' : 'Erase'}}</el-button>
+      <el-col v-show="viewMode === 'ART' && artefact" :span="3">
+        <el-button
+                @click="toggleDrawingMode"
+                :type="drawingMode === 'draw' ? 'primary' : 'warning'"
+                size="mini">
+          {{drawingMode === 'draw' ? 'Draw' : 'Erase'}}
+        </el-button>
       </el-col>
-      <el-col v-show="viewMode === 'ART'" :span="4">
-        <el-slider 
+      <el-col v-show="viewMode === 'ART' && artefact" :span="3">
+        <el-slider
           v-model="brushCursorSize"
           :min="0"
           :max="200"
@@ -88,6 +93,7 @@
                         :draw-mode="drawingMode"
                         :brush-size="brushCursorSize"
                         :divisor="imageShrink"
+                        :mask = "firstClipMask"
                         v-on:mask="setClipMask"
                         ref="currentArtCanvas">
       </artefact-canvas>
@@ -98,6 +104,7 @@
 <script>
 import RoiCanvas from './RoiCanvas.vue'
 import ArtefactCanvas from './ArtefactCanvas.vue'
+import {geoJsonPolygonToSvg} from '../utils/VectorFactory'
 
 export default {
   components: {
@@ -111,13 +118,15 @@ export default {
       filenames: [],
       masterImage: {},
       imageShrink: 2,
+      artefact: undefined,
       zoom: 0.5,
       scale: 0.2,
       selectedImage: undefined,
-      viewMode: 'none',
+      viewMode: 'ART',
       drawingMode: 'draw',
       brushCursorSize: 20,
       clipMask: '',
+      firstClipMask: '',
       clippingOn: false,
     }
   },
@@ -139,8 +148,19 @@ export default {
             result.opacity = 1.0
             this.filenames.push(result)
           })
-          this.masterImage = this.masterImage ? this.masterImage : res.data.results[0]
-          this.clipMask = this.fullImageMask
+          this.masterImage = this.masterImage ? this.masterImage : res.data.results[0] // Is the ternary really necessary?
+          this.clipMask = this.clipMask ? this.clipMask : this.fullImageMask // this would catch edge cases, but may be unnecessary
+        }
+      })
+    },
+    getArtefactMask() {
+      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+        transaction: 'getArtefactMask',
+        artID: this.artefact,
+      })
+      .then(res => {
+        if (res.status === 200 && res.data.results[0]) {
+          this.firstClipMask = this.clipMask = geoJsonPolygonToSvg(res.data.results[0].poly)
         }
       })
     },
@@ -170,22 +190,16 @@ export default {
   },
   watch: {
     '$route' (to, from) {
-      if (
-        to.params.artID !== '~' &&
-        to.params.artID !== from.params.artID &&
-        to.params.imageID === '~'
-      ) {
-        //set up ROI mode
-        this.viewMode = 'ROI'
-        this.fetchImages()
-      } else if (
-        to.params.imageID !== '~' &&
-        to.params.imageID !== from.params.imageID &&
-        to.params.artID === '~'
-      ) {
-        //set up Art mode
-        this.viewMode = 'ART'
-        this.fetchImages(to.params.imageID)
+      if (to.params.imageID !== '~') {
+        // Load new artefact ID if there is one
+        if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
+          this.artefact = to.params.artID
+          this.getArtefactMask()
+        }
+        // Fetch images for image ID if it has changed
+        if (to.params.imageID !== from.params.imageID) {
+          this.fetchImages(to.params.imageID)
+        }
       }
     }
   },
@@ -206,8 +220,8 @@ export default {
 
 <style lang="scss" scoped>
   #singleImageMenu {
-    width: 100%; 
-    height: 50px; 
+    width: 100%;
+    height: 50px;
     max-height: 50px;
   }
   .fileSelector {

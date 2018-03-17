@@ -40,6 +40,8 @@ sub processCGI {
 		'imagesOfInstFragments' => \&imagesOfInstFragments,
 		'institutionArtefacts' => \&getInstitutionArtefacts,
 		'addArtToComb' => \&addArtToComb,
+		'newArtefact' => \&newArtefact,
+		'getArtefactMask' => \&getArtefactMask,
 		'getScrollArtefacts' => \&getScrollArtefacts,
 		'getScrollWidth' => \&getScrollWidth,
 		'getScrollHeight' => \&getScrollHeight,
@@ -556,7 +558,6 @@ sub addArtToComb {
 	my $json_post = shift;
 	my $scroll_version_id =  $json_post->{version_id};
 	$cgi->dbh->set_scrollversion($scroll_version_id);
-	my $user_id = $cgi->dbh->user_id;
 	my $addArtToCombQuery = <<'MYSQL';
 		INSERT IGNORE INTO artefact_owner (artefact_id, scroll_version_id)
 		VALUES(?,?)
@@ -568,6 +569,40 @@ MYSQL
 
 	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $json_post->{art_id}, "scroll_id", $json_post->{scroll_id});
 	handleDBError ($new_scroll_data_id, $error);
+}
+
+#TODO this subrouting needs to be written.
+sub newArtefact {
+	my $cgi = shift;
+	my $json_post = shift;
+	my $scroll_version_id =  $json_post->{version_id};
+	$cgi->dbh->set_scrollversion($scroll_version_id);
+	my $addArtToCombQuery = <<'MYSQL';
+INSERT IGNORE INTO artefact_owner (artefact_id, scroll_version_id)
+VALUES(?,?)
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($json_post->{art_id}, $scroll_version_id);
+	$sql->finish;
+
+	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $json_post->{art_id}, "scroll_id", $json_post->{scroll_id});
+	handleDBError ($new_scroll_data_id, $error);
+}
+
+sub getArtefactMask {
+	my $cgi = shift;
+	my $json_post = shift;
+	my $addArtToCombQuery = <<'MYSQL';
+SELECT ST_AsText(region_in_master_image) as poly
+	FROM artefact
+	WHERE artefact_id = ?
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($json_post->{artID});
+	readResults($sql);
+	return;
 }
 
 sub getScrollArtefacts {

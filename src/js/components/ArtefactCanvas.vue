@@ -44,10 +44,11 @@
 
 <script>
 import {trace} from '../utils/Potrace.js'
+import {clipCanvas} from '../utils/VectorFactory'
 
 export default {
   props: {
-    mask: {},
+    mask: "",
     width: 0,
     height: 0,
     divisor: 0,
@@ -107,7 +108,14 @@ export default {
         this.$emit('mask', res)
       })
     }
-  }
+  },
+  watch: {
+    mask (to, from) {
+      if (to && from !== to) {
+        clipCanvas(this.$refs.maskCanvas, this.mask, this.divisor)
+      }
+    }
+  },
 }
 </script>
 

@@ -1,25 +1,46 @@
+/*
+ * I think this may be misnamed, it seems that it
+ * processes well-known text and not geoJSON.
+ */
 export function geoJsonPolygonToSvg(geoJSON, boundingRect) {
-    let svg
-    if (geoJSON.substring(0, 9) === 'POLYGON((') {
-        svg = ''
-        const polygons = geoJSON.split("\),\(")
-        polygons.forEach(polygon => {
-            svg += 'M'
-            polygon = polygon.replace(/POLYGON/g, "")
-            polygon = polygon.replace(/\(/g, "")
-            polygon = polygon.replace(/\)/g, "")
-            var points = polygon.split(",")
-            points.forEach(point => {
-                if (svg.slice(-1) !== 'M'){
-                    svg += 'L'
-                }
-                svg += `${point.split(' ')[0] - boundingRect.x} ${point.split(' ')[1] - boundingRect.y}`
-            })
+  let svg
+  if (geoJSON.substring(0, 9) === 'POLYGON((') {
+    svg = ''
+    const polygons = geoJSON.split("\),\(")
+    polygons.forEach(polygon => {
+      svg += 'M'
+      polygon = polygon.replace(/POLYGON/g, "")
+      polygon = polygon.replace(/\(/g, "")
+      polygon = polygon.replace(/\)/g, "")
+      var points = polygon.split(",")
+
+      /* When a boundingBox is passed, then we translate every point
+       * based on the x and y position of that bounding box.  Otherwise,
+       * we just add each point to the string unaltered. */
+      if (boundingRect) {
+        points.forEach(point => {
+          if (svg.slice(-1) !== 'M'){
+            svg += 'L'
+          }
+          svg += `${point.split(' ')[0] - boundingRect.x} ${point.split(' ')[1] - boundingRect.y}`
         })
-    }
-    return svg
+      } else {
+        points.forEach(point => {
+          if (svg.slice(-1) !== 'M'){
+            svg += 'L'
+          }
+          svg += `${point.split(' ')[0]} ${point.split(' ')[1]}`
+        })
+      }
+    })
+  }
+  return svg
 }
 
+/*
+ * I think this may be misnamed, it seems that it
+ * processes well-known text and not geoJSON.
+ */
 export function geoJsonPointToSvg(geoJSON) {
     return geoJSON.substring(0, 6) === 'POINT(' 
         ? {
@@ -29,6 +50,10 @@ export function geoJsonPointToSvg(geoJSON) {
         : undefined
 }
 
+/*
+ * I think this may be misnamed, it seems that it
+ * processes well-known text and not geoJSON.
+ */
 export function geoJsonParseRect(geoJSON) {
     let svg
     if (geoJSON.substring(0, 9) === 'POLYGON((') {
@@ -118,6 +143,22 @@ export function matrix16To6(matrix) {
 //     return geoJson
 // }
 
-// export function clipCanvas(canvas) {
-//     return canvas
-// }
+export function clipCanvas(canvas, svgClipPath, divisor) {
+  divisor = divisor ? divisor : 1
+  let ctx = canvas.getContext('2d')
+  ctx.fillStyle = 'purple'
+  const polygons = svgClipPath.split('M').slice(1)
+  ctx.beginPath()
+  polygons.forEach(poly => {
+    const points = poly.split('L')
+    for (let i = 0, length = points.length; i < length; i++) {
+      if (i === 0) {
+        ctx.moveTo(points[i].split(' ')[0] / divisor, points[i].split(' ')[1] / divisor)
+      } else {
+        ctx.lineTo(points[i].split(' ')[0] / divisor, points[i].split(' ')[1] / divisor)
+      }
+    }
+    ctx.closePath()
+  })
+  ctx.fill()
+}

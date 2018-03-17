@@ -8,7 +8,7 @@ export default class SignStreamProcessor {
     }
 
     streamToTree(stream, prevKey, mainKey, nextKey) {
-      return new Promise(resolve=> {
+      return new Promise(resolve => {
         resolve(this._colToTree(stream, prevKey, mainKey, nextKey))
       })
     }

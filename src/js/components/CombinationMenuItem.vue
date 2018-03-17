@@ -72,7 +72,7 @@ export default {
   methods: {
     fetchChildren() {
       // we'll lazy load children, but cache them
-      if (this.children[this.menuType].length < 1) {
+      if (this.children[this.menuType] && this.children[this.menuType].length < 1) {
         this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: this.requestType[this.menuType],
         combID: this.scrollDataID,
