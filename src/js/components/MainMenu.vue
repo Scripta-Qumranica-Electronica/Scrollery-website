@@ -103,7 +103,7 @@
 .menu-body,
 .combination-menu {
   &::-webkit-scrollbar {
-    width: 0px;
+    width: 0;
     background: transparent;
   }
 }
@@ -152,8 +152,6 @@ export default {
     }
   },
   methods: {
-    onArtifactSelected(args) {
-    },
     loadCombinations() {
       if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
         this.combinations = []

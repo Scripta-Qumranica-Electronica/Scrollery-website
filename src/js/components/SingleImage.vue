@@ -18,7 +18,7 @@
                 </span>
               </el-col>
               <el-col :span="10">
-                <input
+                  <input
                   class="image-select-entry"
                   type="range"
                   min="0"
@@ -140,7 +140,7 @@ export default {
         if (res.status === 200 && res.data.results) {
           this.imageElements = res.data.results
           this.filenames = []
-          res.data.results.forEach((result, index) => {
+          res.data.results.forEach((result) => {
             if (result.is_master >>> 0) {
               result.visible = true
               this.masterImage = result
@@ -181,7 +181,7 @@ export default {
       this.$set(this.filenames[idx], 'visible', !this.filenames[idx].visible)
       this.$set(this.filenames, idx, this.filenames[idx])
     },
-    formatTooltip(val) {
+    formatTooltip() {
       return (this.zoom * 100).toFixed(2) + '%'
     },
     toggleDrawingMode() {
