@@ -7,6 +7,7 @@
     :style="{transform: `scale(${scale})`}">
     <canvas
       class="maskCanvas"
+      :class="{pulse: !drawing}"
       ref="maskCanvas"
       :width="width"
       :height="height"
@@ -124,6 +125,9 @@ export default {
     cursor: none;
   }
   .maskCanvas {
+      opacity: 0.3;
+  }
+  .maskCanvas.pulse {
     opacity: 0.3;
     animation: pulsate 3s ease-out;
     animation-iteration-count: infinite;

@@ -572,6 +572,8 @@ MYSQL
 }
 
 #TODO this subrouting needs to be written.
+# I should create an artefact, link an artefact_data,
+# then create the necessary owner tables by using the SQE API.
 sub newArtefact {
 	my $cgi = shift;
 	my $json_post = shift;
