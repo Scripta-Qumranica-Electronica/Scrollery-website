@@ -1,6 +1,5 @@
 const path = require('path')
 
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 module.exports = {
@@ -40,20 +39,18 @@ module.exports = {
       },
       {
         test: /\.css|\.scss/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: true
-              }
-            },
-            {
-              loader: 'sass-loader'
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              minimize: true
             }
-          ]
-        })
+          },
+          {
+            loader: 'sass-loader'
+          }
+        ]
       },
       {
         test: /\.(woff|woff2|eot|ttf)$/,
@@ -76,10 +73,6 @@ module.exports = {
   target: "web",
 
   plugins: [
-    new CleanWebpackPlugin(),
-    new ExtractTextPlugin({
-      filename: 'styles.css',
-      allChunks: true
-    })
+    new CleanWebpackPlugin()
   ],
 }

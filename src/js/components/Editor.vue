@@ -57,8 +57,7 @@ export default {
             this.$post('resources/cgi-bin/scrollery-cgi.pl', {
                 transaction: 'getSignStreamOfColumn',
                 SCROLL_VERSION: scrollVersionID,
-                colId: colID,
-                SESSION_ID: this.$store.getters.sessionID
+                colId: colID
             })
             .then(res => {
                 if (res.status === 200 && res.data) {
@@ -68,7 +67,7 @@ export default {
                         'sign_id',
                         'next_sign_id'
                     )
-                    .then( formattedNodes => {
+                    .then(formattedNodes => {
                         this.currentText = formattedNodes
                     })
                 }

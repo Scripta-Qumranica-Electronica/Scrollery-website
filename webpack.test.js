@@ -7,6 +7,7 @@ const common = require('./webpack.common.js')
 delete common.entry
 
 module.exports = merge(common, {
+  mode: 'development',
   devtool: 'inline-source-map',
   resolve: {
     alias: {

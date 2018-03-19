@@ -6,6 +6,7 @@ const webpack = require('webpack')
 const Notify = require('webpack-build-notifier')
 
 module.exports = merge(common, {
+  mode: 'development',
   entry: [common.entry, 'webpack-hot-middleware/client'],
   devtool: 'source-map',
   watch: true,
