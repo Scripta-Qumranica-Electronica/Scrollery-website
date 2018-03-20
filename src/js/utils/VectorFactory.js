@@ -68,6 +68,34 @@ export function geoJsonParseRect(geoJSON) {
     return svg
 }
 
+/*
+ * Receive an svg path and convert it to a
+ * WKT Polygon.
+ */
+export function svgPolygonToWKT(svg) {
+	let wkt = 'POLYGON('
+	const polygons = svg.split("M")
+	polygons.forEach(poly => {
+		if (poly) {
+			if (wkt === 'POLYGON(') {
+				wkt += '('
+			} else {
+				wkt += '),('
+			}
+			const lines = poly.replace(/L /g, '')
+			const points = lines.split(' ')
+			for (let i = 0, length = points.length - 3; i <= length; i += 2) {
+				wkt += points[i] + ' ' + points[i+1]
+				if (i !== length) {
+				    wkt += ','
+				}
+			}
+		}
+	})
+	wkt += '))'
+	return wkt
+}
+
 // This function expects the transform matrix to be in a 2D array:
 // [[a,c,tx],[b,d,ty]]
 export function dbMatrixToSVG(matrix) {

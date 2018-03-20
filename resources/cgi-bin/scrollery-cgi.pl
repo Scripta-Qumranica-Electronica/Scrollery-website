@@ -84,11 +84,11 @@ sub readResults {
 }
 
 sub handleDBError {
-	my ($info, $error) = @_;
+	my ($info, $error, $id) = @_;
 	if (defined $error) {
 		print '{"error": "';
 		foreach (@$error){
-			print $_ . ' ';
+			print $_ . ' ' . $id;
 		}
 		print '"}';
 	} else {
@@ -574,7 +574,6 @@ MYSQL
 	handleDBError ($new_scroll_data_id, $error);
 }
 
-#TODO this subrouting needs to be written.
 # I should create an artefact, link an artefact_data,
 # then create the necessary owner tables by using the SQE API.
 sub newArtefact {
@@ -582,17 +581,96 @@ sub newArtefact {
 	my $json_post = shift;
 	my $scroll_version_id =  $json_post->{version_id};
 	$cgi->dbh->set_scrollversion($scroll_version_id);
-	my $addArtToCombQuery = <<'MYSQL';
-INSERT IGNORE INTO artefact (sqe_image_id)
-VALUES(?)
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
-		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{art_id}, $scroll_version_id);
-	$sql->finish;
 
-	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $json_post->{art_id}, "scroll_id", $json_post->{scroll_id});
-	handleDBError ($new_scroll_data_id, $error);
+	# Get the sqe_image_id for our image
+	my $getSQEImageIdQuery = <<'MYSQL';
+SELECT sqe_image_id
+FROM SQE_image
+WHERE image_catalog_id = ?
+      AND is_master = 1
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getSQEImageIdQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($json_post->{image_id});
+	my $sqe_image_id = $sql->fetchrow_arrayref()->[0];
+
+	# Create new artefact
+	my $addArtToImageQuery = <<'MYSQL';
+INSERT INTO artefact (sqe_image_id, region_in_master_image)
+VALUES(?, ST_GEOMFROMTEXT(?))
+MYSQL
+	$sql = $cgi->dbh->prepare_cached($addArtToImageQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($sqe_image_id, $json_post->{region_in_master_image});
+	my $artefact_id = $sql->{mysql_insertid};
+
+	# create artefact owner table
+	my $addArtOwnerQuery = <<'MYSQL';
+INSERT INTO artefact_owner (artefact_id, scroll_version_id)
+VALUES(?, ?)
+MYSQL
+	$sql = $cgi->dbh->prepare_cached($addArtOwnerQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($artefact_id, $scroll_version_id);
+
+	# Run add value so that undo tracking system follows along
+#	my ($new_artefact_id, $art_error) = $cgi->dbh->add_value("artefact", $artefact_id, "sqe_image_id", $json_post->{sqe_image_id});
+#	if ($artefact_id ne $new_artefact_id) {
+#		handleDBError ($new_artefact_id, $art_error);
+#	}
+
+	# create artefact_data
+	my $addArtDataQuery = <<'MYSQL';
+INSERT INTO artefact_data (artefact_id, name)
+VALUES(?, ?)
+MYSQL
+	$sql = $cgi->dbh->prepare_cached($addArtDataQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($artefact_id, $json_post->{name});
+	my $artefact_data_id = $sql->{mysql_insertid};
+
+	#create artefact_data_owner table
+	my $addArtDataOwnerQuery = <<'MYSQL';
+INSERT INTO artefact_data_owner (artefact_data_id, scroll_version_id)
+VALUES(?, ?)
+MYSQL
+	$sql = $cgi->dbh->prepare_cached($addArtDataOwnerQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($artefact_data_id, $scroll_version_id);
+
+	# Run add value so that undo tracking system follows along
+#	my ($new_artefact_data_id, $art_data_error) = $cgi->dbh->add_value("artefact_data", $artefact_data_id, "name", $json_post->{name});
+#	if ($artefact_data_id ne $new_artefact_data_id) {
+#		handleDBError ($new_artefact_data_id, $art_data_error);
+#	}
+
+	# create artefact_position
+	my $addArtPositionQuery = <<'MYSQL';
+INSERT INTO artefact_position (artefact_id, scroll_id, transform_matrix)
+VALUES(?, ?, ?)
+MYSQL
+	$sql = $cgi->dbh->prepare_cached($addArtPositionQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($artefact_id, $json_post->{scroll_id}, '{"matrix": [[1,0,0],[0,1,0]]}');
+	my $artefact_position_id = $sql->{mysql_insertid};
+
+	#create artefact_data_owner table
+	my $addArtPositionOwnerQuery = <<'MYSQL';
+INSERT INTO artefact_position_owner (artefact_position_id, scroll_version_id)
+VALUES(?, ?)
+MYSQL
+	$sql = $cgi->dbh->prepare_cached($addArtPositionOwnerQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($artefact_position_id, $scroll_version_id);
+
+	# Run add value so that undo tracking system follows along
+#	my ($new_artefact_position_id, $art_pos_error) = $cgi->dbh->add_value("artefact_position", $artefact_position_id, "scroll_id", $json_post->{scroll_id});
+#	if ($artefact_position_id ne $new_artefact_position_id) {
+#		handleDBError ($new_artefact_position_id, $art_pos_error);
+#	} else {
+#		handleDBError ($artefact_id, $art_error);
+#	}
+	handleDBError ($artefact_id);
 }
 
 sub getArtefactMask {

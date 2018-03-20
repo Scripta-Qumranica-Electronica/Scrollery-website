@@ -104,7 +104,7 @@
 <script>
 import RoiCanvas from './RoiCanvas.vue'
 import ArtefactCanvas from './ArtefactCanvas.vue'
-import {geoJsonPolygonToSvg} from '../utils/VectorFactory'
+import {geoJsonPolygonToSvg, svgPolygonToWKT} from '../utils/VectorFactory'
 
 export default {
   components: {
@@ -167,9 +167,33 @@ export default {
     },
     setClipMask(mask) {
       this.clipMask = mask
+      // console.log('SVG path:' + mask)
+      // console.log('WKT path:' + svgPolygonToWKT(mask))
       if (this.artefact === 'new') {
       	console.log(mask)
         console.log(`New art name: ${this.artName}`)
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+          transaction: 'newArtefact',
+          image_id: this.$route.params.imageID,
+          region_in_master_image: svgPolygonToWKT(mask),
+          name: this.artName,
+          scroll_id: this.$route.params.scrollID,
+          version_id: this.$route.params.scrollVersionID,
+        })
+        .then(res => {
+            if (res.status === 200 && res.data.returned_info) {
+	            this.$router.push({
+                      name: 'workbenchAddress',
+                      params: {
+                          scrollID: this.$route.params.scrollID,
+                          scrollVersionID: this.$route.params.scrollVersionID,
+                          colID: this.$route.params.colID ? this.$route.params.colID : '~',
+                          imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
+                          artID: res.data.returned_info
+                      }
+                  })
+            }
+        })
       }
     // TODO function update artefact, perhaps create a new one if a name is passed
     },
@@ -199,7 +223,7 @@ export default {
       if (to.params.imageID !== '~') {
         // Load new artefact ID if there is one
         if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
-        	if (to.params.artID.includes('name')) {
+        	if (to.params.artID.toString().indexOf('name') !== -1) {
         		this.viewMode = 'ART'
                 this.artefact = 'new'
                 this.artName = to.params.artID.split('name-')[1]
