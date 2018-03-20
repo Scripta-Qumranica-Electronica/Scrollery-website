@@ -822,7 +822,7 @@ MYSQL
 	if ($pos_error) {
 		handleDBError ($new_art_data_id, $pos_error);
 	}
-	print '{"artefact_id": ' . $new_art_id . ', "artefact_data_id": ' . $new_art_data_id . ', "artefact_position_id": ' . $new_art_pos_id . '}';
+	print '{"artefact_id": ' . $new_art_id . ', "artefact_data_id": ' . $new_art_pos_id . ', "artefact_position_id": ' . $new_art_pos_id . '}';
 
 	return;
 }

@@ -150,7 +150,8 @@ export default {
             this.filenames.push(result)
           })
           this.masterImage = this.masterImage ? this.masterImage : res.data.results[0] // Is the ternary really necessary?
-          this.clipMask = this.clipMask ? this.clipMask : this.fullImageMask // this would catch edge cases, but may be unnecessary
+          this.clipMask = undefined
+          // this.clipMask = this.clipMask ? this.clipMask : this.fullImageMask // this would catch edge cases, but may be unnecessary
         }
       })
     },
@@ -181,38 +182,38 @@ export default {
         .then(res => {
             if (res.status === 200 && res.data.returned_info) {
 	            this.$router.push({
-                      name: 'workbenchAddress',
-                      params: {
-                          scrollID: this.$route.params.scrollID,
-                          scrollVersionID: this.$route.params.scrollVersionID,
-                          colID: this.$route.params.colID ? this.$route.params.colID : '~',
-                          imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-                          artID: res.data.returned_info
-                      }
-                  })
+                name: 'workbenchAddress',
+                params: {
+                  scrollID: this.$route.params.scrollID,
+                  scrollVersionID: this.$route.params.scrollVersionID,
+                  colID: this.$route.params.colID ? this.$route.params.colID : '~',
+                  imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
+                  artID: res.data.returned_info
+                }
+              })
             }
         })
       } else {
 	      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-		    transaction: 'changeArtefactPoly',
-		    region_in_master_image: svgPolygonToWKT(mask),
-            artefact_id: this.$route.params.artID,
-            version_id: this.$route.params.scrollVersionID,
+          transaction: 'changeArtefactPoly',
+          region_in_master_image: svgPolygonToWKT(mask),
+          artefact_id: this.$route.params.artID,
+          version_id: this.$route.params.scrollVersionID,
 	      })
-          .then(res => {
-              if (res.status === 200 && res.data.returned_info) {
-                  this.$router.push({
-                                        name: 'workbenchAddress',
-                                        params: {
-                                            scrollID: this.$route.params.scrollID,
-                                            scrollVersionID: this.$route.params.scrollVersionID,
-                                            colID: this.$route.params.colID ? this.$route.params.colID : '~',
-                                            imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-                                            artID: res.data.returned_info
-                                        }
-                                    })
+        .then(res => {
+          if (res.status === 200 && res.data.artefact_id) {
+            this.$router.push({
+              name: 'workbenchAddress',
+              params: {
+                scrollID: this.$route.params.scrollID,
+                scrollVersionID: this.$route.params.scrollVersionID,
+                colID: this.$route.params.colID ? this.$route.params.colID : '~',
+                imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
+                artID: res.data.artefact_id
               }
-          })
+            })
+          }
+        })
       }
     },
     toggleMask() {
@@ -242,13 +243,13 @@ export default {
         // Load new artefact ID if there is one
         if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
         	if (to.params.artID.toString().indexOf('name') !== -1) {
-        		this.viewMode = 'ART'
-                this.artefact = 'new'
-                this.artName = to.params.artID.split('name-')[1]
-            } else {
-                this.artefact = to.params.artID
-                this.getArtefactMask()
-            }
+            this.viewMode = 'ART'
+            this.artefact = 'new'
+            this.artName = to.params.artID.split('name-')[1]
+          } else {
+            this.artefact = to.params.artID
+            this.getArtefactMask()
+          }
         }
         // Fetch images for image ID if it has changed
         if (to.params.imageID !== from.params.imageID) {

@@ -165,12 +165,6 @@ export function matrix16To6(matrix) {
         undefined
 }
 
-// The following functions might be written later.
-// export function svgPolygonToGeoJson(svg) {
-//     let geoJson
-//     return geoJson
-// }
-
 export function clipCanvas(canvas, svgClipPath, divisor) {
   divisor = divisor ? divisor : 1
   let ctx = canvas.getContext('2d')
