@@ -45,19 +45,19 @@
           :format-tooltip="formatTooltip">
         </el-slider>
       </el-col>
-      <el-col v-show="artefact"  :span="5">
+      <el-col v-show="artefact && artefact !== 'new'"  :span="5">
         <el-radio-group v-model="viewMode" size="mini">
           <el-radio-button label="ROI">{{$i18n.str('ROI')}}</el-radio-button>
           <el-radio-button label="ART">{{$i18n.str('ART')}}</el-radio-button>
         </el-radio-group>
       </el-col>
-      <el-col v-show="artefact"  :span="3">
+      <el-col v-show="artefact || artefact === 'new'"  :span="3">
         <el-button @click="toggleMask" size="mini">Mask</el-button>
       </el-col>
       <el-col v-show="viewMode === 'ROI' && artefact" :span="3">
         <el-button @click="delSelectedRoi" size="mini">Del ROI</el-button>
       </el-col>
-      <el-col v-show="viewMode === 'ART' && artefact" :span="3">
+      <el-col v-show="viewMode === 'ART' && (artefact || artefact === 'new')" :span="3">
         <el-button
                 @click="toggleDrawingMode"
                 :type="drawingMode === 'draw' ? 'primary' : 'warning'"
@@ -65,7 +65,7 @@
           {{drawingMode === 'draw' ? 'Draw' : 'Erase'}}
         </el-button>
       </el-col>
-      <el-col v-show="viewMode === 'ART' && artefact" :span="3">
+      <el-col v-show="viewMode === 'ART' && (artefact || artefact === 'new')" :span="3">
         <el-slider
           v-model="brushCursorSize"
           :min="0"
@@ -119,6 +119,7 @@ export default {
       masterImage: {},
       imageShrink: 2,
       artefact: undefined,
+      artName: '',
       zoom: 0.5,
       scale: 0.2,
       selectedImage: undefined,
@@ -166,6 +167,11 @@ export default {
     },
     setClipMask(mask) {
       this.clipMask = mask
+      if (this.artefact === 'new') {
+      	console.log(mask)
+        console.log(`New art name: ${this.artName}`)
+      }
+    // TODO function update artefact, perhaps create a new one if a name is passed
     },
     toggleMask() {
       this.clippingOn = !this.clippingOn
@@ -193,8 +199,14 @@ export default {
       if (to.params.imageID !== '~') {
         // Load new artefact ID if there is one
         if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
-          this.artefact = to.params.artID
-          this.getArtefactMask()
+        	if (to.params.artID.includes('name')) {
+        		this.viewMode = 'ART'
+                this.artefact = 'new'
+                this.artName = to.params.artID.split('name-')[1]
+            } else {
+                this.artefact = to.params.artID
+                this.getArtefactMask()
+            }
         }
         // Fetch images for image ID if it has changed
         if (to.params.imageID !== from.params.imageID) {

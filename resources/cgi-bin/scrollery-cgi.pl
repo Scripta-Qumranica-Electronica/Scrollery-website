@@ -154,16 +154,19 @@ sub getArtOfImage {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $getArtOfImageQuery = <<'MYSQL';
-SELECT DISTINCT artefact.artefact_id
+SELECT DISTINCT artefact.artefact_id, artefact_data.name
 FROM artefact
-JOIN artefact_owner USING(artefact_id)
-JOIN SQE_image USING(sqe_image_id)
+	JOIN artefact_owner USING(artefact_id)
+	JOIN artefact_data USING(artefact_id)
+	JOIN artefact_data_owner USING(artefact_data_id)
+	JOIN SQE_image USING(sqe_image_id)
 WHERE SQE_image.image_catalog_id = ?
-AND artefact_owner.scroll_version_id = ?
+      AND artefact_owner.scroll_version_id = ?
+      AND artefact_data_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{image_id}, $json_post->{version_id});
+	$sql->execute($json_post->{image_id}, $json_post->{version_id}, $json_post->{version_id});
 	readResults($sql);
 	return;
 }
@@ -580,8 +583,8 @@ sub newArtefact {
 	my $scroll_version_id =  $json_post->{version_id};
 	$cgi->dbh->set_scrollversion($scroll_version_id);
 	my $addArtToCombQuery = <<'MYSQL';
-INSERT IGNORE INTO artefact_owner (artefact_id, scroll_version_id)
-VALUES(?,?)
+INSERT IGNORE INTO artefact (sqe_image_id)
+VALUES(?)
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;

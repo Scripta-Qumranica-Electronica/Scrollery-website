@@ -32,7 +32,6 @@
             <ul class="combination-menu" placeholder="Search for scroll">
               <li v-for="combination in filterCombinations" :key="combination.scroll_id + '-' + combination.version_id">
                   <combinaton-menu-item
-                  @artifact-selected="onArtifactSelected"
                   :count="combination.count"
                   :name="combination.name"
                   :scrollDataID="combination.scroll_data_id"

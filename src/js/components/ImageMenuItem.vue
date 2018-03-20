@@ -7,7 +7,7 @@
         <ul>
           <li @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New Artefact') }}</span></li>
           <li v-for="child in children">
-            <artefact-menu-item :data-id="child.artefact_id"></artefact-menu-item>
+            <artefact-menu-item :artefact="child.artefact_id" :name="child.name"></artefact-menu-item>
           </li>
         </ul>
     </div>
@@ -39,7 +39,6 @@ export default {
   methods: {
     fetchChildren() {
       this.children = []
-      // let children = []
       // we'll lazy load children, but cache them
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getArtOfImage',
@@ -80,6 +79,21 @@ export default {
 
       addArtefact() {
         //Add code to create new artefact with the CGI script
+        const name = (new Date).getTime()
+        this.children.unshift({
+          name: name,
+          artefact_id: undefined,
+        })
+        this.$router.push({
+            name: 'workbenchAddress',
+            params: {
+                scrollID: this.$route.params.scrollID,
+                scrollVersionID: this.$route.params.scrollVersionID,
+                colID: this.$route.params.colID ? this.$route.params.colID : '~',
+                imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
+                artID: `name-${name}`,
+            }
+        })
       }
   },
   watch: {
