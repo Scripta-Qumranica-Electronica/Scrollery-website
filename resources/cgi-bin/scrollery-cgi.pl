@@ -19,35 +19,36 @@ sub processCGI {
 	my $json_post = decode_json(''.$cgi->param('POSTDATA'));
 	my $transaction = $json_post->{transaction} || 'unspecified';
 	my %action = (
-		'validateSession' => \&validateSession,
-		'getCombs' => \&getCombs,
-		'getArtOfComb' => \&getArtOfComb,
-		'getArtOfImage' => \&getArtOfImage,
-		'getImgOfComb' => \&getImgOfComb,
-		'getColOfComb' => \&getColOfComb,
-		'getFragsOfCol' => \&getFragsOfCol,
-		'getColOfScrollID' => \&getColOfScrollID,
-		'getSignStreamOfColumn' => \&getSignStreamOfColumn,
-		'imagesOfFragment' => \&getImagesOfFragment,
-		'getIAAEdID' => \&getIAAEdID,
-		'canonicalCompositions' => \&getCanonicalCompositions,
-		'canonicalID1' => \&getCanonicalID1,
-		'canonicalID2' => \&getCanonicalID2,
+		'validateSession'                => \&validateSession,
+		'getCombs'                       => \&getCombs,
+		'getArtOfComb'                   => \&getArtOfComb,
+		'getArtOfImage'                  => \&getArtOfImage,
+		'getImgOfComb'                   => \&getImgOfComb,
+		'getColOfComb'                   => \&getColOfComb,
+		'getFragsOfCol'                  => \&getFragsOfCol,
+		'getColOfScrollID'               => \&getColOfScrollID,
+		'getSignStreamOfColumn'          => \&getSignStreamOfColumn,
+		'imagesOfFragment'               => \&getImagesOfFragment,
+		'getIAAEdID'                     => \&getIAAEdID,
+		'canonicalCompositions'          => \&getCanonicalCompositions,
+		'canonicalID1'                   => \&getCanonicalID1,
+		'canonicalID2'                   => \&getCanonicalID2,
 		'getScrollColNameFromDiscCanRef' => \&getScrollColNameFromDiscCanRef,
-		'institutions' => \&getInstitutions,
-		'institutionPlates' => \&getInstitutionPlates,
-		'institutionFragments' => \&getInstitutionFragments,
-		'imagesOfInstFragments' => \&imagesOfInstFragments,
-		'institutionArtefacts' => \&getInstitutionArtefacts,
-		'addArtToComb' => \&addArtToComb,
-		'newArtefact' => \&newArtefact,
-		'getArtefactMask' => \&getArtefactMask,
-		'getScrollArtefacts' => \&getScrollArtefacts,
-		'getScrollWidth' => \&getScrollWidth,
-		'getScrollHeight' => \&getScrollHeight,
-		'newCombination' => \&newCombination,
-		'copyCombination' => \&copyCombination,
-		'nameCombination' => \&nameCombination,
+		'institutions'                   => \&getInstitutions,
+		'institutionPlates'              => \&getInstitutionPlates,
+		'institutionFragments'           => \&getInstitutionFragments,
+		'imagesOfInstFragments'          => \&imagesOfInstFragments,
+		'institutionArtefacts'           => \&getInstitutionArtefacts,
+		'addArtToComb'                   => \&addArtToComb,
+		'newArtefact'                    => \&newArtefact,
+		'getArtefactMask'                => \&getArtefactMask,
+		'getScrollArtefacts'             => \&getScrollArtefacts,
+		'getScrollWidth'                 => \&getScrollWidth,
+		'getScrollHeight'                => \&getScrollHeight,
+		'newCombination'                 => \&newCombination,
+		'copyCombination'                => \&copyCombination,
+		'nameCombination'                => \&nameCombination,
+		'changeArtefactPoly'             => \&changeArtefactPoly,
 		'setArtPosition' => \&setArtPosition,
 		'setArtRotation' => \&setArtRotation,
 	);
@@ -84,11 +85,11 @@ sub readResults {
 }
 
 sub handleDBError {
-	my ($info, $error, $id) = @_;
+	my ($info, $error) = @_;
 	if (defined $error) {
 		print '{"error": "';
 		foreach (@$error){
-			print $_ . ' ' . $id;
+			print $_ . ' ';
 		}
 		print '"}';
 	} else {
@@ -782,6 +783,47 @@ sub nameCombination {
 	my $user_id = $cgi->dbh->user_id;
 	my ($new_scroll_data_id, $error) = $cgi->dbh->change_value("scroll_data", $scroll_data_id, "name", $scroll_name);
 	handleDBError ($new_scroll_data_id, $error);
+	return;
+}
+
+sub changeArtefactPoly {
+	my $cgi = shift;
+	my $json_post = shift;
+	$cgi->dbh->set_scrollversion($json_post->{version_id});
+	my ($new_art_id, $new_art_error) = $cgi->dbh->change_value("artefact", $json_post->{artefact_id}, "region_in_master_image", ['ST_GEOMFROMTEXT', $json_post->{region_in_master_image}]);
+	if ($new_art_error) {
+		handleDBError ($new_art_id, $new_art_error);
+	}
+
+	my $getArtDataQuery = <<'MYSQL';
+SELECT artefact_data_id
+FROM artefact_data
+WHERE artefact_id = ?
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getArtDataQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($json_post->{artefact_id});
+	my $artefact_data_id = $sql->fetchrow_arrayref()->[0];
+	my ($new_art_data_id, $data_error) = $cgi->dbh->change_value("artefact_data", $artefact_data_id, "artefact_id", $new_art_id);
+	if ($data_error) {
+		handleDBError ($new_art_data_id, $data_error);
+	}
+
+	my $getArtPosQuery = <<'MYSQL';
+SELECT artefact_position_id
+FROM artefact_position
+WHERE artefact_id = ?
+MYSQL
+	$sql = $cgi->dbh->prepare_cached($getArtPosQuery)
+		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($json_post->{artefact_id});
+	my $artefact_pos_id = $sql->fetchrow_arrayref()->[0];
+	my ($new_art_pos_id, $pos_error) = $cgi->dbh->change_value("artefact_position", $artefact_pos_id, "artefact_id", $new_art_id);
+	if ($pos_error) {
+		handleDBError ($new_art_data_id, $pos_error);
+	}
+	print '{"artefact_id": ' . $new_art_id . ', "artefact_data_id": ' . $new_art_data_id . ', "artefact_position_id": ' . $new_art_pos_id . '}';
+
 	return;
 }
 
