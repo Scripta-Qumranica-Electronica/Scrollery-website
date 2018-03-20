@@ -113,6 +113,7 @@ export default {
   watch: {
     mask (to, from) {
       if (to && from !== to) {
+
         clipCanvas(this.$refs.maskCanvas, this.mask, this.divisor)
       }
     }
