@@ -12,7 +12,7 @@
       :width="width"
       :height="height"
       @mousemove="trackMouse($event)"
-      @mouseenter="mouseOver = true"
+      @mouseenter="mouseOver = locked ? false : true"
       @mouseleave="mouseOver = false"
       @mousedown="processMouseDown"
       @mouseup="processMouseUp">
@@ -44,6 +44,13 @@
 </template>
 
 <script>
+/*
+ * The mask seems to dilate with every edit.
+ * Check for fix, perhaps something to do with
+ * potrace algorithm, or perhaps the vector path
+ * stroke makes the path a bit larger with every
+ * draw.
+ */
 import {trace} from '../utils/Potrace.js'
 import {clipCanvas} from '../utils/VectorFactory'
 
@@ -56,6 +63,7 @@ export default {
     scale: 0,
     drawMode: '',
     brushSize: 0,
+    locked: true,
   },
   data() {
     return {
@@ -83,17 +91,19 @@ export default {
       this.canvasToSVG()
     },
     drawOnCanvas() {
-      const ctx = this.$refs.maskCanvas.getContext('2d')
-      ctx.beginPath()
-      ctx.arc(this.cursorPos.x / this.scale, this.cursorPos.y / this.scale, this.brushSize / 2 / this.scale, 0, 2 * Math.PI)
-      ctx.closePath()
-      if(this.drawMode === 'erase'){
-        ctx.globalCompositeOperation='destination-out'
-        ctx.fill()
-      } else {
-        ctx.globalCompositeOperation='source-over'
-        ctx.fillStyle = 'purple'
-        ctx.fill()
+      if (!this.locked) {
+        const ctx = this.$refs.maskCanvas.getContext('2d')
+        ctx.beginPath()
+        ctx.arc(this.cursorPos.x / this.scale, this.cursorPos.y / this.scale, this.brushSize / 2 / this.scale, 0, 2 * Math.PI)
+        ctx.closePath()
+        if(this.drawMode === 'erase'){
+          ctx.globalCompositeOperation='destination-out'
+          ctx.fill()
+        } else {
+          ctx.globalCompositeOperation='source-over'
+          ctx.fillStyle = 'purple'
+          ctx.fill()
+        }
       }
     },
     mousePositionInElement(event, element) {

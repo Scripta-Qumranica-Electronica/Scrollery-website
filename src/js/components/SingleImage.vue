@@ -94,6 +94,7 @@
                         :brush-size="brushCursorSize"
                         :divisor="imageShrink"
                         :mask = "firstClipMask"
+                        :locked="lock"
                         v-on:mask="setClipMask"
                         ref="currentArtCanvas">
       </artefact-canvas>
@@ -129,6 +130,7 @@ export default {
       clipMask: '',
       firstClipMask: '',
       clippingOn: false,
+      lock: true,
     }
   },
   methods: {
@@ -150,8 +152,8 @@ export default {
             this.filenames.push(result)
           })
           this.masterImage = this.masterImage ? this.masterImage : res.data.results[0] // Is the ternary really necessary?
-          this.clipMask = undefined
-          // this.clipMask = this.clipMask ? this.clipMask : this.fullImageMask // this would catch edge cases, but may be unnecessary
+          // this.clipMask = undefined
+          this.clipMask = this.clipMask ? this.clipMask : this.fullImageMask // this would catch edge cases, but may be unnecessary
         }
       })
     },
@@ -167,9 +169,8 @@ export default {
       })
     },
     setClipMask(mask) {
+      this.lock = true
       this.clipMask = mask
-      // console.log('SVG path:' + mask)
-      // console.log('WKT path:' + svgPolygonToWKT(mask))
       if (this.artefact === 'new') {
         this.$post('resources/cgi-bin/scrollery-cgi.pl', {
           transaction: 'newArtefact',
@@ -191,6 +192,7 @@ export default {
                   artID: res.data.returned_info
                 }
               })
+              this.lock = false
             }
         })
       } else {
@@ -212,6 +214,7 @@ export default {
                 artID: res.data.artefact_id
               }
             })
+            this.lock = false
           }
         })
       }
@@ -250,6 +253,7 @@ export default {
             this.artefact = to.params.artID
             this.getArtefactMask()
           }
+          this.lock = false
         }
         // Fetch images for image ID if it has changed
         if (to.params.imageID !== from.params.imageID) {
