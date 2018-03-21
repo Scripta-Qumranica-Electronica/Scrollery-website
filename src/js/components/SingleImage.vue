@@ -105,7 +105,7 @@
 <script>
 import RoiCanvas from './RoiCanvas.vue'
 import ArtefactCanvas from './ArtefactCanvas.vue'
-import {geoJsonPolygonToSvg, svgPolygonToWKT} from '../utils/VectorFactory'
+import {wktPolygonToSvg, svgPolygonToWKT} from '../utils/VectorFactory'
 
 export default {
   components: {
@@ -164,7 +164,7 @@ export default {
       })
       .then(res => {
         if (res.status === 200 && res.data.results[0]) {
-          this.firstClipMask = this.clipMask = geoJsonPolygonToSvg(res.data.results[0].poly)
+          this.firstClipMask = this.clipMask = wktPolygonToSvg(res.data.results[0].poly)
         }
       })
     },

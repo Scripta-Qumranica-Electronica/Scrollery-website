@@ -1,7 +1,7 @@
 import {
-  geoJsonPolygonToSvg,
-  geoJsonPointToSvg,
-  geoJsonParseRect,
+  wktPolygonToSvg,
+  wktPointToSvg,
+  wktParseRect,
   // svgPolygonToGeoJson,
   // clipCanvas,
   dbMatrixToSVG,
@@ -10,9 +10,9 @@ import {
   matrix16To6,
 } from '~/utils/VectorFactory.js'
 
-describe("VectorFactory.geoJsonPolygonToSvg", () => {
+describe("VectorFactory.wktPolygonToSvg", () => {
   it('should return undefined when unrecognized input passed', () => {
-    expect(geoJsonPolygonToSvg('INCORRECT')).to.equal(undefined)
+    expect(wktPolygonToSvg('INCORRECT')).to.equal(undefined)
   })
 
   it('should convert a GeoJSON Polygon to a valid svg path String', () => {
@@ -40,14 +40,14 @@ describe("VectorFactory.geoJsonPolygonToSvg", () => {
     const expectedSvgPolygon = `M${point1.x} ${point1.y}L${point2.x} ${point2.y}L${point3.x} ${point3.y}L${point1.x} ${point1.y}`
 
     // assert expected value
-    expect(geoJsonPolygonToSvg(geoJsonPolygon, boundingRect)).to.equal(expectedSvgPolygon)
+    expect(wktPolygonToSvg(geoJsonPolygon, boundingRect)).to.equal(expectedSvgPolygon)
   })
 })
 
 
-describe('VectorFactory.geoJsonPointToSvg', () => {
+describe('VectorFactory.wktPointToSvg', () => {
   it('should return undefined when unrecognized input passed', () => {
-    expect(geoJsonPointToSvg('INCORRECT')).to.equal(undefined)
+    expect(wktPointToSvg('INCORRECT')).to.equal(undefined)
   })
 
   it('should should convert a GeoJSON point to a point object', () => {
@@ -61,14 +61,14 @@ describe('VectorFactory.geoJsonPointToSvg', () => {
     }
 
     // assert expected value
-    expect(geoJsonPointToSvg(geoJsonPoint)).to.deep.equal(pointObject)
+    expect(wktPointToSvg(geoJsonPoint)).to.deep.equal(pointObject)
   })
 })
 
-describe('VectorFactory.geoJsonParseRect', () => {
+describe('VectorFactory.wktParseRect', () => {
 
   it('should return undefined when unrecognized input passed', () => {
-    expect(geoJsonParseRect('INCORRECT')).to.equal(undefined)
+    expect(wktParseRect('INCORRECT')).to.equal(undefined)
   })
 
   it('should convert a POLYGON string to a JSON rect', () => {
@@ -86,7 +86,7 @@ describe('VectorFactory.geoJsonParseRect', () => {
     }
 
     // assert expected value
-    expect(geoJsonParseRect(polygon)).to.deep.equal(expectedResult)
+    expect(wktParseRect(polygon)).to.deep.equal(expectedResult)
   })
 
 })
@@ -122,7 +122,7 @@ describe('VectorFactory.svgMatrixToDB', () => {
     const svgMatrix = [1,2,3,4,5,6]
 
     //define expected result
-    const dbMatrix = '{\\"matrix\\": [[1,3,5],[2,4,6]]}'
+    const dbMatrix = '{"matrix": [[1,3,5],[2,4,6]]}'
 
     // assert expected value
     expect(svgMatrixToDB(svgMatrix)).to.equal(dbMatrix)

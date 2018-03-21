@@ -1,8 +1,8 @@
 /*
- * I think this may be misnamed, it seems that it
- * processes well-known text and not geoJSON.
+ * This function transforms a well-known-text
+ * polygon into an SVG path.
  */
-export function geoJsonPolygonToSvg(geoJSON, boundingRect) {
+export function wktPolygonToSvg(geoJSON, boundingRect) {
   let svg
   if (geoJSON.substring(0, 9) === 'POLYGON((') {
     svg = ''
@@ -14,9 +14,13 @@ export function geoJsonPolygonToSvg(geoJSON, boundingRect) {
       polygon = polygon.replace(/\)/g, "")
       var points = polygon.split(",")
 
-      /* When a boundingBox is passed, then we translate every point
-       * based on the x and y position of that bounding box.  Otherwise,
-       * we just add each point to the string unaltered. */
+      /* 
+       * When a boundingBox is passed, then we 
+       * translate every point based on the x 
+       * and y position of that bounding box.
+       * Otherwise, we just add each point to 
+       * the string unaltered. 
+       */
       if (boundingRect) {
         points.forEach(point => {
           if (svg.slice(-1) !== 'M'){
@@ -38,10 +42,10 @@ export function geoJsonPolygonToSvg(geoJSON, boundingRect) {
 }
 
 /*
- * I think this may be misnamed, it seems that it
- * processes well-known text and not geoJSON.
+ * This function transforms a well-known-text
+ * point into an SVG path.
  */
-export function geoJsonPointToSvg(geoJSON) {
+export function wktPointToSvg(geoJSON) {
     return geoJSON.substring(0, 6) === 'POINT(' 
         ? {
             x: parseFloat(geoJSON.split(' ')[0].replace('POINT(', '')),
@@ -51,10 +55,12 @@ export function geoJsonPointToSvg(geoJSON) {
 }
 
 /*
- * I think this may be misnamed, it seems that it
- * processes well-known text and not geoJSON.
+ * This function receives a well-known-text
+ * representation of a rectangle and parses
+ * that to a JSON object with an x-origin,
+ * y-origin, width, and hieght.
  */
-export function geoJsonParseRect(geoJSON) {
+export function wktParseRect(geoJSON) {
     let svg
     if (geoJSON.substring(0, 9) === 'POLYGON((') {
         const rect = geoJSON.replace('POLYGON((', '')
@@ -69,8 +75,8 @@ export function geoJsonParseRect(geoJSON) {
 }
 
 /*
- * Receive an svg path and convert it to a
- * WKT Polygon.
+ * This function receives an SVG path and 
+ * converts it to a WKT Polygon.
  */
 export function svgPolygonToWKT(svg) {
 	let wkt = 'POLYGON('
@@ -96,8 +102,12 @@ export function svgPolygonToWKT(svg) {
 	return wkt
 }
 
-// This function expects the transform matrix to be in a 2D array:
-// [[a,c,tx],[b,d,ty]]
+/* 
+ * This function expects the transform matrix 
+ * to be in a 2D array: [[a,c,tx],[b,d,ty]].
+ * It returns a transform matrix which can be
+ * used in an SVG element.
+ */
 export function dbMatrixToSVG(matrix) {
     return matrix.length === 2 &&
     matrix[0].length === 3 &&
@@ -115,8 +125,11 @@ export function dbMatrixToSVG(matrix) {
         undefined
 }
 
-// This function converts the 6 element SVG transform matrix 
-// to a JSON string for the 2D as stored in the database
+/* 
+ * This function converts the 6 element SVG 
+ * transform matrix to a JSON string for the 
+ * 2D transform matrix as stored in the database.
+ */
 export function svgMatrixToDB(matrix) {
     return Array.isArray(matrix) && matrix.length === 6
     ?
@@ -125,6 +138,11 @@ export function svgMatrixToDB(matrix) {
         undefined
 }
 
+/* 
+ * This function converts the 16 element 3D 
+ * SVG transform matrix to a 6 element 2D SVG 
+ * transform matrix.
+ */
 export function matrix6To16(matrix) {
     return Array.isArray(matrix) && matrix.length === 6
     ?
@@ -150,6 +168,11 @@ export function matrix6To16(matrix) {
         undefined
 }
 
+/* 
+ * This function converts the 6 element 2D 
+ * SVG transform matrix to a 16 element 3D SVG 
+ * transform matrix.
+ */
 export function matrix16To6(matrix) {
     return Array.isArray(matrix) && matrix.length === 16
     ?
@@ -165,6 +188,12 @@ export function matrix16To6(matrix) {
         undefined
 }
 
+/*
+ * This function receives an HTML5 canvas
+ * along with a svg path for the clipping 
+ * mask and a divisor for the canvas scaling.
+ * It then draws the svg path onto the canvas.
+ */
 export function clipCanvas(canvas, svgClipPath, divisor) {
   divisor = divisor ? divisor : 1
   let ctx = canvas.getContext('2d')

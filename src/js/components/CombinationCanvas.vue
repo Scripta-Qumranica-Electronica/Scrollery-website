@@ -17,9 +17,9 @@
 
 <script>
 import {
-    geoJsonPolygonToSvg, 
-    geoJsonPointToSvg, 
-    geoJsonParseRect, 
+    wktPolygonToSvg, 
+    wktPointToSvg, 
+    wktParseRect, 
     dbMatrixToSVG, 
     svgMatrixToDB
 } from '../utils/VectorFactory'
@@ -103,8 +103,8 @@ export default {
             if (res.status === 200 && res.data.results) {
                 this.artefacts = res.data.results
                 this.artefacts.forEach(artefact => {
-                    artefact.rect = geoJsonParseRect(artefact.rect)
-                    artefact.poly = geoJsonPolygonToSvg(artefact.poly, artefact.rect)
+                    artefact.rect = wktParseRect(artefact.rect)
+                    artefact.poly = wktPolygonToSvg(artefact.poly, artefact.rect)
                     artefact.matrix = dbMatrixToSVG(JSON.parse(artefact.matrix).matrix)
                 })
             }
