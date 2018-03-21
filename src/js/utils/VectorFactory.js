@@ -1,6 +1,10 @@
 /*
  * This function transforms a well-known-text
- * polygon into an SVG path.
+ * polygon into an SVG path.  When a boundingBox 
+ * is passed, then we translate every point based 
+ * on the x and y position of that bounding box.  
+ * Otherwise, we just add each point to the string 
+ * unaltered. 
  */
 export function wktPolygonToSvg(geoJSON, boundingRect) {
   let svg
@@ -14,13 +18,6 @@ export function wktPolygonToSvg(geoJSON, boundingRect) {
       polygon = polygon.replace(/\)/g, "")
       var points = polygon.split(",")
 
-      /* 
-       * When a boundingBox is passed, then we 
-       * translate every point based on the x 
-       * and y position of that bounding box.
-       * Otherwise, we just add each point to 
-       * the string unaltered. 
-       */
       if (boundingRect) {
         points.forEach(point => {
           if (svg.slice(-1) !== 'M'){
@@ -79,26 +76,29 @@ export function wktParseRect(geoJSON) {
  * converts it to a WKT Polygon.
  */
 export function svgPolygonToWKT(svg) {
-	let wkt = 'POLYGON('
-	const polygons = svg.split("M")
-	polygons.forEach(poly => {
-		if (poly) {
-			if (wkt === 'POLYGON(') {
-				wkt += '('
-			} else {
-				wkt += '),('
-			}
-			const lines = poly.replace(/L /g, '')
-			const points = lines.split(' ')
-			for (let i = 0, length = points.length - 3; i <= length; i += 2) {
-				wkt += points[i] + ' ' + points[i+1]
-				if (i !== length) {
-				    wkt += ','
-				}
-			}
-		}
-	})
-	wkt += '))'
+    let wkt = undefined
+    if (svg.startsWith("M")) {
+        wkt = 'POLYGON('
+        const polygons = svg.split("M")
+        polygons.forEach(poly => {
+            if (poly) {
+                if (wkt === 'POLYGON(') {
+                    wkt += '('
+                } else {
+                    wkt += '),('
+                }
+                const lines = poly.replace(/L /g, '')
+                const points = lines.split(' ')
+                for (let i = 0, length = points.length - 3; i <= length; i += 2) {
+                    wkt += points[i] + ' ' + points[i+1]
+                    if (i !== length) {
+                        wkt += ','
+                    }
+                }
+            }
+        })
+        wkt += '))'
+    }
 	return wkt
 }
 

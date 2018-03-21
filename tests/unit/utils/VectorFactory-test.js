@@ -2,7 +2,7 @@ import {
   wktPolygonToSvg,
   wktPointToSvg,
   wktParseRect,
-  // svgPolygonToGeoJson,
+  svgPolygonToWKT,
   // clipCanvas,
   dbMatrixToSVG,
   svgMatrixToDB,
@@ -87,6 +87,37 @@ describe('VectorFactory.wktParseRect', () => {
 
     // assert expected value
     expect(wktParseRect(polygon)).to.deep.equal(expectedResult)
+  })
+
+})
+
+describe('VectorFactory.svgPolygonToWKT', () => {
+
+  it('should return undefined when unrecognized input passed', () => {
+    expect(svgPolygonToWKT('INCORRECT')).to.equal(undefined)
+  })
+
+  it('should convert an SVG path to a WKT string', () => {
+
+    // Setup the input and result
+    let svg = 'M'
+    let wkt = 'POLYGON(('
+    for (let i = 0; i < 20; i++) {
+      svg += `${i} ${i * 10}`
+      wkt += `${i} ${i * 10}`
+      if (i % 2 === 0) {
+        svg += ' L '
+      } else {
+        svg += ' '
+      }
+      if (i !== 19) {
+        wkt += ','
+      }
+    }
+    wkt += '))'
+
+    // assert expected value
+    expect(svgPolygonToWKT(svg)).to.equal(wkt)
   })
 
 })
