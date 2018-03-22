@@ -1,12 +1,13 @@
 <template>
-  <span class="clickable-menu-item" @click="setRouter">Artefact: {{dataId}}</span>
+  <span class="clickable-menu-item" @click="setRouter">Artefact: {{name}}</span>
 </template>
 
 <script>
 
 export default {
   props: {
-    dataId: Number,
+    artefact: undefined,
+    name: "",
   },
   methods: {
     setRouter() {
@@ -17,7 +18,7 @@ export default {
           scrollVersionID: this.$route.params.scrollVersionID,
           colID: this.$route.params.colID ? this.$route.params.colID : '~',
           imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-          artID: this.dataId
+          artID: this.artefact
         }
       })
     },

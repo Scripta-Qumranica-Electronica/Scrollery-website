@@ -13,8 +13,8 @@
             + ',' + artefactData.rect.width + ',' + artefactData.rect.height 
             + '/pct:10' + '' + '/0/' 
             + artefactData.suffix"
-            :width="artefactData.rect.width"
-            :height="artefactData.rect.height"
+            :width="artefactData.rect.width ? artefactData.rect.width : 0"
+            :height="artefactData.rect.height ? artefactData.rect.height : 0"
             :data-index="index"/>
     </g>
 </template>

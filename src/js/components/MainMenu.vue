@@ -32,16 +32,15 @@
             <ul class="combination-menu" placeholder="Search for scroll">
               <li v-for="combination in filterCombinations" :key="combination.scroll_id + '-' + combination.version_id">
                   <combinaton-menu-item
-                  @artifact-selected="onArtifactSelected"
                   :count="combination.count"
                   :name="combination.name"
                   :scrollDataID="combination.scroll_data_id"
                   :scrollID="combination.scroll_id"
                   :version="combination.version"
                   :versionID="combination.version_id"
-                  :user="combination.user_id"
+                  :user="combination.user_id >>> 0 /* We have to cast this to int. */"
                   :menu-type="menuDisplay"
-                  :locked="combination.locked"
+                  :locked="combination.locked >>> 0 /* We have to cast this to int. */"
                   />
               </li>
             </ul>
@@ -103,7 +102,7 @@
 .menu-body,
 .combination-menu {
   &::-webkit-scrollbar {
-    width: 0px;
+    width: 0;
     background: transparent;
   }
 }
@@ -152,8 +151,6 @@ export default {
     }
   },
   methods: {
-    onArtifactSelected(args) {
-    },
     loadCombinations() {
       if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
         this.combinations = []

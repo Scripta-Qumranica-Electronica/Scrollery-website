@@ -5,49 +5,32 @@ const conf = require('./webpack.server.js')
 const compiler = webpack(conf)
 const express = require('express')
 const app = express()
-const formidable = require('formidable')
+const bodyParser = require('body-parser')
+app.use(bodyParser.text({type: '*/*'}))
 
 const { exec } = require('child_process')
 
 const perl = (req, res) => {
 
   const sendErr = msg => res.status(500).send(msg || "Request Failed")
-  
-  var form = new formidable.IncomingForm();
-  form.parse(req, (err, fields, files) => {
-
+  const file = resolve.apply(null, [__dirname].concat(req.url.split("/")))
+  exec(`carton exec ${file} 'POSTDATA=${req.body}'`, {cwd: file.substring(0, file.lastIndexOf("/")), maxBuffer: Infinity}, (err, stdout, stderr) => {
     try {
       if (err) {
         console.error(err)
-        return sendErr()
+        sendErr(err.message)
+      } else if (stderr) {
+        console.error(stderr)
+        sendErr(stderr)
+      } else if (stdout) {
+        const payload = stdout.replace(/^[^\{]*/g, "")
+        payload
+          ? res.json(JSON.parse(payload))
+          : res.status(200).send("OK")
+      } else {
+        res.status(400).send("Request Failed")
       }
-      
-      const file = resolve.apply(null, [__dirname].concat(req.url.split("/")))
-      var bodyStr = Object.keys(fields).reduce((acc, key) => {
-        return acc + `${acc.length ? "&" : ""}${key}=${fields[key]}`
-      }, "")
-      exec(`carton exec ${file} "${bodyStr}"`, {cwd: file.substring(0, file.lastIndexOf("/")), maxBuffer: Infinity}, (err, stdout, stderr) => {
-        try {
-          if (err) {
-            console.error(err)
-            sendErr(err.message)
-          } else if (stderr) {
-            console.error(stderr)
-            sendErr(stderr)
-          } else if (stdout) {
-            const payload = stdout.replace(/^[^\{]*/g, "")
-            payload
-              ? res.json(JSON.parse(payload))
-              : res.status(200).send("OK")
-          } else {
-            res.status(400).send("Request Failed")
-          }
-        } catch (err) {
-          sendErr("Request Failed")
-        }
-      })
     } catch (err) {
-      console.error(err)
       sendErr("Request Failed")
     }
   })

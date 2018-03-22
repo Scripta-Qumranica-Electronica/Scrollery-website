@@ -14,5 +14,6 @@ module.exports = {
   "Errors.ServiceUnavailable": "Unable to connect to the server. Please retry another time.",
 
   // Menu
-  "Menu.Bars.Tooltip": "Click to keep menu open"
+  "Menu.Bars.Tooltip": "Click to keep menu open",
+  "New Artefact": "New Artefact",
 };

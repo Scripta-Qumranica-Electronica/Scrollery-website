@@ -1,26 +1,48 @@
-export function geoJsonPolygonToSvg(geoJSON, boundingRect) {
-    let svg
-    if (geoJSON.substring(0, 9) === 'POLYGON((') {
-        svg = ''
-        const polygons = geoJSON.split("\),\(")
-        polygons.forEach(polygon => {
-            svg += 'M'
-            polygon = polygon.replace(/POLYGON/g, "")
-            polygon = polygon.replace(/\(/g, "")
-            polygon = polygon.replace(/\)/g, "")
-            var points = polygon.split(",")
-            points.forEach(point => {
-                if (svg.slice(-1) !== 'M'){
-                    svg += 'L'
-                }
-                svg += `${point.split(' ')[0] - boundingRect.x} ${point.split(' ')[1] - boundingRect.y}`
-            })
+/*
+ * This function transforms a well-known-text
+ * polygon into an SVG path.  When a boundingBox 
+ * is passed, then we translate every point based 
+ * on the x and y position of that bounding box.  
+ * Otherwise, we just add each point to the string 
+ * unaltered. 
+ */
+export function wktPolygonToSvg(geoJSON, boundingRect) {
+  let svg
+  if (geoJSON.substring(0, 9) === 'POLYGON((') {
+    svg = ''
+    const polygons = geoJSON.split("\),\(")
+    polygons.forEach(polygon => {
+      svg += 'M'
+      polygon = polygon.replace(/POLYGON/g, "")
+      polygon = polygon.replace(/\(/g, "")
+      polygon = polygon.replace(/\)/g, "")
+      var points = polygon.split(",")
+
+      if (boundingRect) {
+        points.forEach(point => {
+          if (svg.slice(-1) !== 'M'){
+            svg += 'L'
+          }
+          svg += `${point.split(' ')[0] - boundingRect.x} ${point.split(' ')[1] - boundingRect.y}`
         })
-    }
-    return svg
+      } else {
+        points.forEach(point => {
+          if (svg.slice(-1) !== 'M'){
+            svg += 'L'
+          }
+          svg += `${point.split(' ')[0]} ${point.split(' ')[1]}`
+        })
+      }
+    })
+  }
+  return svg
 }
 
-export function geoJsonPointToSvg(geoJSON) {
+/*
+ * This function transforms a well-known-text
+ * point into an SVG path.
+ */
+export function wktPointToSvg(geoJSON) {
     return geoJSON.substring(0, 6) === 'POINT(' 
         ? {
             x: parseFloat(geoJSON.split(' ')[0].replace('POINT(', '')),
@@ -29,7 +51,13 @@ export function geoJsonPointToSvg(geoJSON) {
         : undefined
 }
 
-export function geoJsonParseRect(geoJSON) {
+/*
+ * This function receives a well-known-text
+ * representation of a rectangle and parses
+ * that to a JSON object with an x-origin,
+ * y-origin, width, and hieght.
+ */
+export function wktParseRect(geoJSON) {
     let svg
     if (geoJSON.substring(0, 9) === 'POLYGON((') {
         const rect = geoJSON.replace('POLYGON((', '')
@@ -43,8 +71,43 @@ export function geoJsonParseRect(geoJSON) {
     return svg
 }
 
-// This function expects the transform matrix to be in a 2D array:
-// [[a,c,tx],[b,d,ty]]
+/*
+ * This function receives an SVG path and 
+ * converts it to a WKT Polygon.
+ */
+export function svgPolygonToWKT(svg) {
+    let wkt = undefined
+    if (svg.startsWith("M")) {
+        wkt = 'POLYGON('
+        const polygons = svg.split("M")
+        polygons.forEach(poly => {
+            if (poly) {
+                if (wkt === 'POLYGON(') {
+                    wkt += '('
+                } else {
+                    wkt += '),('
+                }
+                const lines = poly.replace(/L /g, '')
+                const points = lines.split(' ')
+                for (let i = 0, length = points.length - 3; i <= length; i += 2) {
+                    wkt += points[i] + ' ' + points[i+1]
+                    if (i !== length) {
+                        wkt += ','
+                    }
+                }
+            }
+        })
+        wkt += '))'
+    }
+	return wkt
+}
+
+/* 
+ * This function expects the transform matrix 
+ * to be in a 2D array: [[a,c,tx],[b,d,ty]].
+ * It returns a transform matrix which can be
+ * used in an SVG element.
+ */
 export function dbMatrixToSVG(matrix) {
     return matrix.length === 2 &&
     matrix[0].length === 3 &&
@@ -62,16 +125,24 @@ export function dbMatrixToSVG(matrix) {
         undefined
 }
 
-// This function converts the 16 element SVG transform matrix 
-// to a JSON string for the 2D as stored in the database
+/* 
+ * This function converts the 6 element SVG 
+ * transform matrix to a JSON string for the 
+ * 2D transform matrix as stored in the database.
+ */
 export function svgMatrixToDB(matrix) {
-    return Array.isArray(matrix) && matrix.length === 16
+    return Array.isArray(matrix) && matrix.length === 6
     ?
-        `{\\"matrix\\": [[${matrix[0]},${matrix[2]},${matrix[12]}],[${matrix[1]},${matrix[3]},${matrix[13]}]]}`
+        `{"matrix": [[${matrix[0]},${matrix[2]},${matrix[4]}],[${matrix[1]},${matrix[3]},${matrix[5]}]]}`
     :
         undefined
 }
 
+/* 
+ * This function converts the 16 element 3D 
+ * SVG transform matrix to a 6 element 2D SVG 
+ * transform matrix.
+ */
 export function matrix6To16(matrix) {
     return Array.isArray(matrix) && matrix.length === 6
     ?
@@ -97,6 +168,11 @@ export function matrix6To16(matrix) {
         undefined
 }
 
+/* 
+ * This function converts the 6 element 2D 
+ * SVG transform matrix to a 16 element 3D SVG 
+ * transform matrix.
+ */
 export function matrix16To6(matrix) {
     return Array.isArray(matrix) && matrix.length === 16
     ?
@@ -112,12 +188,30 @@ export function matrix16To6(matrix) {
         undefined
 }
 
-// The following functions might be written later.
-// export function svgPolygonToGeoJson(svg) {
-//     let geoJson
-//     return geoJson
-// }
-
-// export function clipCanvas(canvas) {
-//     return canvas
-// }
+/*
+ * This function receives an HTML5 canvas
+ * along with a svg path for the clipping 
+ * mask and a divisor for the canvas scaling.
+ * It then draws the svg path onto the canvas.
+ */
+export function clipCanvas(canvas, svgClipPath, divisor) {
+  divisor = divisor ? divisor : 1
+  let ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.globalCompositeOperation='source-over'
+  ctx.fillStyle = 'purple'
+  const polygons = svgClipPath.split('M').slice(1)
+  ctx.beginPath()
+  polygons.forEach(poly => {
+    const points = poly.split('L')
+    for (let i = 0, length = points.length; i < length; i++) {
+      if (i === 0) {
+        ctx.moveTo(points[i].split(' ')[0] / divisor, points[i].split(' ')[1] / divisor)
+      } else {
+        ctx.lineTo(points[i].split(' ')[0] / divisor, points[i].split(' ')[1] / divisor)
+      }
+    }
+    ctx.closePath()
+  })
+  ctx.fill()
+}

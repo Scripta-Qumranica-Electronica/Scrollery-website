@@ -1,18 +1,18 @@
 import {
-  geoJsonPolygonToSvg,
-  geoJsonPointToSvg,
-  geoJsonParseRect,
-  // svgPolygonToGeoJson,
-  // clipCanvas,
+  wktPolygonToSvg,
+  wktPointToSvg,
+  wktParseRect,
+  svgPolygonToWKT,
   dbMatrixToSVG,
   svgMatrixToDB,
   matrix6To16,
   matrix16To6,
+  clipCanvas,
 } from '~/utils/VectorFactory.js'
 
-describe("VectorFactory.geoJsonPolygonToSvg", () => {
+describe("VectorFactory.wktPolygonToSvg", () => {
   it('should return undefined when unrecognized input passed', () => {
-    expect(geoJsonPolygonToSvg('INCORRECT')).to.equal(undefined)
+    expect(wktPolygonToSvg('INCORRECT')).to.equal(undefined)
   })
 
   it('should convert a GeoJSON Polygon to a valid svg path String', () => {
@@ -40,14 +40,14 @@ describe("VectorFactory.geoJsonPolygonToSvg", () => {
     const expectedSvgPolygon = `M${point1.x} ${point1.y}L${point2.x} ${point2.y}L${point3.x} ${point3.y}L${point1.x} ${point1.y}`
 
     // assert expected value
-    expect(geoJsonPolygonToSvg(geoJsonPolygon, boundingRect)).to.equal(expectedSvgPolygon)
+    expect(wktPolygonToSvg(geoJsonPolygon, boundingRect)).to.equal(expectedSvgPolygon)
   })
 })
 
 
-describe('VectorFactory.geoJsonPointToSvg', () => {
+describe('VectorFactory.wktPointToSvg', () => {
   it('should return undefined when unrecognized input passed', () => {
-    expect(geoJsonPointToSvg('INCORRECT')).to.equal(undefined)
+    expect(wktPointToSvg('INCORRECT')).to.equal(undefined)
   })
 
   it('should should convert a GeoJSON point to a point object', () => {
@@ -61,14 +61,14 @@ describe('VectorFactory.geoJsonPointToSvg', () => {
     }
 
     // assert expected value
-    expect(geoJsonPointToSvg(geoJsonPoint)).to.deep.equal(pointObject)
+    expect(wktPointToSvg(geoJsonPoint)).to.deep.equal(pointObject)
   })
 })
 
-describe('VectorFactory.geoJsonParseRect', () => {
+describe('VectorFactory.wktParseRect', () => {
 
   it('should return undefined when unrecognized input passed', () => {
-    expect(geoJsonParseRect('INCORRECT')).to.equal(undefined)
+    expect(wktParseRect('INCORRECT')).to.equal(undefined)
   })
 
   it('should convert a POLYGON string to a JSON rect', () => {
@@ -86,7 +86,38 @@ describe('VectorFactory.geoJsonParseRect', () => {
     }
 
     // assert expected value
-    expect(geoJsonParseRect(polygon)).to.deep.equal(expectedResult)
+    expect(wktParseRect(polygon)).to.deep.equal(expectedResult)
+  })
+
+})
+
+describe('VectorFactory.svgPolygonToWKT', () => {
+
+  it('should return undefined when unrecognized input passed', () => {
+    expect(svgPolygonToWKT('INCORRECT')).to.equal(undefined)
+  })
+
+  it('should convert an SVG path to a WKT string', () => {
+
+    // Setup the input and result
+    let svg = 'M'
+    let wkt = 'POLYGON(('
+    for (let i = 0; i < 20; i++) {
+      svg += `${i} ${i * 10}`
+      wkt += `${i} ${i * 10}`
+      if (i % 2 === 0) {
+        svg += ' L '
+      } else {
+        svg += ' '
+      }
+      if (i !== 19) {
+        wkt += ','
+      }
+    }
+    wkt += '))'
+
+    // assert expected value
+    expect(svgPolygonToWKT(svg)).to.equal(wkt)
   })
 
 })
@@ -117,12 +148,12 @@ describe('VectorFactory.svgMatrixToDB', () => {
     expect(svgMatrixToDB([0,1,2,3,4,5,6,7])).to.equal(undefined)
   })
 
-  it('should convert 16 element SVG matrix to a JSON string for the DB matrix', () => {
+  it('should convert 6 element SVG matrix to a JSON string for the DB matrix', () => {
     // setup initial input
-    const svgMatrix = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
+    const svgMatrix = [1,2,3,4,5,6]
 
     //define expected result
-    const dbMatrix = '{\\"matrix\\": [[1,3,13],[2,4,14]]}'
+    const dbMatrix = '{"matrix": [[1,3,5],[2,4,6]]}'
 
     // assert expected value
     expect(svgMatrixToDB(svgMatrix)).to.equal(dbMatrix)
@@ -165,10 +196,28 @@ describe('VectorFactory.matrix16To6', () => {
   })
 })
 
-// describe('svgPolygonToGeoJson', () => {
-
-// })
-
-// describe('clipCanvas', () => {
-  
-// })
+describe('clipCanvas', () => {
+  it('should draw an SVG path on the canvas', () => {
+    let testCanvas = document.createElement('canvas')
+    let comparisonCanvas = document.createElement('canvas')
+    testCanvas.width = 10
+    comparisonCanvas.width = 10
+    testCanvas.height = 10
+    comparisonCanvas.height = 10
+    const path = 'M1 1 L 1 3 1 3 L 3 3 3 3 L 3 1 3 1 L 1 1'
+    let comparisonCTX = comparisonCanvas.getContext('2d')
+    comparisonCTX.beginPath()
+    comparisonCTX.moveTo(1,1)
+    comparisonCTX.lineTo(1,3)
+    comparisonCTX.lineTo(3,3)
+    comparisonCTX.lineTo(3,1)
+    comparisonCTX.lineTo(1,1)
+    comparisonCTX.closePath()
+    comparisonCTX.fillStyle = 'purple'
+    comparisonCTX.fill()
+    clipCanvas(testCanvas, path, 1)
+    expect(testCanvas).to.deep.equal(comparisonCanvas)
+    clipCanvas(testCanvas, path)
+    expect(testCanvas).to.deep.equal(comparisonCanvas)
+  })
+})

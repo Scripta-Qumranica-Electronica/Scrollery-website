@@ -1,6 +1,8 @@
 {
+    "_comment" : "This file maintains the specific version of SQE_DB_API and Data-files necessary for the current Scrollery-website version.",
+    "_subComment" : "Only the first two version digits are necessary, increments of the third digit should be backwards compatible.",
     "dependencies": {
-        "SQE_DB_API": 0.0,
-        "Data-files": 0.0,
+        "SQE_DB_API": 0.1,
+        "Data-files": 0.0
     }
 }
