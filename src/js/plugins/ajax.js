@@ -9,13 +9,6 @@ export default {
         data.SESSION_ID = store.getters.sessionID
       }
 
-      // return axios({
-      //   url,
-      //   method: 'post',
-      //   data: data,
-      //   header: {'Content-Type': 'application/json' }
-      // })
-
       // make the AJAX request
       return axios.post(url, data, opt)
     }
