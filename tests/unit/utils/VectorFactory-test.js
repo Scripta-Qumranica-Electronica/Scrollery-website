@@ -3,11 +3,11 @@ import {
   wktPointToSvg,
   wktParseRect,
   svgPolygonToWKT,
-  // clipCanvas,
   dbMatrixToSVG,
   svgMatrixToDB,
   matrix6To16,
   matrix16To6,
+  clipCanvas,
 } from '~/utils/VectorFactory.js'
 
 describe("VectorFactory.wktPolygonToSvg", () => {
@@ -196,10 +196,28 @@ describe('VectorFactory.matrix16To6', () => {
   })
 })
 
-// describe('svgPolygonToGeoJson', () => {
-
-// })
-
-// describe('clipCanvas', () => {
-  
-// })
+describe('clipCanvas', () => {
+  it('should draw an SVG path on the canvas', () => {
+    let testCanvas = document.createElement('canvas')
+    let comparisonCanvas = document.createElement('canvas')
+    testCanvas.width = 10
+    comparisonCanvas.width = 10
+    testCanvas.height = 10
+    comparisonCanvas.height = 10
+    const path = 'M1 1 L 1 3 1 3 L 3 3 3 3 L 3 1 3 1 L 1 1'
+    let comparisonCTX = comparisonCanvas.getContext('2d')
+    comparisonCTX.beginPath()
+    comparisonCTX.moveTo(1,1)
+    comparisonCTX.lineTo(1,3)
+    comparisonCTX.lineTo(3,3)
+    comparisonCTX.lineTo(3,1)
+    comparisonCTX.lineTo(1,1)
+    comparisonCTX.closePath()
+    comparisonCTX.fillStyle = 'purple'
+    comparisonCTX.fill()
+    clipCanvas(testCanvas, path, 1)
+    expect(testCanvas).to.deep.equal(comparisonCanvas)
+    clipCanvas(testCanvas, path)
+    expect(testCanvas).to.deep.equal(comparisonCanvas)
+  })
+})

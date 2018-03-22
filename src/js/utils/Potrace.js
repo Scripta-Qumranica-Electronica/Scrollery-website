@@ -1,9 +1,12 @@
 export function trace(canvas, multiplyFactor) {
-    return new Promise(resolve=> {
+    return new Promise(resolve => {
         var potrace = new Potrace(canvas, multiplyFactor)
-        // potrace.loadImageFromUrl(canvas.toDataURL("image/png"))
-        potrace.process(function(){
-            resolve(potrace.getPolyPath(1))
+        potrace.process(() => {
+          let path = potrace.getPolyPath(1)
+          if (path === '') {
+            path = 'undefined path'
+          }
+          resolve(path)
         })
     })
 }
@@ -11,7 +14,12 @@ export function trace(canvas, multiplyFactor) {
 /* I should probably either optimize this code for 
  * our use case.  Or perhaps figure out how to
  * use https://www.npmjs.com/package/potrace-js.
- * The code is now a bit more optimized.
+ * The code is now a bit more optimized.  Many 
+ * functions have been commented out, which do
+ * not seem necessary for our implementation.
+ * If error crop up, they should be reinstated.
+ * (This caveat does __not__ apply to the mask 
+ * dilation issue that we currently experience.)
  */
 
 /* Copyright (C) 2001-2013 Peter Selinger.
@@ -141,52 +149,52 @@ function Potrace(canvas, multiplyFactor) {
           alphamax: 0, // We set alphamx to 0 for a polygon with no beziers.
           opttolerance: 0.2, // Get more detailed outline than 0.2.
         };
-    if (imgElement) {
-        imgElement.onload = function() {
-            loadCanvas();
-            loadBm();
-          }
-    } else {
+    // if (imgElement) {
+    //     imgElement.onload = function() {
+    //         loadCanvas();
+    //         loadBm();
+    //       }
+    // } else {
         loadBm()
-    }
+    // }
   
-    function loadImageFromFile(file) {
-      if (info.isReady) {
-        clear();
-      }
-      imgElement.file = file;
-      var reader = new FileReader();
-      reader.onload = (function(aImg) {
-        return function(e) {
-          aImg.src = e.target.result;
-        };
-      })(imgElement);
-      reader.readAsDataURL(file);
-    }
+    // function loadImageFromFile(file) {
+    //   if (info.isReady) {
+    //     clear();
+    //   }
+    //   imgElement.file = file;
+    //   var reader = new FileReader();
+    //   reader.onload = (function(aImg) {
+    //     return function(e) {
+    //       aImg.src = e.target.result;
+    //     };
+    //   })(imgElement);
+    //   reader.readAsDataURL(file);
+    // }
     
-    function loadImageFromUrl(url) {
-      if (info.isReady) {
-        clear();
-      }
-      imgElement.src = url;
+    // function loadImageFromUrl(url) {
+    //   if (info.isReady) {
+    //     clear();
+    //   }
+    //   imgElement.src = url;
       
-    }
+    // }
     
-    function setParameter(obj) {
-     var key;
-     for (key in obj) {
-       if (obj.hasOwnProperty(key)) {
-         info[key] = obj[key];
-       }
-      }
-    }
+    // function setParameter(obj) {
+    //  var key;
+    //  for (key in obj) {
+    //    if (obj.hasOwnProperty(key)) {
+    //      info[key] = obj[key];
+    //    }
+    //   }
+    // }
     
-    function loadCanvas() {
-      imgCanvas.width = imgElement.width;
-      imgCanvas.height = imgElement.height;
-      var ctx = imgCanvas.getContext('2d');
-      ctx.drawImage(imgElement, 0, 0);
-    }
+    // function loadCanvas() {
+    //   imgCanvas.width = imgElement.width;
+    //   imgCanvas.height = imgElement.height;
+    //   var ctx = imgCanvas.getContext('2d');
+    //   ctx.drawImage(imgElement, 0, 0);
+    // }
     
     function loadBm() {
       var ctx = imgCanvas.getContext('2d');
@@ -216,24 +224,24 @@ function Potrace(canvas, multiplyFactor) {
         return i < bm1.size && bm1.index(i);
       }
       
-      function majority(x, y) {
-        var i, a, ct;
-        for (i = 2; i < 5; i++) {
-          ct = 0;
-          for (a = -i + 1; a <= i - 1; a++) {
-            ct += bm1.at(x + a, y + i - 1) ? 1 : -1;
-            ct += bm1.at(x + i - 1, y + a - 1) ? 1 : -1;
-            ct += bm1.at(x + a - 1, y - i) ? 1 : -1;
-            ct += bm1.at(x - i, y + a) ? 1 : -1;
-          }
-          if (ct > 0) {
-            return 1;
-          } else if (ct < 0) {
-            return 0;
-          }
-        }
-        return 0;
-      }
+      // function majority(x, y) {
+      //   var i, a, ct;
+      //   for (i = 2; i < 5; i++) {
+      //     ct = 0;
+      //     for (a = -i + 1; a <= i - 1; a++) {
+      //       ct += bm1.at(x + a, y + i - 1) ? 1 : -1;
+      //       ct += bm1.at(x + i - 1, y + a - 1) ? 1 : -1;
+      //       ct += bm1.at(x + a - 1, y - i) ? 1 : -1;
+      //       ct += bm1.at(x - i, y + a) ? 1 : -1;
+      //     }
+      //     if (ct > 0) {
+      //       return 1;
+      //     } else if (ct < 0) {
+      //       return 0;
+      //     }
+      //   }
+      //   return 0;
+      // }
       
       function findPath(point) {
         var path = new Path(),
@@ -413,82 +421,82 @@ function Potrace(canvas, multiplyFactor) {
         return x1 * y2 - x2 * y1;
       }
       
-      function cprod(p0, p1, p2, p3) {
-        var x1, y1, x2, y2;
+      // function cprod(p0, p1, p2, p3) {
+      //   var x1, y1, x2, y2;
       
-        x1 = p1.x - p0.x;
-        y1 = p1.y - p0.y;
-        x2 = p3.x - p2.x;
-        y2 = p3.y - p2.y;
+      //   x1 = p1.x - p0.x;
+      //   y1 = p1.y - p0.y;
+      //   x2 = p3.x - p2.x;
+      //   y2 = p3.y - p2.y;
       
-        return x1 * y2 - x2 * y1;
-      }
+      //   return x1 * y2 - x2 * y1;
+      // }
         
-      function iprod(p0, p1, p2) {
-        var x1, y1, x2, y2;
+      // function iprod(p0, p1, p2) {
+      //   var x1, y1, x2, y2;
       
-        x1 = p1.x - p0.x;
-        y1 = p1.y - p0.y;
-        x2 = p2.x - p0.x;
-        y2 = p2.y - p0.y;
+      //   x1 = p1.x - p0.x;
+      //   y1 = p1.y - p0.y;
+      //   x2 = p2.x - p0.x;
+      //   y2 = p2.y - p0.y;
       
-        return x1*x2 + y1*y2;
-      }
+      //   return x1*x2 + y1*y2;
+      // }
         
-      function iprod1(p0, p1, p2, p3) {
-        var x1, y1, x2, y2;
+      // function iprod1(p0, p1, p2, p3) {
+      //   var x1, y1, x2, y2;
       
-        x1 = p1.x - p0.x;
-        y1 = p1.y - p0.y;
-        x2 = p3.x - p2.x;
-        y2 = p3.y - p2.y;
+      //   x1 = p1.x - p0.x;
+      //   y1 = p1.y - p0.y;
+      //   x2 = p3.x - p2.x;
+      //   y2 = p3.y - p2.y;
       
-        return x1 * x2 + y1 * y2;
-      }
+      //   return x1 * x2 + y1 * y2;
+      // }
       
-      function ddist(p, q) {
-        return Math.sqrt((p.x - q.x) * (p.x - q.x) + (p.y - q.y) * (p.y - q.y));
-      }
+      // function ddist(p, q) {
+      //   return Math.sqrt((p.x - q.x) * (p.x - q.x) + (p.y - q.y) * (p.y - q.y));
+      // }
       
-      function bezier(t, p0, p1, p2, p3) {
-        var s = 1 - t, res = new Point();
+      // function bezier(t, p0, p1, p2, p3) {
+      //   var s = 1 - t, res = new Point();
       
-        res.x = s*s*s*p0.x + 3*(s*s*t)*p1.x + 3*(t*t*s)*p2.x + t*t*t*p3.x;
-        res.y = s*s*s*p0.y + 3*(s*s*t)*p1.y + 3*(t*t*s)*p2.y + t*t*t*p3.y;
+      //   res.x = s*s*s*p0.x + 3*(s*s*t)*p1.x + 3*(t*t*s)*p2.x + t*t*t*p3.x;
+      //   res.y = s*s*s*p0.y + 3*(s*s*t)*p1.y + 3*(t*t*s)*p2.y + t*t*t*p3.y;
       
-        return res;
-      }
+      //   return res;
+      // }
     
-      function tangent(p0, p1, p2, p3, q0, q1) {
-        var A, B, C, a, b, c, d, s, r1, r2;
+      // function tangent(p0, p1, p2, p3, q0, q1) {
+      //   var A, B, C, a, b, c, d, s, r1, r2;
       
-        A = cprod(p0, p1, q0, q1);
-        B = cprod(p1, p2, q0, q1);
-        C = cprod(p2, p3, q0, q1);
+      //   A = cprod(p0, p1, q0, q1);
+      //   B = cprod(p1, p2, q0, q1);
+      //   C = cprod(p2, p3, q0, q1);
       
-        a = A - 2 * B + C;
-        b = -2 * A + 2 * B;
-        c = A;
+      //   a = A - 2 * B + C;
+      //   b = -2 * A + 2 * B;
+      //   c = A;
         
-        d = b * b - 4 * a * c;
+      //   d = b * b - 4 * a * c;
       
-        if (a===0 || d<0) {
-          return -1.0;
-        }
+      //   if (a===0 || d<0) {
+      //     return -1.0;
+      //   }
       
-        s = Math.sqrt(d);
+      //   s = Math.sqrt(d);
       
-        r1 = (-b + s) / (2 * a);
-        r2 = (-b - s) / (2 * a);
+      //   r1 = (-b + s) / (2 * a);
+      //   r2 = (-b - s) / (2 * a);
       
-        if (r1 >= 0 && r1 <= 1) {
-          return r1;
-        } else if (r2 >= 0 && r2 <= 1) {
-          return r2;
-        } else {
-          return -1.0;
-        }
-      }
+      //   if (r1 >= 0 && r1 <= 1) {
+      //     return r1;
+      //   } else if (r2 >= 0 && r2 <= 1) {
+      //     return r2;
+      //   } else {
+      //     return -1.0;
+      //   }
+      // }
       
       function calcSums(path) {
         var i, x, y;
@@ -547,11 +555,11 @@ function Potrace(canvas, multiplyFactor) {
                 sign(pt[k].y - pt[k1].y)) / 2;
             ct[dir]++;
             
-            if (ct[0] && ct[1] && ct[2] && ct[3]) {
-              pivk[i] = k1;
-              foundk = 1;
-              break;
-            }
+            // if (ct[0] && ct[1] && ct[2] && ct[3]) {
+            //   pivk[i] = k1;
+            //   foundk = 1;
+            //   break;
+            // }
             
             cur.x = pt[k].x - pt[i].x;
             cur.y = pt[k].y - pt[i].y;
@@ -855,23 +863,23 @@ function Potrace(canvas, multiplyFactor) {
               break;
             }
       
-            if (Q.at(0, 0)>Q.at(1, 1)) {
-              v[0] = -Q.at(0, 1);
-              v[1] = Q.at(0, 0);
-            } else if (Q.at(1, 1)) {
-              v[0] = -Q.at(1, 1);
-              v[1] = Q.at(1, 0);
-            } else {
-              v[0] = 1;
-              v[1] = 0;
-            }
-            d = v[0] * v[0] + v[1] * v[1];
-            v[2] = - v[1] * s.y - v[0] * s.x;
-            for (l=0; l<3; l++) {
-              for (k=0; k<3; k++) {
-                Q.data[l * 3 + k] += v[l] * v[k] / d;
-              }
-            }
+            // if (Q.at(0, 0)>Q.at(1, 1)) {
+            //   v[0] = -Q.at(0, 1);
+            //   v[1] = Q.at(0, 0);
+            // } else if (Q.at(1, 1)) {
+            //   v[0] = -Q.at(1, 1);
+            //   v[1] = Q.at(1, 0);
+            // } else {
+            //   v[0] = 1;
+            //   v[1] = 0;
+            // }
+            // d = v[0] * v[0] + v[1] * v[1];
+            // v[2] = - v[1] * s.y - v[0] * s.x;
+            // for (l=0; l<3; l++) {
+            //   for (k=0; k<3; k++) {
+            //     Q.data[l * 3 + k] += v[l] * v[k] / d;
+            //   }
+            // }
           }
           dx = Math.abs(w.x-s.x);
           dy = Math.abs(w.y-s.y);
@@ -929,15 +937,15 @@ function Potrace(canvas, multiplyFactor) {
         }
       }
       
-      function reverse(path) {
-        var curve = path.curve, m = curve.n, v = curve.vertex, i, j, tmp;
+      // function reverse(path) {
+      //   var curve = path.curve, m = curve.n, v = curve.vertex, i, j, tmp;
       
-        for (i=0, j=m-1; i<j; i++, j--) {
-          tmp = v[i];
-          v[i] = v[j];
-          v[j] = tmp;
-        }
-      }
+      //   for (i=0, j=m-1; i<j; i++, j--) {
+      //     tmp = v[i];
+      //     v[i] = v[j];
+      //     v[j] = tmp;
+      //   }
+      // }
       
       function smooth(path) {
         var m = path.curve.n, curve = path.curve;
@@ -1012,115 +1020,115 @@ function Potrace(canvas, multiplyFactor) {
           if (conv === 0) {
             return 1;
           }
-          d = ddist(vertex[i], vertex[i1]);
-          for (k=k1; k!=j; k=k1) {
-            k1 = mod(k+1, m);
-            k2 = mod(k+2, m);
-            if (convc[k1] != conv) {
-              return 1;
-            }
-            if (sign(cprod(vertex[i], vertex[i1], vertex[k1], vertex[k2])) !=
-                conv) {
-              return 1;
-            }
-            if (iprod1(vertex[i], vertex[i1], vertex[k1], vertex[k2]) <
-                d * ddist(vertex[k1], vertex[k2]) * -0.999847695156) {
-              return 1;
-            }
-          }
+          // d = ddist(vertex[i], vertex[i1]);
+          // for (k=k1; k!=j; k=k1) {
+          //   k1 = mod(k+1, m);
+          //   k2 = mod(k+2, m);
+          //   if (convc[k1] != conv) {
+          //     return 1;
+          //   }
+          //   if (sign(cprod(vertex[i], vertex[i1], vertex[k1], vertex[k2])) !=
+          //       conv) {
+          //     return 1;
+          //   }
+          //   if (iprod1(vertex[i], vertex[i1], vertex[k1], vertex[k2]) <
+          //       d * ddist(vertex[k1], vertex[k2]) * -0.999847695156) {
+          //     return 1;
+          //   }
+          // }
       
-          p0 = curve.c[mod(i,m) * 3 + 2].copy();
-          p1 = vertex[mod(i+1,m)].copy();
-          p2 = vertex[mod(j,m)].copy();
-          p3 = curve.c[mod(j,m) * 3 + 2].copy();
+          // p0 = curve.c[mod(i,m) * 3 + 2].copy();
+          // p1 = vertex[mod(i+1,m)].copy();
+          // p2 = vertex[mod(j,m)].copy();
+          // p3 = curve.c[mod(j,m) * 3 + 2].copy();
         
-          area = areac[j] - areac[i];
-          area -= dpara(vertex[0], curve.c[i * 3 + 2], curve.c[j * 3 + 2])/2;
-          if (i>=j) {
-            area += areac[m];
-          }
+          // area = areac[j] - areac[i];
+          // area -= dpara(vertex[0], curve.c[i * 3 + 2], curve.c[j * 3 + 2])/2;
+          // if (i>=j) {
+          //   area += areac[m];
+          // }
         
-          A1 = dpara(p0, p1, p2);
-          A2 = dpara(p0, p1, p3);
-          A3 = dpara(p0, p2, p3);
+          // A1 = dpara(p0, p1, p2);
+          // A2 = dpara(p0, p1, p3);
+          // A3 = dpara(p0, p2, p3);
     
-          A4 = A1+A3-A2;    
+          // A4 = A1+A3-A2;    
           
-          if (A2 == A1) {
-            return 1;
-          }
+          // if (A2 == A1) {
+          //   return 1;
+          // }
         
-          t = A3/(A3-A4);
-          s = A2/(A2-A1);
-          A = A2 * t / 2.0;
+          // t = A3/(A3-A4);
+          // s = A2/(A2-A1);
+          // A = A2 * t / 2.0;
           
-          if (A === 0.0) {
-            return 1;
-          }
+          // if (A === 0.0) {
+          //   return 1;
+          // }
         
-          R = area / A;
-          alpha = 2 - Math.sqrt(4 - R / 0.3);
+          // R = area / A;
+          // alpha = 2 - Math.sqrt(4 - R / 0.3);
         
-          res.c[0] = interval(t * alpha, p0, p1);
-          res.c[1] = interval(s * alpha, p3, p2);
-          res.alpha = alpha;
-          res.t = t;
-          res.s = s;
+          // res.c[0] = interval(t * alpha, p0, p1);
+          // res.c[1] = interval(s * alpha, p3, p2);
+          // res.alpha = alpha;
+          // res.t = t;
+          // res.s = s;
         
-          p1 = res.c[0].copy();
-          p2 = res.c[1].copy(); 
+          // p1 = res.c[0].copy();
+          // p2 = res.c[1].copy(); 
         
-          res.pen = 0;
+          // res.pen = 0;
         
-          for (k=mod(i+1,m); k!=j; k=k1) {
-            k1 = mod(k+1,m);
-            t = tangent(p0, p1, p2, p3, vertex[k], vertex[k1]);
-            if (t<-0.5) {
-              return 1;
-            }
-            pt = bezier(t, p0, p1, p2, p3);
-            d = ddist(vertex[k], vertex[k1]);
-            if (d === 0.0) {
-              return 1;
-            }
-            d1 = dpara(vertex[k], vertex[k1], pt) / d;
-            if (Math.abs(d1) > opttolerance) {
-              return 1;
-            }
-            if (iprod(vertex[k], vertex[k1], pt) < 0 ||
-                iprod(vertex[k1], vertex[k], pt) < 0) {
-              return 1;
-            }
-            res.pen += d1 * d1;
-          }
+          // for (k=mod(i+1,m); k!=j; k=k1) {
+          //   k1 = mod(k+1,m);
+          //   t = tangent(p0, p1, p2, p3, vertex[k], vertex[k1]);
+          //   if (t<-0.5) {
+          //     return 1;
+          //   }
+          //   pt = bezier(t, p0, p1, p2, p3);
+          //   d = ddist(vertex[k], vertex[k1]);
+          //   if (d === 0.0) {
+          //     return 1;
+          //   }
+          //   d1 = dpara(vertex[k], vertex[k1], pt) / d;
+          //   if (Math.abs(d1) > opttolerance) {
+          //     return 1;
+          //   }
+          //   if (iprod(vertex[k], vertex[k1], pt) < 0 ||
+          //       iprod(vertex[k1], vertex[k], pt) < 0) {
+          //     return 1;
+          //   }
+          //   res.pen += d1 * d1;
+          // }
         
-          for (k=i; k!=j; k=k1) {
-            k1 = mod(k+1,m);
-            t = tangent(p0, p1, p2, p3, curve.c[k * 3 + 2], curve.c[k1 * 3 + 2]);
-            if (t<-0.5) {
-              return 1;
-            }
-            pt = bezier(t, p0, p1, p2, p3);
-            d = ddist(curve.c[k * 3 + 2], curve.c[k1 * 3 + 2]);
-            if (d === 0.0) {
-              return 1;
-            }
-            d1 = dpara(curve.c[k * 3 + 2], curve.c[k1 * 3 + 2], pt) / d;
-            d2 = dpara(curve.c[k * 3 + 2], curve.c[k1 * 3 + 2], vertex[k1]) / d;
-            d2 *= 0.75 * curve.alpha[k1];
-            if (d2 < 0) {
-              d1 = -d1;
-              d2 = -d2;
-            }
-            if (d1 < d2 - opttolerance) {
-              return 1;
-            }
-            if (d1 < d2) {
-              res.pen += (d1 - d2) * (d1 - d2);
-            }
-          }
+          // for (k=i; k!=j; k=k1) {
+          //   k1 = mod(k+1,m);
+          //   t = tangent(p0, p1, p2, p3, curve.c[k * 3 + 2], curve.c[k1 * 3 + 2]);
+          //   if (t<-0.5) {
+          //     return 1;
+          //   }
+          //   pt = bezier(t, p0, p1, p2, p3);
+          //   d = ddist(curve.c[k * 3 + 2], curve.c[k1 * 3 + 2]);
+          //   if (d === 0.0) {
+          //     return 1;
+          //   }
+          //   d1 = dpara(curve.c[k * 3 + 2], curve.c[k1 * 3 + 2], pt) / d;
+          //   d2 = dpara(curve.c[k * 3 + 2], curve.c[k1 * 3 + 2], vertex[k1]) / d;
+          //   d2 *= 0.75 * curve.alpha[k1];
+          //   if (d2 < 0) {
+          //     d1 = -d1;
+          //     d2 = -d2;
+          //   }
+          //   if (d1 < d2 - opttolerance) {
+          //     return 1;
+          //   }
+          //   if (d1 < d2) {
+          //     res.pen += (d1 - d2) * (d1 - d2);
+          //   }
+          // }
         
-          return 0;
+          // return 0;
         }
       
         var curve = path.curve, m = curve.n, vert = curve.vertex, 
@@ -1148,12 +1156,12 @@ function Potrace(canvas, multiplyFactor) {
         p0 = curve.vertex[0];
         for (i=0; i<m; i++) {
           i1 = mod(i+1, m);
-          if (curve.tag[i1] == "CURVE") {
-            alpha = curve.alpha[i1];
-            area += 0.3 * alpha * (4-alpha) *
-                dpara(curve.c[i * 3 + 2], vert[i1], curve.c[i1 * 3 + 2])/2;
-            area += dpara(p0, curve.c[i * 3 + 2], curve.c[i1 * 3 + 2])/2;
-          }
+          // if (curve.tag[i1] == "CURVE") {
+          //   alpha = curve.alpha[i1];
+          //   area += 0.3 * alpha * (4-alpha) *
+          //       dpara(curve.c[i * 3 + 2], vert[i1], curve.c[i1 * 3 + 2])/2;
+          //   area += dpara(p0, curve.c[i * 3 + 2], curve.c[i1 * 3 + 2])/2;
+          // }
           areac[i+1] = area;
         }
       
@@ -1173,14 +1181,14 @@ function Potrace(canvas, multiplyFactor) {
             if (r) {
               break;
             }
-              if (len[j] > len[i]+1 ||
-                  (len[j] == len[i]+1 && pen[j] > pen[i] + o.pen)) {
-                pt[j] = i;
-                pen[j] = pen[i] + o.pen;
-                len[j] = len[i] + 1;
-                opt[j] = o;
-                o = new Opti();
-              }
+              // if (len[j] > len[i]+1 ||
+              //     (len[j] == len[i]+1 && pen[j] > pen[i] + o.pen)) {
+              //   pt[j] = i;
+              //   pen[j] = pen[i] + o.pen;
+              //   len[j] = len[i] + 1;
+              //   opt[j] = o;
+              //   o = new Opti();
+              // }
           }
         }
         om = len[m];
@@ -1190,7 +1198,7 @@ function Potrace(canvas, multiplyFactor) {
       
         j = m;
         for (i=om-1; i>=0; i--) {
-          if (pt[j]==j-1) {
+          // if (pt[j]==j-1) {
             ocurve.tag[i]     = curve.tag[mod(j,m)];
             ocurve.c[i * 3 + 0]    = curve.c[mod(j,m) * 3 + 0];
             ocurve.c[i * 3 + 1]    = curve.c[mod(j,m) * 3 + 1];
@@ -1200,18 +1208,18 @@ function Potrace(canvas, multiplyFactor) {
             ocurve.alpha0[i]  = curve.alpha0[mod(j,m)];
             ocurve.beta[i]    = curve.beta[mod(j,m)];
             s[i] = t[i] = 1.0;
-          } else {
-            ocurve.tag[i] = "CURVE";
-            ocurve.c[i * 3 + 0] = opt[j].c[0];
-            ocurve.c[i * 3 + 1] = opt[j].c[1];
-            ocurve.c[i * 3 + 2] = curve.c[mod(j,m) * 3 + 2];
-            ocurve.vertex[i] = interval(opt[j].s, curve.c[mod(j,m) * 3 + 2],
-                                         vert[mod(j,m)]);
-            ocurve.alpha[i] = opt[j].alpha;
-            ocurve.alpha0[i] = opt[j].alpha;
-            s[i] = opt[j].s;
-            t[i] = opt[j].t;
-          }
+          // } else {
+          //   ocurve.tag[i] = "CURVE";
+          //   ocurve.c[i * 3 + 0] = opt[j].c[0];
+          //   ocurve.c[i * 3 + 1] = opt[j].c[1];
+          //   ocurve.c[i * 3 + 2] = curve.c[mod(j,m) * 3 + 2];
+          //   ocurve.vertex[i] = interval(opt[j].s, curve.c[mod(j,m) * 3 + 2],
+          //                                vert[mod(j,m)]);
+          //   ocurve.alpha[i] = opt[j].alpha;
+          //   ocurve.alpha0[i] = opt[j].alpha;
+          //   s[i] = opt[j].s;
+          //   t[i] = opt[j].t;
+          // }
           j = pt[j];
         }
       
@@ -1257,71 +1265,71 @@ function Potrace(canvas, multiplyFactor) {
       callback = null;
     }
   
-    function clear() {
-      bm = null;
-      pathlist = [];
-      callback = null;
-      info.isReady = false;
-    }
+    // function clear() {
+    //   bm = null;
+    //   pathlist = [];
+    //   callback = null;
+    //   info.isReady = false;
+    // }
     
-    function getSVG(size, opt_type) {
+    // function getSVG(size, opt_type) {
     
-      function path(curve) {
+    //   function path(curve) {
       
-        function bezier(i) {
-          var b = 'C ' + (curve.c[i * 3 + 0].x * size).toFixed(3) + ' ' +
-              (curve.c[i * 3 + 0].y * size).toFixed(3) + ',';
-          b += (curve.c[i * 3 + 1].x * size).toFixed(3) + ' ' +
-              (curve.c[i * 3 + 1].y * size).toFixed(3) + ',';
-          b += (curve.c[i * 3 + 2].x * size).toFixed(3) + ' ' +
-              (curve.c[i * 3 + 2].y * size).toFixed(3) + ' ';
-          return b;
-        }
+    //     function bezier(i) {
+    //       var b = 'C ' + (curve.c[i * 3 + 0].x * size).toFixed(3) + ' ' +
+    //           (curve.c[i * 3 + 0].y * size).toFixed(3) + ',';
+    //       b += (curve.c[i * 3 + 1].x * size).toFixed(3) + ' ' +
+    //           (curve.c[i * 3 + 1].y * size).toFixed(3) + ',';
+    //       b += (curve.c[i * 3 + 2].x * size).toFixed(3) + ' ' +
+    //           (curve.c[i * 3 + 2].y * size).toFixed(3) + ' ';
+    //       return b;
+    //     }
       
-        function segment(i) {
-          var s = 'L ' + (curve.c[i * 3 + 1].x * size).toFixed(3) + ' ' +
-              (curve.c[i * 3 + 1].y * size).toFixed(3) + ' ';
-          s += (curve.c[i * 3 + 2].x * size).toFixed(3) + ' ' +
-              (curve.c[i * 3 + 2].y * size).toFixed(3) + ' ';
-          return s;
-        }
+    //     function segment(i) {
+    //       var s = 'L ' + (curve.c[i * 3 + 1].x * size).toFixed(3) + ' ' +
+    //           (curve.c[i * 3 + 1].y * size).toFixed(3) + ' ';
+    //       s += (curve.c[i * 3 + 2].x * size).toFixed(3) + ' ' +
+    //           (curve.c[i * 3 + 2].y * size).toFixed(3) + ' ';
+    //       return s;
+    //     }
   
-        var n = curve.n, i;
-        var p = 'M' + (curve.c[(n - 1) * 3 + 2].x * size).toFixed(3) +
-            ' ' + (curve.c[(n - 1) * 3 + 2].y * size).toFixed(3) + ' ';
-        for (i = 0; i < n; i++) {
-          if (curve.tag[i] === "CURVE") {
-            p += bezier(i);
-          } else if (curve.tag[i] === "CORNER") {
-            p += segment(i);
-          }
-        }
-        //p += 
-        return p;
-      }
+    //     var n = curve.n, i;
+    //     var p = 'M' + (curve.c[(n - 1) * 3 + 2].x * size).toFixed(3) +
+    //         ' ' + (curve.c[(n - 1) * 3 + 2].y * size).toFixed(3) + ' ';
+    //     for (i = 0; i < n; i++) {
+    //       if (curve.tag[i] === "CURVE") {
+    //         p += bezier(i);
+    //       } else if (curve.tag[i] === "CORNER") {
+    //         p += segment(i);
+    //       }
+    //     }
+    //     //p += 
+    //     return p;
+    //   }
   
-      var w = bm.w * size, h = bm.h * size,
-        len = pathlist.length, c, i, strokec, fillc, fillrule;
+    //   var w = bm.w * size, h = bm.h * size,
+    //     len = pathlist.length, c, i, strokec, fillc, fillrule;
   
-      var svg = '<svg id="svg" version="1.1" width="' + w + '" height="' + h +
-          '" xmlns="http://www.w3.org/2000/svg">';
-      svg += '<path d="';
-      for (i = 0; i < len; i++) {
-        c = pathlist[i].curve;
-        svg += path(c);
-      }
-      if (opt_type === "curve") {
-        strokec = "black";
-        fillc = "none";
-        fillrule = '';
-      } else {
-        strokec = "none";
-        fillc = "black";
-        fillrule = ' fill-rule="evenodd"';
-      }
-      svg += '" stroke="' + strokec + '" fill="' + fillc + '"' + fillrule + '/></svg>';
-      return svg;
-    }
+    //   var svg = '<svg id="svg" version="1.1" width="' + w + '" height="' + h +
+    //       '" xmlns="http://www.w3.org/2000/svg">';
+    //   svg += '<path d="';
+    //   for (i = 0; i < len; i++) {
+    //     c = pathlist[i].curve;
+    //     svg += path(c);
+    //   }
+    //   if (opt_type === "curve") {
+    //     strokec = "black";
+    //     fillc = "none";
+    //     fillrule = '';
+    //   } else {
+    //     strokec = "none";
+    //     fillc = "black";
+    //     fillrule = ' fill-rule="evenodd"';
+    //   }
+    //   svg += '" stroke="' + strokec + '" fill="' + fillc + '"' + fillrule + '/></svg>';
+    //   return svg;
+    // }
 
     function getPolyPath(size, opt_type) {
     
@@ -1355,11 +1363,11 @@ function Potrace(canvas, multiplyFactor) {
       }
     
     return{
-      loadImageFromFile: loadImageFromFile,
-      loadImageFromUrl: loadImageFromUrl,
-      setParameter: setParameter,
+      // loadImageFromFile: loadImageFromFile,
+      // loadImageFromUrl: loadImageFromUrl,
+      // setParameter: setParameter,
       process: process,
-      getSVG: getSVG,
+      // getSVG: getSVG,
       getPolyPath: getPolyPath,
       img: imgElement
     };
