@@ -23,7 +23,7 @@ describe("ArtefactMenuItem", function() {
         // create wrapper with mocked route and routers
         let wrapper = mount(ArtefactMenuItem, {
             propsData: {
-                dataId: artID,
+                artefact: artID,
             },
             mocks: { 
                 $router: { push },

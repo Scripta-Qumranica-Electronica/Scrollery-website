@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export default {
   install(Vue, { store }) {
-    Vue.prototype.$post = function(url, data = {}, config) {
+    Vue.prototype.$post = function(url, data = {}, opt) {
 
       // Set SESSION_ID if available
       if (!data.SESSION_ID && store.getters.sessionID) {
@@ -10,7 +10,7 @@ export default {
       }
 
       // make the AJAX request
-      return axios.post(url, data, config || {})
+      return axios.post(url, data, opt)
     }
   }
 }
