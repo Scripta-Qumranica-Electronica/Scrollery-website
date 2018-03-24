@@ -9,7 +9,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.[name].js",
-    publicPath: "dist/",
+    publicPath: "/dist/",
   },
 
   module: {
@@ -46,18 +46,35 @@ module.exports = {
             {
               loader: 'css-loader',
               options: {
-                minimize: true
+                sourceMaps: true
               }
             },
             {
-              loader: 'sass-loader'
+              loader: 'resolve-url-loader',
+              options: {
+                sourceMap: true
+              }
+            },
+            {
+              loader: 'sass-loader',
+              options: {
+                sourceMaps: true
+              }
             }
           ]
         })
       },
       {
         test: /\.(woff|woff2|eot|ttf)$/,
-        loader: 'url-loader?limit=100000'
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              outputPath: path.resolve(__dirname, "dist"),
+              publicPath: "/dist/"
+            }  
+          }
+        ]
       }
     ]
   },

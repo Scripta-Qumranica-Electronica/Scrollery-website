@@ -96,7 +96,7 @@ import HeaderMenu from './HeaderMenu.vue'
 import MainMenu from './MainMenu.vue'
 import SplitPane from 'vue-splitpane'
 import SingleImage from './SingleImage.vue'
-import Editor from './Editor.vue'
+import Editor from './editor/Editor.vue'
 import Combination from './Combination.vue'
 
 export default {
