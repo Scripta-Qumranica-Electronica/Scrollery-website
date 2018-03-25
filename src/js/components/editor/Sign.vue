@@ -143,7 +143,7 @@ export default {
 .sign-value.whitespace {
   display: inline-block;
   position: relative;
-    top: -3px;
+    top: 5px;
   height: 22px;
   width: 7px;
 }

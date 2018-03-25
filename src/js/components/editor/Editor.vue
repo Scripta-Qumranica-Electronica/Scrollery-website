@@ -42,7 +42,7 @@ import TextSelector from './TextSelector.vue'
 import Toolbar from './Toolbar.vue'
 import SignStreamProcessor from '~/utils/SignStreamProcessor.js'
 import Sign from './Sign.vue';
-import { Store } from 'vuex'
+import editorStore from './EditorStore.js'
 
 export default {
     components: {
@@ -91,23 +91,10 @@ export default {
              */
             focusedSign: null,
 
-            // TODO: move to own file
-            state: new Store({
-                state: {
-                    showReconstructedText: true
-                },
-                getters: {
-                    showReconstructedText: state => state.showReconstructedText
-                },
-                mutations: {
-                    showReconstructedText(state) {
-                        state.showReconstructedText = true;
-                    },
-                    hideReconstructedText(state) {
-                        state.showReconstructedText = false;
-                    }
-                }
-            })
+            /**
+             * @type {Store} A Vuex store for the editor component tree
+             */
+            state: editorStore()
         }
     },
     methods: {
