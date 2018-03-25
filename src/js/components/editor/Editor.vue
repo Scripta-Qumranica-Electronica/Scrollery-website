@@ -60,7 +60,7 @@ export default {
         },
 
         colInRouter() {
-            return (this.$route.params.colID !== '~' && this.$route.params.colID > -1)
+            return (this.$route.params.colID !== '~' && this.$route.params.colID > 0)
         }
     },
     data() {
@@ -188,14 +188,14 @@ export default {
         // check to see if there's a columnID in the route
         // if so, attempt to load up the text straightaway
         const colID = this.$route.params.colID
-        if (colID !== '~' && colID > -1) {
+        if (colID !== '~' && colID > 0) {
             this.getText(this.$route.params.scrollVersionID, colID)
         }
     },
     watch: {
         '$route' (to, from) {
             if (to.params.colID !== from.params.colID) {
-                if (to.params.colID !== '~' && to.params.colID > -1) {
+                if (to.params.colID !== '~' && to.params.colID > 0) {
                     this.getText(to.params.scrollVersionID, to.params.colID)
                 } else {
                     this.currentText = []
