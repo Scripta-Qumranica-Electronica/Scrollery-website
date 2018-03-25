@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import SignStreamProcessor from '../utils/SignStreamProcessor.js'
+import SignStreamProcessor from '~/utils/SignStreamProcessor.js'
 
 export default {
     data() {
