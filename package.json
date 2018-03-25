@@ -6,6 +6,7 @@
     "dev": "webpack --config webpack.dev.js",
     "prod": "webpack --config webpack.prod.js",
     "start": "node ./dev-server.js",
+    "setup:db": "sh ./bin/init-docker.sh",
     "test": "karma start --config karma.conf.js",
     "test:chrome": "karma start --config karma.conf.js --browsers=Chrome",
     "test_travis": "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=PhantomJS,Firefox",

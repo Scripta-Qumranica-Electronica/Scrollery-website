@@ -52,6 +52,8 @@ docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 sqe-m
 docker exec -i SQE_Database /tmp/import-docker.sh
 ```
 
+If all of these defaults look good, you can also run `npm run setup:db` from the root of the project, which will build and start the docker container for you.
+
 ## Client
 
 **Prerequisites:**
