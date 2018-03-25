@@ -1,12 +1,10 @@
 <template>
     <span class="sign"
+      @click="onClick"
       :class="signClasses"
-      :data-id="sign.id"
-      :data-prev-sign-id="sign.prev_sign_id"
-      :data-next-sign-id="sign.next_sign_id"
     >
       <span v-if="showReconstructedStart" class="reconstruction-start">[</span>
-      <span class="sign-value" :class='{whitespace: isWhitespace}'>{{sign.sign}}</span>
+      <span class="sign-value" :class='{whitespace: isWhitespace}'>{{isWhitespace ? '  ' : sign.sign}}</span>
       <span v-if="showReconstructedEnd" class="reconstruction-end">]</span>
     </span>
 </template>
@@ -14,9 +12,14 @@
 <script>
 
 import { Store } from 'vuex'
-import Sign from '~/utils/Sign.js'
+import Sign from '~/models/Sign.js'
 import attributes from './sign_attributes.js'
 
+/**
+ * A sign is the smallest unit known to the editor, and it can be comprised
+ * of characters, whitespace, and possibly other relevant markings to be 
+ * represented in the WYSIWYG editor.
+ */
 export default {
   props: {
     showReconstructedSigns: {
@@ -30,6 +33,11 @@ export default {
     sign: {
       type: Sign,
       required: true
+    },
+    focusedSignId: {
+      type: Number,
+      required: false,
+      default: -1
     }
   },
   computed: {
@@ -37,10 +45,17 @@ export default {
     /**
      * Whether or not to show the current sign
      */
-    visible() {
+    isVisible() {
       return this.state.getters.showReconstructedText
                 ? true // show reconstructed text ... i.e., we show everything
                 : !this.sign.reconstructed(); // do not show reconstructed text, only show sign if it's no reconstructed
+    },
+
+    /**
+     * Whether or not the sign is currently in focus
+     */
+    isInFocus() {
+      return this.sign.id === this.focusedSignId;
     },
 
     /**
@@ -70,14 +85,28 @@ export default {
       )
     },
 
+    /**
+     * @return {object} a plain object with Vue-compatible classes and relevant conditions
+     */
     signClasses() {
       return {
         complete: !this.sign.is_reconstructed,
-        visible: this.visible,
+        visible: this.isVisible,
+        focused: this.isInFocus,
         reconstructed: this.sign.is_reconstructed, 
         incomplete_clear: this.sign.readability === attributes.readability.incomplete.clear,
         incomplete_not_clear: this.sign.readability === attributes.readability.incomplete.unclear
       }
+    }
+  },
+  methods: {
+
+    /**
+     * @param {MouseEvent} event  The DOM event
+     */
+    onClick(event) {
+      event.preventDefault();
+      this.$emit('click', this.sign)
     }
   }
 }
@@ -96,13 +125,27 @@ export default {
   }
 }
 
+@keyframes blink {
+  from, to {border-color:black}
+  50%{border-color:transparent}
+}
+
+.sign.focused > .sign-value {
+  margin-right: -1px;
+  border-right: 1px solid black;
+  animation: 1s blink step-end infinite;
+}
+
 .sign.visible {
   visibility: visible;
 }
 
 .sign-value.whitespace {
-  visibility: hidden;
-  letter-spacing: 2px;
+  display: inline-block;
+  position: relative;
+    top: -3px;
+  height: 22px;
+  width: 7px;
 }
 
 .sign.reconstructed {

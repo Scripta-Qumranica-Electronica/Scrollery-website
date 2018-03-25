@@ -61,14 +61,14 @@ export default class Sign {
    * @return {boolean} whether or not this sign is preceded by another sign
    */
   hasPrevious() {
-    return this.prev_sign_id && this.map.has(this.prev_sign_id)
+    return this.prev_sign_id ? this.map.has(this.prev_sign_id) : false;
   }
 
   /**
    * @return {Sign} The previous sign object
    */
   previous() {
-    return this.hasNext()
+    return this.hasPrevious()
       ? this.map.get(this.prev_sign_id)
       : null;
   }
@@ -77,7 +77,7 @@ export default class Sign {
    * @return {boolean} whether or not this sign is followed by another sign
    */
   hasNext() {
-    return this.next_sign_id && this.map.has(this.next_sign_id)
+    return this.next_sign_id ? this.map.has(this.next_sign_id) : false
   }
 
   /**

@@ -1,4 +1,4 @@
-import Sign from './Sign.js'
+import Sign from '~/models/Sign.js'
 
 class SignStreamProcessor {
 
