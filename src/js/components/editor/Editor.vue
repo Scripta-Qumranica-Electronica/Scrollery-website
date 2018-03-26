@@ -154,7 +154,14 @@ export default {
          * @param {KeyboardEvent} event  The keyboard event received from the input
          */
         onKeyup(event) {
-            switch(event.code) {
+
+            // Hand-off all Ctrl-key events to another method
+            if (event.ctrlKey) {
+                this.onCtrlKeyEvent(event)
+                return;
+            }
+
+            switch (event.code) {
 
                 // next sign
                 case KEY_CODES.ARROWS.LEFT:
@@ -168,12 +175,38 @@ export default {
                     if (this.focusedSign && this.focusedSign.hasPrevious()) {
                         this.focusedSign = this.focusedSign.previous();
                     }
+                    break
+                
+                // down arrow
+                case KEY_CODES.ARROWS.DOWN:
                     break;
+
+                // up arrow
+                case KEY_CODES.ARROWS.UP:
+                    break;
+                
+                // default: handle any other change
+                default:
+
+                    // there's text entered in the field
+                    if (this.input && this.input.length) {
+                        this.focusedSign
+                    }
+
                     break;
             }
 
             // handled the input, reset it
             this.input = ''
+        },
+
+        /**
+         * Handle the user's ctrl + Key event
+         * 
+         * @param {KeyboardEvent} event  The keyboard event received from the input
+         */
+        onCtrlKeyEvent(event) {
+
         },
 
         /**

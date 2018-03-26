@@ -131,8 +131,8 @@ export default {
 }
 
 .sign.focused > .sign-value {
-  margin-right: -1px;
-  border-right: 1px solid black;
+  margin-left: -1px;
+  border-left: 1px solid black;
   animation: 1s blink step-end infinite;
 }
 
