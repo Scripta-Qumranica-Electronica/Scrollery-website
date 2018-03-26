@@ -26,4 +26,12 @@ export default [
       return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
     }
   },
+
+  // 404 - keep at bottom
+  {
+    path: '*',
+    redirect: {
+      name: 'login'
+    }
+  }
 ]
