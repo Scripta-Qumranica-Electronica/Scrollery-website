@@ -237,12 +237,13 @@ describe("Login", function() {
         })
       })
 
-      it('should load i18n and reroute', done => {
-        vm.$i18n.load = () => {
-          return new Promise(resolve => resolve());
-        }
+      it('should load i18n and reroute to workbench', done => {
+        const $i18nLoadStub = sinon.stub().returns(new Promise(resolve => resolve()))
+        vm.$i18n.load = $i18nLoadStub
         vm.$router = {
           push: route => {
+
+            // ensure route is workbench
             expect(route.name).to.equal('workbench')
           }
         }
@@ -255,7 +256,12 @@ describe("Login", function() {
         }
 
         vm.validateLogin(res)
-        .then(() => done())
+        .then(() => {
+
+          // ensure that i18n is attempted to load
+          expect($i18nLoadStub.called).to.equal(true)
+          done()
+        })
         .catch(err => {
           done(new Error('test case expected succesful promise, but failed'))
         })
