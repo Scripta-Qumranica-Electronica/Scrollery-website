@@ -136,6 +136,13 @@ export default {
     },
     validateLogin(res) {
       return new Promise((resolve, reject) => {
+
+        // Safeguard to ensure data given
+        if (!res) {
+          reject(new Error('Login.validateLogin requires a server response'))
+        }
+
+
         if (res.data && res.data.error) {
           this.errMsg = res.data.error
           console.error(res.data)

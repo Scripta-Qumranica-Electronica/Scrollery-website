@@ -4,8 +4,8 @@ import { mount } from '@test'
 import Login from '~/components/Login.vue'
 
 describe("Login", function() {
-    let wrapper, vm
 
+    let wrapper, vm
     beforeEach(() => {
       wrapper = mount(Login)
       vm = wrapper.vm
@@ -193,6 +193,73 @@ describe("Login", function() {
 
       // trigger form submission
       wrapper.vm.onSubmit()
+    })
+
+    describe('validate login', () => {
+      it('should fail if an empty response from server', done => {
+        vm.validateLogin()
+        .then(() => {
+          done(new Error('test case expected failed promise, but succeeded'))
+        })
+        .catch(err => {
+          expect(err instanceof Error).to.equal(true)
+          done()
+        })
+      })
+
+      it('should reject the promise if the response contains an error message', done => {
+        vm.validateLogin({data: {error: true}})
+        .then(() => {
+          done(new Error('test case expected failed promise, but succeeded'))
+        })
+        .catch(err => {
+          expect(err instanceof Error).to.equal(true)
+          done()
+        })
+      })
+
+      it('should reject the promise if the response is not properly formatted', done => {
+        const partialData = {
+          data: {
+
+            // missing a USER_ID
+            SESSION_ID: 12345
+          }
+        }
+
+        vm.validateLogin(partialData)
+        .then(() => {
+          done(new Error('test case expected failed promise, but succeeded'))
+        })
+        .catch(err => {
+          expect(err instanceof Error).to.equal(true)
+          done()
+        })
+      })
+
+      it('should load i18n and reroute', done => {
+        vm.$i18n.load = () => {
+          return new Promise(resolve => resolve());
+        }
+        vm.$router = {
+          push: route => {
+            expect(route.name).to.equal('workbench')
+          }
+        }
+
+        const res = {
+          data: {
+            USER_ID: 1,
+            SESSION_ID: 12345
+          }
+        }
+
+        vm.validateLogin(res)
+        .then(() => done())
+        .catch(err => {
+          done(new Error('test case expected succesful promise, but failed'))
+        })
+      })
     })
 
 })
