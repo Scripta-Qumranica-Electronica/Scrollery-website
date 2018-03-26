@@ -23,6 +23,14 @@ describe("Login", function() {
       expect(vm.language).to.equal('en')
     })
 
+    it('sets initial visibility to false until session is validated', () => {
+      expect(Login.data().visible).to.equal(false)
+
+      // since, on create, it will check the session and immediately become
+      // visible, this is true for the actual Vue component instance
+      expect(vm.visible).to.equal(true)
+    })
+
     it('should post a transaction to validate the session ID', done => {
       const sessionID = '1234567890'
       vm.$post = function(url, payload) {
