@@ -20,7 +20,7 @@ class SignStreamProcessor {
 
     _colToTree(stream, prevKey, mainKey, nextKey) {
         const map = new Map()
-        const object = {map, cols: []}
+        const cols = []
         try {
             stream = this._sortSignStream(stream, mainKey, nextKey)
             let columnNode = 0
@@ -29,20 +29,24 @@ class SignStreamProcessor {
             for (let i = 0, n = stream.length; i < n; i++) {
                 let entry = stream[i]
                 if (entry.col_name != column) {
-                    if (object.cols.length > 0) {
+                    if (cols.length > 0) {
                         columnNode++
                     }
                     column = entry.col_name
-                    object.cols.push({col: column, lines: []})
+                    cols.push({col: column, lines: []})
                     lineNode = 0
                     line = entry.line_name
-                    object.cols[columnNode].lines.push({line: line, lineId: entry.line_id, signs: []})
+                    cols[columnNode].lines.push({
+                        line: line,
+                        lineId: entry.line_id,
+                        signs: []
+                    })
                 } else if (entry.line_name !== line) {
-                    if (object.cols.length > 0) {
+                    if (cols.length > 0) {
                         lineNode++
                     }
                     line = entry.line_name
-                    object.cols[columnNode].lines.push({line: line, lineId: entry.line_id, signs: []})
+                    cols[columnNode].lines.push({line: line, lineId: entry.line_id, signs: []})
                 }
                 // We have to "cast" numeric variables with an unsigned bit shift below
                 // since we cannot (yet) guarantee that the Perl cgi script will
@@ -58,46 +62,62 @@ class SignStreamProcessor {
                     is_retraced: entry.is_retraced >>> 0,
                     prev_sign: entry[prevKey],
                     next_sign: entry[nextKey],
+
+                    // position in stream info
+                    // > col
+                    col_name: entry.col_name,
+                    col_id: entry.col_id,
+
+                    // > line
+                    line_name: entry.line_name,
+                    lineId: entry.line_id
                 }, map)
                 map.set(entry[mainKey], sign)
-                object.cols[columnNode].lines[lineNode].signs.push(sign)
+                cols[columnNode].lines[lineNode].signs.push(sign)
             }
         } catch (err) {
             throw err;
         }
 
-        return object;
+        return {cols, map};
     }
 
     // Pass in here an array of JS objects, each of which has an id (provide the key of this id in "mainID") and a
     // reference to the id of the object that follows it (the key of which must be provided in "nextID").  The
     // function returns a sorted list following the link order.
-    _sortSignStream(stream, mainKey, nextKey) {
+
+    /**
+     * 
+     * @todo This is O(n*2); consider using a BST or some other algorithm that could be O(n) or O(log(n))
+     * 
+     * @param {array.<object>} array   The array of bare sign object
+     * @param {string} mainKey         The main key (???)
+     * @param {string} nextKey         The next key(??)
+     * 
+     * @returns {array.object}         The array of signs, sort
+     */
+    _sortSignStream(array, mainKey, nextKey) {
         let sortedLinkedList = []
         let listMap = new Map()
         let currentId = null
-        let count = stream.length
+        let count = array.length
 
         for (let i = count - 1; i > -1; i--) {
-            if (stream[i][nextKey] === null) {
-                currentId = stream[i][mainKey]
-                sortedLinkedList.push(stream[i])
+            if (array[i][nextKey] === null) {
+                currentId = array[i][mainKey]
+                sortedLinkedList.push(array[i])
             } else {
-                listMap.set(stream[i][nextKey], i)
+                listMap.set(array[i][nextKey], i)
             }
         }
 
-        // for (let i = 1; i < count; i++) {
-        //     sortedLinkedList.splice(0,0,stream[listMap.get(currentId)])
-        //     currentId = stream[listMap.get(currentId)][mainKey]
-        // }
-
-        while (sortedLinkedList.length < stream.length) {
-            if (listMap.get(currentId) === undefined) {
-                throw new Error('This sign stream is broken')
+        while (sortedLinkedList.length < array.length) {
+            if (listMap.has(currentId) === undefined) {
+                throw new Error('This sign array is broken')
             }
-            sortedLinkedList.splice(0, 0, stream[listMap.get(currentId)])
-            currentId = stream[listMap.get(currentId)][mainKey]
+            let item = listMap.get(currentId)
+            sortedLinkedList.splice(0, 0, array[item])
+            currentId = array[item][mainKey]
         }
         
         return sortedLinkedList

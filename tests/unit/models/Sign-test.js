@@ -5,34 +5,21 @@ describe('Sign', () => {
   it('should be constructible', () => {
     let sign = new Sign({
       id: "test"
-    }, null)
+    })
     expect(sign instanceof Sign).to.equal(true)
-  })
-
-  it('should preserve a reference to the map', () => {
-    let map = {}
-    let sign = new Sign({
-      id: "test"
-    }, map)
-    expect(sign.map).to.equal(map)
   })
 
   describe('next sign', () => {
 
-    let sign, map, next
+    let sign, next
     beforeEach(() => {
-      map = new Map()
-
       sign = new Sign({
         id: 1,
         next_sign: 2
-      }, map)
+      })
       next = new Sign({
         id: 2
-      }, map)
-
-      map.set(sign.id, sign)
-      map.set(next.id, next)
+      })
     })
 
     it('should throw an error when attempting to overwrite next sign', () => {
@@ -46,28 +33,19 @@ describe('Sign', () => {
       expect(next.hasNext()).to.equal(false)
     })
 
-    it('should retrieve the next sign', () => {
-      expect(sign.next()).to.equal(next)
-    })
-
   })
 
   describe('previous sign', () => {
 
-    let sign, map, prev
+    let sign, prev
     beforeEach(() => {
-      map = new Map()
-
       sign = new Sign({
         id: 2,
         prev_sign: 1
-      }, map)
+      })
       prev = new Sign({
         id: 1
-      }, map)
-
-      map.set(sign.id, sign)
-      map.set(prev.id, prev)
+      })
     })
 
     it('should throw an error when attempting to overwrite previous sign', () => {
@@ -81,22 +59,16 @@ describe('Sign', () => {
       expect(prev.hasPrevious()).to.equal(false)
     })
 
-    it('should retrieve the previous sign', () => {
-      expect(sign.previous()).to.equal(prev)
-    })
-
   })
 
   describe('attributes', () => {
-    let sign, map
+    let sign
     beforeEach(() => {
-      map = new Map()
       sign = new Sign({
         id: 1,
         sign: '·',
         is_reconstructed: true
-      }, map)
-      map.set(sign.id, sign)
+      })
     })
 
     it('should know if it is a whitespace character', () => {
@@ -106,5 +78,28 @@ describe('Sign', () => {
     it('should know if it is reconstructed', () => {
       expect(sign.reconstructed()).to.equal(true)
     })
+  })
+
+  describe('extending', () => {
+
+    let sign, attrs = {
+      id: 1,
+      sign: '·',
+      is_reconstructed: true
+    }
+    beforeEach(() => {
+      sign = new Sign(attrs)
+    })
+
+    it('should expose an extend method that returns a new sign with the extended attributes', () => {
+      let newSign = sign.extend({
+        col_id: 1
+      })
+      expect(newSign instanceof Sign).to.equal(true)
+      expect(newSign).not.to.equal(sign)
+      expect(newSign.reconstructed()).to.equal(sign.reconstructed())
+      expect(newSign.col_id).to.equal(1)
+    })
+
   })
 })

@@ -8,91 +8,72 @@ const property = value => ({
 /**
  * Manage all the data related to a sign
  * 
+ * Signs are immutable, and any mutations create new signs
+ * 
  * @class
  */
 export default class Sign {
 
   /**
-   * 
    * @param {object} attrs sign attributes
-   * @param {Map} signMap  reference to the map that contains all linked signs
    */
-  constructor(attrs, signMap) {
-    this.map = signMap;
+  constructor(attrs) {
 
-    // set the properties as read only to preserve integretity of the data point
-    Object.defineProperties(this, {
-      id: property(attrs.id),
-      sign: property(attrs.sign),
-      is_variant: property(attrs.is_variant),
-      break_type: property(attrs.break_type),
-      is_reconstructed: property(attrs.is_reconstructed),
-      readability: property(attrs.readability),
-      is_retraced: property(attrs.is_retraced),
-      prev_sign_id: property(attrs.prev_sign),
-      prev_sign: {
-        configurable: false,
-        enumerable: true,
-        get() {
-          signMap.get(this.prev_sign_id)
-        },
-        set() {
-          throw new Error("attempt to write read-only property");
-        }
-      },
-      next_sign_id: property(attrs.next_sign),
-      next_sign: {
-        configurable: false,
-        enumerable: true,
-        get() {
-          signMap.get(this.next_sign_id)
-        },
-        set() {
-          throw new Error("attempt to write read-only property");
-        }
-      },
-    })
+    // set the properties as read only to preserve integrity of the data point
+    const props = {}
+    const keys = Object.keys(attrs)
+    for (var i = 0, n = keys.length; i < n; i++) {
+      let propName = keys[i]
+      props[propName] = property(attrs[propName])
+    }
+
+    // set props on the Sign
+    Object.defineProperties(this, props)
 
     // don't allow new props
-    Object.freeze(this);
+    Object.freeze(this)
+  }
+
+  /**
+   * @public
+   * @instance
+   * 
+   * @param {object} attrs A set of attributes to apply to the copy
+   * @return {Sign}        The sign with the new attributes applied
+   */
+  extend(attrs = {}) {
+    attrs = {
+      ...this, // only enumerable, own properties
+      ...attrs
+    }
+
+    return new Sign(attrs)
   }
 
   /**
    * @return {boolean} whether or not this sign is preceded by another sign
    */
   hasPrevious() {
-    return this.prev_sign_id ? this.map.has(this.prev_sign_id) : false;
-  }
-
-  /**
-   * @return {Sign} The previous sign object
-   */
-  previous() {
-    return this.hasPrevious()
-      ? this.map.get(this.prev_sign_id)
-      : null;
+    return Boolean(this.prev_sign);
   }
 
   /**
    * @return {boolean} whether or not this sign is followed by another sign
    */
   hasNext() {
-    return this.next_sign_id ? this.map.has(this.next_sign_id) : false
+    return Boolean(this.next_sign)
   }
 
   /**
-   * @return {Sign} The next sign object
+   * @returns {boolean} whether or not this sign is a whitespace character
    */
-  next() {
-    return this.hasNext()
-      ? this.map.get(this.next_sign_id)
-      : null;
-  }
-
   isWhitespace() {
     return this.sign === '·'
   }
 
+  /**
+   * @returns {boolean} whether or not this sign is reconstructed
+   */
   reconstructed() {
     return this.is_reconstructed
   }
