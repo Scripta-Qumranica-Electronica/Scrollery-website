@@ -9,13 +9,13 @@
       @click="lockScroll"></i>
     <div class="children" v-show="open">
         <ul>
-          <li v-if="menuType === 'text'" v-for="child in children[menuType]">
+          <li v-if="menuType === 'text'" v-for="child in children[menuType]" :key="child.id">
             <column-menu-item 
               :data-id="child.id >>> 0"
               :name="child.name">
             </column-menu-item>
           </li>
-          <li v-if="menuType === 'image'" v-for="child in children[menuType]">
+          <li v-if="menuType === 'image'" v-for="child in children[menuType]" :key="child.id">
             <image-menu-item 
               :data-id="child.id >>> 0"
               :institution="child.institution"

@@ -6,17 +6,32 @@
     <div class="children" v-show="open">
         <ul>
           <li @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
-          <li v-for="child in children">
+          <li v-for="child in children" :key="child.artefact_id">
             <artefact-menu-item :artefact="child.artefact_id" :name="child.name"></artefact-menu-item>
           </li>
         </ul>
     </div>
+
+    <el-dialog
+      title="Add Artefact"
+      :visible.sync="dialogVisible"
+      width="80%">
+      <add-new-dialog
+        :add-type="'artefacts'"
+        :initial-combination="versionID"
+        :initial-image="dataId"></add-new-dialog>
+      <!-- <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
+      </span> -->
+    </el-dialog>
   </div>
 </template>
 
 <script>
 
 import ArtefactMenuItem from './ArtefactMenuItem.vue'
+import AddNewDialog from './AddNewDialog.vue'
 
 export default {
   props: {
@@ -29,11 +44,13 @@ export default {
   },
   components: {
     'artefact-menu-item': ArtefactMenuItem,
+    'add-new-dialog': AddNewDialog,
   },
   data() {
     return {
       children: [],
       open: false,
+      dialogVisible: false,
     }
   },
   methods: {
@@ -78,22 +95,23 @@ export default {
     },
 
       addArtefact() {
+        this.dialogVisible = true
         //Add code to create new artefact with the CGI script
-        const name = (new Date).getTime()
-        this.children.unshift({
-          name: name,
-          artefact_id: undefined,
-        })
-        this.$router.push({
-            name: 'workbenchAddress',
-            params: {
-                scrollID: this.$route.params.scrollID,
-                scrollVersionID: this.$route.params.scrollVersionID,
-                colID: this.$route.params.colID ? this.$route.params.colID : '~',
-                imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-                artID: `name-${name}`,
-            }
-        })
+        // const name = (new Date).getTime()
+        // this.children.unshift({
+        //   name: name,
+        //   artefact_id: undefined,
+        // })
+        // this.$router.push({
+        //     name: 'workbenchAddress',
+        //     params: {
+        //         scrollID: this.$route.params.scrollID,
+        //         scrollVersionID: this.$route.params.scrollVersionID,
+        //         colID: this.$route.params.colID ? this.$route.params.colID : '~',
+        //         imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
+        //         artID: `name-${name}`,
+        //     }
+        // })
       }
   },
   watch: {
