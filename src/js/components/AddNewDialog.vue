@@ -1,42 +1,46 @@
 <template>
   <div class="addNewDialog">
     <div class="addNewMenu">
-        <el-select 
-            class="combinationSelector" 
-            v-model="selectedCombination" 
-            placeholder="Select a combination" 
-            size="mini">
-            <el-option
-                v-for="combination in combinations"
-                :key="combination.version_id"
-                :label="`${combination.name} - ${combination.version}`"
-                :value="combination.version_id">
-            </el-option>
-        </el-select>
-        <el-select 
-            v-if="addType === 'artefacts'" 
-            class="imageSelector" 
-            v-model="selectedImage" 
-            placeholder="Select an image" 
-            size="mini">
-            <el-option
-                v-for="image in images"
-                :key="image.id"
-                :label="`${image.institution}: ${image.lvl1}-${image.lvl2}, ${image.side >>> 0 === 0 ? 'R' : 'V'}`"
-                :value="image.id">
-            </el-option>
-        </el-select>
-        <ul>
-            <li 
+        <div class="addDialogSelect">
+            <el-select 
+                class="combinationSelector" 
+                v-model="selectedCombination" 
+                placeholder="Select a combination" 
+                size="mini">
+                <el-option
+                    v-for="combination in combinations"
+                    :key="combination.version_id"
+                    :label="`${combination.name} - ${combination.version}`"
+                    :value="combination.version_id">
+                </el-option>
+            </el-select>
+            <el-select 
                 v-if="addType === 'artefacts'" 
-                v-for="artefact in artefacts"
-                :key="artefact.artefact_id">{{artefact.name}}</li>
-             <li 
-                v-if="addType === 'columns'"
-                v-for="column in columns"
-                :key="column.id">{{column.name}}
-            </li>
-        </ul>
+                class="imageSelector" 
+                v-model="selectedImage" 
+                placeholder="Select an image" 
+                size="mini">
+                <el-option
+                    v-for="image in images"
+                    :key="image.id"
+                    :label="`${image.institution}: ${image.lvl1}-${image.lvl2}, ${image.side >>> 0 === 0 ? 'R' : 'V'}`"
+                    :value="image.id">
+                </el-option>
+            </el-select>
+        </div>
+        <div class="addDialogueMenuListings">
+            <ul>
+                <li 
+                    v-if="addType === 'artefacts'" 
+                    v-for="artefact in artefacts"
+                    :key="artefact.artefact_id">{{artefact.name}}</li>
+                <li 
+                    v-if="addType === 'columns'"
+                    v-for="column in columns"
+                    :key="column.id">{{column.name}}
+                </li>
+            </ul>
+        </div>
     </div>
     <div class="addNewDisplay">
         <div v-if="columns">
@@ -51,21 +55,34 @@
 
 <style lang="scss" scoped>
     @import "~sass-vars";
+    .addNewDialog {
+        height: 70vh;
+        min-height: 70vh;
+        max-height: 70vh;
+    }
     .addNewMenu {
-        width: 25%;
-        min-width: 25%;
-        height: 100%;
-        min-height: 100%;
+        width: 20%;
+        min-width: 20%;
+        height: 65vh;
+        min-height: 65vh;
         background: $ltBlue;
         float: left;
     }
+    .addDialogSelect {
+        height: 60px;
+    }
+    .addDialogueMenuListings {
+        overflow: auto;
+        height: calc(60vh - 60px);
+        min-height: calc(60vh - 60px);
+    }
     .addNewDisplay {
-        width: 75%;
-        min-width: 75%;
-        height: 100%;
-        min-height: 100%;
+        width: 80%;
+        min-width: 80%;
+        height: 65vh;
+        min-height: 65vh;
         background: gray;
-        margin-left: 25%;
+        margin-left: 20%;
     }
 </style>
 
@@ -146,13 +163,11 @@ export default {
             }
         },
         selectedImage(to, from) {
-            if (to !== from) {
-                if (this.addType === 'artefacts') {
-                    console.log(`Selected image is: ${to}`)
-                    this.populateList('artefacts')
-                } else {
-                    //just view the image
-                }
+            if (this.addType === 'artefacts') {
+                console.log(`Selected image is: ${to}`)
+                this.populateList('artefacts')
+            } else {
+                //just view the image
             }
         },
     }

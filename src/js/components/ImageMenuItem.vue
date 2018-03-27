@@ -15,7 +15,9 @@
     <el-dialog
       title="Add Artefact"
       :visible.sync="dialogVisible"
-      width="80%">
+      width="80vw"
+      height="80vh"
+      >
       <add-new-dialog
         :add-type="'artefacts'"
         :initial-combination="versionID"
