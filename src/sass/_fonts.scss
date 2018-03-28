@@ -2,3 +2,43 @@
   font-family: 'SBL Hebrew';
   src: url(../../assets/fonts/SBL_Hbrw.woff);
 }
+
+.text-sbl-hebrew {
+  font-family: 'SBL Hebrew', serif;
+}
+
+@font-face {
+  font-family: '4Q416';
+  src: url(../../assets/fonts/4Q416new.woff);
+}
+
+.text-4Q416 {
+  font-family: '4Q416', 'SBL Hebrew', serif;
+}
+
+@font-face {
+  font-family: '4Q417';
+  src: url(../../assets/fonts/4Q417new.woff);
+}
+
+.text-4Q417 {
+  font-family: '4Q417', 'SBL Hebrew', serif;
+}
+
+@font-face {
+  font-family: '4Q418';
+  src: url(../../assets/fonts/4Q418new.woff);
+}
+
+.text-4Q418 {
+  font-family: '4Q418', 'SBL Hebrew', serif;
+}
+
+@font-face {
+  font-family: 'cryptic';
+  src: url(../../assets/fonts/cryptica-haifauni-regular.woff);
+}
+
+.text-cryptic {
+  font-family: 'cryptic', 'SBL Hebrew', serif;
+}

@@ -18,6 +18,7 @@ module.exports = {
   "New Artefact": "New Artefact",
 
   // Editor
+  "Editor.HandOf": "Hand of",
   "Editor.Fullscreen": "Show fullscreen",
   "Editor.ToggleReconstructedText": "Toggle reconstructed text"
 };
