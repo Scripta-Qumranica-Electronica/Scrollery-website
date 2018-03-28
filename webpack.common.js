@@ -72,7 +72,7 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              publicPath: "/dist/"
+              publicPath: "dist/"
             }  
           }
         ]
