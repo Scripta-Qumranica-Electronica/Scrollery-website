@@ -4,13 +4,15 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 module.exports = {
-  entry: path.resolve(__dirname, 'src', 'js', 'main.js'),
+  entry: path.join(__dirname, 'src', 'js', 'main.js'),
 
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.join(__dirname, "dist"),
     filename: "bundle.[name].js",
     publicPath: "dist/",
   },
+
+  context: __dirname,
 
   module: {
     rules: [
@@ -32,7 +34,7 @@ module.exports = {
             {
               loader: 'sass-resources-loader',
               options: {
-                resources: path.resolve(__dirname, 'src/sass/_variables.scss')
+                resources: path.join(__dirname, 'src/sass/_variables.scss')
               }
             }
           ],
@@ -70,7 +72,6 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              outputPath: path.resolve(__dirname, "dist"),
               publicPath: "/dist/"
             }  
           }
@@ -82,11 +83,11 @@ module.exports = {
   resolve: {
     alias: {
       "vue": 'vue/dist/vue.js',
-      "@": path.resolve(__dirname),
-      "~": path.resolve(__dirname, "src", "js"),
-      "sass": path.resolve(__dirname, "src", "sass"),
-      "sass-vars$": path.resolve(__dirname, "src", "sass", "_variables.scss"),
-      "legacy": path.resolve(__dirname, "resources", "js")
+      "@": path.join(__dirname),
+      "~": path.join(__dirname, "src", "js"),
+      "sass": path.join(__dirname, "src", "sass"),
+      "sass-vars$": path.join(__dirname, "src", "sass", "_variables.scss"),
+      "legacy": path.join(__dirname, "resources", "js")
     }
   },
 
