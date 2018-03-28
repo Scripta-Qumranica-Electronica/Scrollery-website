@@ -1,13 +1,17 @@
 import { Store } from 'vuex'
 
-export default () => new Store({
+export default $i18n => (new Store({
   state: {
     showReconstructedText: true,
-    fontClass: 'text-sbl-hebrew'
+    font: {
+      name: 'SBL Hebrew',
+      class: 'text-sbl-hebrew',
+      label: `SBL Hebrew (${$i18n.str('Editor.HandOf')})` 
+    }
   },
   getters: {
     showReconstructedText: state => state.showReconstructedText,
-    font: state => state.fontClass
+    font: state => state.font
   },
   mutations: {
     showReconstructedText(state) {
@@ -16,8 +20,8 @@ export default () => new Store({
     hideReconstructedText(state) {
         state.showReconstructedText = false;
     },
-    setFontClass(state, font) {
-        state.fontClass = font
+    setFont(state, font) {
+        state.font = font
     }
   }
-})
+}))

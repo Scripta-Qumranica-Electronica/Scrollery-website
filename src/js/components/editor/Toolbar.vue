@@ -1,8 +1,8 @@
 <template>
   <div class="toolbar">
-    <el-dropdown :hide-on-click="true" @command="handleFontChange">
+    <el-dropdown :hide-on-click="true" trigger="click" @command="handleFontChange">
       <span class="el-dropdown-link">
-        Select Font <i class="el-icon-arrow-down el-icon--right"></i>
+        {{ fontName }} <i class="el-icon-arrow-down el-icon--right"></i>
       </span>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item v-for="(font, key) in fonts" :key="key" :command="key">
@@ -39,8 +39,9 @@ export default {
 
     // todo: move into store
     return {
+      fontName: 'SBL Hebrew',
       fonts: {
-        'default': {
+        'SBL Hebrew': {
           name: 'SBL Hebrew',
           class: 'text-sbl-hebrew',
           label: `SBL Hebrew (${i18n.default})` 
@@ -76,7 +77,8 @@ export default {
     },
     handleFontChange(font) {
       if (this.fonts[font]) {
-        this.state.commit('setFontClass', this.fonts[font].class)
+        this.fontName = font
+        this.state.commit('setFont', this.fonts[font])
       }
     }
   }

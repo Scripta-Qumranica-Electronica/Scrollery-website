@@ -99,7 +99,7 @@ export default {
       }
 
       // add font
-      classes[this.state.getters.font] = true;
+      classes[this.state.getters.font.class] = true;
 
       return classes;
     }
