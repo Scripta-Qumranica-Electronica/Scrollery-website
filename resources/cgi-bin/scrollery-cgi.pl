@@ -183,11 +183,12 @@ SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
 	   image_catalog.image_catalog_id AS id
 FROM image_catalog
 	JOIN image_to_edition_catalog USING (image_catalog_id)
-	JOIN edition_catalog_to_discrete_reference USING (edition_catalog_id)
-	JOIN discrete_canonical_reference USING (discrete_canonical_reference_id)
+	JOIN edition_catalog USING(edition_catalog_id)
+	JOIN scroll_data
+	ON scroll_data.name = edition_catalog.composition
 	JOIN SQE_image USING(image_catalog_id)
-WHERE discrete_canonical_reference.scroll_id = ?
-	AND SQE_image.is_master = 1
+WHERE scroll_data.scroll_id = ?	
+AND SQE_image.is_master = 1
 ORDER BY lvl1, lvl2, side
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
