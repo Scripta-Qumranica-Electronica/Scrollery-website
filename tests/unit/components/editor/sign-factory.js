@@ -6,7 +6,9 @@ import editorStore from '~/components/editor/EditorStore.js'
 export default (props = {}) => mount(Sign, {
   propsData: Object.assign({
     showReconstructedSigns: true,
-    state: editorStore(),
+    state: editorStore({
+      str: key => key
+    }),
     sign: new SignModel({
       id: 1
     }, new Map()),

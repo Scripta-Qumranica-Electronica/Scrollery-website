@@ -89,7 +89,7 @@ export default {
      * @return {object} a plain object with Vue-compatible classes and relevant conditions
      */
     signClasses() {
-      return {
+      const classes = {
         complete: !this.sign.is_reconstructed,
         visible: this.isVisible,
         focused: this.isInFocus,
@@ -97,6 +97,11 @@ export default {
         incomplete_clear: this.sign.readability === attributes.readability.incomplete.clear,
         incomplete_not_clear: this.sign.readability === attributes.readability.incomplete.unclear
       }
+
+      // add font
+      classes[this.state.getters.font.class] = true;
+
+      return classes;
     }
   },
   methods: {
@@ -115,7 +120,6 @@ export default {
 <style lang="scss" scoped>
 .sign {
   visibility: hidden;
-  font-family: 'SBL Hebrew';
   font-size: 0;
   letter-spacing: .4px;
   white-space: nowrap;
