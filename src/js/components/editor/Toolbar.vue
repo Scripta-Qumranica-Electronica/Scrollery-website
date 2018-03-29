@@ -61,6 +61,11 @@ export default {
           class: 'text-4Q418',
           label: `${i18n.handOf} 4Q418`
         },
+        '4Q503': {
+          name: '4Q503',
+          class: 'text-4Q503',
+          label: `${i18n.handOf} 4Q503`
+        },
         'cryptic': {
           name: 'Cryptic',
           class: 'text-cryptic',

@@ -1,3 +1,4 @@
+// SBL Hebrew
 @font-face {
   font-family: 'SBL Hebrew';
   src: url(../../assets/fonts/SBL_Hbrw.woff);
@@ -7,6 +8,7 @@
   font-family: 'SBL Hebrew', serif;
 }
 
+// Hand of 4Q416
 @font-face {
   font-family: '4Q416';
   src: url(../../assets/fonts/4Q416new.woff);
@@ -16,6 +18,7 @@
   font-family: '4Q416', 'SBL Hebrew', serif;
 }
 
+// Hand of 4Q417
 @font-face {
   font-family: '4Q417';
   src: url(../../assets/fonts/4Q417new.woff);
@@ -25,6 +28,7 @@
   font-family: '4Q417', 'SBL Hebrew', serif;
 }
 
+// Hand of 4Q418
 @font-face {
   font-family: '4Q418';
   src: url(../../assets/fonts/4Q418new.woff);
@@ -34,6 +38,17 @@
   font-family: '4Q418', 'SBL Hebrew', serif;
 }
 
+// Hand of 4Q503
+@font-face {
+  font-family: '4Q503';
+  src: url(../../assets/fonts/4Q503.woff);
+}
+
+.text-4Q503 {
+  font-family: '4Q503', 'SBL Hebrew', serif;
+}
+
+// Cryptic
 @font-face {
   font-family: 'cryptic';
   src: url(../../assets/fonts/cryptica-haifauni-regular.woff);
