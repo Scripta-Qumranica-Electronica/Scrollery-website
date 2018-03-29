@@ -1,8 +1,8 @@
 <template>
   <div class="toolbar">
-    <el-dropdown :hide-on-click="true" trigger="click" @command="handleFontChange">
+    <el-dropdown :hide-on-click="true" trigger="click" @command="onFontChange">
       <span class="el-dropdown-link">
-        {{ fontName }} <i class="el-icon-arrow-down el-icon--right"></i>
+        {{ font.name }} <i class="el-icon-arrow-down el-icon--right"></i>
       </span>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item v-for="(font, key) in fonts" :key="key" :command="key">
@@ -21,7 +21,6 @@
 </template>
 
 <script>
-
 import { Store } from 'vuex'
 
 export default {
@@ -31,47 +30,20 @@ export default {
       required: true
     }
   },
-  data() {
-    const i18n = {
-      handOf: this.$i18n.str("Editor.HandOf"),
-      default: this.$i18n.str("Global.Default") 
-    }
+  computed: {
 
-    // todo: move into store
-    return {
-      fontName: 'SBL Hebrew',
-      fonts: {
-        'SBL Hebrew': {
-          name: 'SBL Hebrew',
-          class: 'text-sbl-hebrew',
-          label: `SBL Hebrew (${i18n.default})` 
-        },
-        '4Q416': {
-          name: '4Q416',
-          class: 'text-4Q416',
-          label: `${i18n.handOf} 4Q416`
-        },
-        '4Q417': {
-          name: '4Q417',
-          class: 'text-4Q417',
-          label: `${i18n.handOf} 4Q417`
-        },
-        '4Q418': {
-          name: '4Q418',
-          class: 'text-4Q418',
-          label: `${i18n.handOf} 4Q418`
-        },
-        '4Q503': {
-          name: '4Q503',
-          class: 'text-4Q503',
-          label: `${i18n.handOf} 4Q503`
-        },
-        'cryptic': {
-          name: 'Cryptic',
-          class: 'text-cryptic',
-          label: 'Cryptic'
-        }
-      }
+    /**
+     * @type {object} an object representing the current font in use
+     */
+    fonts() {
+      return this.state.getters.fonts
+    },
+
+    /**
+     * @type {object} an object whose keys are font-keys, and values are font objects
+     */
+    font() {
+      return this.state.getters.font
     }
   },
   methods: {
@@ -80,11 +52,12 @@ export default {
         ? this.state.commit('hideReconstructedText')
         : this.state.commit('showReconstructedText')
     },
-    handleFontChange(font) {
-      if (this.fonts[font]) {
-        this.fontName = font
-        this.state.commit('setFont', this.fonts[font])
-      }
+
+    /**
+     * @param {string} font  The font key (corresponding to it's key in the state.fonts object)
+     */
+    onFontChange(font) {
+      this.state.commit('setFont', font)
     }
   }
 }
