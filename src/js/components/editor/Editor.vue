@@ -94,7 +94,7 @@ export default {
             /**
              * @type {Store} A Vuex store for the editor component tree
              */
-            state: editorStore()
+            state: editorStore(this.$i18n)
         }
     },
     methods: {

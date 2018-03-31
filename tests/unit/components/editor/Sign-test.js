@@ -3,11 +3,12 @@ import SignModel from '~/models/Sign.js'
 import Sign from '~/components/editor/Sign.vue'
 import editorStore from '~/components/editor/EditorStore.js'
 
+
+const mocki18n = {
+  str: key => key
+}
+
 describe('Sign.vue', () => {
-
-  describe('DOM', () => {
-
-  })
 
   describe('reconstructed', () => {
     let model, state, wrapper, vm
@@ -20,7 +21,7 @@ describe('Sign.vue', () => {
       }, new Map());
 
       // test wrapper
-      state = editorStore();
+      state = editorStore(mocki18n);
       wrapper = signFactory({
         sign: model,
         state 
@@ -56,7 +57,7 @@ describe('Sign.vue', () => {
       }, new Map());
 
       // test wrapper
-      state = editorStore();
+      state = editorStore(mocki18n);
       wrapper = signFactory({
         sign: model,
         state 
@@ -92,7 +93,7 @@ describe('Sign.vue', () => {
       }, new Map());
 
       // test wrapper
-      state = editorStore();
+      state = editorStore(mocki18n);
       wrapper = signFactory({
         sign: model,
         state 
@@ -105,6 +106,48 @@ describe('Sign.vue', () => {
     it('should know if it is a whitespace sign or not', () => {
       expect(vm.isWhitespace).to.equal(true)
     })
+  })
+
+  describe('fonts', () => {
+
+    let model, state, wrapper, vm
+    beforeEach(() => {
+
+      // sign model
+      model = new SignModel({
+        id: 1
+      }, new Map());
+
+      // test wrapper
+      state = editorStore(mocki18n);
+      wrapper = signFactory({
+        sign: model,
+        state 
+      })
+
+      // component instance
+      vm = wrapper.vm
+    })
+    
+    it('should set its font class to the initial font', () => {
+      let initial = vm.state.getters.font
+      let classes = vm.signClasses
+      
+      expect(Object.keys(classes).indexOf(initial.class)).to.be.above(-1)
+    })
+
+    it('should respond to font changes by changing its class', () => {
+      let fonts = vm.state.getters.fonts
+
+      // fonts is an object, grab the first key off of it.
+      // and change the font to that font in the store
+      let fontName = Object.keys(fonts)[1];
+      vm.state.commit('setFont', fontName)
+      
+      // expect that the sign has responded to that change
+      expect(Object.keys(vm.signClasses).indexOf(fonts[fontName].class)).to.be.above(-1)
+    })
+
   })
 
   describe('focus', () => {
@@ -120,7 +163,7 @@ describe('Sign.vue', () => {
         }, new Map());
   
         // test wrapper
-        state = editorStore();
+        state = editorStore(mocki18n);
         wrapper = signFactory({
           sign: model,
           state,
@@ -147,7 +190,7 @@ describe('Sign.vue', () => {
         }, new Map());
   
         // test wrapper
-        state = editorStore();
+        state = editorStore(mocki18n);
         wrapper = signFactory({
           sign: model,
           state,
@@ -178,7 +221,7 @@ describe('Sign.vue', () => {
         }, new Map());
   
         // test wrapper
-        state = editorStore();
+        state = editorStore(mocki18n);
         wrapper = signFactory({
           sign: model,
           state
