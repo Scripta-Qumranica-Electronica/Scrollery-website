@@ -3,6 +3,8 @@
 
     <!-- toggle for expanding/collapsing menu -->
     <input type="checkbox" id="show-hide-menu" class="hidden" v-model="keepMenuOpen" />
+    <span v-if="menuCorpus && menuCorpus._id && menuCorpus.itemAtIndex(0)">{{menuCorpus.itemAtIndex(0).name}}</span>
+    <span v-if="menuCorpus && menuCorpus._id && menuCorpus.itemWithID(302934)">{{menuCorpus.itemWithID(302934).name}}</span>
 
     <!-- main menu in sidebar -->
     <main-menu
@@ -98,6 +100,9 @@ import SplitPane from 'vue-splitpane'
 import SingleImage from './SingleImage.vue'
 import Editor from './editor/Editor.vue'
 import Combination from './Combination.vue'
+import { mapMutations, mapGetters } from 'vuex'
+
+import MenuCorpus from '~/models/MenuCorpus.js'
 
 export default {
   components: {
@@ -111,13 +116,35 @@ export default {
   data() {
     return {
       keepMenuOpen: false,
-      mouseOver: false
+      mouseOver: false,
+      // menuCorpus: new MenuCorpus(this.$post, 5, this.$set),
     }
   },
   computed: {
     menuOpen() {
       return this.mouseOver || this.keepMenuOpen
-    }
-  }
+    },
+    ...mapGetters(
+      ['menuCorpus'],
+    ),
+  },
+  methods: {
+    ...mapMutations([
+      'setMenuCorpus',
+    ]),
+  },
+  mounted() {
+    this.setMenuCorpus(new MenuCorpus(this.$post, 5, this.$set))
+
+    setTimeout(() => {
+      this.menuCorpus.insert({name: 'bronson', version_id: 302934}, 0)
+      console.log(this.menuCorpus.itemAtIndex(0))
+    }, 10000)
+
+    setTimeout(() => {
+      this.menuCorpus.changeItemValue(302934, 'name', 'jerk')
+      console.log(this.menuCorpus.itemAtIndex(0))
+    }, 20000)
+  },
 }
 </script>

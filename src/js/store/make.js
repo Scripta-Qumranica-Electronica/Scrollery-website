@@ -5,7 +5,8 @@ export default function(Vuex, plugins) {
       userID: -1,
       username: '',
       language: 'en',
-      languages: {}
+      languages: {},
+      menuCorpus: undefined,
     },
     getters: {
       sessionID: state => state.sessionID,
@@ -15,7 +16,8 @@ export default function(Vuex, plugins) {
       languages: state => state.languages,
       scrollID: state => state.scrollID,
       scrollVersionID: state => state.scrollVersionID,
-      colID: state => state.colID
+      colID: state => state.colID,
+      menuCorpus: state => state.menuCorpus,
     },
     mutations: {
       logout(state) {
@@ -36,7 +38,10 @@ export default function(Vuex, plugins) {
       },
       loadLanguage(state, {key, data}) {
         state.languages[key] = data
-      }
+      },
+      setMenuCorpus(state, menuCorpus) {
+        state.menuCorpus = menuCorpus
+      },
     },
     plugins
   })
