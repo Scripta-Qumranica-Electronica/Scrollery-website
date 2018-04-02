@@ -8,10 +8,10 @@
                 placeholder="Select a combination" 
                 size="mini">
                 <el-option
-                    v-for="combination in combinations"
-                    :key="combination.version_id"
-                    :label="`${combination.name} - ${combination.version}`"
-                    :value="combination.version_id">
+                    v-for="combination in corpus.combinations._itemList"
+                    :key="'addmenu-combination-' + combination"
+                    :label="`${corpus.combinations.itemWithID(combination).name} - ${corpus.combinations.itemWithID(combination).version}`"
+                    :value="combination">
                 </el-option>
             </el-select>
             <el-select 
@@ -21,19 +21,20 @@
                 placeholder="Select an image" 
                 size="mini">
                 <el-option
-                    v-for="image in images"
-                    :key="image.id"
-                    :label="`${image.institution}: ${image.lvl1}-${image.lvl2}, ${image.side >>> 0 === 0 ? 'R' : 'V'}`"
-                    :value="image.id">
+                    v-if="selectedCombination"
+                    v-for="image in corpus.combinations.itemWithID(selectedCombination).images"
+                    :key="'addmenu-image-' + image"
+                    :label="`${corpus.images.itemWithID(image).institution}: ${corpus.images.itemWithID(image).lvl1}, ${corpus.images.itemWithID(image).lvl2} ${corpus.images.itemWithID(image).side === 0 ? 'R' : 'V'}`"
+                    :value="image">
                 </el-option>
             </el-select>
         </div>
         <div class="addDialogueMenuListings">
             <ul>
                 <li 
-                    v-if="addType === 'artefacts'" 
-                    v-for="artefact in artefacts"
-                    :key="artefact.artefact_id">{{artefact.name}}</li>
+                    v-if="addType === 'artefacts' && selectedImage" 
+                    v-for="artefact in corpus.images.itemWithID(selectedImage).artefacts"
+                    :key="'addmenu-artefact-' + artefact">{{corpus.artefacts.itemWithID(artefact).name}}</li>
                 <li 
                     v-if="addType === 'columns'"
                     v-for="column in columns"
@@ -94,6 +95,7 @@ export default {
         addType: '',
         initialCombination: '',
         initialImage: '',
+        corpus: {},
     },
     data() {
         return {
@@ -111,65 +113,17 @@ export default {
             selectedImage: this.initialImage,
         }
     },
-    created() {
-        this.populateList('combinations')
-    },
-    methods: {
-        populateList(dropdown) {
-            let request = {
-                transaction: this.referenceType[dropdown],
-                version_id: this.selectedCombination,
-            }
-            if (dropdown === 'images' || dropdown === 'columns') {
-                request.combID = this.selectedCombination
-            } else if (dropdown === 'artefacts') {
-                request.image_id = this.selectedImage
-            }
-
-            this.$post('resources/cgi-bin/scrollery-cgi.pl', request)
-            .then(res => {
-                if (res.status === 200 && res.data) {
-                    switch(dropdown) {
-                        case 'combinations':
-                            this.combinations = undefined
-                            this.combinations = res.data.results
-                            break
-                        case 'images':
-                            this.images = undefined
-                            this.images = res.data.results
-                            break
-                        case 'columns':
-                            this.columns = undefined
-                            this.columns = res.data.results
-                            break
-                        case 'artefacts':
-                            this.artefacts = undefined
-                            this.artefacts = res.data.results
-                            break
-                    }
-                }
-            })
-            .catch(console.error)
-        },
-    },
     watch: {
         selectedCombination(to, from) {
+            console.log('from: ' + from + ', to: ' + to)
             if (to !== from) {
-                if (this.addType === 'images' || this.addType === 'artefacts') {
-                    this.populateList('images')
-                } else {
-                    this.populateList('columns')
-                }
+                this.corpus.populateImagesOfScrollVersion(to, this.corpus.combinations.itemWithID(to).scroll_id)
+                .then(res => {
+                    this.selectedImage = this.corpus.combinations.itemWithID(to).images[0] || 
+                    undefined
+                })
             }
-        },
-        selectedImage(to, from) {
-            if (this.addType === 'artefacts') {
-                console.log(`Selected image is: ${to}`)
-                this.populateList('artefacts')
-            } else {
-                //just view the image
-            }
-        },
-    }
+        }
+    },
 }
 </script>

@@ -24,7 +24,8 @@
       <add-new-dialog
         :add-type="'artefacts'"
         :initial-combination="versionID"
-        :initial-image="dataId"></add-new-dialog>
+        :initial-image="dataId"
+        :corpus="corpus"></add-new-dialog>
       <!-- <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">Cancel</el-button>
         <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>

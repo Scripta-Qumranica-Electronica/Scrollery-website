@@ -9,8 +9,8 @@
       @click="lockScroll"></i>
     <div class="children" v-show="open">
         <ul>
+          <li><span>columns</span></li>
           <li 
-            v-if="menuType === 'text' && corpus.combinations.itemWithID(versionID).columns" 
             v-for="column in corpus.combinations.itemWithID(versionID).columns" 
             :key="'column-' + column">
             <column-menu-item 
@@ -19,10 +19,10 @@
               :corpus="corpus">
             </column-menu-item>
           </li>
+          <li><span>images</span></li>
           <li 
-            v-if="menuType === 'image' && corpus.combinations.itemWithID(versionID).images" 
             v-for="image in corpus.combinations.itemWithID(versionID).images" 
-            :key="'image-' + image">
+            :key="'menu-image-' + image">
             <image-menu-item 
               :data-id="corpus.images.itemWithID(image).id"
               :version-i-d="versionID"

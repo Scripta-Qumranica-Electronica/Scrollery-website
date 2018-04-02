@@ -64,6 +64,16 @@ class MenuObject {
    * @public 
    * @instance
    * 
+   * @return {Array<Number>}       list of all items
+   */
+  items() {
+    return (this._itemList)
+  }
+
+  /**
+   * @public 
+   * @instance
+   * 
    * @param {number} index the item index to retrieve 
    * 
    * @return {Model}       the Model object

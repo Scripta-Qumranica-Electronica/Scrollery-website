@@ -31,45 +31,59 @@ class MenuCorpus {
   }
 
   populateCombinations() {
-    this.combinations.populate() 
+    return new Promise((resolve, reject) => {
+      this.combinations.populate()
+      .then(res => {
+        resolve(res)
+      })
+    }) 
   }
 
   populateColumnsOfScrollVersion(scrollVersionID, combinationID) {
-    this.columns.populate({version_id: scrollVersionID, combID: combinationID})
-    .then(res => {
-      let columnIDArray = []
-      res.forEach(column => {
-        columnIDArray.push(column[this.columns.itemIDKey])
+    return new Promise((resolve, reject) => {
+      this.columns.populate({version_id: scrollVersionID, combID: combinationID})
+      .then(res => {
+        let columnIDArray = []
+        res.forEach(column => {
+          columnIDArray.push(column[this.columns.itemIDKey])
+        })
+        if (!this.combinations.itemAtIndex(scrollVersionID) || columnIDArray !== this.combinations.itemAtIndex(scrollVersionID).columns) {
+          this.combinations.changeItemValue(scrollVersionID, 'columns', columnIDArray)
+        }
+        resolve(res)
       })
-      if (!this.combinations.itemAtIndex(scrollVersionID) || columnIDArray !== this.combinations.itemAtIndex(scrollVersionID).columns) {
-        this.combinations.changeItemValue(scrollVersionID, 'columns', columnIDArray)
-      }
     })
   }
 
   populateImagesOfScrollVersion(scrollVersionID, combinationID) {
-    this.images.populate({combID: combinationID})
-    .then(res => {
-      let imageIDArray = []
-      res.forEach(image => {
-        imageIDArray.push(image[this.images.itemIDKey])
+    return new Promise((resolve, reject) => {
+      this.images.populate({combID: combinationID})
+      .then(res => {
+        let imageIDArray = []
+        res.forEach(image => {
+          imageIDArray.push(image[this.images.itemIDKey])
+        })
+        if (!this.combinations.itemAtIndex(scrollVersionID) || imageIDArray !== this.combinations.itemAtIndex(scrollVersionID).images) {
+          this.combinations.changeItemValue(scrollVersionID, 'images', imageIDArray)
+        }
+        resolve(res)
       })
-      if (!this.combinations.itemAtIndex(scrollVersionID) || imageIDArray !== this.combinations.itemAtIndex(scrollVersionID).images) {
-        this.combinations.changeItemValue(scrollVersionID, 'images', imageIDArray)
-      }
     })
   }
 
   populateArtefactsofImage(scrollVersionID, imageID) {
-    this.artefacts.populate({image_id: imageID, version_id: scrollVersionID})
-    .then(res => {
-      let artefactIDArray = []
-      res.forEach(artefact => {
-        artefactIDArray.push(artefact[this.artefacts.itemIDKey])
+    return new Promise((resolve, reject) => {
+      this.artefacts.populate({image_id: imageID, version_id: scrollVersionID})
+      .then(res => {
+        let artefactIDArray = []
+        res.forEach(artefact => {
+          artefactIDArray.push(artefact[this.artefacts.itemIDKey])
+        })
+        if (!this.images.itemAtIndex(imageID) || artefactIDArray !== this.images.itemAtIndex(imageID).artefacts) {
+          this.images.changeItemValue(imageID, 'artefacts', artefactIDArray)
+        }
+        resolve(res)
       })
-      if (!this.images.itemAtIndex(imageID) || artefactIDArray !== this.images.itemAtIndex(imageID).artefacts) {
-        this.images.changeItemValue(imageID, 'artefacts', artefactIDArray)
-      }
     })
   }
 }
