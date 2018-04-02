@@ -1,9 +1,39 @@
-const property = value => ({
-  writable: false,
-  configurable: false,
-  enumerable: true,
-  value
-})
+import { Record } from 'immutable'
+
+
+/**
+ * Default values for a new sign object
+ * 
+ * @static
+ * @constant
+ */
+const defaults = {
+  sign_id: 0,
+  id: 0,
+  sign: '',
+
+  // characteristics
+  readability: '',
+  break_type: '',
+  is_reconstructed: 0,
+  is_variant: 0,
+  is_retraced: 0,
+  is_whitespace: 0,
+
+  // position in stream info
+
+  // > peers
+  prev_sign_id: 0,
+  next_sign_id: 0,
+
+  // > col
+  col_name: '',
+  col_id: 0,
+
+  // > line
+  line_name: '',
+  line_id: 0
+}
 
 /**
  * Manage all the data related to a sign
@@ -11,27 +41,24 @@ const property = value => ({
  * Signs are immutable, and any mutations create new signs
  * 
  * @class
+ * @extends Record
  */
-export default class Sign {
+export default class Sign extends Record(defaults) {
+
+  constructor(attrs) {
+    attrs.id = attrs.sign_id
+    attrs.is_whitespace = (!attrs.sign || attrs.sign === '')
+    super(attrs)
+  }
 
   /**
-   * @param {object} attrs sign attributes
+   * @public
+   * @instance
+   * 
+   * @return {string} the sign Id
    */
-  constructor(attrs) {
-
-    // set the properties as read only to preserve integrity of the data point
-    const props = {}
-    const keys = Object.keys(attrs)
-    for (var i = 0, n = keys.length; i < n; i++) {
-      let propName = keys[i]
-      props[propName] = property(attrs[propName])
-    }
-
-    // set props on the Sign
-    Object.defineProperties(this, props)
-
-    // don't allow new props
-    Object.freeze(this)
+  getID() {
+    return this.id
   }
 
   /**
@@ -43,7 +70,7 @@ export default class Sign {
    */
   extend(attrs = {}) {
     attrs = {
-      ...this, // only enumerable, own properties
+      ...this.toJS(), // only enumerable, own properties
       ...attrs
     }
 
@@ -54,21 +81,14 @@ export default class Sign {
    * @return {boolean} whether or not this sign is preceded by another sign
    */
   hasPrevious() {
-    return Boolean(this.prev_sign);
+    return Boolean(this.prev_sign_id);
   }
 
   /**
    * @return {boolean} whether or not this sign is followed by another sign
    */
   hasNext() {
-    return Boolean(this.next_sign)
-  }
-
-  /**
-   * @returns {boolean} whether or not this sign is a whitespace character
-   */
-  isWhitespace() {
-    return this.sign === '·'
+    return Boolean(this.next_sign_id)
   }
 
   /**
@@ -76,5 +96,12 @@ export default class Sign {
    */
   reconstructed() {
     return this.is_reconstructed
+  }
+
+  /**
+   * @returns {string} 
+   */
+  toDOMString() {
+    return this.is_whitespace ? '&nbsp;' : this.sign
   }
 }

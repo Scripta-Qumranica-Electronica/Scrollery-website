@@ -10,14 +10,6 @@ import Sign from './Sign.js'
  */
 class Line extends List {
 
-  /**
-   * @param {object}        attributes  The line attributes
-   * @param {array.<Signs>=[]} signs       An array of signs that comprise the line
-   */
-  constructor(attributes, signs = []) {
-    super(attributes, signs)
-  }
-
   static getModel() {
     return Sign;
   }
@@ -51,6 +43,21 @@ class Line extends List {
     }
 
     super.push(this._setAttributes(sign))
+  }
+
+  toDOMString() {
+    return `<p data-line-id="${this.getID()}">${this.toString()}</p>`
+  }
+
+  /**
+   * @returns {string} a plain string with all signs
+   */
+  toString() {
+    let str = ''
+    this.forEach(sign => {
+      str += sign.toDOMString()
+    }, this)
+    return str
   }
 
   /**

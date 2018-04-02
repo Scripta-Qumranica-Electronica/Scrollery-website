@@ -1,12 +1,5 @@
 <template>
-    <span class="sign"
-      @click="onClick"
-      :class="signClasses"
-    >
-      <span v-if="showReconstructedStart" class="reconstruction-start">[</span>
-      <span class="sign-value" :class='{whitespace: isWhitespace}'>{{isWhitespace ? '  ' : sign.sign}}</span>
-      <span v-if="showReconstructedEnd" class="reconstruction-end">]</span>
-    </span>
+<span class="sign" :class="signClasses" :data-sign-id="sign.id" :data-sign-index="index" :data-line-index="lineIndex">{{isWhitespace ? '  ' : sign.sign}}</span>
 </template>
 
 <script>
@@ -34,10 +27,13 @@ export default {
       type: Sign,
       required: true
     },
-    focusedSignId: {
+    lineIndex: {
       type: Number,
-      required: false,
-      default: -1
+      required: true
+    },
+    index: {
+      type: Number,
+      required: true
     }
   },
   computed: {
@@ -52,37 +48,10 @@ export default {
     },
 
     /**
-     * Whether or not the sign is currently in focus
-     */
-    isInFocus() {
-      return this.sign.id === this.focusedSignId;
-    },
-
-    /**
      * Whether or not to show the current sign is a whitespace-type sign
      */
     isWhitespace() {
       return this.sign.isWhitespace();
-    },
-    
-    /**
-     * Reconstruction start should be shown if this sign is reconstructed
-     * and it's not preceded by a reconstructed sign. 
-     */
-    showReconstructedStart() {
-      return this.sign.reconstructed() && (
-        !this.sign.hasPrevious() || !this.sign.previous().reconstructed()
-      )
-    },
-
-    /**
-     * Reconstruction end should be shown if this sign is reconstructed
-     * and it's not followed by a reconstructed sign. 
-     */
-    showReconstructedEnd() {
-      return this.sign.reconstructed() && (
-        !this.sign.hasNext() || !this.sign.next().reconstructed()
-      )
     },
 
     /**
@@ -105,13 +74,8 @@ export default {
     }
   },
   methods: {
-
-    /**
-     * @param {MouseEvent} event  The DOM event
-     */
-    onClick(event) {
-      event.preventDefault();
-      this.$emit('click', this.sign)
+    onKeyup(e) {
+      console.log(e)
     }
   }
 }
@@ -120,36 +84,13 @@ export default {
 <style lang="scss" scoped>
 .sign {
   visibility: hidden;
-  font-size: 0;
   letter-spacing: .4px;
   white-space: nowrap;
-
-  & span {
-    font-size: 22px;
-  }
-}
-
-@keyframes blink {
-  from, to {border-color:black}
-  50%{border-color:transparent}
-}
-
-.sign.focused > .sign-value {
-  margin-left: -1px;
-  border-left: 1px solid black;
-  animation: 1s blink step-end infinite;
+  font-size: 22px;
 }
 
 .sign.visible {
   visibility: visible;
-}
-
-.sign-value.whitespace {
-  display: inline-block;
-  position: relative;
-    top: 5px;
-  height: 22px;
-  width: 7px;
 }
 
 .sign.reconstructed {

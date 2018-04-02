@@ -1,20 +1,46 @@
 import List from './List.js'
 import Column from './Column.js'
 
+import sort from '~/utils/SortSigns.js'
+
 /**
- * A text is an abstract concept that does not fit neatly into any single scroll or artefact
+ * A composition is an abstract concept that does not fit neatly into any single scroll or artefact
  * 
- * A text is comprised of a number of columns.
+ * A composition is comprised of a number of columns.
  * 
  * The hierarchy looks like so:
- *   Text
+ *   Composition
  *     > Column
  *       > Line
  *         > Sign 
  * 
  * @class
  */
-class Text extends List {
+class Composition extends List {
+
+  /**
+   * 
+   * @param {object}      attrs 
+   * @param {array.object} signs  an array of raw, but sorted sign objects
+   */
+  constructor(attrs, signs = []) {
+    super(attrs)
+
+    const cols = {}
+    for (let i = 0, n = signs.length; i < n; i ++) {
+      let sign = signs[i]
+      let col = cols[sign.col_id]
+      if (!col) {
+        col = cols[sign.col_id] = new Column({
+          id: sign.col_id,
+          name: sign.col_name
+        })
+        this.insert(col);
+      }
+
+      col.insertSign(sign)
+    }
+  }
 
   /**
    * @public
@@ -28,15 +54,13 @@ class Text extends List {
    * @public
    * @static
    * 
+   * @param {object}         attrs attributes of the text
    * @param {array.<object>} signs an array of plain objects (derived from DB rows) that can be 
    *                               transformed into a text with columns and lines
    * @return {Text} an Text instance, created from the stream of signs
    */
-  static fromSigns(signs = []) {
-    const text = new Text()
-
-
-    return text
+  static fromSigns(attrs = {}, signs = []) {
+    return new Composition(attrs, sort(signs))
   }
 
   /**
@@ -56,4 +80,4 @@ class Text extends List {
   
 }
 
-export default Text
+export default Composition
