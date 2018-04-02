@@ -1,13 +1,16 @@
 <template>
   <div class="clickable-menu-item">
     <span @click="selectImage">
-      {{institution}}: {{plate}}, {{fragment}} {{side >>> 0 === 0 ? 'recto' : 'verso'}}
+      {{corpus.images.itemWithID(dataId).institution}}: {{corpus.images.itemWithID(dataId).lvl1}}, {{corpus.images.itemWithID(dataId).lvl2}} {{corpus.images.itemWithID(dataId).side === 0 ? 'recto' : 'verso'}}
     </span>
     <div class="children" v-show="open">
         <ul>
           <li @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
-          <li v-for="child in children" :key="child.artefact_id">
-            <artefact-menu-item :artefact="child.artefact_id" :name="child.name"></artefact-menu-item>
+          <li v-if="corpus.images.itemWithID(dataId).artefacts" v-for="artefact in corpus.images.itemWithID(dataId).artefacts" :key="'image-artefact-' + artefact">
+            <artefact-menu-item 
+              :artefact="corpus.artefacts.itemWithID(artefact).id" 
+              :name="corpus.artefacts.itemWithID(artefact).name">
+            </artefact-menu-item>
           </li>
         </ul>
     </div>
@@ -33,16 +36,13 @@
 <script>
 
 import ArtefactMenuItem from './ArtefactMenuItem.vue'
-import AddNewDialog from './AddNewDialog.vue'
+import AddNewDialog from '~/components/AddNewDialog.vue'
 
 export default {
   props: {
     dataId: Number,
-    plate: '',
-    fragment: '',
-    institution: '',
     versionID: '',
-    side: '',
+    corpus: {},
   },
   components: {
     'artefact-menu-item': ArtefactMenuItem,
@@ -56,23 +56,6 @@ export default {
     }
   },
   methods: {
-    fetchChildren() {
-      this.children = []
-      // we'll lazy load children, but cache them
-      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-        transaction: 'getArtOfImage',
-        image_id: this.dataId,
-        version_id: this.versionID,
-      })
-      .then(res => {
-        if (res.status === 200 && res.data) {
-          this.children = res.data.results
-          // children = res.data.results
-        }
-      })
-      .catch(console.error)
-    },
-
     setRouter() {
       this.$router.push({ 
         name: 'workbenchAddress',
@@ -91,32 +74,30 @@ export default {
       if (this.open) {
         this.setRouter()
         if (!this.children.length) {
-          this.fetchChildren()
+          this.corpus.populateArtefactsofImage(this.versionID, this.dataId)
         }
       }
     },
 
-      addArtefact() {
-        this.dialogVisible = true
-        //Add code to create new artefact with the CGI script
-        // const name = (new Date).getTime()
-        // this.children.unshift({
-        //   name: name,
-        //   artefact_id: undefined,
-        // })
-        // this.$router.push({
-        //     name: 'workbenchAddress',
-        //     params: {
-        //         scrollID: this.$route.params.scrollID,
-        //         scrollVersionID: this.$route.params.scrollVersionID,
-        //         colID: this.$route.params.colID ? this.$route.params.colID : '~',
-        //         imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-        //         artID: `name-${name}`,
-        //     }
-        // })
-      }
+    addArtefact() {
+      this.dialogVisible = true
+      //Add code to create new artefact with the CGI script
+      // const name = (new Date).getTime()
+      // this.children.unshift({
+      //   name: name,
+      //   artefact_id: undefined,
+      // })
+      // this.$router.push({
+      //     name: 'workbenchAddress',
+      //     params: {
+      //         scrollID: this.$route.params.scrollID,
+      //         scrollVersionID: this.$route.params.scrollVersionID,
+      //         colID: this.$route.params.colID ? this.$route.params.colID : '~',
+      //         imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
+      //         artID: `name-${name}`,
+      //     }
+      // })
+    }
   },
-  watch: {
-  }
 }
 </script>

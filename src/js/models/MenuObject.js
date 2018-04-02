@@ -23,17 +23,16 @@
  * }
  */
 class MenuObject {
-  constructor($post, id, set, itemIDKey, ajaxPayload, items = {}, itemList = []) {
-    this.$post = $post // axios post functionality
-    this._id = id
-    this.set = set || ((object, key, value) => { object[key] = value })
-    this._itemIDKey = itemIDKey
-    this._hash = ''
-    this._items = items
-    this._itemList = itemList
+  constructor(post, user, set, itemIDKey, ajaxPayload) {
+    this.post = post // axios post functionality
+    this.user = user
+    this.set = set || ((object, key, value) => { object[key] = value }) // This allows you to pass a custom data setter [for proper reactivity]
+    this.itemIDKey = itemIDKey // This is must match the key of the UID returned from the database for this data item (version_id for combinations, image_catalog_id for images, etc.)
     this._ajaxPayload = ajaxPayload
 
-    this.populate()
+    this._hash = ''
+    this._items = {}
+    this._itemList = []
   }
 
   /**
@@ -96,13 +95,9 @@ class MenuObject {
    * @param {Model}     item    A list item to insert
    * @param {number=-1} index   The index at which to insert the list, defaults to the end
    */
-  insert(item, index = -1) {
-    // if (!(item instanceof this.constructor.getModel())) {
-    //   throw new TypeError(`Expect an instance of ${this.constructor.getModel().name} in List.prototype.insert`)
-    // }
-
-    this._setItem(item[this._itemIDKey], item)
-    this._insertItem(item[this._itemIDKey], index)
+  _newItem(item, index = -1) {
+    this._setItem(item[this.itemIDKey], item)
+    this._insertItem(item[this.itemIDKey], index)
   }
 
   /**
@@ -139,8 +134,8 @@ class MenuObject {
       : this._itemList.splice(index, 0, id)
   }
 
-  changeItemValue(id, value, name) {
-    this.set(this._items[id], value, name)
+  changeItemValue(id, key, value) {
+    this.set(this._items[id], key, value)
   }
 
   /**
@@ -204,22 +199,32 @@ class MenuObject {
     }
   }
 
-  populate() {
-    this.$post('resources/cgi-bin/scrollery-cgi.pl', this._ajaxPayload)
+  populate(customPayload) {
+    let payload = Object.assign({}, this._ajaxPayload, customPayload)
+
+    return new Promise((resolve, reject) => {
+      try {
+        this.post('resources/cgi-bin/scrollery-cgi.pl', payload)
         .then(res => {
             if (res.status === 200 && res.data) {
 
-                // We can store hashes for the returned data
-                // in the future, so we can avoid unnecessary
-                // data transmission.
-                this._hash = res.data.hash
+              // We can store hashes for the returned data
+              // in the future, so we can avoid unnecessary
+              // data transmission.
+              this._hash = res.data.hash
 
-                res.data.results.forEach(item => {
-                    this.insert(item)
-                });
+              res.data.results.forEach(item => {
+                if (!this._items[item[this.itemIDKey]] || this._items[item[this.itemIDKey]] !== item) {
+                  this._newItem(item)
+                }
+              })
+              resolve(res.data.results)
             }
         })
-        .catch(console.error)
+      } catch (err) {
+          reject(err);
+      }
+    })
   }
 }
 

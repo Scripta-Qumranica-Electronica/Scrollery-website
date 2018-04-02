@@ -9,20 +9,24 @@
       @click="lockScroll"></i>
     <div class="children" v-show="open">
         <ul>
-          <li v-if="menuType === 'text'" v-for="child in children[menuType]" :key="child.id">
+          <li 
+            v-if="menuType === 'text' && corpus.combinations.itemWithID(versionID).columns" 
+            v-for="column in corpus.combinations.itemWithID(versionID).columns" 
+            :key="'column-' + column">
             <column-menu-item 
-              :data-id="child.id >>> 0"
-              :name="child.name">
+              :data-id="corpus.columns.itemWithID(column).id"
+              :name="corpus.columns.itemWithID(column).name"
+              :corpus="corpus">
             </column-menu-item>
           </li>
-          <li v-if="menuType === 'image'" v-for="child in children[menuType]" :key="child.id">
+          <li 
+            v-if="menuType === 'image' && corpus.combinations.itemWithID(versionID).images" 
+            v-for="image in corpus.combinations.itemWithID(versionID).images" 
+            :key="'image-' + image">
             <image-menu-item 
-              :data-id="child.id >>> 0"
-              :institution="child.institution"
-              :plate="child.lvl1"
-              :fragment="child.lvl2"
+              :data-id="corpus.images.itemWithID(image).id"
               :version-i-d="versionID"
-              :side="child.side">
+              :corpus="corpus">
             </image-menu-item>
           </li>
         </ul>
@@ -47,6 +51,7 @@ export default {
     user: 0,
     menuType: '',
     locked: "",
+    corpus: {},
   },
   components: {
     'column-menu-item': ColumnMenuItem,
@@ -67,27 +72,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['username', 'sessionID', 'userID']),
+    ...mapGetters(['username',]),
   },
   methods: {
-    fetchChildren() {
-      // we'll lazy load children, but cache them
-      if (this.children[this.menuType] && this.children[this.menuType].length < 1) {
-        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-        transaction: this.requestType[this.menuType],
-        combID: this.scrollDataID,
-        user: this.userID,
-        version_id: this.versionID,
-        })
-        .then(res => {
-          if (res.status === 200 && res.data) {
-            this.children[this.menuType] = res.data.results
-          }
-        })
-        .catch(console.error)
-      }
-    },
-
     setRouter() {
       this.$router.push({
         name: 'workbenchAddress',
@@ -105,7 +92,8 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        this.fetchChildren()
+        this.corpus.populateColumnsOfScrollVersion(this.scrollID, this.versionID)
+        this.corpus.populateImagesOfScrollVersion(this.scrollID, this.versionID)
       }
     },
 
@@ -119,22 +107,16 @@ export default {
         if (res.status === 200 && res.data.scroll_clone === 'success') {
           // Please emit message to parent to either reload 
           // all combinations or add the one just created.
-          this.$emit('reloadListings', res.data)
+          // this.$emit('reloadListings', res.data)
         }
       })
       .catch(console.error)
     },
+
     lockScroll() {
-      this.$emit('reloadListings')
+      // this.$emit('reloadListings')
     }
   },
-  watch: {
-    menuType() {
-      if (this.open) {
-        this.fetchChildren()
-      }
-    }
-  }
 }
 </script>
 

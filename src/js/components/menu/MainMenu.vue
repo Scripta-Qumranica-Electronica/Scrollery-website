@@ -30,17 +30,18 @@
           </div>
           <div>
             <ul class="combination-menu" placeholder="Search for scroll">
-              <li v-for="combination in filterCombinations" :key="combination.scroll_id + '-' + combination.version_id">
+              <li v-for="combination in corpus.combinations._itemList" :key="'menu-combination-' + combination">
                   <combinaton-menu-item
-                  :count="combination.count"
-                  :name="combination.name"
-                  :scrollDataID="combination.scroll_data_id"
-                  :scrollID="combination.scroll_id"
-                  :version="combination.version"
-                  :versionID="combination.version_id"
-                  :user="combination.user_id >>> 0 /* We have to cast this to int. */"
+                  :count="corpus.combinations.itemWithID(combination).count"
+                  :name="corpus.combinations.itemWithID(combination).name"
+                  :scrollDataID="corpus.combinations.itemWithID(combination).scroll_data_id"
+                  :scrollID="corpus.combinations.itemWithID(combination).scroll_id"
+                  :version="corpus.combinations.itemWithID(combination).version"
+                  :versionID="corpus.combinations.itemWithID(combination).version_id"
+                  :user="corpus.combinations.itemWithID(combination).user_id"
                   :menu-type="menuDisplay"
-                  :locked="combination.locked >>> 0 /* We have to cast this to int. */"
+                  :locked="corpus.combinations.itemWithID(combination).locked"
+                  :corpus="corpus"
                   />
               </li>
             </ul>
@@ -138,12 +139,13 @@ export default {
   },
   props: {
     open: Boolean,
-    keepOpen: Boolean
+    keepOpen: Boolean,
+    corpus: {},
   },
   data() {
     return {
       combinationsTitle: "",
-      combinations: [],
+      // combinations: [],
       menuBarsTooltip: "",
       queryString: '',
       menuDisplayInstitutional: true,
@@ -151,27 +153,27 @@ export default {
     }
   },
   methods: {
-    loadCombinations() {
-      if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
-        this.combinations = []
-        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-          transaction: 'getCombs',
-          user: this.$store.getters.userID,
-        })
-        .then(res => {
-          if (res.status === 200 && res.data) {
-            this.combinations = res.data.results
-          }
-        })
-        .catch(console.log)
-      }
-    }
+    // loadCombinations() {
+    //   if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
+    //     this.combinations = []
+    //     this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+    //       transaction: 'getCombs',
+    //       user: this.$store.getters.userID,
+    //     })
+    //     .then(res => {
+    //       if (res.status === 200 && res.data) {
+    //         this.combinations = res.data.results
+    //       }
+    //     })
+    //     .catch(console.log)
+    //   }
+    // }
   },
   mounted() {
     // i18n
     this.combinationsTitle = this.$i18n.str("Combinations");
     this.menuBarsTooltip = this.$i18n.str("Menu.Bars.Tooltip")
-    this.loadCombinations()
+    // this.loadCombinations()
   }
 }
 
