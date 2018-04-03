@@ -158,16 +158,19 @@ export default {
     },
   },
   mounted() {
-    if (this.$route.params.scrollVersionID) {
+    if (this.$route.params.scrollVersionID && this.$route.params.scrollID) {
     this.artefacts = []
     this.setScrollDimensions(this.$route.params.scrollID, this.$route.params.scrollVersionID)
     }
   },
   watch: {
     '$route' (to, from) {
-      if (to.params.scrollVersionID && to.params.scrollVersionID !== from.params.scrollVersionID) {
-        this.artefacts = []
-        this.setScrollDimensions(to.params.scrollID, to.params.scrollVersionID)
+      if (to.params.scrollVersionID && to.params.scrollID) {
+        if (to.params.scrollVersionID !== from.params.scrollVersionID
+            || to.params.scrollID !== from.params.scrollID) {
+            this.artefacts = []
+            this.setScrollDimensions(to.params.scrollID, to.params.scrollVersionID)
+        }
       }
     }
   }
