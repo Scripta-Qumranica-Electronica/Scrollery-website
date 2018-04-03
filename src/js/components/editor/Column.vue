@@ -1,5 +1,6 @@
 <template>
   <div class="editor-column">
+    <button @click="reset">Reset</button>
     <div class="text-col inline text-sbl-hebrew" dir="rtl" contenteditable="true" @keydown="onKeydown" @input="onInput" @paste="onPaste" @copy="onCopy" v-html="colHtmlString">
     </div><div class="line-number-col inline">
         <p class="line-number" v-for="(line, lineIndex) of column.items()" :key="line.id">{{ lineIndex + 1 }}</p>
@@ -9,7 +10,6 @@
 
 <script>
 import KEYS from './key_codes.js'
-import diff from '~/utils/StringDiff.js'
 
 // components
 import TextLine from './Line.vue'
@@ -49,11 +49,32 @@ export default {
     },
 
     /**
+     * The converse of reset. Synchronize the column model to the current DOM column
+     * 
+     * @param {HTMLElement} colNode  the DOM element corresponding to this column
+     */
+     synchronize(colNode) {
+      // first, gather up the target represenation from the DOM
+      let target = []
+      for (let i = 0, n = colNode.children.length; i < n; i++) {
+        let child = colNode.children[i]
+        target.push({
+          id: child.dataset.lineId,
+          text: child.innerText
+        })
+      }
+      // second, apply to the column model
+      this.column.synchronizeTo(target)
+    },
+
+    /**
      * For contenteditable divs, the only place we can stop input ... is before keyup
      * 
      * Thus, we can intercept some events here, and stub in our own if need be.
      */
     onKeydown(e) {
+
+      // safeguard: ensure trusted input
       if (!e.isTrusted) {
         e.preventDefault()
       }
@@ -64,6 +85,12 @@ export default {
     },
 
     /**
+     * Handle meta-key inputs (exact meta key varies by OS. Thes are usually hot keys,
+     * 
+     * OS: 
+     *  - mac: CMD + key
+     *  - windows: ctl + key
+     * 
      * @param {KeyboardEvent} e triggered event
      */
     processMetaInput(e) {
@@ -71,7 +98,7 @@ export default {
 
         /* disallowed actions */
         case KEYS.ALPHA.I: // meta + i = italic
-        // case KEYS.ALPHA.B: // meta + b = bold
+        case KEYS.ALPHA.B: // meta + b = bold
           e.preventDefault()
           break;
       }
@@ -82,8 +109,7 @@ export default {
      * 
      * @param {KeyboardEvent} e triggered event
      */
-    insertLineAtSelection(e) {
-      let { line, node } = this.getSelection()
+    insertLineAtSelection(e, { line, node }) {
 
       // whereas the line model still reflects the previous state
       // the node should be the newly inserted bit.
@@ -96,65 +122,27 @@ export default {
     /**
      * @param {InputEvent} e
      */
-     signsChanged(e) {
+     signsChanged(e, { line, node }) {
 
-      // get the text node and corresponding line model
-      let {node, line} = this.getSelection()
-
-      // the Line model will be diffed against the DOM. Therefore,
-      // inserts/deletes to the data will be to bring it into
-      // alignment with the DOM which currently represents
-      // the users intention for that line.
-      let diffs = diff(line.toString().replace(/\s/g, '&nbsp;'), node.innerText.replace(/\s/g, '&nbsp;'))
-
-      let diffIndex = 0
-      for (let i = 0, n = diffs.length; i < n; i++) {
-
-        // each diff in the array takes this shape:
-        // [code = 0, 1, -1, change = 'string difference']
-        let d = diffs[i]
-        switch (d[0]) {
-
-          // no change, simply increment up our string index
-          case diff.EQUAL:
-            diffIndex = diffIndex + d[1].length
-            break;
-
-          // there's been (a) sign(s) inserted
-          case diff.INSERT:
-            d[1].split('').forEach(sign => {
-              diffIndex++
-              line.insert(new Sign({ sign }), diffIndex)
-            })
-            break; 
-
-          // there's been a sign deleted
-          case diff.DELETE:
-            d[1].split('').forEach(() => line.delete(diffIndex))
-            break;
-        }
-      }
+      // synchronize the line > DOM
+      line.synchronizeTo(node.innerText)
     },
 
     /**
      * @param {InputEvent} e
      */
-    signsRemoved(e) {
-
-      // removal could mean lines removes, or simply a character
-      let {node, line} = this.getSelection()
+    signsRemoved(e, { line, node }) {
 
       // determine if the lines are the same as the count of <p> elements
       // if not, then a line was deleted/merged into 
       if (node.parentElement.children.length !== this.column.length) {
-        
-        // TODO: handle line deleted
+        this.synchronize(node.parentElement)
 
       } else {
 
         // this was a simple removal of a sign, we can handle that
         // via a signsChanged to diff the DOM
-        this.signsChanged(e)
+        this.signsChanged(e, { line, node })
       }
     },
 
@@ -176,27 +164,37 @@ export default {
      * @param {InputEvent} e triggered event
      */
     onInput(e) {
+
       switch (e.inputType) {
+
+        // inserted block/paragraph
         case "insertParagraph":
-          this.insertLineAtSelection(e)
+          this.insertLineAtSelection(e, this.getLineSelection())
           break;
 
-        /* handle chars changed (insert/remove) together */
+        // inserted chars
         case "insertText":
-          this.signsChanged(e)
+          this.signsChanged(e, this.getLineSelection())
           break
+
+        // deleted content. Could be line or single char
         case "deleteContentBackward":
-          this.signsRemoved(e)
+          this.signsRemoved(e, this.getLineSelection())
           break;
+
+        // for now, just log out what we're missing
         default:
           console.log('unhandle input event', e)
       }
     },
 
     /**
-     *
+     * @returns {object} with this shape: {
+     *  line: {Line} the line model, where applicable
+     *  node: {HtmlElement} the DOM element corresponding to the line
+     * }
      */
-    getSelection() {
+    getLineSelection() {
       let selectedNode = document.getSelection()
 
       // safeguard to ensure a workable DOM element is available
