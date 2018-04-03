@@ -109,13 +109,17 @@ export default {
     },
     watch: {
         selectedCombination(to, from) {
-            console.log('from: ' + from + ', to: ' + to)
             if (to !== from) {
                 this.corpus.populateImagesOfScrollVersion(to, this.corpus.combinations.itemWithID(to).scroll_id)
                 .then(res => {
                     this.selectedImage = this.corpus.combinations.itemWithID(to).images[0] || 
                     undefined
                 })
+            }
+        },
+        selectedImage(to, from) {
+            if (to !== from) {
+                this.corpus.populateArtefactsofImage(this.selectedCombination, to)
             }
         }
     },

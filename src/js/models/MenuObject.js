@@ -226,7 +226,7 @@ class MenuObject {
       try {
         axios.post('resources/cgi-bin/scrollery-cgi.pl', payload)
         .then(res => {
-            if (res.status === 200 && res.data) {
+            if (res.status === 200 && res.data.results) {
 
               // We can store hashes for the returned data
               // in the future, so we can avoid unnecessary
