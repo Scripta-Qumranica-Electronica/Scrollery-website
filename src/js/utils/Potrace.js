@@ -224,24 +224,24 @@ function Potrace(canvas, multiplyFactor) {
         return i < bm1.size && bm1.index(i);
       }
       
-      // function majority(x, y) {
-      //   var i, a, ct;
-      //   for (i = 2; i < 5; i++) {
-      //     ct = 0;
-      //     for (a = -i + 1; a <= i - 1; a++) {
-      //       ct += bm1.at(x + a, y + i - 1) ? 1 : -1;
-      //       ct += bm1.at(x + i - 1, y + a - 1) ? 1 : -1;
-      //       ct += bm1.at(x + a - 1, y - i) ? 1 : -1;
-      //       ct += bm1.at(x - i, y + a) ? 1 : -1;
-      //     }
-      //     if (ct > 0) {
-      //       return 1;
-      //     } else if (ct < 0) {
-      //       return 0;
-      //     }
-      //   }
-      //   return 0;
-      // }
+      function majority(x, y) {
+        var i, a, ct;
+        for (i = 2; i < 5; i++) {
+          ct = 0;
+          for (a = -i + 1; a <= i - 1; a++) {
+            ct += bm1.at(x + a, y + i - 1) ? 1 : -1;
+            ct += bm1.at(x + i - 1, y + a - 1) ? 1 : -1;
+            ct += bm1.at(x + a - 1, y - i) ? 1 : -1;
+            ct += bm1.at(x - i, y + a) ? 1 : -1;
+          }
+          if (ct > 0) {
+            return 1;
+          } else if (ct < 0) {
+            return 0;
+          }
+        }
+        return 0;
+      }
       
       function findPath(point) {
         var path = new Path(),
@@ -937,15 +937,15 @@ function Potrace(canvas, multiplyFactor) {
         }
       }
       
-      // function reverse(path) {
-      //   var curve = path.curve, m = curve.n, v = curve.vertex, i, j, tmp;
+      function reverse(path) {
+        var curve = path.curve, m = curve.n, v = curve.vertex, i, j, tmp;
       
-      //   for (i=0, j=m-1; i<j; i++, j--) {
-      //     tmp = v[i];
-      //     v[i] = v[j];
-      //     v[j] = tmp;
-      //   }
-      // }
+        for (i=0, j=m-1; i<j; i++, j--) {
+          tmp = v[i];
+          v[i] = v[j];
+          v[j] = tmp;
+        }
+      }
       
       function smooth(path) {
         var m = path.curve.n, curve = path.curve;
