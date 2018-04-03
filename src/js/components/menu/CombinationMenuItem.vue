@@ -16,6 +16,8 @@
             <column-menu-item 
               :data-id="corpus.columns.itemWithID(column).id"
               :name="corpus.columns.itemWithID(column).name"
+              :scroll-i-d="scrollID"
+              :scroll-version-i-d="versionID"
               :corpus="corpus">
             </column-menu-item>
           </li>
@@ -24,8 +26,9 @@
             v-for="image in corpus.combinations.itemWithID(versionID).images" 
             :key="'menu-image-' + image">
             <image-menu-item 
-              :data-id="corpus.images.itemWithID(image).id"
-              :version-i-d="versionID"
+              :image-i-d="corpus.images.itemWithID(image).id"
+              :scroll-i-d="scrollID"
+              :scroll-version-i-d="versionID"
               :corpus="corpus">
             </image-menu-item>
           </li>

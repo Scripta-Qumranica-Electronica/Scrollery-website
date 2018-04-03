@@ -1,14 +1,17 @@
 <template>
   <div class="clickable-menu-item">
     <span @click="selectImage">
-      {{corpus.images.itemWithID(dataId).institution}}: {{corpus.images.itemWithID(dataId).lvl1}}, {{corpus.images.itemWithID(dataId).lvl2}} {{corpus.images.itemWithID(dataId).side === 0 ? 'recto' : 'verso'}}
+      {{corpus.images.itemWithID(imageID).institution}}: {{corpus.images.itemWithID(imageID).lvl1}}, {{corpus.images.itemWithID(imageID).lvl2}} {{corpus.images.itemWithID(imageID).side === 0 ? 'recto' : 'verso'}}
     </span>
     <div class="children" v-show="open">
         <ul>
           <li @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
-          <li v-if="corpus.images.itemWithID(dataId).artefacts" v-for="artefact in corpus.images.itemWithID(dataId).artefacts" :key="'image-artefact-' + artefact">
+          <li v-if="corpus.images.itemWithID(imageID).artefacts" v-for="artefact in corpus.images.itemWithID(imageID).artefacts" :key="'image-artefact-' + artefact">
             <artefact-menu-item 
-              :artefact="corpus.artefacts.itemWithID(artefact).id" 
+              :artefact-i-d="artefact" 
+              :scroll-i-d="scrollID"
+              :scroll-version-i-d="scrollVersionID"
+              :image-i-d="imageID"
               :name="corpus.artefacts.itemWithID(artefact).name">
             </artefact-menu-item>
           </li>
@@ -23,8 +26,8 @@
       >
       <add-new-dialog
         :add-type="'artefacts'"
-        :initial-combination="versionID"
-        :initial-image="dataId"
+        :initial-combination="scrollVersionID"
+        :initial-image="imageID"
         :corpus="corpus"></add-new-dialog>
       <!-- <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">Cancel</el-button>
@@ -41,8 +44,9 @@ import AddNewDialog from '~/components/AddNewDialog.vue'
 
 export default {
   props: {
-    dataId: Number,
-    versionID: '',
+    imageID: Number,
+    scrollID: Number,
+    scrollVersionID: Number,
     corpus: {},
   },
   components: {
@@ -61,10 +65,10 @@ export default {
       this.$router.push({ 
         name: 'workbenchAddress',
         params: {
-          scrollID: this.$route.params.scrollID,
-          scrollVersionID: this.$route.params.scrollVersionID,
-          colID: this.$route.params.colID ? this.$route.params.colID : '~',
-          imageID: this.dataId,
+          scrollID: this.scrollID,
+          scrollVersionID: this.scrollVersionID,
+          colID: '~',
+          imageID: this.imageID,
           artID: '~',
         }
       })
@@ -75,7 +79,7 @@ export default {
       if (this.open) {
         this.setRouter()
         if (!this.children.length) {
-          this.corpus.populateArtefactsofImage(this.versionID, this.dataId)
+          this.corpus.populateArtefactsofImage(this.scrollVersionID, this.imageID)
         }
       }
     },

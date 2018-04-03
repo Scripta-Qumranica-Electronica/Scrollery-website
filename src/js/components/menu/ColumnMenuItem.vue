@@ -1,6 +1,6 @@
 <template>
   <span class="clickable-menu-item" @click="setRouter">
-    {{name}} ({{dataId}})
+    {{name}} ({{columnID}})
   </span>
 </template>
 
@@ -8,8 +8,10 @@
 
 export default {
   props: {
-    dataId: Number,
+    columnID: Number,
     name: String,
+    scrollVersionID: Number,
+    scrollID: Number,
     corpus: {},
   },
   methods: {
@@ -21,11 +23,11 @@ export default {
       this.$router.push({
         name: 'workbenchAddress',
         params: {
-          scrollID: this.$route.params.scrollID,
-          scrollVersionID: this.$route.params.scrollVersionID,
-          colID: this.dataId,
-          imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-          artID: this.$route.params.artID ? this.$route.params.artID : '~'
+          scrollID: this.scrollID,
+          scrollVersionID: this.scrollVersionID,
+          colID: this.columnID,
+          imageID: '~',
+          artID: '~',
         }
       })
     },
