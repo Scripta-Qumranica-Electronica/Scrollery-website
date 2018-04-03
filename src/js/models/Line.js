@@ -46,7 +46,12 @@ class Line extends List {
   }
 
   toDOMString() {
-    return `<p data-line-id="${this.getID()}">${this.toString()}</p>`
+    let str = ''
+    this.forEach(sign => {
+      str += sign.toDOMString()
+    }, this)
+
+    return `<p data-line-id="${this.getID()}">${str}</p>`
   }
 
   /**
@@ -55,7 +60,7 @@ class Line extends List {
   toString() {
     let str = ''
     this.forEach(sign => {
-      str += sign.toDOMString()
+      str += sign.toString()
     }, this)
     return str
   }

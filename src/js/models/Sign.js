@@ -47,7 +47,7 @@ export default class Sign extends Record(defaults) {
 
   constructor(attrs) {
     attrs.id = attrs.sign_id
-    attrs.is_whitespace = (!attrs.sign || attrs.sign === '')
+    attrs.is_whitespace = (!attrs.sign || attrs.sign === '' || attrs.sign === ' ')
     super(attrs)
   }
 
@@ -96,6 +96,13 @@ export default class Sign extends Record(defaults) {
    */
   reconstructed() {
     return this.is_reconstructed
+  }
+
+  /**
+   * @returns {string} 
+   */
+  toString() {
+    return this.is_whitespace ? ' ' : this.sign
   }
 
   /**

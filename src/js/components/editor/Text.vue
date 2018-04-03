@@ -36,7 +36,7 @@ export default {
 
 .editor {
     position: relative;
-    overflow: scroll;
+    overflow: hidden;
     background-color: rgba($ltOrange, 0.1);
     width: 100%;
     height: 100%;

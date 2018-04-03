@@ -28,8 +28,7 @@ const sort = signs => {
     hash[signs[i]['sign_id']] = signs[i]
   }
 
-  
-  let start = signs.find(sign => !sign.previous_sign_id);
+  let start = signs.find(sign => !sign.previous_sign_id)
   let sorted = []
   return appendNext(sorted, hash, start)
 }

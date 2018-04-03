@@ -115,7 +115,7 @@ export default {
 <style lang="scss" scoped>
 
 .text-pane {
-    overflow: hidden;
+    overflow: scroll;
     position: relative;
     background-color: #fff;
     top: 0;
