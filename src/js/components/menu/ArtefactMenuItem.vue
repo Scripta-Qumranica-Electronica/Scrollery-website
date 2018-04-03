@@ -14,16 +14,21 @@ export default {
   },
   methods: {
     setRouter() {
-      this.$router.push({
-        name: 'workbenchAddress',
-        params: {
-          scrollID: this.scrollID,
-          scrollVersionID: this.scrollVersionID,
-          colID: '~',
-          imageID: this.imageID,
-          artID: this.artefactID
-        }
-      })
+      if (this.$route.params.scrollID !== this.scrollID 
+        || this.$route.params.scrollVersionID !== this.versionID
+        || this.$route.params.imageID !== this.imageID
+        || this.$route.params.artID !== this.artefactID) {
+        this.$router.push({
+          name: 'workbenchAddress',
+          params: {
+            scrollID: this.scrollID,
+            scrollVersionID: this.scrollVersionID,
+            colID: '~',
+            imageID: this.imageID,
+            artID: this.artefactID
+          }
+        })
+      }
     },
   },
 }

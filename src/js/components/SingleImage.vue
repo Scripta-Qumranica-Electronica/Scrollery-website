@@ -240,6 +240,15 @@ export default {
       this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
     }
   },
+  mounted() {
+    if (this.$route.params.imageID) {
+      this.fetchImages(this.$route.params.imageID)
+    }
+    if (this.$route.params.artID) {
+      this.artefact = this.$route.params.artID
+      this.getArtefactMask()
+    }
+  },
   watch: {
     '$route' (to, from) {
       if (to.params.imageID !== '~') {

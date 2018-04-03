@@ -14,7 +14,7 @@
             v-for="column in corpus.combinations.itemWithID(versionID).columns" 
             :key="'column-' + column">
             <column-menu-item 
-              :data-id="corpus.columns.itemWithID(column).id"
+              :column-i-d="corpus.columns.itemWithID(column).id"
               :name="corpus.columns.itemWithID(column).name"
               :scroll-i-d="scrollID"
               :scroll-version-i-d="versionID"
@@ -79,16 +79,19 @@ export default {
   },
   methods: {
     setRouter() {
-      this.$router.push({
-        name: 'workbenchAddress',
-        params: {
-          scrollID: this.scrollID, 
-          scrollVersionID: this.versionID,
-          imageID: '~',
-          colID: '~',
-          artID: '~'
-        }
-      })
+      if (this.$route.params.scrollID !== this.scrollID 
+        || this.$route.params.scrollVersionID !== this.versionID) {
+        this.$router.push({
+          name: 'workbenchAddress',
+          params: {
+            scrollID: this.scrollID, 
+            scrollVersionID: this.versionID,
+            imageID: '~',
+            colID: '~',
+            artID: '~'
+          }
+        })
+      }
     },
 
     selectCombination() {

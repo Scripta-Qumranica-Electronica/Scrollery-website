@@ -20,16 +20,20 @@ export default {
      * artefacts belonging to a column.
      */
     setRouter() {
-      this.$router.push({
-        name: 'workbenchAddress',
-        params: {
-          scrollID: this.scrollID,
-          scrollVersionID: this.scrollVersionID,
-          colID: this.columnID,
-          imageID: '~',
-          artID: '~',
-        }
-      })
+      if (this.$route.params.scrollID !== this.scrollID 
+        || this.$route.params.scrollVersionID !== this.versionID
+        || this.$route.params.colID !== this.columnID) {
+        this.$router.push({
+          name: 'workbenchAddress',
+          params: {
+            scrollID: this.scrollID,
+            scrollVersionID: this.scrollVersionID,
+            colID: this.columnID,
+            imageID: '~',
+            artID: '~',
+          }
+        })
+      }
     },
   },
   watch: {
