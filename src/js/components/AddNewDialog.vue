@@ -103,12 +103,6 @@ export default {
             images: [],
             artefacts: [],
             columns: [],
-            referenceType: {
-                'combinations': 'getCombs',
-                'images': 'getImgOfComb',
-                'columns': 'getColOfComb',
-                'artefacts': 'getArtOfImage',
-            },
             selectedCombination: this.initialCombination,
             selectedImage: this.initialImage,
         }

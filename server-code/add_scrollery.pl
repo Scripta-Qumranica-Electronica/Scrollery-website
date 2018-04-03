@@ -7,6 +7,7 @@
 use strict;
 use warnings;
 use File::chdir;
+use File::Slurp qw(edit_file);
 
 # Gather information about the tag.
 # Format the appropriate paths and variables.
@@ -18,8 +19,12 @@ $modID =~ s/\W/_/g;
 $modID = "SQE_$modID";
 my $tempDir = "/tmp/Scrollery-builds/Scrollery-website";
 my $installDir = "/var/www/html/development/Scrollery/$urlID";
-my $lockFile = "/tmp/Scrollery-builds/build.lock";
+my $lockFile = "/var/www/html/stable/webhook/build.lock";
 my $epoch = time();
+
+# Setup the logfiles.
+my $logFile = "/var/www/html/stable/webhook/$id-$epoch.log";
+open(my $log, '>', $logFile) or die "Could not open file '$logFile' $!";
 
 # Now we wait if the install directory is in use.
 sleep 1 while -e $lockFile;
@@ -27,13 +32,17 @@ sleep 1 while -e $lockFile;
 # Directory is available for use, let's lock it for ourselves
 my $fileHandler;
 open($fileHandler, '>', $lockFile) or
-	die "Unable to open file $lockFile : $!";
+        die "Unable to open file $lockFile : $!";
 close($fileHandler)
-	or die "Couldn't : $lockFile $!";
+        or die "Couldn't : $lockFile $!";
 
-# Setup the logfiles.
-my $logFile = "/var/www/html/stable/webhook/$id-$epoch.txt";
-open(my $log, '>', $logFile) or die "Could not open file '$logFile' $!";
+# Check if install directory exists, create it if absent.
+if (-e $tempDir and -d $tempDir) {
+	print $log "$tempDir is available for usage\n"; 
+} else {
+	print $log "Cloning from GitHub\n"; 
+	print $log `git clone https://github.com/Scripta-Qumranica-Electronica/Scrollery-website.git $tempDir`;
+}
 
 # Start install process.
 print $log "Starting install.\n";
@@ -62,19 +71,22 @@ print $log `/bin/cp -rf $tempDir/dist $installDir`;
 print $log `/bin/cp -rf $tempDir/resources $installDir`;
 
 # Patch the Perl cgi scripts to use the proper paths.
-local $CWD = "$installDir/resources/cgi-bin";
-print $log `perl -i -p -e 's!\.\./perl-libs!/var/www/html/development!g;' *.pl`;
-print $log `perl -i -p -e 's/use SQE_/use SQE_API\:\:SQE_/g;' *.pl`;
+#local $CWD = "$installDir/resources/cgi-bin";
+edit_file { s@use lib qw\(\.\./perl-libs\);@use lib qw\($installDir/resources/cgi-bin/local/lib/perl5\);\nuse lib qw\(/var/www/html/development\);@g } $installDir . '/resources/cgi-bin/scrollery-cgi.pl';
+edit_file { s@use SQE_@use SQE_API\:\:SQE_@g } $installDir . '/resources/cgi-bin/scrollery-cgi.pl';
+
+#print $log `sed -i'' 's!use lib qw\(\.\./perl-libs\);!use lib qw\($installDir/resources/cgi-bin/local/lib/perl5\);\nuse lib qw\(/var/www/html/development\);!g' *.pl`;
+#print $log `perl -i -p -e 's/use SQE_/use SQE_API\:\:SQE_/g;' *.pl`;
 
 # We're finished, let's unlock the install folder
 unlink $lockFile;
 if(-e $lockFile)
 {
-	print "Failed to delete lockfile.";
+	print $log "Failed to delete lockfile.\n";
 }
 else
 {
-	print "Lockfile removed";
+	print $log "Lockfile removed.\n";
 }
 
 # Close the log file and end.

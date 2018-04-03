@@ -92,8 +92,8 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        this.corpus.populateColumnsOfScrollVersion(this.scrollID, this.versionID)
-        this.corpus.populateImagesOfScrollVersion(this.scrollID, this.versionID)
+        this.corpus.populateColumnsOfScrollVersion(this.versionID, this.scrollID)
+        this.corpus.populateImagesOfScrollVersion(this.versionID, this.scrollID)
       }
     },
 
