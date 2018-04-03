@@ -13,10 +13,10 @@ class MenuCombinations extends MenuObject {
    * @param {object}          attributes the image attributes
    * @param {array.<MenuImage>=[]} [images]    an array of images
    */
-  constructor(post, user, set, itemIDKey, ajaxPayload) {
+  constructor(sessionID, user, set, itemIDKey, ajaxPayload) {
     itemIDKey = itemIDKey || 'version_id'
     ajaxPayload = ajaxPayload || {transaction: 'getCombs', user: user}
-    super(post, user, set, itemIDKey, ajaxPayload)
+    super(sessionID, user, set, itemIDKey, ajaxPayload)
   }
 }
 

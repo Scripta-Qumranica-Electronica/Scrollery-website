@@ -115,7 +115,7 @@ export default {
     return {
       keepMenuOpen: false,
       mouseOver: false,
-      menuCorpus: new MenuCorpus(this.$post, this.$store.state.userID, this.$set),
+      menuCorpus: new MenuCorpus(this.$store.state.sessionID, this.$store.state.userID, this.$set),
     }
   },
   computed: {

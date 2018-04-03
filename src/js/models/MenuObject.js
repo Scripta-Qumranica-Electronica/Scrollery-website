@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 /**
  * A base data model for menu items,
  * including relevant business logic.
@@ -23,12 +25,16 @@
  * }
  */
 class MenuObject {
-  constructor(post, user, set, itemIDKey, ajaxPayload) {
-    this.post = post // axios post functionality
+  constructor(sessionID, user, set, itemIDKey, ajaxPayload) {
+    this.sessionID = sessionID // axios post functionality
     this.user = user
     this.set = set || ((object, key, value) => { object[key] = value }) // This allows you to pass a custom data setter [for proper reactivity]
     this.itemIDKey = itemIDKey // This is must match the key of the UID returned from the database for this data item (version_id for combinations, image_catalog_id for images, etc.)
-    this._ajaxPayload = ajaxPayload
+    this._ajaxPayload = Object.assign(
+      {}, 
+      ajaxPayload, 
+      {SESSION_ID: this.sessionID}
+    )
 
     this._hash = ''
     this._items = {}
@@ -210,11 +216,15 @@ class MenuObject {
   }
 
   populate(customPayload) {
-    let payload = Object.assign({}, this._ajaxPayload, customPayload)
+    let payload = Object.assign(
+      {}, 
+      this._ajaxPayload, 
+      customPayload
+    )
 
     return new Promise((resolve, reject) => {
       try {
-        this.post('resources/cgi-bin/scrollery-cgi.pl', payload)
+        axios.post('resources/cgi-bin/scrollery-cgi.pl', payload)
         .then(res => {
             if (res.status === 200 && res.data) {
 
