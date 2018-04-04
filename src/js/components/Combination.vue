@@ -1,6 +1,6 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <el-row class="combination-panel-menu" style="{width: 100%; height 50px;}">
+    <el-row class="combination-panel-menu" style="{width: 100%; height 30px;}">
         <el-col :span="4">
             <label>Zoom</label>
         </el-col>
@@ -24,7 +24,7 @@
     @import "~sass-vars";
 
     .combination-panel-menu {
-        background: lightgrey;
+        background: #dedede;
     }
 </style>
 

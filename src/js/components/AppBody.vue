@@ -113,6 +113,10 @@
 .vue-splitter-container {
   width: 100%;
 }
+
+.splitter-pane-resizer {
+  background: black;
+}
 </style>
 
 

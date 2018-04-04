@@ -1,6 +1,6 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <el-row id="singleImageMenu" :gutter="4" type="flex" justify="space-around">
+    <el-row class="single-image-pane-menu" :gutter="4" type="flex" justify="space-around">
       <el-col :span="8">
         <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple size="mini">
           <el-option
@@ -289,11 +289,13 @@ export default {
 <style lang="scss" scoped>
   @import "~sass-vars";
 
-  #singleImageMenu {
+  .single-image-pane-menu {
     width: 100%;
-    height: 50px;
-    max-height: 50px;
-    background: lightgrey;
+    height: 32px; // Should be 30px, but 32px looks better
+    max-height: 32px; // Should be 30px, but 32px looks better
+    background: #dedede;
+    margin-left: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
+    margin-right: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
   }
   .fileSelector {
     border-radius: 15px;
