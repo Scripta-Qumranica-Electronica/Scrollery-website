@@ -24,7 +24,7 @@
 
 .title {
   overflow: hidden;
-  width: 0;
+  width: calc(100% - (#{$spacer} * 2) - 50px);
   color: $dkBlue;
   font-weight: 600;
 }
@@ -40,22 +40,17 @@
 }
 
 .body {
-  width: 0;
-  padding: 0;
-  overflow-x: hidden;
-  transition: all 300ms;
+  padding: #{$spacer};
+  width: 100%;
+  opacity: 0;
+  transition: all 100ms;
   text-align: left;
 }
 
 .menu-section.open {
-
-  & .title {
-    width: calc(100% - (#{$spacer} * 2) - 50px);
-  }
-
   & .body {
-    padding: #{$spacer};
-    width: 100%;
+    opacity: 1.0;
+  transition: all 400ms;
   }
 }
 

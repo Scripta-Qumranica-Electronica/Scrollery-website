@@ -20,21 +20,23 @@
       <!-- We currently use two nested "split-panes" to hold the individual components.
       Perhaps update to some more advanced system to manage organization
       and display of these components -->
-      <split-pane :min-percent='20' :default-percent='30' split="horizontal">
-        <template slot="paneL">
-          <split-pane split="vertical">
-            <template slot="paneL">
-              <single-image class="pane-content"></single-image>
-            </template>
-            <template slot="paneR">
-              <editor class="pane-content"></editor>
-            </template>
-          </split-pane>
-        </template>
-        <template slot="paneR">
-          <combination></combination>
-        </template>
-      </split-pane>
+      <div class="editing-pane-container">
+        <split-pane :min-percent='20' :default-percent='30' split="horizontal">
+          <template slot="paneL">
+            <split-pane split="vertical">
+              <template slot="paneL">
+                <single-image class="pane-content"></single-image>
+              </template>
+              <template slot="paneR">
+                <editor class="pane-content"></editor>
+              </template>
+            </split-pane>
+          </template>
+          <template slot="paneR">
+            <combination></combination>
+          </template>
+        </split-pane>
+      </div>
     </div>
   </div>
 </template>
@@ -44,7 +46,7 @@
 @import "~sass-vars";
 
 #site {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   overflow: hidden;
   font-size: 0;
@@ -53,11 +55,10 @@
 
 #editing-window,
 #side-menu, {
-  position: relative;
+  position: absolute;
   height: 100%;
   vertical-align: top;
   font-size: 20px;
-  display: inline-block;
 }
 
 #show-hide-menu {
@@ -65,21 +66,36 @@
 }
 
 #side-menu {
-  width: 50px;
+  width: #{$sidebarWidth};
+  left: #{$collapsedSidebarOffset};
+  top: 0;
   overflow-x: hidden;
-  transition: width 300ms;
+  transition: left #{$menuSlideTransitionOut};
+  transition-timing-function: ease-out;
 
   &.open {
-    width: #{$sidebarWidth};
+    left: 0;
+  transition: left #{$menuSlideTransitionIn};
+  transition-timing-function: ease-in;
   }
 }
 #editing-window {
-  width: calc(100% - 50px);
-  transition: width 300ms;
+  width: #{$editorWidthWithoutSidebar};
+  left: #{$header};
+  top: 0;
+  transition: all #{$menuSlideTransitionOut};
+  transition-timing-function: ease-out;
 
   &.open {
-    width: calc(100% - #{$sidebarWidth});
+    left: #{$sidebarWidth};
+    width: #{$editorWidthWithSidebar};
+    transition: all #{$menuSlideTransitionIn};
+    transition-timing-function: ease-in;
   }
+}
+
+.editing-pane-container {
+  height: calc(100% - #{$header});
 }
 
 .pane-content {

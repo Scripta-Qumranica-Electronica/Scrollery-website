@@ -33,7 +33,8 @@
               <li v-for="combination in corpus.combinations._itemList" :key="'menu-combination-' + combination">
                   <combinaton-menu-item
                     v-show="!queryString || 
-                      corpus.combinations.itemWithID(combination).name.includes(queryString)"
+                      corpus.combinations.itemWithID(combination)
+                      .name.toLowerCase().indexOf(queryString.toLowerCase()) !== -1"
                     :count="corpus.combinations.itemWithID(combination).count"
                     :name="corpus.combinations.itemWithID(combination).name"
                     :scrollDataID="corpus.combinations.itemWithID(combination).scroll_data_id"
@@ -63,20 +64,29 @@
   background: #{$dkBlue};
   
   label {
-    float: left;
     padding: #{$spacer};
 
     i {
+      margin-top: 10px;
+      margin-left: #{$sidebarCollapsedWidth};
       line-height: calc(#{$header} - #{$spacer * 2});
       font-size: 2em;
       color: #fff;
       transition: color 300ms;
+      transition: margin-left #{$menuSlideTransitionOut};
+      transition-timing-function: ease-out;
 
       &:hover {
         color: $tan;
       }
     }
   }
+}
+
+#side-menu.open .header label i {
+  margin-left: 0px;
+  transition: margin-left #{$menuSlideTransitionIn};
+  transition-timing-function: ease-in;
 }
 
 #side-menu.keep-open .header label i {
@@ -147,35 +157,16 @@ export default {
   data() {
     return {
       combinationsTitle: "",
-      // combinations: [],
       menuBarsTooltip: "",
       queryString: '',
       menuDisplayInstitutional: true,
       menuDisplay: 'text',
     }
   },
-  methods: {
-    // loadCombinations() {
-    //   if (this.$store.getters.sessionID && this.$store.getters.userID > -1) {
-    //     this.combinations = []
-    //     this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-    //       transaction: 'getCombs',
-    //       user: this.$store.getters.userID,
-    //     })
-    //     .then(res => {
-    //       if (res.status === 200 && res.data) {
-    //         this.combinations = res.data.results
-    //       }
-    //     })
-    //     .catch(console.log)
-    //   }
-    // }
-  },
   mounted() {
     // i18n
     this.combinationsTitle = this.$i18n.str("Combinations");
     this.menuBarsTooltip = this.$i18n.str("Menu.Bars.Tooltip")
-    // this.loadCombinations()
   }
 }
 
