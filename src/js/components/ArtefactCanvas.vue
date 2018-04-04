@@ -115,7 +115,8 @@ export default {
       return returnPos
     },
     canvasToSVG(){
-      trace(this.$refs.maskCanvas, this.divisor).then(res=>{
+      trace(this.$refs.maskCanvas, this.divisor)
+      .then(res=>{
         this.$emit('mask', res)
       })
     }
