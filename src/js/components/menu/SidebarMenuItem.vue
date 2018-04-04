@@ -44,13 +44,15 @@
   width: 100%;
   opacity: 0;
   transition: all 100ms;
+  transition-timing-function: ease-out;
   text-align: left;
 }
 
 .menu-section.open {
   & .body {
     opacity: 1.0;
-  transition: all 400ms;
+    transition: all 300ms;
+  transition-timing-function: ease-in;
   }
 }
 
