@@ -287,10 +287,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  @import "~sass-vars";
+
   #singleImageMenu {
     width: 100%;
     height: 50px;
     max-height: 50px;
+    background: lightgrey;
   }
   .fileSelector {
     border-radius: 15px;

@@ -25,7 +25,7 @@
           <template slot="paneL">
             <split-pane split="vertical">
               <template slot="paneL">
-                <single-image class="pane-content"></single-image>
+                <single-image class="pane-content single-image-pane"></single-image>
               </template>
               <template slot="paneR">
                 <editor class="pane-content"></editor>
@@ -33,7 +33,7 @@
             </split-pane>
           </template>
           <template slot="paneR">
-            <combination></combination>
+            <combination class="combination-pane"></combination>
           </template>
         </split-pane>
       </div>
@@ -100,6 +100,14 @@
 
 .pane-content {
   height: 100%;
+}
+
+.single-image-pane {
+  background: maroon;
+}
+
+.combination-pane {
+  background: rgb(82, 119, 215);
 }
 
 .vue-splitter-container {

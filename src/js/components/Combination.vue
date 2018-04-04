@@ -1,6 +1,6 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <el-row style="{width: 100%; height 50px;}">
+    <el-row class="combination-panel-menu" style="{width: 100%; height 50px;}">
         <el-col :span="4">
             <label>Zoom</label>
         </el-col>
@@ -19,6 +19,15 @@
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+    @import "~sass-vars";
+
+    .combination-panel-menu {
+        background: lightgrey;
+    }
+</style>
+
 
 <script>
 import CombinationCanvas from './CombinationCanvas.vue'
