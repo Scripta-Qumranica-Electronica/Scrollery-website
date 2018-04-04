@@ -1,4 +1,4 @@
-import Text from '~/models/Text.js'
+import Composition from '~/models/Composition.js'
 import Column from '~/models/Column.js'
 import Line from '~/models/Line.js'
 
@@ -6,11 +6,11 @@ describe('TextModel', () => {
 
   let text
   beforeEach(() => {
-    text = new Text()
+    text = new Composition()
   })
 
   it('should create a text from a stream', () => {
-    expect(Text.fromSigns() instanceof Text).to.equal(true)
+    expect(Composition.fromSigns([]) instanceof Composition).to.equal(true)
   })
 
   describe('adding columns', () => {

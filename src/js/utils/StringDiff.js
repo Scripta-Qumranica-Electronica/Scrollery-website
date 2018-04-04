@@ -1,3 +1,4 @@
+/* instanbul ignore */
 /**
  * This library modifies the diff-patch-match library by Neil Fraser
  * by removing the patch and match functionality and certain advanced

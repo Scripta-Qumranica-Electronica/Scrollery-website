@@ -1,4 +1,4 @@
-import { Record } from 'immutable'
+import Model from './Model.js'
 
 /**
  * A base class for lists of models. Mainly, this provides an interface to
@@ -7,6 +7,11 @@ import { Record } from 'immutable'
  * It has a similar API as the array, but is more focused
  */
 class List {
+
+  /**
+   * @param {object={}} [attributes] List attributes 
+   * @param {array=[]}  [items]      An initial array of items for the list 
+   */
   constructor(attributes = {}, items = []) {
 
     // todp: safety to ensure props not overwritten
@@ -42,7 +47,7 @@ class List {
    * @returns {Record}  the record class itself
    */
   static getModel() {
-    return Record
+    return Model
   };
 
   /**
@@ -116,13 +121,13 @@ class List {
    * @instance
    * 
    * @param {number} start    the start index
-   * @param {number} end      the end index
+   * @param {number} count    the number of items to slice off
    * @param {List}   [target] the target list
    * 
    * @returns {List} A new list with the slice which is either the list or one created on the fly
    */
-  sliceInto(start, end, target) {
-    let slice = this._items.splice(start, end)
+  sliceInto(start, count, target) {
+    let slice = this._items.splice(start, count)
 
     // use or create the new List, and insert the slice into it
     target = target || new this.constructor()
@@ -172,15 +177,15 @@ class List {
    * @public
    * @instance
    * 
-   * @param {Record|id|function} criteria
+   * @param {Record|id|function} criteria  Criteria by which to find an item
    */
   findIndex(criteria) {
     if (typeof criteria === 'function') {
       return this._items.findIndex(criteria)
     } else {
       return this._items.findIndex(item => {
-        return (criteria instanceof Record)
-          ? item.is(criteria)            // this is an instance of Record
+        return (criteria instanceof this.constructor.getModel())
+          ? item === criteria            // this is an instance of model
           : item.getID() === criteria    // criteria is a string, which is assumed to be the id
       })
     }

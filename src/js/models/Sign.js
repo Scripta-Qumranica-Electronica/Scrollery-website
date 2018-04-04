@@ -1,5 +1,5 @@
 import { Record } from 'immutable'
-
+import Model from './Model.js'
 
 /**
  * Default values for a new sign object
@@ -47,7 +47,7 @@ export default class Sign extends Record(defaults) {
 
   constructor(attrs) {
     attrs.id = attrs.sign_id
-    attrs.is_whitespace = (!attrs.sign || attrs.sign === '' || attrs.sign === ' ' || attrs.sign === '&nbsp;')
+    attrs.is_whitespace = (!attrs.sign || attrs.sign === '' || attrs.sign === ' ' || attrs.sign === '&nbsp;' || attrs.sign === '·')
     super(attrs)
   }
 
