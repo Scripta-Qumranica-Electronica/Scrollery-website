@@ -141,13 +141,6 @@ export default {
   },
   computed: {
     ...mapGetters(['userID', 'sessionID']),
-    filterCombinations() {
-        return this.queryString.length 
-            ? this.combinations.filter((combination) => {
-                return combination.name.toLowerCase().indexOf(this.queryString.toLowerCase()) !== -1
-              })
-            : this.combinations
-    }
   },
   props: {
     open: Boolean,

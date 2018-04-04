@@ -5,189 +5,94 @@ import ImageMenuItem from '~/components/menu/ImageMenuItem.vue'
 
 describe("ImageMenuItem", function() {
     let wrapper, vm
-    const fakeID = 12345
+    const push = sinon.spy()
+    const scrollID = 2
+    const scrollVersionID = 2
+    const imageID = 2
 
     beforeEach(() => {
         wrapper = mount(ImageMenuItem, {
             propsData: {
-                dataId: fakeID,
+                corpus: new MenuCorpus(),
+                scrollID: scrollID,
+                versionID: scrollVersionID,
+                imageID: imageID,
+            },
+            mocks: { 
+                $router: { push },
+                $route: {
+                    params: { 
+                        scrollID: 20,
+                        scrollVersionID: 324,
+                        imageID: 23
+                    }
+                },
             }
         })
         vm = wrapper.vm
     })
     
-    it('responds properly to clicks', done => {
-        const push = sinon.spy()
-        const imageID = 4284
-        const plate = '1094'
-        const fragment = '1'
-        const institution = 'IAA'
-        const scrollVersionID = '1231'
-        const versionID = scrollVersionID
-        const scrollID = '894'
-
-        // create wrapper with mocked route and routers
-        let wrapper = mount(ImageMenuItem, {
-            propsData: {
-                dataId: imageID,
-                plate: plate,
-                fragment: fragment,
-                institution: institution,
-                versionID: versionID,
-            },
-            mocks: { 
-                $router: { push },
-                $route: {
-                    params: { 
-                        imageID,
-                        scrollID: scrollID,
-                        scrollVersionID: scrollVersionID,
-                    }
-                }
-            }
-        })
-        wrapper.vm.$post = function(url, payload) {
-            expect(payload.image_id).to.equal(imageID)
-            expect(payload.version_id).to.equal(versionID)
-            expect(payload.transaction).to.equal('getArtOfImage')
-            
-            done()
-    
-            // adhere to interface
-            return new Promise();
-        }.bind(vm)
-
+    // This does run over all the code, but
+    // I should be able to test a little bit more 
+    // like checking the router and the name in the span.
+    it('responds properly to clicks', () => {
         wrapper.find('span').trigger('click')
+        expect(wrapper.vm.open).to.equal(true)
 
         // assertions
         expect(push.firstCall.args[0].name).to.equal("workbenchAddress")
-        expect(push.firstCall.args[0].params).to.include({ imageID })
+        expect(push.firstCall.args[0].params.imageID).to.equal(imageID)
     })
 
-    it('can handle empty $post return data', done => {
-        const imageID = 4284
-        const plate = '1094'
-        const fragment = '1'
-        const institution = 'IAA'
-        const scrollVersionID = '1231'
-        const versionID = scrollVersionID
-        const scrollID = '894'
-
-        const returnData = {
-            status: 200,
-          }
-
-        // create wrapper with mocked route and routers
-        let wrapper = mount(ImageMenuItem, {
-            propsData: {
-                dataId: imageID,
-                plate: plate,
-                fragment: fragment,
-                institution: institution,
-                versionID: versionID,
-            },
-        })
-        wrapper.vm.$post = function() {
-            return new Promise((resolve, reject) => resolve(returnData))
-        }.bind(vm)
-
-        wrapper.vm.fetchChildren()
-
-        // assertions
-        wrapper.vm.$nextTick(() => {
-            // How do I check my data() to make sure this.children is correct?
-            // expect(wrapper.vm.children).to.equal([])
-            done() // ends the test
-          })
-        
+    it('can add a new artefact', () => {
+        wrapper.find('li').trigger('click')
+        expect(wrapper.vm.dialogVisible).to.equal(true)
     })
-
-    it('can $post to get children', done => {
-        const imageID = 4284
-        const plate = '1094'
-        const fragment = '1'
-        const institution = 'IAA'
-        const scrollVersionID = '1231'
-        const versionID = scrollVersionID
-        const scrollID = '894'
-
-        const returnData = {
-            status: 200,
-            data: {
-                results: [
-                    {artefact_id: 1},
-                ],
-            },
-          }
-
-        // create wrapper with mocked route and routers
-        let wrapper = mount(ImageMenuItem, {
-            propsData: {
-                dataId: imageID,
-                plate: plate,
-                fragment: fragment,
-                institution: institution,
-                versionID: versionID,
-            },
-        })
-        wrapper.vm.$post = function() {
-            return new Promise((resolve, reject) => resolve(returnData))
-        }.bind(vm)
-
-        wrapper.vm.fetchChildren()
-
-        // assertions
-        wrapper.vm.$nextTick(() => {
-            // How do I check my data() to make sure this.children is correct?
-            // expect(wrapper.vm.children).to.deep.equal(returnData.data.results)
-            done() // ends the test
-          })
-        
-    })
-
-    it('pushes data to the router', () => {
-        const push = sinon.spy()
-        const imageID = 4284
-        const plate = '1094'
-        const fragment = '1'
-        const institution = 'IAA'
-        const scrollVersionID = '1231'
-        const versionID = scrollVersionID
-        const scrollID = '894'
-
-        // create wrapper with mocked route and routers
-        let wrapper = mount(ImageMenuItem, {
-            propsData: {
-                dataId: imageID,
-                plate: plate,
-                fragment: fragment,
-                institution: institution,
-                versionID: versionID,
-            },
-            mocks: { 
-                $router: { push },
-                $route: {
-                    params: { 
-                        imageID,
-                        scrollID: scrollID,
-                        scrollVersionID: scrollVersionID,
-                    }
-                }
-            }
-        })
-
-        wrapper.vm.setRouter()
-
-        // assertions
-        expect(push.firstCall.args[0].name).to.equal("workbenchAddress")
-        expect(push.firstCall.args[0].params).to.include({ imageID })
-    })
-
-    it('has a span', () => {
-      expect(wrapper.contains('span')).to.equal(true)
-    })
-
-    it('has a div', () => {
-        expect(wrapper.contains('div')).to.equal(true)
-      })
 })
+
+class MenuCorpus {
+
+    /**
+     * @param {object}          attributes the image attributes
+     * @param {array.<MenuImage>=[]} [images]    an array of images
+     */
+    constructor() {
+        this.combinations = new MenuCombinations()
+        this.images = new MenuImages()
+    }
+    populateColumnsOfScrollVersion(versionID, scrollID) {
+        return {versionID: versionID, scrollID: scrollID}
+    }
+    populateImagesOfScrollVersion(versionID, scrollID) {
+        return {versionID: versionID, scrollID: scrollID}
+    }
+    populateArtefactsofImage(versionID, scrollID) {
+        return {versionID: versionID, scrollID: scrollID}
+    }
+  }
+
+class MenuCombinations {
+    constructor() {
+        this.items = {
+            2: {
+                name: 'test'
+            }
+        }
+    }
+    itemWithID(id) {
+        return this.items[id]
+    }
+}
+
+class MenuImages {
+    constructor() {
+        this.items = {
+            2: {
+                name: 'test'
+            }
+        }
+    }
+    itemWithID(id) {
+        return this.items[id]
+    }
+}

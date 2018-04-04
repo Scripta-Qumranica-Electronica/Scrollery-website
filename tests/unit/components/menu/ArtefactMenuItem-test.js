@@ -5,45 +5,42 @@ import ArtefactMenuItem from '~/components/menu/ArtefactMenuItem.vue'
 
 describe("ArtefactMenuItem", function() {
     let wrapper, vm
-    const fakeID = 12345
+    const push = sinon.spy()
+    const scrollID = 2
+    const scrollVersionID = 2
+    const imageID = 2
+    const artID = 2
 
     beforeEach(() => {
         wrapper = mount(ArtefactMenuItem, {
             propsData: {
-                dataId: fakeID,
-            }
-        })
-        vm = wrapper.vm
-    })
-    
-    it('pushes data to the router', () => {
-        const push = sinon.spy()
-        const artID = 12345
-
-        // create wrapper with mocked route and routers
-        let wrapper = mount(ArtefactMenuItem, {
-            propsData: {
-                artefact: artID,
+                artefactID: artID,
+                scrollID: scrollID,
+                imageID: imageID,
+                versionID: scrollVersionID,
             },
             mocks: { 
                 $router: { push },
                 $route: {
                     params: { 
-                        artID,
-                        scrollID: 808,
-                        scrollVersionID: 1,
+                        artID: 34,
+                        scrollID: 33,
+                        scrollVersionID: 32,
                     }
                 }
             }
         })
+        vm = wrapper.vm
+    })
+    
+    // This does run over all the code, but
+    // I should be able to test a little bit more 
+    // like checking the router and the name in the span.
+    it('responds properly to clicks', () => {
         wrapper.find('span').trigger('click')
 
         // assertions
         expect(push.firstCall.args[0].name).to.equal("workbenchAddress")
-        expect(push.firstCall.args[0].params).to.include({ artID })
-    })
-
-    it('has a span', () => {
-      expect(wrapper.contains('span')).to.equal(true)
+        expect(push.firstCall.args[0].params.artID).to.equal(artID)
     })
 })

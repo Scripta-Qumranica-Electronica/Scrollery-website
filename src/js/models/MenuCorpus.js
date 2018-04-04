@@ -17,15 +17,15 @@ class MenuCorpus {
    * @param {user} Number   the user id for the model
    * @param {set}           the set function which the framework uses for reactivity
    */
-  constructor(post, user, set) {
-    this._post = post
+  constructor(sessionID, user, set) {
+    this.sessionID = sessionID
     this._user = user
     this._set = set || ((object, key, value) => { object[key] = value })
 
-    this.combinations = new MenuCombinations(this._post, this._user, this._set)
-    this.columns = new MenuColumns(this._post, this._user, this._set)
-    this.images = new MenuImages(this._post, this._user, this._set)
-    this.artefacts = new MenuArtefacts(this._post, this._user, this._set)
+    this.combinations = new MenuCombinations(this.sessionID, this._user, this._set)
+    this.columns = new MenuColumns(this.sessionID, this._user, this._set)
+    this.images = new MenuImages(this.sessionID, this._user, this._set)
+    this.artefacts = new MenuArtefacts(this.sessionID, this._user, this._set)
 
     this.populateCombinations()
   }

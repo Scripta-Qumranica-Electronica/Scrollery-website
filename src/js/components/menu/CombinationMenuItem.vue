@@ -104,23 +104,11 @@ export default {
     },
 
     cloneScroll() {
-      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-        transaction: 'copyCombination',
-        scroll_id: this.scrollDataID,
-        scroll_version_id: this.versionID,
-      })
-      .then(res => {
-        if (res.status === 200 && res.data.scroll_clone === 'success') {
-          // Please emit message to parent to either reload 
-          // all combinations or add the one just created.
-          // this.$emit('reloadListings', res.data)
-        }
-      })
-      .catch(console.error)
+      
     },
 
     lockScroll() {
-      // this.$emit('reloadListings')
+
     }
   },
 }
