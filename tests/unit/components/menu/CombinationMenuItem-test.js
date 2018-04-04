@@ -1,7 +1,7 @@
 "use strict"
 
 import { mount } from '@test'
-import CombinationMenuItem from '~/components/CombinationMenuItem.vue'
+import CombinationMenuItem from '~/components/menu/CombinationMenuItem.vue'
 
 describe("CombinationMenuItem", function() {
     let wrapper, vm
@@ -20,11 +20,19 @@ describe("CombinationMenuItem", function() {
     
     it('responds properly to clicks', done => {
         const push = sinon.spy()
+        const corpus = {
+            populateColumnsOfScrollVersion(versionID, scrollID) {
+                return {versionID: versionID, scrollID: scrollID}
+            },
+            populateImagesOfScrollVersion(versionID, scrollID) {
+                return {versionID: versionID, scrollID: scrollID}
+            },
+        }
 
         // create wrapper with mocked route and routers
         let wrapper = mount(CombinationMenuItem, {
             propsData: {
-                menuType: menuType,
+                corpus: corpus,
             },
             mocks: { 
                 $router: { push },
@@ -36,16 +44,6 @@ describe("CombinationMenuItem", function() {
                 }
             }
         })
-        wrapper.vm.$post = function(url, payload) {
-            // expect(payload.combID).to.equal(scrollID)
-            // expect(payload.version_id).to.equal(versionID)
-            // expect(payload.transaction).to.equal('getColOfComb')
-            
-            done()
-    
-            // adhere to interface
-            return new Promise();
-        }.bind(vm)
 
         wrapper.find('span').trigger('click')
 
@@ -55,34 +53,34 @@ describe("CombinationMenuItem", function() {
         // expect(push.firstCall.args[0].params).to.include({ scrollVersionID })
     })
 
-    it('can handle $post return data when fetching children', done => {
-        const returnData = {
-            status: 200,
-            data: {
-                results: [],
-            },
-        }
+    // it('can handle $post return data when fetching children', done => {
+    //     const returnData = {
+    //         status: 200,
+    //         data: {
+    //             results: [],
+    //         },
+    //     }
 
-        // create wrapper with mocked route and routers
-        let wrapper = mount(CombinationMenuItem, {
-            propsData: {
-                menuType: menuType,
-            },
-        })
-        wrapper.vm.$post = function() {
-            // adhere to interface
-            return new Promise((resolve, reject) => resolve(returnData))
-        }.bind(vm)
+    //     // create wrapper with mocked route and routers
+    //     let wrapper = mount(CombinationMenuItem, {
+    //         propsData: {
+    //             menuType: menuType,
+    //         },
+    //     })
+    //     wrapper.vm.$post = function() {
+    //         // adhere to interface
+    //         return new Promise((resolve, reject) => resolve(returnData))
+    //     }.bind(vm)
 
-        wrapper.vm.fetchChildren()
+    //     wrapper.vm.fetchChildren()
 
-        // assertions
-        wrapper.vm.$nextTick(() => {
-            // How do I check my data() to make sure this.children is correct?
-            // expect(wrapper.vm.children).to.equal([])
-            done() // ends the test
-          })
-    })
+    //     // assertions
+    //     wrapper.vm.$nextTick(() => {
+    //         // How do I check my data() to make sure this.children is correct?
+    //         // expect(wrapper.vm.children).to.equal([])
+    //         done() // ends the test
+    //       })
+    // })
 
     it('can clone a scroll', done => {
         const returnData = {

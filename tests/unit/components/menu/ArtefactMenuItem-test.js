@@ -1,18 +1,16 @@
 "use strict"
 
 import { mount } from '@test'
-import ColumnMenuItem from '~/components/ColumnMenuItem.vue'
+import ArtefactMenuItem from '~/components/menu/ArtefactMenuItem.vue'
 
-describe("ColumnMenuItem", function() {
+describe("ArtefactMenuItem", function() {
     let wrapper, vm
     const fakeID = 12345
-    const name = 'test col'
 
     beforeEach(() => {
-        wrapper = mount(ColumnMenuItem, {
+        wrapper = mount(ArtefactMenuItem, {
             propsData: {
                 dataId: fakeID,
-                name: name,
             }
         })
         vm = wrapper.vm
@@ -20,19 +18,18 @@ describe("ColumnMenuItem", function() {
     
     it('pushes data to the router', () => {
         const push = sinon.spy()
-        const colID = 12345
+        const artID = 12345
 
         // create wrapper with mocked route and routers
-        let wrapper = mount(ColumnMenuItem, {
+        let wrapper = mount(ArtefactMenuItem, {
             propsData: {
-                dataId: colID,
-                name: name,
+                artefact: artID,
             },
             mocks: { 
                 $router: { push },
                 $route: {
                     params: { 
-                        colID,
+                        artID,
                         scrollID: 808,
                         scrollVersionID: 1,
                     }
@@ -43,7 +40,7 @@ describe("ColumnMenuItem", function() {
 
         // assertions
         expect(push.firstCall.args[0].name).to.equal("workbenchAddress")
-        expect(push.firstCall.args[0].params).to.include({ colID })
+        expect(push.firstCall.args[0].params).to.include({ artID })
     })
 
     it('has a span', () => {

@@ -1,7 +1,7 @@
 "use strict"
 
 import { mount } from '@test'
-import ImageMenuItem from '~/components/ImageMenuItem.vue'
+import ImageMenuItem from '~/components/menu/ImageMenuItem.vue'
 
 describe("ImageMenuItem", function() {
     let wrapper, vm
