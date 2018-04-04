@@ -14,7 +14,7 @@
             </el-slider>
         </el-col>
     </el-row>
-    <div style="{width: 100%; height: calc(100% - 50px); overflow: auto;}">
+    <div style="{width: 100%; height: calc(100% - 38px); overflow: auto;}">
         <combination-canvas :global-scale="globalScale"></combination-canvas>
     </div>
   </div>

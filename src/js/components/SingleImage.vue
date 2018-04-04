@@ -74,7 +74,7 @@
         </el-slider>
       </el-col>
     </el-row>
-    <div style="{width: 100%; height: calc(100% - 50px); overflow: auto; position: relative;}">
+    <div style="{width: 100%; height: calc(100% - 30px); overflow: auto; position: relative;}">
       <roi-canvas class="overlay-image"
                   :width="masterImage.width ? masterImage.width : 0"
                   :height="masterImage.height ? masterImage.height : 0"
