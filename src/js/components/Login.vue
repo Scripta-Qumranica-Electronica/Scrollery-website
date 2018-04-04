@@ -1,6 +1,6 @@
 // TODO: check if the session is valid before trying to login with locatdata
 <template>
-  <el-card class="loginCard" header="Login" :body-style="{ background: 'white' }">
+  <el-card v-show="visible" class="loginCard" header="Login" :body-style="{ background: 'white' }">
     <el-form id="login" @submit.native.prevent="onSubmit" :label-position="labelPosition">
       <el-form-item class="error warningText" v-show='errMsg.length'>
         {{ errMsg }}
@@ -34,6 +34,7 @@ import { mapMutations, mapGetters } from 'vuex'
 export default {
   data() {
     return {
+      visible: false,
       user: '',
       password: '',
       errMsg: '',
@@ -49,8 +50,14 @@ export default {
   },
   created() {
     this.user = this.username
+
+    // if there's a session hanging around in localStorage, check that
     if (this.sessionID) {
       this.validateSession(window.localStorage ? window.localStorage : null)
+    } else {
+
+      // users first time here, show the Login screen
+      this.visible = true
     }
   },
   methods: {
@@ -88,7 +95,7 @@ export default {
       }
     },
     validateSession(storage) {
-      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+      return this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         SESSION_ID: this.sessionID,
         transaction: 'validateSession',
         SCROLLVERSION: 1
@@ -101,8 +108,11 @@ export default {
           storage.removeItem('sqe')
           
         } else if (res.data) {
-          this.validateLogin(res)
+          return this.validateLogin(res)
         }
+      })
+      .then(() => {
+        this.visible = true;
       })
       .catch(({ response }) => {
 
@@ -125,32 +135,46 @@ export default {
       });
     },
     validateLogin(res) {
-      if (res.data && res.data.error) {
-        this.errMsg = res.data.error
-        console.error(res.data)
-      } else if (res.data 
-                && res.data.SESSION_ID 
-                &&  res.data.USER_ID 
+      return new Promise((resolve, reject) => {
+
+        // Safeguard to ensure data given
+        if (!res) {
+          reject(new Error('Login.validateLogin requires a server response'))
+        }
+
+
+        if (res.data && res.data.error) {
+          this.errMsg = res.data.error
+          console.error(res.data)
+          reject(new Error("Login invalid"))
+        } else if (
+          res.data 
+          && res.data.SESSION_ID 
+          &&  res.data.USER_ID 
         ) {
 
-          // Set store state
-          this.setSessionID(res.data.SESSION_ID)
-          this.setUserID(res.data.USER_ID)
-          this.setUsername(this.user.trim())
-          this.setLanguage(this.language)
+            // Set store state
+            this.setSessionID(res.data.SESSION_ID)
+            this.setUserID(res.data.USER_ID)
+            this.setUsername(this.user.trim())
+            this.setLanguage(this.language)
 
-          // Load language files
-          this.$i18n.load().then(() => {
+            // Load language files
+            this.$i18n.load().then(() => {
 
-            // success!
-            this.$router.push({name: 'workbench'})
-          })
-          .catch(() => {
-            this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
-          })
-      } else {
-        this.errMsg = this.$i18n.str('Errors.Unknown')
-      }
+              // success!
+              this.$router.push({name: 'workbench'})
+              resolve()
+            })
+            .catch(() => {
+              this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
+              reject(new Error("Service unavailable"))
+            })
+        } else {
+          this.errMsg = this.$i18n.str('Errors.Unknown')
+          reject(new Error("Unknown error"))
+        }
+      })
     }
   }
 }
