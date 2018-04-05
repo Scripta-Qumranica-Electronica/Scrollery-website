@@ -36,11 +36,17 @@ const sort = (signs = []) => {
     hash[signs[i]['sign_id']] = signs[i]
   }
 
-  // get the first sign ...i.e., the one with a previous sign
-  let start = signs.find(sign => !sign.prev_sign_id)
-  let sorted = []
+  // get the first sign ...i.e., the one without a previous sign 
+  // designated or available in the hash.
+  let start = signs.find(sign => (!sign.prev_sign_id || !hash[sign.prev_sign_id]))
+  
+  // ensure a start is found
+  if (!start) {
+    return signs;
+  }
 
   // call and return from recursive appendNext
+  let sorted = []
   return appendNext(sorted, hash, start)
 }
 
