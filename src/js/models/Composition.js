@@ -49,7 +49,7 @@ class Composition extends List {
   static getModel() {
     return Column
   }
-
+  
   /**
    * @public
    * @static
