@@ -122,6 +122,20 @@ class Column extends List {
    * @public
    * @instance
    * 
+   * @returns {string} a string representation of the column. Lines are separate with a \n 
+   */
+  toString() {
+    let str = ''
+    this.forEach(line => {
+      str += `${str.length ? '\n' : ''}${line.toString()}`
+    })
+    return str
+  }
+
+  /**
+   * @public
+   * @instance
+   * 
    * @returns {string} a DOM string representing this column
    */
   toDOMString() {

@@ -29,6 +29,7 @@
     "es6-shim": "^0.35.3",
     "express": "^4.16.2",
     "extract-text-webpack-plugin": "^3.0.2",
+    "faker": "^4.1.0",
     "file-loader": "^1.1.11",
     "karma": "^2.0.0",
     "karma-chrome-launcher": "^2.2.0",
