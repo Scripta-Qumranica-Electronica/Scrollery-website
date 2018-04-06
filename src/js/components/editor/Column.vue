@@ -182,11 +182,9 @@ export default {
       let selectedNode = document.getSelection()
 
       // safeguard to ensure a workable DOM element is available
-      if (!selectedNode || !selectedNode.anchorNode) {
-        return {}
-      }
-
-      return this.getLineParent(selectedNode.anchorNode)
+      return (!selectedNode || !selectedNode.anchorNode)
+        ? {}
+        : this.getLineParent(selectedNode.anchorNode)
     },
 
     /**
