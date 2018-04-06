@@ -5,7 +5,7 @@ const merge = require('webpack-merge')
 const Notify = require('webpack-build-notifier')
 
 module.exports = merge(common, {
-  devtool: 'eval-source-map',
+  devtool: 'source-map',
   watch: true,
   watchOptions: {
     ignored: /node_modules|dist/

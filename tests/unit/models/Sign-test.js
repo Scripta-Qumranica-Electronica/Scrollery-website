@@ -4,7 +4,7 @@ import Sign from '~/models/Sign.js'
 describe('Sign', () => {
   it('should be constructible', () => {
     let sign = new Sign({
-      id: "test"
+      sign_id: "test"
     })
     expect(sign instanceof Sign).to.equal(true)
   })
@@ -14,18 +14,12 @@ describe('Sign', () => {
     let sign, next
     beforeEach(() => {
       sign = new Sign({
-        id: 1,
-        next_sign: 2
+        sign_id: 1,
+        next_sign_id: 2
       })
       next = new Sign({
-        id: 2
+        sign_id: 2
       })
-    })
-
-    it('should throw an error when attempting to overwrite next sign', () => {
-      expect(() => {
-        sign.next_sign = null
-      }).to.throw()
     })
 
     it('should know if it has a next sign', () => {
@@ -40,18 +34,12 @@ describe('Sign', () => {
     let sign, prev
     beforeEach(() => {
       sign = new Sign({
-        id: 2,
-        prev_sign: 1
+        sign_id: 2,
+        prev_sign_id: 1
       })
       prev = new Sign({
-        id: 1
+        sign_id: 1
       })
-    })
-
-    it('should throw an error when attempting to overwrite previous sign', () => {
-      expect(() => {
-        sign.prev_sign = null
-      }).to.throw()
     })
 
     it('should know if it has a previous sign', () => {
@@ -65,14 +53,31 @@ describe('Sign', () => {
     let sign
     beforeEach(() => {
       sign = new Sign({
-        id: 1,
+        sign_id: 1,
         sign: '·',
         is_reconstructed: true
       })
     })
 
+    it('should know its id', () => {
+      expect(sign.getID()).to.equal(1)
+    })
+
     it('should know if it is a whitespace character', () => {
-      expect(sign.isWhitespace()).to.equal(true)
+      expect(sign.is_whitespace).to.equal(true)
+    })
+
+    it('should know about the varieties of whitespace', () => {
+      [
+        { sign: false },
+        { sign: '' },
+        { sign: ' ' },
+        { sign: '&nbsp;' },
+        { sign: '·' }
+      ].forEach(attrs => {
+        sign = new Sign({sign: false})
+        expect(sign.is_whitespace).to.equal(true)
+      })
     })
 
     it('should know if it is reconstructed', () => {
@@ -83,7 +88,7 @@ describe('Sign', () => {
   describe('extending', () => {
 
     let sign, attrs = {
-      id: 1,
+      sign_id: 1,
       sign: '·',
       is_reconstructed: true
     }
@@ -99,6 +104,76 @@ describe('Sign', () => {
       expect(newSign).not.to.equal(sign)
       expect(newSign.reconstructed()).to.equal(sign.reconstructed())
       expect(newSign.col_id).to.equal(1)
+    })
+
+  })
+
+  describe('stringifying with sign.toString()', () => {
+
+    describe('whitespace', () => {
+      let sign, attrs = {
+        sign_id: 1,
+        sign: '·',
+        is_reconstructed: true
+      }
+      beforeEach(() => {
+        sign = new Sign(attrs)
+      })
+
+      it('should return an empty string for the toString', () => {
+        expect(/^\s$/.test(sign.toString())).to.equal(true)
+      })
+    })
+
+    describe('non-whitespace', () => {
+
+      let sign, attrs = {
+        sign_id: 1,
+        sign: 'א',
+        is_reconstructed: true
+      }
+      beforeEach(() => {
+        sign = new Sign(attrs)
+      })
+
+      it('should return an empty string for the toString', () => {
+        expect(sign.toString()).to.equal('א')
+      })
+    })
+
+  })
+
+  describe('stringifying with sign.toDOMString()', () => {
+
+    describe('whitespace', () => {
+      let sign, attrs = {
+        sign_id: 1,
+        sign: '·',
+        is_reconstructed: true
+      }
+      beforeEach(() => {
+        sign = new Sign(attrs)
+      })
+
+      it('should return an HTML encoded non-breaking space', () => {
+        expect(sign.toDOMString()).to.equal('&nbsp;')
+      })
+    })
+
+    describe('non-whitespace', () => {
+
+      let sign, attrs = {
+        sign_id: 1,
+        sign: 'א',
+        is_reconstructed: true
+      }
+      beforeEach(() => {
+        sign = new Sign(attrs)
+      })
+
+      it('should return the sign without encoding', () => {
+        expect(sign.toDOMString()).to.equal('א')
+      })
     })
 
   })

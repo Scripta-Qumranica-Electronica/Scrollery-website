@@ -2,12 +2,16 @@
   display: none;
 }
 
+.inline {
+  display: inline-block;
+}
+
 .reqired:after {
   content: '*';
 }
 
 .warningText {
-  color: #F56C6C;
+  color: $warning;
 }
 
 .avoid-clicks {

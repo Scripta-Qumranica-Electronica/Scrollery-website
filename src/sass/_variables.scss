@@ -8,6 +8,8 @@ $editorWidthWithSidebar: calc(100% - #{$sidebarWidth});
 $editorWidthWithoutSidebar: calc(100% - #{$header});
 
 // Colors
+
+// Theme
 $dkBlue: #0e1a40;
 $ltBlue: #222f5b;
 $gray: #5d5d5d;
@@ -17,3 +19,10 @@ $black: #000;
 // Transitions
 $menuSlideTransitionIn: 250ms;
 $menuSlideTransitionOut: 200ms;
+// Messaging
+$warning: #F56C6C;
+$orange: $warning;
+
+
+$dkTan: #cd853f;
+$ltOrange: #f4a460;
