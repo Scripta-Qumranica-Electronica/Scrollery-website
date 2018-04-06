@@ -14,7 +14,7 @@
         <i v-show="state.getters.showReconstructedText" class="fa fa-eye" aria-hidden="true"></i>
         <i v-show="!state.getters.showReconstructedText" class="fa fa-eye-slash" aria-hidden="true"></i>
     </button>
-    <button class="toolbar-item" @click="$emit('fullscreen')" v-bind:title="$i18n.str('Editor.Fullscreen')">
+    <button id="editor-fullscreen" class="toolbar-item" @click="$emit('fullscreen')" v-bind:title="$i18n.str('Editor.Fullscreen')">
         <i class="fa fa-arrows-alt" aria-hidden="true"></i>
     </button>
   </div>
@@ -63,7 +63,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 
 @import "~sass-vars";
 

@@ -4,41 +4,22 @@ import Sign from '~/models/Sign.js'
 describe('Sign', () => {
   it('should be constructible', () => {
     let sign = new Sign({
-      id: "test"
-    }, null)
+      sign_id: "test"
+    })
     expect(sign instanceof Sign).to.equal(true)
-  })
-
-  it('should preserve a reference to the map', () => {
-    let map = {}
-    let sign = new Sign({
-      id: "test"
-    }, map)
-    expect(sign.map).to.equal(map)
   })
 
   describe('next sign', () => {
 
-    let sign, map, next
+    let sign, next
     beforeEach(() => {
-      map = new Map()
-
       sign = new Sign({
-        id: 1,
-        next_sign: 2
-      }, map)
+        sign_id: 1,
+        next_sign_id: 2
+      })
       next = new Sign({
-        id: 2
-      }, map)
-
-      map.set(sign.id, sign)
-      map.set(next.id, next)
-    })
-
-    it('should throw an error when attempting to overwrite next sign', () => {
-      expect(() => {
-        sign.next_sign = null
-      }).to.throw()
+        sign_id: 2
+      })
     })
 
     it('should know if it has a next sign', () => {
@@ -46,34 +27,19 @@ describe('Sign', () => {
       expect(next.hasNext()).to.equal(false)
     })
 
-    it('should retrieve the next sign', () => {
-      expect(sign.next()).to.equal(next)
-    })
-
   })
 
   describe('previous sign', () => {
 
-    let sign, map, prev
+    let sign, prev
     beforeEach(() => {
-      map = new Map()
-
       sign = new Sign({
-        id: 2,
-        prev_sign: 1
-      }, map)
+        sign_id: 2,
+        prev_sign_id: 1
+      })
       prev = new Sign({
-        id: 1
-      }, map)
-
-      map.set(sign.id, sign)
-      map.set(prev.id, prev)
-    })
-
-    it('should throw an error when attempting to overwrite previous sign', () => {
-      expect(() => {
-        sign.prev_sign = null
-      }).to.throw()
+        sign_id: 1
+      })
     })
 
     it('should know if it has a previous sign', () => {
@@ -81,30 +47,134 @@ describe('Sign', () => {
       expect(prev.hasPrevious()).to.equal(false)
     })
 
-    it('should retrieve the previous sign', () => {
-      expect(sign.previous()).to.equal(prev)
-    })
-
   })
 
   describe('attributes', () => {
-    let sign, map
+    let sign
     beforeEach(() => {
-      map = new Map()
       sign = new Sign({
-        id: 1,
+        sign_id: 1,
         sign: '·',
         is_reconstructed: true
-      }, map)
-      map.set(sign.id, sign)
+      })
+    })
+
+    it('should know its id', () => {
+      expect(sign.getID()).to.equal(1)
     })
 
     it('should know if it is a whitespace character', () => {
-      expect(sign.isWhitespace()).to.equal(true)
+      expect(sign.is_whitespace).to.equal(true)
+    })
+
+    it('should know about the varieties of whitespace', () => {
+      [
+        { sign: false },
+        { sign: '' },
+        { sign: ' ' },
+        { sign: '&nbsp;' },
+        { sign: '·' }
+      ].forEach(attrs => {
+        sign = new Sign({sign: false})
+        expect(sign.is_whitespace).to.equal(true)
+      })
     })
 
     it('should know if it is reconstructed', () => {
       expect(sign.reconstructed()).to.equal(true)
     })
+  })
+
+  describe('extending', () => {
+
+    let sign, attrs = {
+      sign_id: 1,
+      sign: '·',
+      is_reconstructed: true
+    }
+    beforeEach(() => {
+      sign = new Sign(attrs)
+    })
+
+    it('should expose an extend method that returns a new sign with the extended attributes', () => {
+      let newSign = sign.extend({
+        col_id: 1
+      })
+      expect(newSign instanceof Sign).to.equal(true)
+      expect(newSign).not.to.equal(sign)
+      expect(newSign.reconstructed()).to.equal(sign.reconstructed())
+      expect(newSign.col_id).to.equal(1)
+    })
+
+  })
+
+  describe('stringifying with sign.toString()', () => {
+
+    describe('whitespace', () => {
+      let sign, attrs = {
+        sign_id: 1,
+        sign: '·',
+        is_reconstructed: true
+      }
+      beforeEach(() => {
+        sign = new Sign(attrs)
+      })
+
+      it('should return an empty string for the toString', () => {
+        expect(/^\s$/.test(sign.toString())).to.equal(true)
+      })
+    })
+
+    describe('non-whitespace', () => {
+
+      let sign, attrs = {
+        sign_id: 1,
+        sign: 'א',
+        is_reconstructed: true
+      }
+      beforeEach(() => {
+        sign = new Sign(attrs)
+      })
+
+      it('should return an empty string for the toString', () => {
+        expect(sign.toString()).to.equal('א')
+      })
+    })
+
+  })
+
+  describe('stringifying with sign.toDOMString()', () => {
+
+    describe('whitespace', () => {
+      let sign, attrs = {
+        sign_id: 1,
+        sign: '·',
+        is_reconstructed: true
+      }
+      beforeEach(() => {
+        sign = new Sign(attrs)
+      })
+
+      it('should return an HTML encoded non-breaking space', () => {
+        expect(sign.toDOMString()).to.equal('&nbsp;')
+      })
+    })
+
+    describe('non-whitespace', () => {
+
+      let sign, attrs = {
+        sign_id: 1,
+        sign: 'א',
+        is_reconstructed: true
+      }
+      beforeEach(() => {
+        sign = new Sign(attrs)
+      })
+
+      it('should return the sign without encoding', () => {
+        expect(sign.toDOMString()).to.equal('א')
+      })
+    })
+
   })
 })

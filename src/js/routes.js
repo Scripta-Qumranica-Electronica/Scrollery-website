@@ -16,6 +16,7 @@ export default [
     path: '/workbench',
     name: 'workbench',
     component: () => {
+      /* istanbul ignore next */
       return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
     }
   },
@@ -23,6 +24,7 @@ export default [
     path: '/workbench/scroll-id/:scrollID/scroll-version-id/:scrollVersionID/image-id/:imageID/col-id/:colID/art-id/:artID',
     name: 'workbenchAddress',
     component: () => {
+      /* istanbul ignore next */
       return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
     }
   },
