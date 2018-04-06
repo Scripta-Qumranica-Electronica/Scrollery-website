@@ -205,7 +205,7 @@ export default {
     }
   },
   mounted() {
-    this.reset()
+    this.colHtmlString = this.column.toDOMString()
   }
 }
 </script>
