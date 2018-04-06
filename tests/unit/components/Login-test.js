@@ -4,8 +4,8 @@ import { mount } from '@test'
 import Login from '~/components/Login.vue'
 
 describe("Login", function() {
-    let wrapper, vm
 
+    let wrapper, vm
     beforeEach(() => {
       wrapper = mount(Login)
       vm = wrapper.vm
@@ -21,6 +21,14 @@ describe("Login", function() {
 
     it('has the initial language set to English', () => {
       expect(vm.language).to.equal('en')
+    })
+
+    it('sets initial visibility to false until session is validated', () => {
+      expect(Login.data().visible).to.equal(false)
+
+      // since, on create, it will check the session and immediately become
+      // visible, this is true for the actual Vue component instance
+      expect(vm.visible).to.equal(true)
     })
 
     it('should post a transaction to validate the session ID', done => {
@@ -185,6 +193,79 @@ describe("Login", function() {
 
       // trigger form submission
       wrapper.vm.onSubmit()
+    })
+
+    describe('validate login', () => {
+      it('should fail if an empty response from server', done => {
+        vm.validateLogin()
+        .then(() => {
+          done(new Error('test case expected failed promise, but succeeded'))
+        })
+        .catch(err => {
+          expect(err instanceof Error).to.equal(true)
+          done()
+        })
+      })
+
+      it('should reject the promise if the response contains an error message', done => {
+        vm.validateLogin({data: {error: true}})
+        .then(() => {
+          done(new Error('test case expected failed promise, but succeeded'))
+        })
+        .catch(err => {
+          expect(err instanceof Error).to.equal(true)
+          done()
+        })
+      })
+
+      it('should reject the promise if the response is not properly formatted', done => {
+        const partialData = {
+          data: {
+
+            // missing a USER_ID
+            SESSION_ID: 12345
+          }
+        }
+
+        vm.validateLogin(partialData)
+        .then(() => {
+          done(new Error('test case expected failed promise, but succeeded'))
+        })
+        .catch(err => {
+          expect(err instanceof Error).to.equal(true)
+          done()
+        })
+      })
+
+      it('should load i18n and reroute to workbench', done => {
+        const $i18nLoadStub = sinon.stub().returns(new Promise(resolve => resolve()))
+        vm.$i18n.load = $i18nLoadStub
+        vm.$router = {
+          push: route => {
+
+            // ensure route is workbench
+            expect(route.name).to.equal('workbench')
+          }
+        }
+
+        const res = {
+          data: {
+            USER_ID: 1,
+            SESSION_ID: 12345
+          }
+        }
+
+        vm.validateLogin(res)
+        .then(() => {
+
+          // ensure that i18n is attempted to load
+          expect($i18nLoadStub.called).to.equal(true)
+          done()
+        })
+        .catch(err => {
+          done(new Error('test case expected succesful promise, but failed'))
+        })
+      })
     })
 
 })

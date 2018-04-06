@@ -16,4 +16,9 @@ module.exports = {
   // Menu
   "Menu.Bars.Tooltip": "Click to keep menu open",
   "New Artefact": "New Artefact",
+
+  // Editor
+  "Editor.HandOf": "Hand of",
+  "Editor.Fullscreen": "Show fullscreen",
+  "Editor.ToggleReconstructedText": "Toggle reconstructed text"
 };

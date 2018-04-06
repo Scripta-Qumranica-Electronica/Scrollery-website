@@ -1,7 +1,9 @@
 import axios from 'axios'
 
 export default {
+  /* istanbul ignore next */
   install(Vue, { store }) {
+    /* istanbul ignore next */
     Vue.prototype.$post = function(url, data = {}, opt) {
 
       // Set SESSION_ID if available
