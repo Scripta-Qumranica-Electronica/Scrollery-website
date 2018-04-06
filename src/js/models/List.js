@@ -154,10 +154,9 @@ class List {
    * @param {object}   context  The context within which to run the callback
    */
   forEach(cb, context = null) {
+    cb = context ? cb.bind(context) : cb
     for (let i = 0, n = this._items.length; i < n; i++) {
-      context
-        ? cb(this._items[i], i, this._items)
-        : cb.call(context, this._items[i], i, this._items)
+      cb(this._items[i], i, this._items)
     }
   }
 
