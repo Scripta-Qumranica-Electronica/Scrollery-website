@@ -1,5 +1,4 @@
 import { Record } from 'immutable'
-import Model from './Model.js'
 
 /**
  * Default values for a new sign object
