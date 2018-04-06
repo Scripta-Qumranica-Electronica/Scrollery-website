@@ -4,8 +4,7 @@ import Sign from '~/models/Sign.js'
 import Line from '~/models/Line.js'
 import Column from '~/models/Column.js'
 
-import columnFactory from './factories/column-factory.js'
-import signFactory from './factories/sign-factory.js'
+import { factory } from '@test'
 
 // todo: move into src dir
 let createTargetFromNodeList = nodes => {
@@ -29,11 +28,11 @@ describe('ColumnModel', () => {
 
     let col
     beforeEach(() => {
-      col = columnFactory({signs: 30})
+      col = factory.column({signs: 30})
     })
 
     it('should insert lines on the fly for inserted signs', () => {
-      // rely on columnFactory 
+      // rely on the column factory which uses "insertSign"
       expect(col.toString().replace(/[\s\n]+/g, '').length).to.equal(30)
     })
 
@@ -47,8 +46,8 @@ describe('ColumnModel', () => {
   describe('DOM synchronization', () => {
     let short, long
     beforeEach(() => {
-      short = columnFactory({signs: 20})
-      long = columnFactory({signs: 25})
+      short = factory.column({signs: 20})
+      long = factory.column({signs: 25})
     })
 
     it('should synchronize given an array of {id: lineID, text: "line text"} when the target is longer', () => {
@@ -73,7 +72,7 @@ describe('ColumnModel', () => {
   describe('splitLine(line = Line|lineIndex, splitIndex = indexToSplitLine)', () => {
     let col, line
     beforeEach(() => {
-      col = columnFactory({signs: 30})
+      col = factory.column({signs: 30})
       line = col.get(0)
     })
 

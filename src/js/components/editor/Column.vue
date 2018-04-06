@@ -1,6 +1,5 @@
 <template>
   <div class="editor-column">
-    <button @click="reset">Reset</button>
     <div class="text-col inline text-sbl-hebrew" dir="rtl" contenteditable="true" @keydown="onKeydown" @input="onInput" @paste="onPaste" @copy="onCopy" v-html="colHtmlString">
     </div><div class="line-number-col inline">
         <p class="line-number" v-for="(line, lineIndex) of column.items()" :key="line.id">{{ lineIndex + 1 }}</p>
@@ -11,18 +10,12 @@
 <script>
 import KEYS from './key_codes.js'
 
-// components
-import TextLine from './Line.vue'
-
 // models
 import Column from '~/models/Column.js'
 import Line from '~/models/Line.js'
 import Sign from '~/models/Sign.js'
 
 export default {
-  components: {
-    'text-line': TextLine
-  },
   data() {
     return {
       colHtmlString: ""
@@ -38,15 +31,6 @@ export default {
     }
   },
   methods: {
-
-    /**
-     * Resets the DOM against the model
-     * 
-     * This causes the document to lose history
-     */
-    reset() {
-      this.colHtmlString = this.column.toDOMString()
-    },
 
     /**
      * The converse of reset. Synchronize the column model to the current DOM column

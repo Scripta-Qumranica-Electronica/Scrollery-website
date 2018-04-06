@@ -4,15 +4,15 @@
             <text-selector @selectedColumn="getText"></text-selector>
         </div>
         <toolbar :state="state" @fullscreen="toggleFullScreen" />
-        <editable-text :text="text" :state="state"></editable-text>
+        <composition :text="text" :state="state" />
     </div>
 </template>
 
 <script>
 
 import KEY_CODES from './key_codes.js'
-import Composition from '~/models/Composition.js'
-import EditableText from './Text.vue'
+import CompositionModel from '~/models/Composition.js'
+import Composition from './Composition.vue'
 import TextSelector from './TextSelector.vue'
 import Toolbar from './Toolbar.vue'
 
@@ -20,7 +20,7 @@ import editorStore from './EditorStore.js'
 
 export default {
     components: {
-        'editable-text': EditableText,
+        'composition': Composition,
         'text-selector': TextSelector,
         'toolbar': Toolbar
     },
@@ -40,12 +40,7 @@ export default {
             /**
              * @type {Composition} A text model for display in the editor (can have multiple cols)
              */
-            text: new Composition(),
-
-            /**
-             * @type {string} the hidden input value
-             */
-            input: '',
+            text: new CompositionModel(),
 
             /**
              * @type {Store} A Vuex store for the editor component tree
@@ -69,7 +64,7 @@ export default {
             })
             .then(res => {
                 if (res.status === 200 && res.data) {
-                    this.text = Composition.fromSigns({
+                    this.text = CompositionModel.fromSigns({
                         id: scrollVersionID
                     }, res.data.results)
                 } else {
@@ -104,7 +99,7 @@ export default {
                 if (to.params.colID !== '~' && to.params.colID > 0) {
                     this.getText(to.params.scrollVersionID, to.params.colID)
                 } else {
-                    this.currentText = []
+                    this.text = new CompositionModel()
                 }
             }
         }

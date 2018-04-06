@@ -10,7 +10,7 @@
  */
 const appendNext = (array, hash, current) => {
   array.push(current)
-  return !current.next_sign_id
+  return (!current.next_sign_id || !hash[current.next_sign_id])
     ? array
     : appendNext(array, hash, hash[current.next_sign_id])
 }
@@ -36,6 +36,11 @@ const sort = (signs = []) => {
     hash[signs[i]['sign_id']] = signs[i]
   }
 
+  // ensure hash is same length as signs passed in
+  if (Object.keys(hash).length !== signs.length) {
+    throw new Error("sign stream is invalid and cannot be processed");
+  }
+
   // get the first sign ...i.e., the one without a previous sign 
   // designated or available in the hash.
   let start = signs.find(sign => (!sign.prev_sign_id || !hash[sign.prev_sign_id]))
@@ -47,7 +52,14 @@ const sort = (signs = []) => {
 
   // call and return from recursive appendNext
   let sorted = []
-  return appendNext(sorted, hash, start)
+  try {
+    sorted = appendNext(sorted, hash, start)
+  } catch (err) {
+    console.error("sign stream is invalid and cannot be sorted")
+    throw err
+  }
+  return sorted
+
 }
 
 /**

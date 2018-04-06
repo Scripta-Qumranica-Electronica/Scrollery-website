@@ -28,7 +28,7 @@ export default ({signs = 20, props = {}}) => {
     signsInLine++;
 
     // create the sign
-    let sign = signFactory({
+    let sign = signFactory.model({
       sign_id: nextSignID,
       prev_sign_id: previousSignId,
       next_sign_id: faker.random.uuid(),
