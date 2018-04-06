@@ -1,10 +1,13 @@
 /**
- * @param {string} html       representing one or more elements
- * @return {DocumentFragment} a document fragment with the elements
+ * Create an Html Element from a string
+ * 
+ * @param {string} html representing one or more elements
+ * @return {Element}    a <div> with childNodes representing the elements passed in
  */
 export default html => {
-  var template = document.createElement('template');
-  html = html.trim(); // Never return a text node of whitespace as the result
-  template.innerHTML = html;
-  return template.content;
+  var div = document.createElement('div');
+  div.innerHTML = html.trim();
+
+  // Change this to div.childNodes to support multiple top-level nodes
+  return div; 
 }
