@@ -104,13 +104,13 @@ export default {
     },
     // TODO implement the capability for these functions
     // in the data model.
-    // cloneScroll() {
+    cloneScroll() {
       
-    // },
+    },
 
-    // lockScroll() {
+    lockScroll() {
 
-    // }
+    }
   },
 }
 </script>
