@@ -127,8 +127,8 @@ export default {
       viewMode: 'ART',
       drawingMode: 'draw',
       brushCursorSize: 20,
-      clipMask: '',
-      firstClipMask: '',
+      clipMask: undefined,
+      firstClipMask: undefined,
       clippingOn: false,
       lock: true,
     }
@@ -157,7 +157,7 @@ export default {
         }
       })
     },
-    getArtefactMask() {
+    fetchArtefactMask() {
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getArtefactMask',
         artID: this.artefact,
@@ -241,33 +241,41 @@ export default {
     }
   },
   mounted() {
+    // TODO maybe rethink this to avoid the case where 
+    // we have an artID but no imageID
+
+    // Fetch image data if we have an imageID
     if (this.$route.params.imageID) {
       this.fetchImages(this.$route.params.imageID)
     }
+    // Fetch artefact data if we have an artID
     if (this.$route.params.artID) {
       this.artefact = this.$route.params.artID
-      this.getArtefactMask()
+      this.fetchArtefactMask()
     }
   },
   watch: {
     '$route' (to, from) {
-      if (to.params.imageID !== '~') {
-        // Load new artefact ID if there is one
-        if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
-        	if (to.params.artID.toString().indexOf('name') !== -1) {
-            this.viewMode = 'ART'
-            this.artefact = 'new'
-            this.artName = to.params.artID.split('name-')[1]
-          } else {
-            this.artefact = to.params.artID
-            this.getArtefactMask()
-          }
-          this.lock = false
+      // Fetch images for image ID if it has changed
+      if (to.params.imageID !== '~' 
+        && to.params.imageID !== from.params.imageID) {
+        this.fetchImages(to.params.imageID)
+        this.artefact = undefined
+        this.clipMask = undefined
+        this.firstClipMask = undefined
+      }
+
+      // Load new artefact ID if there is one
+      if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
+        if (to.params.artID.toString().indexOf('name') !== -1) {
+          this.viewMode = 'ART'
+          this.artefact = 'new'
+          this.artName = to.params.artID.split('name-')[1]
+        } else {
+          this.artefact = to.params.artID
+          this.fetchArtefactMask()
         }
-        // Fetch images for image ID if it has changed
-        if (to.params.imageID !== from.params.imageID) {
-          this.fetchImages(to.params.imageID)
-        }
+        this.lock = false
       }
     }
   },

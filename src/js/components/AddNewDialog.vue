@@ -1,7 +1,7 @@
 <template>
-  <div class="addNewDialog">
-    <div class="addNewMenu">
-        <div class="addDialogSelect">
+  <div class="add-new-dialog">
+    <div class="add-new-menu">
+        <div class="add-dialog-select">
             <el-select 
                 class="combinationSelector" 
                 v-model="selectedCombination" 
@@ -29,7 +29,7 @@
                 </el-option>
             </el-select>
         </div>
-        <div class="addDialogueMenuListings">
+        <div class="add-dialog-menu-listings">
             <ul>
                 <li 
                     v-if="addType === 'artefacts' && selectedImage" 
@@ -43,7 +43,8 @@
             </ul>
         </div>
     </div>
-    <div class="addNewDisplay">
+    <!-- TODO add code to display the selected data -->
+    <div class="add-new-display">
         <div v-if="columns">
 
         </div>
@@ -53,40 +54,6 @@
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-    @import "~sass-vars";
-    .addNewDialog {
-        height: 70vh;
-        min-height: 70vh;
-        max-height: 70vh;
-    }
-    .addNewMenu {
-        width: 20%;
-        min-width: 20%;
-        height: 65vh;
-        min-height: 65vh;
-        background: $ltBlue;
-        float: left;
-    }
-    .addDialogSelect {
-        height: 60px;
-    }
-    .addDialogueMenuListings {
-        overflow: auto;
-        height: calc(60vh - 60px);
-        min-height: calc(60vh - 60px);
-    }
-    .addNewDisplay {
-        width: 80%;
-        min-width: 80%;
-        height: 65vh;
-        min-height: 65vh;
-        background: gray;
-        margin-left: 20%;
-    }
-</style>
-
 
 <script>
 
@@ -125,3 +92,36 @@ export default {
     },
 }
 </script>
+
+<style lang="scss" scoped>
+    @import "~sass-vars";
+    .add-new-dialog {
+        height: 70vh;
+        min-height: 70vh;
+        max-height: 70vh;
+    }
+    .add-new-menu {
+        width: 20%;
+        min-width: 20%;
+        height: 65vh;
+        min-height: 65vh;
+        background: $ltBlue;
+        float: left;
+    }
+    .add-dialog-select {
+        height: 60px;
+    }
+    .add-dialog-menu-listings {
+        overflow: auto;
+        height: calc(60vh - 60px);
+        min-height: calc(60vh - 60px);
+    }
+    .add-new-display {
+        width: 80%;
+        min-width: 80%;
+        height: 65vh;
+        min-height: 65vh;
+        background: gray;
+        margin-left: 20%;
+    }
+</style>

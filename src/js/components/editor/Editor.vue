@@ -78,7 +78,6 @@ export default {
         },
 
         /**
-
          * Show the editor in full screen mode
          */
         toggleFullScreen() {

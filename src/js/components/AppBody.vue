@@ -21,7 +21,7 @@
       Perhaps update to some more advanced system to manage organization
       and display of these components -->
       <div class="editing-pane-container">
-        <split-pane :min-percent='20' :default-percent='30' split="horizontal">
+        <split-pane min-percent='20' default-percent='30' split="horizontal">
           <template slot="paneL">
             <split-pane split="vertical">
               <template slot="paneL">

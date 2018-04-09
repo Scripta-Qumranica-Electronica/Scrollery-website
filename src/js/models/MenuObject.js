@@ -48,10 +48,7 @@ class MenuObject {
    * @instance
    */
   destroy() {
-    for (var i = 0, n = this._itemList.length; i < n; i++) {
-      this._itemList[i].destroy()
-      delete this._itemList[i]
-    }
+    this._itemList.length = 0
     delete this._itemList
 
     for (var key in this._items) {

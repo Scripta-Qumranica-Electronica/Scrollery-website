@@ -20,9 +20,10 @@ export default {
      * artefacts belonging to a column.
      */
     setRouter() {
-      if (this.$route.params.scrollID !== this.scrollID 
-        || this.$route.params.scrollVersionID !== this.versionID
-        || this.$route.params.colID !== this.columnID) {
+      const params = this.$route.params
+      if (params.scrollID !== this.scrollID 
+        || params.scrollVersionID !== this.versionID
+        || params.colID !== this.columnID) {
         this.$router.push({
           name: 'workbenchAddress',
           params: {

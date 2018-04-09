@@ -90,22 +90,6 @@ export default {
 
     addArtefact() {
       this.dialogVisible = true
-      //Add code to create new artefact with the CGI script
-      // const name = (new Date).getTime()
-      // this.children.unshift({
-      //   name: name,
-      //   artefact_id: undefined,
-      // })
-      // this.$router.push({
-      //     name: 'workbenchAddress',
-      //     params: {
-      //         scrollID: this.$route.params.scrollID,
-      //         scrollVersionID: this.$route.params.scrollVersionID,
-      //         colID: this.$route.params.colID ? this.$route.params.colID : '~',
-      //         imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-      //         artID: `name-${name}`,
-      //     }
-      // })
     }
   },
 }

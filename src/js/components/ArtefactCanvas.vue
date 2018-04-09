@@ -56,7 +56,7 @@ import {clipCanvas} from '../utils/VectorFactory'
 
 export default {
   props: {
-    mask: "",
+    mask: undefined,
     width: 0,
     height: 0,
     divisor: 0,
@@ -116,15 +116,14 @@ export default {
     },
     canvasToSVG(){
       trace(this.$refs.maskCanvas, this.divisor)
-      .then(res=>{
+      .then(res => {
         this.$emit('mask', res)
       })
     }
   },
   watch: {
     mask (to, from) {
-      if (to && from !== to) {
-
+      if (from !== to) {
         clipCanvas(this.$refs.maskCanvas, this.mask, this.divisor)
       }
     }

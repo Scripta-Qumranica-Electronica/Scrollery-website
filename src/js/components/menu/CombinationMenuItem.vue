@@ -102,14 +102,15 @@ export default {
         this.corpus.populateImagesOfScrollVersion(this.versionID, this.scrollID)
       }
     },
-
-    cloneScroll() {
+    // TODO implement the capability for these functions
+    // in the data model.
+    // cloneScroll() {
       
-    },
+    // },
 
-    lockScroll() {
+    // lockScroll() {
 
-    }
+    // }
   },
 }
 </script>

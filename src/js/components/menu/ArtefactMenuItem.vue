@@ -14,10 +14,11 @@ export default {
   },
   methods: {
     setRouter() {
-      if (this.$route.params.scrollID !== this.scrollID 
-        || this.$route.params.scrollVersionID !== this.versionID
-        || this.$route.params.imageID !== this.imageID
-        || this.$route.params.artID !== this.artefactID) {
+      const params = this.$route.params
+      if (params.scrollID !== this.scrollID 
+        || params.scrollVersionID !== this.versionID
+        || params.imageID !== this.imageID
+        || params.artID !== this.artefactID) {
         this.$router.push({
           name: 'workbenchAddress',
           params: {

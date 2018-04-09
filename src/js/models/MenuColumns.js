@@ -15,7 +15,7 @@ class MenuColumns extends MenuObject {
    */
   constructor(sessionID, user, set, itemIDKey, ajaxPayload) {
     itemIDKey = itemIDKey || 'id'
-    ajaxPayload = ajaxPayload || {transaction: 'getColOfComb',}
+    ajaxPayload = ajaxPayload || {transaction: 'getColOfComb'}
       
     super(sessionID, user, set, itemIDKey, ajaxPayload)
   }

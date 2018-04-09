@@ -1,4 +1,3 @@
-
 import diff from '~/utils/StringDiff.js'
 import List from './List.js'
 import Sign from './Sign.js'
