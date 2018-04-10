@@ -114,6 +114,7 @@ export default {
   },
   data() {
     return {
+      scrollVersionID: undefined,
       imageElements: [],
       selectedImageUrls: [],
       filenames: [],
@@ -161,6 +162,7 @@ export default {
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getArtefactMask',
         artID: this.artefact,
+        scrollVersion: this.scrollVersionID,
       })
       .then(res => {
         if (res.status === 200 && res.data.results[0]) {
@@ -198,7 +200,7 @@ export default {
       } else {
 	      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
           transaction: 'changeArtefactPoly',
-          region_in_master_image: svgPolygonToWKT(mask),
+          region_in_sqe_image: svgPolygonToWKT(mask),
           artefact_id: this.$route.params.artID,
           version_id: this.$route.params.scrollVersionID,
 	      })
@@ -251,6 +253,7 @@ export default {
     // Fetch artefact data if we have an artID
     if (this.$route.params.artID) {
       this.artefact = this.$route.params.artID
+      this.scrollVersionID = this.$route.params.scrollVersionID
       this.fetchArtefactMask()
     }
   },
@@ -273,6 +276,7 @@ export default {
           this.artName = to.params.artID.split('name-')[1]
         } else {
           this.artefact = to.params.artID
+          this.scrollVersionID = to.params.scrollVersionID
           this.fetchArtefactMask()
         }
         this.lock = false

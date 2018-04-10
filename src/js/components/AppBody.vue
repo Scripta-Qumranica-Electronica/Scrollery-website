@@ -103,11 +103,11 @@
 }
 
 .single-image-pane {
-  background: maroon;
+  background: lightgreen;
 }
 
 .combination-pane {
-  background: rgb(82, 119, 215);
+  background: cornflowerblue;
 }
 
 .vue-splitter-container {

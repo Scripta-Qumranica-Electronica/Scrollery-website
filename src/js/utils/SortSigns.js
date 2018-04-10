@@ -37,9 +37,10 @@ const sort = (signs = []) => {
   }
 
   // ensure hash is same length as signs passed in
-  if (Object.keys(hash).length !== signs.length) {
-    throw new Error("sign stream is invalid and cannot be processed");
-  }
+  // if (Object.keys(hash).length !== signs.length) {
+  //   throw new Error(`sign stream has ${signs.length} signs,
+  //    hash has ${Object.keys(hash).length} and cannot be processed`);
+  // }
 
   // get the first sign ...i.e., the one without a previous sign 
   // designated or available in the hash.
