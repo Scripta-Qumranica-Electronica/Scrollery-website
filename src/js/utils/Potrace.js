@@ -4,7 +4,7 @@ export function trace(canvas, multiplyFactor) {
         potrace.process(() => {
           let path = potrace.getPolyPath(1)
           if (path === '') {
-            path = 'undefined path'
+            path = Error('Canvas is blank!')
           }
           resolve(path)
         })
@@ -75,6 +75,7 @@ function Potrace(canvas, multiplyFactor) {
     }
     
     Point.prototype.copy = function(){
+      /* istanbul ignore next */
       return new Point(this.x, this.y);
     };
   
@@ -226,20 +227,26 @@ function Potrace(canvas, multiplyFactor) {
       
       function majority(x, y) {
         var i, a, ct;
+        /* istanbul ignore next */
         for (i = 2; i < 5; i++) {
           ct = 0;
+          /* istanbul ignore next */
           for (a = -i + 1; a <= i - 1; a++) {
             ct += bm1.at(x + a, y + i - 1) ? 1 : -1;
             ct += bm1.at(x + i - 1, y + a - 1) ? 1 : -1;
             ct += bm1.at(x + a - 1, y - i) ? 1 : -1;
             ct += bm1.at(x - i, y + a) ? 1 : -1;
           }
+          /* istanbul ignore next */
           if (ct > 0) {
             return 1;
-          } else if (ct < 0) {
+          } 
+          /* istanbul ignore next */
+          else if (ct < 0) {
             return 0;
           }
         }
+        /* istanbul ignore next */
         return 0;
       }
       
@@ -273,6 +280,7 @@ function Potrace(canvas, multiplyFactor) {
           var r = bm1.at(x + (dirx - diry - 1) / 2, y + (diry + dirx - 1) / 2);
           
           if (r && !l) {
+            /* istanbul ignore next */
             if (info.turnpolicy === "right" ||
             (info.turnpolicy === "black" && path.sign === '+') ||
             (info.turnpolicy === "white" && path.sign === '-') ||
@@ -420,7 +428,7 @@ function Potrace(canvas, multiplyFactor) {
       
         return x1 * y2 - x2 * y1;
       }
-      
+      /* istanbul ignore next */
       function cprod(p0, p1, p2, p3) {
         var x1, y1, x2, y2;
       
@@ -431,7 +439,7 @@ function Potrace(canvas, multiplyFactor) {
       
         return x1 * y2 - x2 * y1;
       }
-        
+      /* istanbul ignore next */
       function iprod(p0, p1, p2) {
         var x1, y1, x2, y2;
       
@@ -442,7 +450,7 @@ function Potrace(canvas, multiplyFactor) {
       
         return x1*x2 + y1*y2;
       }
-        
+      /* istanbul ignore next */
       function iprod1(p0, p1, p2, p3) {
         var x1, y1, x2, y2;
       
@@ -453,11 +461,11 @@ function Potrace(canvas, multiplyFactor) {
       
         return x1 * x2 + y1 * y2;
       }
-      
+      /* istanbul ignore next */
       function ddist(p, q) {
         return Math.sqrt((p.x - q.x) * (p.x - q.x) + (p.y - q.y) * (p.y - q.y));
       }
-      
+      /* istanbul ignore next */
       function bezier(t, p0, p1, p2, p3) {
         var s = 1 - t, res = new Point();
       
@@ -466,7 +474,7 @@ function Potrace(canvas, multiplyFactor) {
       
         return res;
       }
-    
+      /* istanbul ignore next */
       function tangent(p0, p1, p2, p3, q0, q1) {
         var A, B, C, a, b, c, d, s, r1, r2;
       
@@ -682,6 +690,7 @@ function Potrace(canvas, multiplyFactor) {
         
         for (i=0; i<n; i++) {
           c = mod(path.lon[mod(i-1,n)]-1,n);
+          /* istanbul ignore next */
           if (c == i) {
             c = mod(i+1,n);
           }
@@ -750,14 +759,17 @@ function Potrace(canvas, multiplyFactor) {
             j-=n;
             r+=1;
           }
+          /* istanbul ignore next */
           while (i>=n) {
             i-=n;
             r-=1;
           }
+          /* istanbul ignore next */
           while (j<0) {
             j+=n;
             r-=1;
           }
+          /* istanbul ignore next */
           while (i<0) {
             i+=n;
             r+=1;
@@ -796,6 +808,7 @@ function Potrace(canvas, multiplyFactor) {
             }
           }
           if (l===0) {
+            /* istanbul ignore next */
             dir.x = dir.y = 0; 
           }
         }
@@ -821,6 +834,7 @@ function Potrace(canvas, multiplyFactor) {
           q[i] = new Quad();
           d = dir[i].x * dir[i].x + dir[i].y * dir[i].y;
           if (d === 0.0) {
+            /* istanbul ignore next */
             for (j=0; j<3; j++) {
               for (k=0; k<3; k++) {
                 q[i].data[j * 3 + k] = 0;
@@ -862,19 +876,26 @@ function Potrace(canvas, multiplyFactor) {
               w.y = ( Q.at(0, 2)*Q.at(1, 0) - Q.at(1, 2)*Q.at(0, 0)) / det;
               break;
             }
-      
+            /* istanbul ignore next */
             if (Q.at(0, 0)>Q.at(1, 1)) {
               v[0] = -Q.at(0, 1);
               v[1] = Q.at(0, 0);
-            } else if (Q.at(1, 1)) {
+            } 
+            /* istanbul ignore next */
+            else if (Q.at(1, 1)) {
               v[0] = -Q.at(1, 1);
               v[1] = Q.at(1, 0);
-            } else {
+            } 
+            /* istanbul ignore next */
+            else {
               v[0] = 1;
               v[1] = 0;
             }
+            /* istanbul ignore next */
             d = v[0] * v[0] + v[1] * v[1];
+            /* istanbul ignore next */
             v[2] = - v[1] * s.y - v[0] * s.x;
+            /* istanbul ignore next */
             for (l=0; l<3; l++) {
               for (k=0; k<3; k++) {
                 Q.data[l * 3 + k] += v[l] * v[k] / d;
@@ -891,7 +912,7 @@ function Potrace(canvas, multiplyFactor) {
           min = quadform(Q, s);
           xmin = s.x;
           ymin = s.y;
-      
+          
           if (Q.at(0, 0) !== 0.0) {
             for (z=0; z<2; z++) {
               w.y = s.y-0.5+z;
@@ -936,7 +957,7 @@ function Potrace(canvas, multiplyFactor) {
           path.curve.vertex[i] = new Point(xmin + x0, ymin + y0);
         }
       }
-      
+      /* istanbul ignore next */
       function reverse(path) {
         var curve = path.curve, m = curve.n, v = curve.vertex, i, j, tmp;
       
@@ -964,7 +985,9 @@ function Potrace(canvas, multiplyFactor) {
             dd = Math.abs(dd);
             alpha = dd>1 ? (1 - 1.0/dd) : 0;
             alpha = alpha / 0.75;
-          } else {
+          } 
+          /* istanbul ignore next */
+          else {
             alpha = 4/3.0;
           }
           curve.alpha0[j] = alpha;
@@ -973,7 +996,9 @@ function Potrace(canvas, multiplyFactor) {
             curve.tag[j] = "CORNER";
             curve.c[3 * j + 1] = curve.vertex[j];
             curve.c[3 * j + 2] = p4;
-          } else {
+          } 
+          /* istanbul ignore next */
+          else {
             if (alpha < 0.55) {
               alpha = 0.55;
             } else if (alpha > 1) {
@@ -1008,7 +1033,7 @@ function Potrace(canvas, multiplyFactor) {
             p0, p1, p2, p3, pt,
             A, R, A1, A2, A3, A4,
             s, t;
-        
+          /* istanbul ignore next */
           if (i==j) {
             return 1;
           }
@@ -1020,7 +1045,9 @@ function Potrace(canvas, multiplyFactor) {
           if (conv === 0) {
             return 1;
           }
+          /* istanbul ignore next */
           d = ddist(vertex[i], vertex[i1]);
+          /* istanbul ignore next */
           for (k=k1; k!=j; k=k1) {
             k1 = mod(k+1, m);
             k2 = mod(k+2, m);
@@ -1036,50 +1063,66 @@ function Potrace(canvas, multiplyFactor) {
               return 1;
             }
           }
-      
+          /* istanbul ignore next */
           p0 = curve.c[mod(i,m) * 3 + 2].copy();
+          /* istanbul ignore next */
           p1 = vertex[mod(i+1,m)].copy();
+          /* istanbul ignore next */
           p2 = vertex[mod(j,m)].copy();
+          /* istanbul ignore next */
           p3 = curve.c[mod(j,m) * 3 + 2].copy();
-        
+          /* istanbul ignore next */
           area = areac[j] - areac[i];
+          /* istanbul ignore next */
           area -= dpara(vertex[0], curve.c[i * 3 + 2], curve.c[j * 3 + 2])/2;
+          /* istanbul ignore next */
           if (i>=j) {
             area += areac[m];
           }
-        
+          /* istanbul ignore next */
           A1 = dpara(p0, p1, p2);
+          /* istanbul ignore next */
           A2 = dpara(p0, p1, p3);
+          /* istanbul ignore next */
           A3 = dpara(p0, p2, p3);
-    
+          /* istanbul ignore next */
           A4 = A1+A3-A2;    
-          
+          /* istanbul ignore next */
           if (A2 == A1) {
             return 1;
           }
-        
+          /* istanbul ignore next */
           t = A3/(A3-A4);
+          /* istanbul ignore next */
           s = A2/(A2-A1);
+          /* istanbul ignore next */
           A = A2 * t / 2.0;
-          
+          /* istanbul ignore next */
           if (A === 0.0) {
             return 1;
           }
-        
+          /* istanbul ignore next */
           R = area / A;
+          /* istanbul ignore next */
           alpha = 2 - Math.sqrt(4 - R / 0.3);
         
+          /* istanbul ignore next */
           res.c[0] = interval(t * alpha, p0, p1);
+          /* istanbul ignore next */
           res.c[1] = interval(s * alpha, p3, p2);
+          /* istanbul ignore next */
           res.alpha = alpha;
+          /* istanbul ignore next */
           res.t = t;
+          /* istanbul ignore next */
           res.s = s;
-        
+          /* istanbul ignore next */
           p1 = res.c[0].copy();
+          /* istanbul ignore next */
           p2 = res.c[1].copy(); 
-        
+          /* istanbul ignore next */
           res.pen = 0;
-        
+          /* istanbul ignore next */
           for (k=mod(i+1,m); k!=j; k=k1) {
             k1 = mod(k+1,m);
             t = tangent(p0, p1, p2, p3, vertex[k], vertex[k1]);
@@ -1101,7 +1144,7 @@ function Potrace(canvas, multiplyFactor) {
             }
             res.pen += d1 * d1;
           }
-        
+          /* istanbul ignore next */
           for (k=i; k!=j; k=k1) {
             k1 = mod(k+1,m);
             t = tangent(p0, p1, p2, p3, curve.c[k * 3 + 2], curve.c[k1 * 3 + 2]);
@@ -1127,7 +1170,7 @@ function Potrace(canvas, multiplyFactor) {
               res.pen += (d1 - d2) * (d1 - d2);
             }
           }
-        
+          /* istanbul ignore next */
           return 0;
         }
       
@@ -1145,6 +1188,7 @@ function Potrace(canvas, multiplyFactor) {
         
         for (i=0; i<m; i++) {
           if (curve.tag[i] == "CURVE") {
+            /* istanbul ignore next */
             convc[i] = sign(dpara(vert[mod(i-1,m)], vert[i], vert[mod(i+1,m)]));
           } else {
             convc[i] = 0;
@@ -1156,6 +1200,7 @@ function Potrace(canvas, multiplyFactor) {
         p0 = curve.vertex[0];
         for (i=0; i<m; i++) {
           i1 = mod(i+1, m);
+          /* istanbul ignore next */
           if (curve.tag[i1] == "CURVE") {
             alpha = curve.alpha[i1];
             area += 0.3 * alpha * (4-alpha) *
@@ -1181,6 +1226,7 @@ function Potrace(canvas, multiplyFactor) {
             if (r) {
               break;
             }
+            /* istanbul ignore next */
             if (len[j] > len[i]+1 ||
                 (len[j] == len[i]+1 && pen[j] > pen[i] + o.pen)) {
               pt[j] = i;
@@ -1208,7 +1254,9 @@ function Potrace(canvas, multiplyFactor) {
             ocurve.alpha0[i]  = curve.alpha0[mod(j,m)];
             ocurve.beta[i]    = curve.beta[mod(j,m)];
             s[i] = t[i] = 1.0;
-          } else {
+          } 
+          /* istanbul ignore next */
+          else {
             ocurve.tag[i] = "CURVE";
             ocurve.c[i * 3 + 0] = opt[j].c[0];
             ocurve.c[i * 3 + 1] = opt[j].c[1];
@@ -1237,7 +1285,7 @@ function Potrace(canvas, multiplyFactor) {
         calcLon(path);
         bestPolygon(path);
         adjustVertices(path);
-        
+        /* istanbul ignore next */
         if (path.sign === "-") {
           reverse(path);
         }
@@ -1255,6 +1303,7 @@ function Potrace(canvas, multiplyFactor) {
       if (c) {
         callback = c;
       }
+      /* istanbul ignore next */
       if (!info.isReady) {
         setTimeout(process, 100);
         return;
