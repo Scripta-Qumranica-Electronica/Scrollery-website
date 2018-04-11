@@ -1,6 +1,6 @@
 <template>
-  <div style="{width: 100%; height: 100%;}">
-    <el-row style="{width: 100%; height 50px;}">
+  <div class="combination-panel">
+    <el-row class="combination-panel-menu">
         <el-col :span="4">
             <label>Zoom</label>
         </el-col>
@@ -14,7 +14,7 @@
             </el-slider>
         </el-col>
     </el-row>
-    <div style="{width: 100%; height: calc(100% - 50px); overflow: auto;}">
+    <div class="combination-panel-container">
         <combination-canvas :global-scale="globalScale"></combination-canvas>
     </div>
   </div>
@@ -45,3 +45,23 @@ export default {
     }
 }
 </script>
+
+<style lang="scss" scoped>
+    @import "~sass-vars";
+    .combination-panel {
+        width: 100%; 
+        height: 100%;
+    }
+
+    .combination-panel-menu {
+        background: #dedede;
+        width: 100%; 
+        height: 30px;
+    }
+
+    .combination-panel-container {
+        width: 100%; 
+        height: calc(100% - 38px);
+        overflow: auto;
+    }
+</style>

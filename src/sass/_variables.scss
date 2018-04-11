@@ -2,6 +2,10 @@
 $spacer: 10px;
 $header: 50px;
 $sidebarWidth: 250px;
+$sidebarCollapsedWidth: calc(#{$sidebarWidth} - #{$header});
+$collapsedSidebarOffset: calc(#{$sidebarCollapsedWidth} * -1);
+$editorWidthWithSidebar: calc(100% - #{$sidebarWidth});
+$editorWidthWithoutSidebar: calc(100% - #{$header});
 
 // Colors
 
@@ -12,6 +16,9 @@ $gray: #5d5d5d;
 $tan: #946b2d;
 $black: #000;
 
+// Transitions
+$menuSlideTransitionIn: 250ms;
+$menuSlideTransitionOut: 200ms;
 // Messaging
 $warning: #F56C6C;
 $orange: $warning;

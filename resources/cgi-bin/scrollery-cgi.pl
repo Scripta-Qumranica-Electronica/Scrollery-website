@@ -113,19 +113,18 @@ sub getCombs {
 SELECT DISTINCT 
        scroll_data.scroll_id as scroll_id,
        scroll_data.name AS name,
-       scroll_version.version AS version,
        scroll_version.scroll_version_id AS version_id,
        scroll_data.scroll_data_id AS scroll_data_id,
-       scroll_version.locked,
+       scroll_version_group.locked,
        scroll_version.user_id
 FROM scroll_version
+	JOIN scroll_version_group USING(scroll_version_group_id)
 	JOIN scroll_data using(scroll_id)
 	JOIN scroll_data_owner using(scroll_data_id)
 WHERE scroll_version.user_id = ?
       OR scroll_version.user_id = 0
 ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
-	LPAD(SPLIT_STRING(name, "Q", 2), 3, "0"),
-	scroll_version.version
+	LPAD(SPLIT_STRING(name, "Q", 2), 3, "0")
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
@@ -155,14 +154,14 @@ sub getArtOfImage {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $getArtOfImageQuery = <<'MYSQL';
-SELECT DISTINCT artefact.artefact_id, artefact_data.name
-FROM artefact
-	JOIN artefact_owner USING(artefact_id)
+SELECT DISTINCT artefact_shape.artefact_id, artefact_data.name
+FROM artefact_shape
+	JOIN artefact_shape_owner USING(artefact_shape_id)
 	JOIN artefact_data USING(artefact_id)
 	JOIN artefact_data_owner USING(artefact_data_id)
 	JOIN SQE_image USING(sqe_image_id)
 WHERE SQE_image.image_catalog_id = ?
-      AND artefact_owner.scroll_version_id = ?
+      AND artefact_shape_owner.scroll_version_id = ?
       AND artefact_data_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
@@ -269,11 +268,15 @@ SELECT
 	child.sign_id AS sign_id,
 	child.next_sign_id AS next_sign_id,
 	sign_char.is_variant,
-	sign_char.break_type,
-	sign_char.sign,
-	sign_char_reading_data.is_reconstructed,
-	sign_char_reading_data.readability,
-	sign_char_reading_data.is_retraced
+	sign_char.sign, 
+	sequence,
+	attribute.name AS attribute_name,
+	type,
+	attribute.description AS attribute_description,
+	value,
+	string_value,
+	attribute_value.description AS attribute_value_description,
+	css
 FROM position_in_stream AS child
 	JOIN position_in_stream AS parent
 		ON parent.next_sign_id = child.sign_id
@@ -288,13 +291,17 @@ FROM position_in_stream AS child
 	JOIN col_data USING(col_id)
 	JOIN sign_char
 		ON sign_char.sign_id = child.sign_id
-	JOIN sign_char_owner USING(sign_char_id)
-	LEFT JOIN sign_char_reading_data USING(sign_char_id)
+	JOIN sign_attribute USING(sign_char_id)
+	JOIN sign_attribute_owner USING(sign_attribute_id)
+	LEFT JOIN attribute_numeric USING(sign_attribute_id)
+	JOIN attribute_value USING(attribute_value_id)
+	LEFT JOIN attribute_value_css USING(attribute_value_id)
+	JOIN attribute USING(attribute_id)
 WHERE col_to_line.col_id = ?
 	AND position_in_stream_owner.scroll_version_id = ?
 	AND line_to_sign_owner.scroll_version_id = ?
 	AND col_to_line_owner.scroll_version_id = ?
-	AND sign_char_owner.scroll_version_id = ?
+	AND sign_attribute_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare($getScrollsQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
@@ -486,7 +493,7 @@ sub imagesOfInstFragments {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $getInstitutionFragmentsQuery = <<'MYSQL';
-SELECT 	SQE_image.filename AS filename,
+SELECT DISTINCT	SQE_image.filename AS filename,
 		  SQE_image.wavelength_start AS start,
 		  SQE_image.wavelength_end AS end,
 		  SQE_image.is_master,
@@ -498,6 +505,7 @@ SELECT 	SQE_image.filename AS filename,
 		  edition_catalog.edition_side
 FROM SQE_image
 	JOIN image_urls USING(image_urls_id)
+	LEFT JOIN SQE_image_to_edition_catalog USING(sqe_image_id)
 	LEFT JOIN edition_catalog USING(edition_catalog_id)
 WHERE image_catalog_id = ?
 MYSQL
@@ -512,11 +520,11 @@ sub getInstitutionArtefacts {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $getInstitutionArtefactsQuery = <<'MYSQL';
-		SELECT DISTINCT artefact.artefact_id,
+		SELECT DISTINCT artefact_shape.artefact_id,
 			user_id
-		FROM artefact
-			JOIN SQE_image ON SQE_image.sqe_image_id = artefact.sqe_image_id
-			JOIN artefact_owner USING(artefact_id)
+		FROM artefact_shape
+			JOIN SQE_image ON SQE_image.sqe_image_id = artefact_shape.sqe_image_id
+			JOIN artefact_shape_owner USING(artefact_shape)
 			JOIN scroll_version USING(scroll_version_id)
 		WHERE SQE_image.image_catalog_id = ?
 			  AND user_id = ?
@@ -556,6 +564,7 @@ MYSQL
 
 # First I copy the artefect to a new artefact owner with the currect scroll_version_id
 # Then I change the scroll_id of the artefact to match the current scroll_id
+# TODO update for new DB structure.
 sub addArtToComb {
 	my $cgi = shift;
 	my $json_post = shift;
@@ -576,6 +585,7 @@ MYSQL
 
 # I should create an artefact, link an artefact_data,
 # then create the necessary owner tables by using the SQE API.
+# TODO update for new DB structure.
 sub newArtefact {
 	my $cgi = shift;
 	my $json_post = shift;
@@ -677,13 +687,15 @@ sub getArtefactMask {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $addArtToCombQuery = <<'MYSQL';
-SELECT ST_AsText(region_in_master_image) as poly
-	FROM artefact
+SELECT ST_AsText(region_in_sqe_image) as poly
+	FROM artefact_shape
+	JOIN artefact_shape_owner USING(artefact_shape_id)
 	WHERE artefact_id = ?
+		AND scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{artID});
+	$sql->execute($json_post->{artID}, $json_post->{scrollVersion});
 	readResults($sql);
 	return;
 }
@@ -693,8 +705,8 @@ sub getScrollArtefacts {
 	my $json_post = shift;
 	my $getScrollArtefactsQuery = <<'MYSQL';
 SELECT DISTINCT artefact_position.artefact_position_id AS id,
-                ST_AsText(ST_Envelope(artefact.region_in_master_image)) AS rect,
-                ST_AsText(artefact.region_in_master_image) AS poly,
+                ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
+                ST_AsText(artefact_shape.region_in_sqe_image) AS poly,
 				artefact_position.transform_matrix AS matrix,
                 image_urls.url AS url,
                 image_urls.suffix AS suffix,
@@ -702,18 +714,19 @@ SELECT DISTINCT artefact_position.artefact_position_id AS id,
                 SQE_image.dpi AS dpi
 FROM artefact_position_owner
 	JOIN artefact_position USING(artefact_position_id)
-	JOIN artefact USING(artefact_id)
-	JOIN scroll_version USING(scroll_version_id)
+	JOIN artefact_shape USING(artefact_id)
+	JOIN artefact_shape_owner USING(artefact_shape_id)
 	INNER JOIN SQE_image USING(sqe_image_id)
 	INNER JOIN image_urls USING(image_urls_id)
 	INNER JOIN image_catalog USING(image_catalog_id)
 WHERE artefact_position.scroll_id=?
       AND artefact_position_owner.scroll_version_id=?
+	  AND artefact_shape_owner.scroll_version_id=?
       AND image_catalog.catalog_side=0
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollArtefactsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id});
+	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 	readResults($sql);
 	return;
 }
@@ -789,7 +802,7 @@ sub changeArtefactPoly {
 	my $cgi = shift;
 	my $json_post = shift;
 	$cgi->dbh->set_scrollversion($json_post->{version_id});
-	my ($new_art_id, $new_art_error) = $cgi->dbh->change_value("artefact", $json_post->{artefact_id}, "region_in_master_image", ['ST_GEOMFROMTEXT', $json_post->{region_in_master_image}]);
+	my ($new_art_id, $new_art_error) = $cgi->dbh->change_value("artefact_shape", $json_post->{artefact_id}, "region_in_sqe_image", ['ST_GEOMFROMTEXT', $json_post->{region_in_sqe_image}]);
 	if ($new_art_error) {
 		handleDBError ($new_art_id, $new_art_error);
 	}

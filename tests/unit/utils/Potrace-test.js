@@ -43,4 +43,14 @@ describe('Potrace.trace', () => {
         })
         .finally(done())
     })
+
+    it ('should return an error for a blank canvas', (done) => {
+        let testCanvas = document.createElement('canvas')
+        const error = Error('Canvas is blank!')
+        trace(testCanvas, 1)
+        .then((resolve) => {
+            expect(resolve).to.deep.equal(error)
+        })
+        .finally(done())
+    })
 })
