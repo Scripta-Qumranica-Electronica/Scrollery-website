@@ -3,6 +3,13 @@ import MenuColumns from './MenuColumns.js'
 import MenuImages from './MenuImages.js'
 import MenuArtefacts from './MenuArtefacts.js'
 
+/* TODO I ignore this for testing until I decide on
+ * a set model.  Write tests when that has been
+ * determined!
+ */
+
+/* istanbul ignore next */
+
 /**
  * A corpus is collection of all consituent objects.
  * 

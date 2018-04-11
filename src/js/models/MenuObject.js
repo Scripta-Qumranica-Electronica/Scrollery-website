@@ -1,5 +1,12 @@
 import axios from 'axios'
 
+/* TODO I ignore this for testing until I decide on
+ * a set model.  Write tests when that has been
+ * determined!
+ */
+
+/* istanbul ignore next */
+
 /**
  * A base data model for menu items,
  * including relevant business logic.
