@@ -3,6 +3,6 @@
     "_subComment" : "Only the first two version digits are necessary, increments of the third digit should be backwards compatible.",
     "dependencies": {
         "SQE_DB_API": 0.1,
-        "Data-files": 0.0
+        "Data-files": 0.1
     }
 }

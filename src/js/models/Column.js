@@ -11,6 +11,7 @@ import Line from './Line.js'
  */
 class Column extends List {
 
+
   static getModel() {
     return Line
   }
@@ -145,7 +146,6 @@ class Column extends List {
     })
     return str
   }
-
 }
 
 export default Column

@@ -80,7 +80,7 @@ export default class Sign extends Record(defaults) {
    * @return {boolean} whether or not this sign is preceded by another sign
    */
   hasPrevious() {
-    return Boolean(this.prev_sign_id);
+    return Boolean(this.prev_sign_id)
   }
 
   /**
