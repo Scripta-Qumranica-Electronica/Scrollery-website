@@ -3,7 +3,7 @@
     <div class="add-new-menu">
         <div class="add-dialog-select">
             <el-select 
-                class="combinationSelector" 
+                class="combination-selector" 
                 v-model="selectedCombination" 
                 placeholder="Select a combination" 
                 size="mini">
@@ -16,7 +16,7 @@
             </el-select>
             <el-select 
                 v-if="addType === 'artefacts'" 
-                class="imageSelector" 
+                class="image-selector" 
                 v-model="selectedImage" 
                 placeholder="Select an image" 
                 size="mini">
@@ -59,10 +59,22 @@
 
 export default {
     props: {
-        addType: '',
-        initialCombination: '',
-        initialImage: '',
-        corpus: {},
+        addType: {
+            required: true,
+            type: String
+        },
+        initialCombination:{
+            required: false,
+            type: Number
+        },
+        initialImage: {
+            required: false,
+            type: Number
+        },
+        corpus: {
+            required: true,
+            type: Object
+        },
     },
     data() {
         return {
@@ -70,9 +82,13 @@ export default {
             images: [],
             artefacts: [],
             columns: [],
-            selectedCombination: this.initialCombination,
-            selectedImage: this.initialImage,
+            selectedCombination: 1,
+            selectedImage: 1,
         }
+    },
+    created() {
+        this.selectedCombination = this.initialCombination
+        this.selectedImage = this.initialImage
     },
     watch: {
         selectedCombination(to, from) {
