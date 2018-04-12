@@ -25,7 +25,9 @@
           <template slot="paneL">
             <split-pane split="vertical">
               <template slot="paneL">
-                <single-image class="pane-content single-image-pane"></single-image>
+                <single-image 
+                  class="pane-content single-image-pane"
+                  :corpus="menuCorpus"></single-image>
               </template>
               <template slot="paneR">
                 <editor class="pane-content"></editor>
@@ -40,6 +42,40 @@
     </div>
   </div>
 </template>
+
+<script>
+import HeaderMenu from './HeaderMenu.vue'
+import MainMenu from './menu/MainMenu.vue'
+import SplitPane from 'vue-splitpane'
+import SingleImage from './SingleImage.vue'
+import Editor from './editor/Editor.vue'
+import Combination from './Combination.vue'
+
+import MenuCorpus from '~/models/MenuCorpus.js'
+
+export default {
+  components: {
+    'header-menu': HeaderMenu,
+    'main-menu': MainMenu,
+    'split-pane': SplitPane,
+    'single-image': SingleImage,
+    'editor': Editor,
+    'combination': Combination,
+  },
+  data() {
+    return {
+      keepMenuOpen: false,
+      mouseOver: false,
+      menuCorpus: new MenuCorpus(this.$store.state.sessionID, this.$store.state.userID, this.$set),
+    }
+  },
+  computed: {
+    menuOpen() {
+      return this.mouseOver || this.keepMenuOpen
+    },
+  },
+}
+</script>
 
 <style lang="scss" scoped>
 
@@ -118,38 +154,3 @@
   background: black;
 }
 </style>
-
-
-<script>
-import HeaderMenu from './HeaderMenu.vue'
-import MainMenu from './menu/MainMenu.vue'
-import SplitPane from 'vue-splitpane'
-import SingleImage from './SingleImage.vue'
-import Editor from './editor/Editor.vue'
-import Combination from './Combination.vue'
-
-import MenuCorpus from '~/models/MenuCorpus.js'
-
-export default {
-  components: {
-    'header-menu': HeaderMenu,
-    'main-menu': MainMenu,
-    'split-pane': SplitPane,
-    'single-image': SingleImage,
-    'editor': Editor,
-    'combination': Combination,
-  },
-  data() {
-    return {
-      keepMenuOpen: false,
-      mouseOver: false,
-      menuCorpus: new MenuCorpus(this.$store.state.sessionID, this.$store.state.userID, this.$set),
-    }
-  },
-  computed: {
-    menuOpen() {
-      return this.mouseOver || this.keepMenuOpen
-    },
-  },
-}
-</script>

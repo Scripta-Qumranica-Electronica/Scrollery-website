@@ -93,6 +93,22 @@ class MenuCorpus {
       })
     })
   }
+
+  fetchArtefactData(scrollVersionID, artefactID) {
+    return new Promise((resolve, reject) => {
+      this.artefacts.populate({image_id: imageID, version_id: scrollVersionID})
+      .then(res => {
+        let artefactIDArray = []
+        res.forEach(artefact => {
+          artefactIDArray.push(artefact[this.artefacts.itemIDKey])
+        })
+        if (!this.images.itemAtIndex(imageID) || artefactIDArray !== this.images.itemAtIndex(imageID).artefacts) {
+          this.images.changeItemValue(imageID, 'artefacts', artefactIDArray)
+        }
+        resolve(res)
+      })
+    })
+  }
 }
 
 export default MenuCorpus

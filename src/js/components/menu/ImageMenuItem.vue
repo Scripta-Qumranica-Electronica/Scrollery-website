@@ -12,7 +12,7 @@
               :scroll-i-d="scrollID"
               :scroll-version-i-d="scrollVersionID"
               :image-i-d="imageID"
-              :name="corpus.artefacts.itemWithID(artefact).name">
+              :corpus="corpus">
             </artefact-menu-item>
           </li>
         </ul>
@@ -84,6 +84,7 @@ export default {
         this.setRouter()
         if (!this.children.length) {
           this.corpus.populateArtefactsofImage(this.scrollVersionID, this.imageID)
+          this.corpus.images.itemWithID(this.imageID).populateItems(this.imageID)
         }
       }
     },

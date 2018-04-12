@@ -33,7 +33,7 @@ import axios from 'axios'
  */
 class MenuObject {
   constructor(sessionID, user, set, itemIDKey, ajaxPayload) {
-    this.sessionID = sessionID // axios post functionality
+    this.sessionID = sessionID // Needed for axios post functionality
     this.user = user
     this.set = set || ((object, key, value) => { object[key] = value }) // This allows you to pass a custom data setter [for proper reactivity]
     this.itemIDKey = itemIDKey // This is must match the key of the UID returned from the database for this data item (version_id for combinations, image_catalog_id for images, etc.)

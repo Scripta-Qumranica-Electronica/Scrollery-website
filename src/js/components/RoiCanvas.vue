@@ -19,15 +19,15 @@
       </clipPath>
     </defs>
     <g pointer-events="none" :clip-path="clip ? 'url(#Clipping-outline)' : 'url(#Full-clipping-outline)'">
-      <image v-for="image of images" 
+      <image v-for="(image, key) in images" 
             :key="'svg-image-' + image.filename"
             class="clippedImg" 
             draggable="false" 
-            :xlink:href="image.url + image.filename + '/full/pct:' + 100 / divisor + '/0/' + image.suffix"
+            :xlink:href="image.getAddress() + 'full/pct:' + 100 / divisor + '/0/' + image.suffix"
             :width="width / divisor"
             :height="height / divisor"
-            :opacity="image.opacity"
-            :visibility="image.visible ? 'visible' : 'hidden'"></image>
+            :opacity="imageSettings[key].opacity"
+            :visibility="imageSettings[key].visible ? 'visible' : 'hidden'"></image>
     </g>
     <use class="pulsate" v-show="!clip" stroke="blue" fill="none" fill-rule="evenodd" stroke-width="2" href="#Clip-path"></use>
     <g v-for="box of boxes">
@@ -91,8 +91,12 @@ export default {
         height: 0,
         zoomLevel: '',
         images: {
-            type: Array,
-            default: [],
+            type: Object,
+            default: {},
+        },
+        imageSettings: {
+            type: Object,
+            default: {},
         },
         divisor: 0,
         clippingMask: '',

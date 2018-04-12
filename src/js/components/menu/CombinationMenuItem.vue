@@ -26,7 +26,7 @@
             v-for="image in corpus.combinations.itemWithID(versionID).images" 
             :key="'menu-image-' + image">
             <image-menu-item 
-              :image-i-d="corpus.images.itemWithID(image).id"
+              :image-i-d="image"
               :scroll-i-d="scrollID"
               :scroll-version-i-d="versionID"
               :corpus="corpus">

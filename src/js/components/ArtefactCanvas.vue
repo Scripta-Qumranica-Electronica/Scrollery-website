@@ -123,8 +123,11 @@ export default {
   },
   watch: {
     mask (to, from) {
-      if (from !== to) {
+      if (to && from !== to) {
         clipCanvas(this.$refs.maskCanvas, this.mask, this.divisor)
+      } else {
+        let ctx = this.$refs.maskCanvas.getContext('2d')
+        ctx.clearRect(0, 0, this.$refs.maskCanvas.width, this.$refs.maskCanvas.height)
       }
     }
   },

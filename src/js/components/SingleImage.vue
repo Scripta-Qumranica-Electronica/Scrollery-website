@@ -6,15 +6,15 @@
           <el-option
             v-for="(image, index) in filenames"
             :key="'selector-' + image.filename"
-            :label="image | formatImageType"
-            :value="image | formatImageType">
+            :label="image.type | formatImageType"
+            :value="index">
             <el-row>
               <el-col :span="2">
                 <span class="drag-handle image-select-entry" style="float: left">☰</span>
               </el-col>
               <el-col :span="8">
                 <span class="image-select-entry">
-                  &nbsp;{{image | formatImageType}}
+                  &nbsp;{{image.type | formatImageType}}
                 </span>
               </el-col>
               <el-col :span="10">
@@ -28,7 +28,7 @@
               </el-col>
               <el-col :span="4">
                 <i class="fa fa-eye image-select-entry"
-                  :style="{color: image.visible ? 'green' : 'red'}"
+                  :style="{color: imageSettings[index].visible ? 'green' : 'red'}"
                   @click="toggleVisible(index)">
                 </i>
               </el-col>
@@ -80,6 +80,7 @@
                   :height="masterImage.height ? masterImage.height : 0"
                   :zoom-level="zoom"
                   :images="filenames"
+                  :image-settings="imageSettings"
                   :divisor="imageShrink"
                   :clipping-mask="clipMask"
                   :clip="clippingOn"
@@ -108,6 +109,12 @@ import ArtefactCanvas from './ArtefactCanvas.vue'
 import {wktPolygonToSvg, svgPolygonToWKT} from '../utils/VectorFactory'
 
 export default {
+  props: {
+    corpus: {
+      required: true,
+      type: Object,
+    }
+  },
   components: {
     'roi-canvas': RoiCanvas,
     'artefact-canvas': ArtefactCanvas,
@@ -117,7 +124,7 @@ export default {
       scrollVersionID: undefined,
       imageElements: [],
       selectedImageUrls: [],
-      filenames: [],
+      filenames: {},
       masterImage: {},
       imageShrink: 2,
       artefact: undefined,
@@ -132,44 +139,22 @@ export default {
       firstClipMask: undefined,
       clippingOn: false,
       lock: true,
+      imageSettings: {},
     }
   },
   methods: {
     fetchImages(id) {
-      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-        transaction: 'imagesOfInstFragments',
-        id: id,
-      })
-      .then(res => {
-        if (res.status === 200 && res.data.results) {
-          this.imageElements = res.data.results
-          this.filenames = []
-          res.data.results.forEach((result) => {
-            if (result.is_master >>> 0) {
-              result.visible = true
-              this.masterImage = result
-            }
-            result.opacity = 1.0
-            this.filenames.push(result)
-          })
-          this.masterImage = this.masterImage ? this.masterImage : res.data.results[0] // Is the ternary really necessary?
-          // this.clipMask = undefined
-          this.clipMask = this.clipMask ? this.clipMask : this.fullImageMask // this would catch edge cases, but may be unnecessary
+      this.filenames = this.corpus.images.itemWithID(this.$route.params.imageID).getItems()
+      for (const key in this.filenames) {
+        if (this.filenames[key].isMaster) {
+          this.$set(this.imageSettings, key, {visible: true, opacity: 1.0})
+          this.masterImage = this.filenames[key]
+        } else {
+          this.$set(this.imageSettings, key, {visible: false, opacity: 1.0})
         }
-      })
+      }
     },
-    fetchArtefactMask() {
-      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-        transaction: 'getArtefactMask',
-        artID: this.artefact,
-        scrollVersion: this.scrollVersionID,
-      })
-      .then(res => {
-        if (res.status === 200 && res.data.results[0]) {
-          this.firstClipMask = this.clipMask = wktPolygonToSvg(res.data.results[0].poly)
-        }
-      })
-    },
+    // TODO move the logic for this into the data model.
     setClipMask(mask) {
       this.lock = true
       this.clipMask = mask
@@ -228,12 +213,10 @@ export default {
       this.$refs.currentRoiCanvas.deleteSelectedRoi()
     },
     setOpacity(idx, val) {
-      this.$set(this.filenames[idx], 'opacity', val)
-      this.$set(this.filenames, idx, this.filenames[idx])
+      this.$set(this.imageSettings[idx], 'opacity', val)
     },
     toggleVisible(idx) {
-      this.$set(this.filenames[idx], 'visible', !this.filenames[idx].visible)
-      this.$set(this.filenames, idx, this.filenames[idx])
+      this.$set(this.imageSettings[idx], 'visible', !this.imageSettings[idx].visible)
     },
     formatTooltip() {
       return (this.zoom * 100).toFixed(2) + '%'
@@ -249,12 +232,17 @@ export default {
     // Fetch image data if we have an imageID
     if (this.$route.params.imageID) {
       this.fetchImages(this.$route.params.imageID)
+      this.firstClipMask = this.clipMask = undefined
+      this.artefact = undefined
     }
     // Fetch artefact data if we have an artID
     if (this.$route.params.artID) {
       this.artefact = this.$route.params.artID
       this.scrollVersionID = this.$route.params.scrollVersionID
-      this.fetchArtefactMask()
+      this.corpus.artefacts.fetchMask(this.scrollVersionID, this.artefactID)
+      .then(res => {
+        this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
+      })
     }
   },
   watch: {
@@ -262,10 +250,9 @@ export default {
       // Fetch images for image ID if it has changed
       if (to.params.imageID !== '~' 
         && to.params.imageID !== from.params.imageID) {
-        this.fetchImages(to.params.imageID)
+        this.fetchImages(this.$route.params.imageID)
         this.artefact = undefined
-        this.clipMask = undefined
-        this.firstClipMask = undefined
+        this.firstClipMask = this.clipMask = undefined
       }
 
       // Load new artefact ID if there is one
@@ -277,7 +264,7 @@ export default {
         } else {
           this.artefact = to.params.artID
           this.scrollVersionID = to.params.scrollVersionID
-          this.fetchArtefactMask()
+          this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
         }
         this.lock = false
       }
@@ -285,12 +272,15 @@ export default {
   },
   filters: {
     formatImageType(value) {
-      if (!value) return ''
-      let formattedString = value.start === value.end ? value.start : value.start + '–' + value.end
-      if (value.type >>> 0 == 2) {
-        formattedString += ' RL'
-      } else if (value.type >>> 0 == 3) {
-        formattedString += ' RR'
+      let formattedString = ''
+      if (value == 0) {
+        formattedString += 'Full Color'
+      } else if (value == 1) {
+        formattedString += '940nm'
+      } else if (value == 2) {
+        formattedString += '940nm RL'
+      } else if (value == 3) {
+        formattedString += '940nm RR'
       }
       return formattedString
     }

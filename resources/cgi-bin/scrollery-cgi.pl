@@ -176,10 +176,10 @@ sub getImgOfComb {
 	my $json_post = shift;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
-       image_catalog.catalog_number_2 AS lvl2,
-	   image_catalog.catalog_side AS side,
-	image_catalog.institution,
-	   image_catalog.image_catalog_id AS id
+		image_catalog.catalog_number_2 AS lvl2,
+		image_catalog.catalog_side AS side,
+		image_catalog.institution,
+		image_catalog.image_catalog_id AS id
 FROM image_catalog
 	JOIN image_to_edition_catalog USING (image_catalog_id)
 	JOIN edition_catalog USING (edition_catalog_id)
@@ -493,16 +493,18 @@ sub imagesOfInstFragments {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $getInstitutionFragmentsQuery = <<'MYSQL';
-SELECT DISTINCT	SQE_image.filename AS filename,
-		  SQE_image.wavelength_start AS start,
-		  SQE_image.wavelength_end AS end,
-		  SQE_image.is_master,
-		  SQE_image.native_width AS width,
-		  SQE_image.native_height AS height,
-		  SQE_image.type AS type,
-		  image_urls.url AS url,
-		  image_urls.suffix AS suffix,
-		  edition_catalog.edition_side
+SELECT DISTINCT	SQE_image.sqe_image_id,
+				SQE_image.filename AS filename,
+				SQE_image.dpi AS dpi,
+				SQE_image.wavelength_start AS start,
+				SQE_image.wavelength_end AS end,
+				SQE_image.is_master,
+				SQE_image.native_width AS width,
+				SQE_image.native_height AS height,
+				SQE_image.type AS type,
+				image_urls.url AS url,
+				image_urls.suffix AS suffix,
+				edition_catalog.edition_side
 FROM SQE_image
 	JOIN image_urls USING(image_urls_id)
 	LEFT JOIN SQE_image_to_edition_catalog USING(sqe_image_id)
@@ -687,15 +689,19 @@ sub getArtefactMask {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $addArtToCombQuery = <<'MYSQL';
-SELECT ST_AsText(region_in_sqe_image) as poly
+SELECT ST_AsText(region_in_sqe_image) as poly,
+	transform_matrix
 	FROM artefact_shape
 	JOIN artefact_shape_owner USING(artefact_shape_id)
+	JOIN artefact_position USING(artefact_id)
+	JOIN artefact_position_owner USING(artefact_position_id)
 	WHERE artefact_id = ?
-		AND scroll_version_id = ?
+		AND artefact_shape_owner.scroll_version_id = ?
+		AND artefact_position_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{artID}, $json_post->{scrollVersion});
+	$sql->execute($json_post->{artID}, $json_post->{scrollVersion}, $json_post->{scrollVersion});
 	readResults($sql);
 	return;
 }
