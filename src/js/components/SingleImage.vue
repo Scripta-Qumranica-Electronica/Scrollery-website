@@ -1,6 +1,6 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <el-row id="singleImageMenu" :gutter="4" type="flex" justify="space-around">
+    <el-row class="single-image-pane-menu" :gutter="4" type="flex" justify="space-around">
       <el-col :span="8">
         <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple size="mini">
           <el-option
@@ -74,7 +74,7 @@
         </el-slider>
       </el-col>
     </el-row>
-    <div style="{width: 100%; height: calc(100% - 50px); overflow: auto; position: relative;}">
+    <div style="{width: 100%; height: calc(100% - 30px); overflow: auto; position: relative;}">
       <roi-canvas class="overlay-image"
                   :width="masterImage.width ? masterImage.width : 0"
                   :height="masterImage.height ? masterImage.height : 0"
@@ -114,6 +114,7 @@ export default {
   },
   data() {
     return {
+      scrollVersionID: undefined,
       imageElements: [],
       selectedImageUrls: [],
       filenames: [],
@@ -127,8 +128,8 @@ export default {
       viewMode: 'ART',
       drawingMode: 'draw',
       brushCursorSize: 20,
-      clipMask: '',
-      firstClipMask: '',
+      clipMask: undefined,
+      firstClipMask: undefined,
       clippingOn: false,
       lock: true,
     }
@@ -157,10 +158,11 @@ export default {
         }
       })
     },
-    getArtefactMask() {
+    fetchArtefactMask() {
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getArtefactMask',
         artID: this.artefact,
+        scrollVersion: this.scrollVersionID,
       })
       .then(res => {
         if (res.status === 200 && res.data.results[0]) {
@@ -198,7 +200,7 @@ export default {
       } else {
 	      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
           transaction: 'changeArtefactPoly',
-          region_in_master_image: svgPolygonToWKT(mask),
+          region_in_sqe_image: svgPolygonToWKT(mask),
           artefact_id: this.$route.params.artID,
           version_id: this.$route.params.scrollVersionID,
 	      })
@@ -240,25 +242,44 @@ export default {
       this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
     }
   },
+  mounted() {
+    // TODO maybe rethink this to avoid the case where 
+    // we have an artID but no imageID
+
+    // Fetch image data if we have an imageID
+    if (this.$route.params.imageID) {
+      this.fetchImages(this.$route.params.imageID)
+    }
+    // Fetch artefact data if we have an artID
+    if (this.$route.params.artID) {
+      this.artefact = this.$route.params.artID
+      this.scrollVersionID = this.$route.params.scrollVersionID
+      this.fetchArtefactMask()
+    }
+  },
   watch: {
     '$route' (to, from) {
-      if (to.params.imageID !== '~') {
-        // Load new artefact ID if there is one
-        if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
-        	if (to.params.artID.toString().indexOf('name') !== -1) {
-            this.viewMode = 'ART'
-            this.artefact = 'new'
-            this.artName = to.params.artID.split('name-')[1]
-          } else {
-            this.artefact = to.params.artID
-            this.getArtefactMask()
-          }
-          this.lock = false
+      // Fetch images for image ID if it has changed
+      if (to.params.imageID !== '~' 
+        && to.params.imageID !== from.params.imageID) {
+        this.fetchImages(to.params.imageID)
+        this.artefact = undefined
+        this.clipMask = undefined
+        this.firstClipMask = undefined
+      }
+
+      // Load new artefact ID if there is one
+      if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
+        if (to.params.artID.toString().indexOf('name') !== -1) {
+          this.viewMode = 'ART'
+          this.artefact = 'new'
+          this.artName = to.params.artID.split('name-')[1]
+        } else {
+          this.artefact = to.params.artID
+          this.scrollVersionID = to.params.scrollVersionID
+          this.fetchArtefactMask()
         }
-        // Fetch images for image ID if it has changed
-        if (to.params.imageID !== from.params.imageID) {
-          this.fetchImages(to.params.imageID)
-        }
+        this.lock = false
       }
     }
   },
@@ -278,10 +299,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  #singleImageMenu {
+  @import "~sass-vars";
+
+  .single-image-pane-menu {
     width: 100%;
-    height: 50px;
-    max-height: 50px;
+    height: 32px; // Should be 30px, but 32px looks better
+    max-height: 32px; // Should be 30px, but 32px looks better
+    background: #dedede;
+    margin-left: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
+    margin-right: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
   }
   .fileSelector {
     border-radius: 15px;

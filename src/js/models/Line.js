@@ -11,6 +11,7 @@ import Sign from './Sign.js'
  */
 class Line extends List {
 
+
   static getModel() {
     return Sign;
   }
@@ -47,6 +48,7 @@ class Line extends List {
   }
 
   /**
+
    * Diff the line-model against the provided string (usually from the DOM representation
    * of this line). Therefore, inserts/deletes to the data will be to bring it into
    * alignment with the given string

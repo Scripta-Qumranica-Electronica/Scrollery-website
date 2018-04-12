@@ -139,5 +139,4 @@ describe('List', () => {
       expect(Array.isArray(list.items())).to.equal(true)
     })
   })
-
 })

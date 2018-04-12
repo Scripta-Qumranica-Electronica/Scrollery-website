@@ -8,6 +8,7 @@ import Model from './Model.js'
  */
 class List {
 
+
   /**
    * @param {object={}} [attributes] List attributes 
    * @param {array=[]}  [items]      An initial array of items for the list 
@@ -44,6 +45,7 @@ class List {
   }
 
   /**
+
    * @returns {Record}  the record class itself
    */
   static getModel() {

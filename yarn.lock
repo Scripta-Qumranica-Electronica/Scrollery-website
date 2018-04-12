@@ -4434,10 +4434,6 @@ once@1.x, once@^1.3.0, once@^1.3.1, once@^1.3.3, once@^1.4.0:
   dependencies:
     wrappy "1"
 
-openseadragon@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/openseadragon/-/openseadragon-2.3.1.tgz#efdcfee19d8b3c46d00d7f7dda787c7057f68364"
-
 optimist@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/optimist/-/optimist-0.6.1.tgz#da3ea74686fa21a19a111c326e90eb15a0196686"
