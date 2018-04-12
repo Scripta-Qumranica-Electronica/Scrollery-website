@@ -2,7 +2,7 @@ import faker from 'faker'
 import signFactory from './sign-factory.js'
 import Column from '~/models/Column.js'
 
-export default ({signs = 20, props = {}}) => {
+export default ({signs = 20, props = {}} = {}) => {
   props = Object.assign({
     id: faker.random.uuid(),
     name: faker.random.word()
@@ -11,7 +11,7 @@ export default ({signs = 20, props = {}}) => {
   const col = new Column(props)
 
   let previousSignId, nextSignID,
-  lineID = faker.random.uuid(),
+  lineID = faker.random.number(),
   lineName = faker.random.word(),
   signsInLine = 0
   for (var i = 0; i < signs; i++) {
@@ -19,7 +19,7 @@ export default ({signs = 20, props = {}}) => {
     // determine if we should add a new line:
     // algorithm: if > 15 signs and faker says yes.
     if (signsInLine > 15 && faker.random.boolean()) {
-      lineID = faker.random.uuid()
+      lineID = faker.random.number()
       lineName = faker.random.word();
       signsInLine = 0
     }

@@ -85,11 +85,6 @@ export default {
      */
     onKeydown(e) {
 
-      // safeguard: ensure trusted input
-      if (!e.isTrusted) {
-        e.preventDefault()
-      }
-
       if (e.metaKey) {
         this.processMetaInput(e)
       }
