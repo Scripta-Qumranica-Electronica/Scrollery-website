@@ -8,7 +8,7 @@ export default (Component, opt = {}) => {
 
   // Vuex
   localVue.use(Vuex)
-  const store = makeStore(Vuex, []);
+  const store = makeStore(Vuex, [])
 
   // i18n
   localVue.use(i18n, { store })
@@ -16,9 +16,10 @@ export default (Component, opt = {}) => {
   // create args
   const args = {
     ...{
-      store, localVue
+      store,
+      localVue,
     },
-    ...opt
+    ...opt,
   }
 
   return shallow(Component, args)

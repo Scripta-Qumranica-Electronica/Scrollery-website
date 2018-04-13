@@ -56,88 +56,87 @@
 </template>
 
 <script>
-
 export default {
-    props: {
-        addType: {
-            required: true,
-            type: String
-        },
-        initialCombination:{
-            required: false,
-            type: Number
-        },
-        initialImage: {
-            required: false,
-            type: Number
-        },
-        corpus: {
-            required: true,
-            type: Object
-        },
+  props: {
+    addType: {
+      required: true,
+      type: String,
     },
-    data() {
-        return {
-            combinations: [],
-            images: [],
-            artefacts: [],
-            columns: [],
-            selectedCombination: 1,
-            selectedImage: 1,
-        }
+    initialCombination: {
+      required: false,
+      type: Number,
     },
-    created() {
-        this.selectedCombination = this.initialCombination
-        this.selectedImage = this.initialImage
+    initialImage: {
+      required: false,
+      type: Number,
     },
-    watch: {
-        selectedCombination(to, from) {
-            if (to !== from) {
-                this.corpus.populateImagesOfScrollVersion(to, this.corpus.combinations.itemWithID(to).scroll_id)
-                .then(res => {
-                    this.selectedImage = this.corpus.combinations.itemWithID(to).images[0] || 
-                    undefined
-                })
-            }
-        },
-        selectedImage(to, from) {
-            if (to !== from) {
-                this.corpus.populateArtefactsofImage(this.selectedCombination, to)
-            }
-        }
+    corpus: {
+      required: true,
+      type: Object,
     },
+  },
+  data() {
+    return {
+      combinations: [],
+      images: [],
+      artefacts: [],
+      columns: [],
+      selectedCombination: 1,
+      selectedImage: 1,
+    }
+  },
+  created() {
+    this.selectedCombination = this.initialCombination
+    this.selectedImage = this.initialImage
+  },
+  watch: {
+    selectedCombination(to, from) {
+      if (to !== from) {
+        this.corpus
+          .populateImagesOfScrollVersion(to, this.corpus.combinations.itemWithID(to).scroll_id)
+          .then(res => {
+            this.selectedImage = this.corpus.combinations.itemWithID(to).images[0] || undefined
+          })
+      }
+    },
+    selectedImage(to, from) {
+      if (to !== from) {
+        this.corpus.populateArtefactsofImage(this.selectedCombination, to)
+      }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-    @import "~sass-vars";
-    .add-new-dialog {
-        height: 70vh;
-        min-height: 70vh;
-        max-height: 70vh;
-    }
-    .add-new-menu {
-        width: 20%;
-        min-width: 20%;
-        height: 65vh;
-        min-height: 65vh;
-        background: $ltBlue;
-        float: left;
-    }
-    .add-dialog-select {
-        height: 60px;
-    }
-    .add-dialog-menu-listings {
-        overflow: auto;
-        height: calc(60vh - 60px);
-        min-height: calc(60vh - 60px);
-    }
-    .add-new-display {
-        width: 80%;
-        min-width: 80%;
-        height: 65vh;
-        min-height: 65vh;
-        background: gray;
-        margin-left: 20%;
-    }
+@import '~sass-vars';
+.add-new-dialog {
+  height: 70vh;
+  min-height: 70vh;
+  max-height: 70vh;
+}
+.add-new-menu {
+  width: 20%;
+  min-width: 20%;
+  height: 65vh;
+  min-height: 65vh;
+  background: $ltBlue;
+  float: left;
+}
+.add-dialog-select {
+  height: 60px;
+}
+.add-dialog-menu-listings {
+  overflow: auto;
+  height: calc(60vh - 60px);
+  min-height: calc(60vh - 60px);
+}
+.add-new-display {
+  width: 80%;
+  min-width: 80%;
+  height: 65vh;
+  min-height: 65vh;
+  background: gray;
+  margin-left: 20%;
+}
 </style>

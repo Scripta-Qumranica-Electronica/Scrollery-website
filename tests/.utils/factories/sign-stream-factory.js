@@ -4,29 +4,32 @@ import signFactory from './sign-factory.js'
 /**
  * Construct a sign stream
  */
-export default ({signsCount = 20, colProps = {}}) => {
+export default ({ signsCount = 20, colProps = {} }) => {
   let signs = []
-  colProps = Object.assign({
-    id: faker.random.uuid(),
-    name: faker.random.word()
-  }, colProps)
+  colProps = Object.assign(
+    {
+      id: faker.random.uuid(),
+      name: faker.random.word(),
+    },
+    colProps
+  )
 
-  let previousSignId = "", nextSignID = faker.random.uuid(),
-  lineID = faker.random.uuid(),
-  lineName = faker.random.word(),
-  signsInLine = 0
+  let previousSignId = '',
+    nextSignID = faker.random.uuid(),
+    lineID = faker.random.uuid(),
+    lineName = faker.random.word(),
+    signsInLine = 0
   for (var i = 0; i < signsCount; i++) {
-    
     // determine if we should add a new line:
     // algorithm: if > 15 signs and faker says yes.
     if (signsInLine > 15 && faker.random.boolean()) {
       lineID = faker.random.uuid()
-      lineName = faker.random.word();
+      lineName = faker.random.word()
       signsInLine = 0
     }
 
     // increment the signs in line
-    signsInLine++;
+    signsInLine++
 
     // create the plain sign object
     let sign = signFactory.plain({
@@ -36,7 +39,7 @@ export default ({signsCount = 20, colProps = {}}) => {
       line_id: lineID,
       line_name: lineName,
       col_id: colProps.id,
-      col_name: colProps.name
+      col_name: colProps.name,
     })
     signs.push(sign)
 

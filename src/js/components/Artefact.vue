@@ -21,20 +21,19 @@
 
 <script>
 export default {
-    props: {
-        artefactData: {},
-        baseDPI: {
-            type: Number,
-            default: 1215,
-        },
-        index: Number,
+  props: {
+    artefactData: {},
+    baseDPI: {
+      type: Number,
+      default: 1215,
     },
-  components: {
+    index: Number,
   },
+  components: {},
   computed: {
-      scale() {
-          return this.baseDPI / this.artefactData.dpi
-      },
+    scale() {
+      return this.baseDPI / this.artefactData.dpi
+    },
   },
 }
 </script>

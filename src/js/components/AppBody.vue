@@ -42,19 +42,19 @@
 </template>
 
 <style lang="scss" scoped>
-
-@import "~sass-vars";
+@import '~sass-vars';
 
 #site {
   width: 100%;
   height: 100vh;
   overflow: hidden;
   font-size: 0;
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    '微软雅黑', Arial, sans-serif;
 }
 
 #editing-window,
-#side-menu, {
+#side-menu {
   position: absolute;
   height: 100%;
   vertical-align: top;
@@ -75,8 +75,8 @@
 
   &.open {
     left: 0;
-  transition: left #{$menuSlideTransitionIn};
-  transition-timing-function: ease-in;
+    transition: left #{$menuSlideTransitionIn};
+    transition-timing-function: ease-in;
   }
 }
 #editing-window {
@@ -136,8 +136,8 @@ export default {
     'main-menu': MainMenu,
     'split-pane': SplitPane,
     'single-image': SingleImage,
-    'editor': Editor,
-    'combination': Combination,
+    editor: Editor,
+    combination: Combination,
   },
   data() {
     return {

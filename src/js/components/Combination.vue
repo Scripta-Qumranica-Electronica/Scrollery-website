@@ -23,45 +23,45 @@
 <script>
 import CombinationCanvas from './CombinationCanvas.vue'
 export default {
-    components: {
-        'combination-canvas': CombinationCanvas,
-    },
-    data() {
-        return {
-            scale: 0.01,
-        }
-    },
-    computed: {
-        globalScale() {
-            // This returns a logarithmical scale value for
-            // the current slider position.
-            return parseFloat((((100-1)*Math.pow((this.scale / 100), 3) + 1) / 100).toFixed(4));
-        }
-    },
-    methods: {
-        formatTooltip(val) {
-            return (this.globalScale * 100).toFixed(2) + '%'
-        }
+  components: {
+    'combination-canvas': CombinationCanvas,
+  },
+  data() {
+    return {
+      scale: 0.01,
     }
+  },
+  computed: {
+    globalScale() {
+      // This returns a logarithmical scale value for
+      // the current slider position.
+      return parseFloat((((100 - 1) * Math.pow(this.scale / 100, 3) + 1) / 100).toFixed(4))
+    },
+  },
+  methods: {
+    formatTooltip(val) {
+      return (this.globalScale * 100).toFixed(2) + '%'
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-    @import "~sass-vars";
-    .combination-panel {
-        width: 100%; 
-        height: 100%;
-    }
+@import '~sass-vars';
+.combination-panel {
+  width: 100%;
+  height: 100%;
+}
 
-    .combination-panel-menu {
-        background: #dedede;
-        width: 100%; 
-        height: 30px;
-    }
+.combination-panel-menu {
+  background: #dedede;
+  width: 100%;
+  height: 30px;
+}
 
-    .combination-panel-container {
-        width: 100%; 
-        height: calc(100% - 38px);
-        overflow: auto;
-    }
+.combination-panel-container {
+  width: 100%;
+  height: calc(100% - 38px);
+  overflow: auto;
+}
 </style>

@@ -38,7 +38,6 @@
 </template>
 
 <script>
-
 import ArtefactMenuItem from './ArtefactMenuItem.vue'
 import AddNewDialog from '~/components/AddNewDialog.vue'
 
@@ -62,10 +61,12 @@ export default {
   },
   methods: {
     setRouter() {
-      if (this.$route.params.scrollID !== this.scrollID 
-        || this.$route.params.scrollVersionID !== this.versionID
-        || this.$route.params.imageID !== this.imageID) {
-        this.$router.push({ 
+      if (
+        this.$route.params.scrollID !== this.scrollID ||
+        this.$route.params.scrollVersionID !== this.versionID ||
+        this.$route.params.imageID !== this.imageID
+      ) {
+        this.$router.push({
           name: 'workbenchAddress',
           params: {
             scrollID: this.scrollID,
@@ -73,7 +74,7 @@ export default {
             colID: '~',
             imageID: this.imageID,
             artID: '~',
-          }
+          },
         })
       }
     },
@@ -90,7 +91,7 @@ export default {
 
     addArtefact() {
       this.dialogVisible = true
-    }
+    },
   },
 }
 </script>

@@ -15,8 +15,7 @@
 </template>
 
 <style lang="scss" scoped>
-
-@import "~sass-vars";
+@import '~sass-vars';
 
 .header {
   width: 100%;
@@ -50,19 +49,18 @@
 
 .menu-section.open {
   & .body {
-    opacity: 1.0;
+    opacity: 1;
     transition: all 300ms;
-  transition-timing-function: ease-in;
+    transition-timing-function: ease-in;
   }
 }
-
 </style>
 
 <script>
 export default {
   props: {
     open: Boolean,
-    title: String
-  }
+    title: String,
+  },
 }
 </script>

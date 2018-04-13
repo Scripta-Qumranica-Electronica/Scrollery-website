@@ -5,5 +5,5 @@ import signStream from './sign-stream-factory.js'
 export default {
   sign,
   column,
-  signStream
+  signStream,
 }

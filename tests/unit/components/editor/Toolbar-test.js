@@ -4,29 +4,28 @@ import editorStore from '~/components/editor/EditorStore.js'
 
 /**
  * Construct Toolbars for testing
- * 
+ *
  * @param {object} props additional props
- * 
+ *
  * @return {VueTestWrapper} the vue-test-utils wrapper class
  */
-const factory = () => mount(Toolbar, {
-  propsData: {
-    state: editorStore({
-      str: key => key
-    }),
-  }
-})
+const factory = () =>
+  mount(Toolbar, {
+    propsData: {
+      state: editorStore({
+        str: key => key,
+      }),
+    },
+  })
 
 describe('Toolbar.vue', () => {
-
   let wrapper, vm
   beforeEach(() => {
-    wrapper = factory();
+    wrapper = factory()
     vm = wrapper.vm
   })
 
   describe('show/hide reconstructed text', () => {
-    
     it('should toggle editor state to show/hide reconstructed state', () => {
       let initial = vm.state.getters.showReconstructedText
 
@@ -39,7 +38,6 @@ describe('Toolbar.vue', () => {
   })
 
   describe('fonts', () => {
-
     it('should not accept unknown fonts but not throw errors', () => {
       let initial = vm.state.getters.font
 
@@ -52,11 +50,10 @@ describe('Toolbar.vue', () => {
       let fonts = vm.state.getters.fonts
 
       // fonts is an object, grab the first key off of it.
-      let fontName = Object.keys(fonts)[1];
+      let fontName = Object.keys(fonts)[1]
 
       vm.onFontChange(fontName)
       expect(vm.state.getters.font).to.equal(fonts[fontName])
     })
-
   })
 })

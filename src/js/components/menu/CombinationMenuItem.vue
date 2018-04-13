@@ -38,7 +38,6 @@
 </template>
 
 <script>
-
 import { mapGetters } from 'vuex'
 import ColumnMenuItem from './ColumnMenuItem.vue'
 import ImageMenuItem from './ImageMenuItem.vue'
@@ -46,14 +45,14 @@ import ImageMenuItem from './ImageMenuItem.vue'
 export default {
   props: {
     count: 0,
-    name: "",
+    name: '',
     scrollDataID: 0,
     scrollID: 0,
     version: 0,
     versionID: 0,
     user: 0,
     menuType: '',
-    locked: "",
+    locked: '',
     corpus: {},
   },
   components: {
@@ -63,33 +62,35 @@ export default {
   data() {
     return {
       children: {
-        'text': [],
-        'image': [],
+        text: [],
+        image: [],
       },
       open: false,
       requestType: {
-        'text': 'getColOfComb',
-        'image': 'getImgOfComb',
+        text: 'getColOfComb',
+        image: 'getImgOfComb',
       },
       lastFetch: '',
     }
   },
   computed: {
-    ...mapGetters(['username',]),
+    ...mapGetters(['username']),
   },
   methods: {
     setRouter() {
-      if (this.$route.params.scrollID !== this.scrollID 
-        || this.$route.params.scrollVersionID !== this.versionID) {
+      if (
+        this.$route.params.scrollID !== this.scrollID ||
+        this.$route.params.scrollVersionID !== this.versionID
+      ) {
         this.$router.push({
           name: 'workbenchAddress',
           params: {
-            scrollID: this.scrollID, 
+            scrollID: this.scrollID,
             scrollVersionID: this.versionID,
             imageID: '~',
             colID: '~',
-            artID: '~'
-          }
+            artID: '~',
+          },
         })
       }
     },
@@ -104,19 +105,15 @@ export default {
     },
     // TODO implement the capability for these functions
     // in the data model.
-    cloneScroll() {
-      
-    },
+    cloneScroll() {},
 
-    lockScroll() {
-
-    }
+    lockScroll() {},
   },
 }
 </script>
 
 <style lang="scss" scoped>
-  .clickable-menu-item {
-    cursor: pointer;
-  }
+.clickable-menu-item {
+  cursor: pointer;
+}
 </style>

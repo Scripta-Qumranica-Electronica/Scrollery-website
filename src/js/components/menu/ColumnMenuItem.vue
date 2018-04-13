@@ -5,7 +5,6 @@
 </template>
 
 <script>
-
 export default {
   props: {
     columnID: Number,
@@ -21,9 +20,11 @@ export default {
      */
     setRouter() {
       const params = this.$route.params
-      if (params.scrollID !== this.scrollID 
-        || params.scrollVersionID !== this.versionID
-        || params.colID !== this.columnID) {
+      if (
+        params.scrollID !== this.scrollID ||
+        params.scrollVersionID !== this.versionID ||
+        params.colID !== this.columnID
+      ) {
         this.$router.push({
           name: 'workbenchAddress',
           params: {
@@ -32,12 +33,11 @@ export default {
             colID: this.columnID,
             imageID: '~',
             artID: '~',
-          }
+          },
         })
       }
     },
   },
-  watch: {
-  }
+  watch: {},
 }
 </script>

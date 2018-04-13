@@ -45,8 +45,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['username',
-                    'sessionID'])
+    ...mapGetters(['username', 'sessionID']),
   },
   created() {
     this.user = this.username
@@ -55,20 +54,14 @@ export default {
     if (this.sessionID) {
       this.validateSession(window.localStorage ? window.localStorage : null)
     } else {
-
       // users first time here, show the Login screen
       this.visible = true
     }
   },
   methods: {
-    ...mapMutations([
-      'setSessionID',
-      'setUserID',
-      'setUsername',
-      'setLanguage'
-    ]),
+    ...mapMutations(['setSessionID', 'setUserID', 'setUsername', 'setLanguage']),
     onSubmit() {
-      const isUserValid = this.validateUsername();
+      const isUserValid = this.validateUsername()
       const isPasswordValid = this.validatePassword()
       if (isUserValid && isPasswordValid) {
         this.attemptLogin()
@@ -98,95 +91,87 @@ export default {
       return this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         SESSION_ID: this.sessionID,
         transaction: 'validateSession',
-        SCROLLVERSION: 1
+        SCROLLVERSION: 1,
       })
-      .then(res => {
-        if (res.data && res.data.error) {
-
-          // blow away localStorage on session error
+        .then(res => {
+          if (res.data && res.data.error) {
+            // blow away localStorage on session error
+            this.errMsg = ''
+            storage.removeItem('sqe')
+          } else if (res.data) {
+            return this.validateLogin(res)
+          }
+        })
+        .then(() => {
+          this.visible = true
+        })
+        .catch(({ response }) => {
+          // The Session is invalid, so clear out local Vuex storage but
+          // no error message required.
           this.errMsg = ''
-          storage.removeItem('sqe')
-          
-        } else if (res.data) {
-          return this.validateLogin(res)
-        }
-      })
-      .then(() => {
-        this.visible = true;
-      })
-      .catch(({ response }) => {
-
-        // The Session is invalid, so clear out local Vuex storage but
-        // no error message required.
-        this.errMsg = ''
-        storage && storage.removeItem('sqe')
-      });
+          storage && storage.removeItem('sqe')
+        })
     },
     attemptLogin() {
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         USER_NAME: this.user.trim(),
         PASSWORD: this.password.trim(),
         transaction: 'validateSession',
-        SCROLLVERSION: 1
+        SCROLLVERSION: 1,
       })
-      .then(res => this.validateLogin(res))
-      .catch(({ response }) => {
-        this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
-      });
+        .then(res => this.validateLogin(res))
+        .catch(({ response }) => {
+          this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
+        })
     },
     validateLogin(res) {
       return new Promise((resolve, reject) => {
-
         // Safeguard to ensure data given
         if (!res) {
           reject(new Error('Login.validateLogin requires a server response'))
         }
 
-
         if (res.data && res.data.error) {
           this.errMsg = res.data.error
           console.error(res.data)
-          reject(new Error("Login invalid"))
-        } else if (
-          res.data 
-          && res.data.SESSION_ID 
-          &&  res.data.USER_ID 
-        ) {
+          reject(new Error('Login invalid'))
+        } else if (res.data && res.data.SESSION_ID && res.data.USER_ID) {
+          // Set store state
+          this.setSessionID(res.data.SESSION_ID)
+          this.setUserID(res.data.USER_ID)
+          this.setUsername(this.user.trim())
+          this.setLanguage(this.language)
 
-            // Set store state
-            this.setSessionID(res.data.SESSION_ID)
-            this.setUserID(res.data.USER_ID)
-            this.setUsername(this.user.trim())
-            this.setLanguage(this.language)
-
-            // Load language files
-            this.$i18n.load().then(() => {
-
+          // Load language files
+          this.$i18n
+            .load()
+            .then(() => {
               // success!
-              this.$router.push({name: 'workbench'})
+              this.$router.push({ name: 'workbench' })
               resolve()
             })
             .catch(() => {
               this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
-              reject(new Error("Service unavailable"))
+              reject(new Error('Service unavailable'))
             })
         } else {
           this.errMsg = this.$i18n.str('Errors.Unknown')
-          reject(new Error("Unknown error"))
+          reject(new Error('Unknown error'))
         }
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .loginCard {
   width: 325px;
-  background: #409EFF;
+  background: #409eff;
   color: white;
   font-size: 20px;
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    '微软雅黑', Arial, sans-serif;
 }
 
 .loginUsername {
