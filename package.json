@@ -11,14 +11,12 @@
     "setup:db": "sh ./bin/init-docker.sh",
     "test": "karma start --config karma.conf.js",
     "test:chrome": "karma start --config karma.conf.js --browsers=Chrome",
-    "test_travis": "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=Chrome,Firefox",
+    "test_travis":
+      "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=Chrome,Firefox",
     "posttest_travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "lint-staged": {
-    "*.js,*.vue": [
-      "npm run prettier",
-      "git add"
-    ]
+    "*": ["npm run prettier", "git add"]
   },
   "devDependencies": {
     "@vue/test-utils": "^1.0.0-beta.10",
