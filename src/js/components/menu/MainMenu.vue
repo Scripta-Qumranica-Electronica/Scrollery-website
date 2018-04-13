@@ -56,13 +56,12 @@
 </template>
 
 <style lang="scss" scoped>
-
-@import "~sass-vars";
+@import '~sass-vars';
 
 .header {
   height: #{$header};
   background: #{$dkBlue};
-  
+
   label {
     padding: #{$spacer};
 
@@ -96,7 +95,7 @@
 .menu-body {
   min-width: calc(100% - #{$spacer * 2});
   height: calc(100% - #{$header});
-  background: rgba($gray, .2);
+  background: rgba($gray, 0.2);
   text-align: right;
   overflow-x: hidden;
   font-size: 18px;
@@ -137,7 +136,7 @@ import SidebarMenuItem from './SidebarMenuItem.vue'
 export default {
   components: {
     'combinaton-menu-item': CombinationMenuItem,
-    'sidebar-menu-item': SidebarMenuItem
+    'sidebar-menu-item': SidebarMenuItem,
   },
   computed: {
     ...mapGetters(['userID', 'sessionID']),
@@ -149,8 +148,8 @@ export default {
   },
   data() {
     return {
-      combinationsTitle: "",
-      menuBarsTooltip: "",
+      combinationsTitle: '',
+      menuBarsTooltip: '',
       queryString: '',
       menuDisplayInstitutional: true,
       menuDisplay: 'text',
@@ -158,9 +157,8 @@ export default {
   },
   mounted() {
     // i18n
-    this.combinationsTitle = this.$i18n.str("Combinations");
-    this.menuBarsTooltip = this.$i18n.str("Menu.Bars.Tooltip")
-  }
+    this.combinationsTitle = this.$i18n.str('Combinations')
+    this.menuBarsTooltip = this.$i18n.str('Menu.Bars.Tooltip')
+  },
 }
-
 </script>

@@ -10,36 +10,34 @@ import Column from './Column.vue'
 
 export default {
   components: {
-    'column': Column
+    column: Column,
   },
   props: {
     text: {
       default() {
         return new Composition()
-      }
+      },
     },
     state: {
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     columns() {
       return this.text.items()
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-
-@import "~sass-vars";
+@import '~sass-vars';
 
 .editor {
-    position: relative;
-    overflow: hidden;
-    background-color: rgba($ltOrange, 0.1);
-    width: 100%;
-    height: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: rgba($ltOrange, 0.1);
+  width: 100%;
+  height: 100%;
 }
-
 </style>

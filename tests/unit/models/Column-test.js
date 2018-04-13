@@ -13,7 +13,7 @@ let createTargetFromNodeList = nodes => {
     let child = nodes[i]
     target.push({
       id: child.dataset.lineId,
-      text: child.innerText
+      text: child.innerText,
     })
   }
   return target
@@ -25,10 +25,9 @@ describe('ColumnModel', () => {
   })
 
   describe('instantiated without lines', () => {
-
     let col
     beforeEach(() => {
-      col = factory.column({signs: 30})
+      col = factory.column({ signs: 30 })
     })
 
     it('should insert lines on the fly for inserted signs', () => {
@@ -46,33 +45,32 @@ describe('ColumnModel', () => {
   describe('DOM synchronization', () => {
     let short, long
     beforeEach(() => {
-      short = factory.column({signs: 20})
-      long = factory.column({signs: 25})
+      short = factory.column({ signs: 20 })
+      long = factory.column({ signs: 25 })
     })
 
     it('should synchronize given an array of {id: lineID, text: "line text"} when the target is longer', () => {
       let lines = stringToElement(long.toDOMString()),
-      target = createTargetFromNodeList(lines.childNodes)
+        target = createTargetFromNodeList(lines.childNodes)
       short.synchronizeTo(target)
-      
+
       expect(short.toString()).to.equal(long.toString())
     })
 
     it('should synchronize given an array of {id: lineID, text: "line text"} when the target is shorter', () => {
       let lines = stringToElement(short.toDOMString()),
-      target = createTargetFromNodeList(lines.childNodes)
+        target = createTargetFromNodeList(lines.childNodes)
 
       long.synchronizeTo(target)
-      
+
       expect(short.toString()).to.equal(long.toString())
     })
-
   })
 
   describe('splitLine(line = Line|lineIndex, splitIndex = indexToSplitLine)', () => {
     let col, line
     beforeEach(() => {
-      col = factory.column({signs: 30})
+      col = factory.column({ signs: 30 })
       line = col.get(0)
     })
 
@@ -82,16 +80,16 @@ describe('ColumnModel', () => {
 
     it('should create a new line instance to split the line into', () => {
       let newLine = col.splitLine(line, 5)
-      expect(line).not.to.equal(newLine)      
+      expect(line).not.to.equal(newLine)
     })
 
     it('should place the new line directly after the previous line', () => {
       let newLine = col.splitLine(line, 5)
-      expect(newLine).to.equal(col.get(1))      
+      expect(newLine).to.equal(col.get(1))
     })
 
     it('should put everything after the index into the new line', () => {
-      let oldStr = line.toString();
+      let oldStr = line.toString()
       let newLine = col.splitLine(line, 5)
 
       // check lengths

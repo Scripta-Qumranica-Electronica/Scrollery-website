@@ -86,118 +86,126 @@
 
 <script>
 export default {
-    props: {
-        width: 0,
-        height: 0,
-        zoomLevel: '',
-        images: {
-            type: Array,
-            default: [],
-        },
-        divisor: 0,
-        clippingMask: '',
-        clip: false,
+  props: {
+    width: 0,
+    height: 0,
+    zoomLevel: '',
+    images: {
+      type: Array,
+      default: [],
     },
-    data() {
-        return {
-            boxes: [],
-            selectedBox: undefined,
-            mouseMoveType: undefined,
-            oldMousePos: undefined,
-            click: false,
-        }
-    },
+    divisor: 0,
+    clippingMask: '',
+    clip: false,
+  },
+  data() {
+    return {
+      boxes: [],
+      selectedBox: undefined,
+      mouseMoveType: undefined,
+      oldMousePos: undefined,
+      click: false,
+    }
+  },
   computed: {
     scale() {
-        return 1 / this.divisor
+      return 1 / this.divisor
     },
     fullImageMask() {
       return `M0 0L${this.width} 0L${this.width} ${this.height}L0 ${this.height}`
-    }
-  },
-    methods: {
-        newROI(event) {
-            if (event.target.nodeName === 'svg') {
-            const point = this.pointInSvg(event.clientX, event.clientY);
-            const box = { x: point.x,
-                y: point.y,
-                width: 10,
-                height: 10,
-                color: 'purple'};
-            this.boxes.push(box);
-            this.selectROI(event, box, 'resizeWH');
-            }
-        },
-
-        selectROI(event, box, type) {
-            if (this.selectedBox) {
-            this.selectedBox.color = 'purple';
-            }
-            this.selectedBox = box;
-            this.selectedBox.color = 'orange';
-            this.oldMousePos = {x: event.clientX,
-            y: event.clientY};
-            this.mouseMoveType = type;
-            this.click = true;
-            window.setTimeout(() => this.click = false, 200);
-        },
-
-        deselectROI() {
-            this.mouseMoveType = undefined;
-            this.oldMousePos = undefined;
-        },
-
-        moveROI(event) {
-            if (this.mouseMoveType) {
-                const move = {x: (event.clientX - this.oldMousePos.x) / this.zoomLevel,
-                    y: (event.clientY - this.oldMousePos.y) / this.zoomLevel};
-                this.oldMousePos = {x: event.clientX,
-                    y: event.clientY};
-                if (this.mouseMoveType === 'drag') {
-                    this.selectedBox.x += move.x;
-                    this.selectedBox.y += move.y;
-                } else if (this.mouseMoveType === 'resizeXY') {
-                    this.selectedBox.x += move.x;
-                    this.selectedBox.y += move.y;
-                    this.selectedBox.width -= move.x;
-                    this.selectedBox.height -= move.y;
-                } else if (this.mouseMoveType === 'resizeWY') {
-                    this.selectedBox.y += move.y;
-                    this.selectedBox.width += move.x;
-                    this.selectedBox.height -= move.y;
-                } else if (this.mouseMoveType === 'resizeWH') {
-                    this.selectedBox.width += move.x;
-                    this.selectedBox.height += move.y;
-                } else if (this.mouseMoveType === 'resizeXH') {
-                    this.selectedBox.x += move.x;
-                    this.selectedBox.width -= move.x;
-                    this.selectedBox.height += move.y;
-                }
-            }
-        },
-
-        deleteSelectedRoi() {
-            if (this.selectedBox) {
-            const idx = this.boxes.indexOf(this.selectedBox);
-                if (idx !== -1) {
-                    this.boxes.splice(idx, 1);
-                }
-            }
-        },
-
-        pointInSvg(x, y) {
-            const pt = this.$refs.roiSvg.createSVGPoint();
-            pt.x = x;
-            pt.y = y;
-            return pt.matrixTransform(this.$refs.roiSvg.getScreenCTM().inverse());
-        },
     },
+  },
+  methods: {
+    newROI(event) {
+      if (event.target.nodeName === 'svg') {
+        const point = this.pointInSvg(event.clientX, event.clientY)
+        const box = {
+          x: point.x,
+          y: point.y,
+          width: 10,
+          height: 10,
+          color: 'purple',
+        }
+        this.boxes.push(box)
+        this.selectROI(event, box, 'resizeWH')
+      }
+    },
+
+    selectROI(event, box, type) {
+      if (this.selectedBox) {
+        this.selectedBox.color = 'purple'
+      }
+      this.selectedBox = box
+      this.selectedBox.color = 'orange'
+      this.oldMousePos = {
+        x: event.clientX,
+        y: event.clientY,
+      }
+      this.mouseMoveType = type
+      this.click = true
+      window.setTimeout(() => (this.click = false), 200)
+    },
+
+    deselectROI() {
+      this.mouseMoveType = undefined
+      this.oldMousePos = undefined
+    },
+
+    moveROI(event) {
+      if (this.mouseMoveType) {
+        const move = {
+          x: (event.clientX - this.oldMousePos.x) / this.zoomLevel,
+          y: (event.clientY - this.oldMousePos.y) / this.zoomLevel,
+        }
+        this.oldMousePos = {
+          x: event.clientX,
+          y: event.clientY,
+        }
+        if (this.mouseMoveType === 'drag') {
+          this.selectedBox.x += move.x
+          this.selectedBox.y += move.y
+        } else if (this.mouseMoveType === 'resizeXY') {
+          this.selectedBox.x += move.x
+          this.selectedBox.y += move.y
+          this.selectedBox.width -= move.x
+          this.selectedBox.height -= move.y
+        } else if (this.mouseMoveType === 'resizeWY') {
+          this.selectedBox.y += move.y
+          this.selectedBox.width += move.x
+          this.selectedBox.height -= move.y
+        } else if (this.mouseMoveType === 'resizeWH') {
+          this.selectedBox.width += move.x
+          this.selectedBox.height += move.y
+        } else if (this.mouseMoveType === 'resizeXH') {
+          this.selectedBox.x += move.x
+          this.selectedBox.width -= move.x
+          this.selectedBox.height += move.y
+        }
+      }
+    },
+
+    deleteSelectedRoi() {
+      if (this.selectedBox) {
+        const idx = this.boxes.indexOf(this.selectedBox)
+        if (idx !== -1) {
+          this.boxes.splice(idx, 1)
+        }
+      }
+    },
+
+    pointInSvg(x, y) {
+      const pt = this.$refs.roiSvg.createSVGPoint()
+      pt.x = x
+      pt.y = y
+      return pt.matrixTransform(this.$refs.roiSvg.getScreenCTM().inverse())
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 svg {
-    max-height: initial;
+  max-height: initial;
 }
 
 use.pulsate {
@@ -207,8 +215,17 @@ use.pulsate {
 }
 
 @keyframes pulsate {
-  0%    { opacity:0.4; stroke-width: 3; }
-  50%   { opacity:1.0; stroke-width: 5; }
-  100%  { opacity:0.4; stroke-width: 3; }
+  0% {
+    opacity: 0.4;
+    stroke-width: 3;
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 5;
+  }
+  100% {
+    opacity: 0.4;
+    stroke-width: 3;
+  }
 }
 </style>

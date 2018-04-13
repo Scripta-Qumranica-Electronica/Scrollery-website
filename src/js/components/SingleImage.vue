@@ -105,7 +105,7 @@
 <script>
 import RoiCanvas from './RoiCanvas.vue'
 import ArtefactCanvas from './ArtefactCanvas.vue'
-import {wktPolygonToSvg, svgPolygonToWKT} from '../utils/VectorFactory'
+import { wktPolygonToSvg, svgPolygonToWKT } from '../utils/VectorFactory'
 
 export default {
   components: {
@@ -139,12 +139,11 @@ export default {
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'imagesOfInstFragments',
         id: id,
-      })
-      .then(res => {
+      }).then(res => {
         if (res.status === 200 && res.data.results) {
           this.imageElements = res.data.results
           this.filenames = []
-          res.data.results.forEach((result) => {
+          res.data.results.forEach(result => {
             if (result.is_master >>> 0) {
               result.visible = true
               this.masterImage = result
@@ -163,8 +162,7 @@ export default {
         transaction: 'getArtefactMask',
         artID: this.artefact,
         scrollVersion: this.scrollVersionID,
-      })
-      .then(res => {
+      }).then(res => {
         if (res.status === 200 && res.data.results[0]) {
           this.firstClipMask = this.clipMask = wktPolygonToSvg(res.data.results[0].poly)
         }
@@ -181,30 +179,28 @@ export default {
           name: this.artName,
           scroll_id: this.$route.params.scrollID,
           version_id: this.$route.params.scrollVersionID,
-        })
-        .then(res => {
-            if (res.status === 200 && res.data.returned_info) {
-	            this.$router.push({
-                name: 'workbenchAddress',
-                params: {
-                  scrollID: this.$route.params.scrollID,
-                  scrollVersionID: this.$route.params.scrollVersionID,
-                  colID: this.$route.params.colID ? this.$route.params.colID : '~',
-                  imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-                  artID: res.data.returned_info
-                }
-              })
-              this.lock = false
-            }
+        }).then(res => {
+          if (res.status === 200 && res.data.returned_info) {
+            this.$router.push({
+              name: 'workbenchAddress',
+              params: {
+                scrollID: this.$route.params.scrollID,
+                scrollVersionID: this.$route.params.scrollVersionID,
+                colID: this.$route.params.colID ? this.$route.params.colID : '~',
+                imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
+                artID: res.data.returned_info,
+              },
+            })
+            this.lock = false
+          }
         })
       } else {
-	      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
           transaction: 'changeArtefactPoly',
           region_in_sqe_image: svgPolygonToWKT(mask),
           artefact_id: this.$route.params.artID,
           version_id: this.$route.params.scrollVersionID,
-	      })
-        .then(res => {
+        }).then(res => {
           if (res.status === 200 && res.data.artefact_id) {
             this.$router.push({
               name: 'workbenchAddress',
@@ -213,8 +209,8 @@ export default {
                 scrollVersionID: this.$route.params.scrollVersionID,
                 colID: this.$route.params.colID ? this.$route.params.colID : '~',
                 imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-                artID: res.data.artefact_id
-              }
+                artID: res.data.artefact_id,
+              },
             })
             this.lock = false
           }
@@ -240,10 +236,10 @@ export default {
     },
     toggleDrawingMode() {
       this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
-    }
+    },
   },
   mounted() {
-    // TODO maybe rethink this to avoid the case where 
+    // TODO maybe rethink this to avoid the case where
     // we have an artID but no imageID
 
     // Fetch image data if we have an imageID
@@ -258,10 +254,9 @@ export default {
     }
   },
   watch: {
-    '$route' (to, from) {
+    $route(to, from) {
       // Fetch images for image ID if it has changed
-      if (to.params.imageID !== '~' 
-        && to.params.imageID !== from.params.imageID) {
+      if (to.params.imageID !== '~' && to.params.imageID !== from.params.imageID) {
         this.fetchImages(to.params.imageID)
         this.artefact = undefined
         this.clipMask = undefined
@@ -281,7 +276,7 @@ export default {
         }
         this.lock = false
       }
-    }
+    },
   },
   filters: {
     formatImageType(value) {
@@ -293,44 +288,44 @@ export default {
         formattedString += ' RR'
       }
       return formattedString
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-  @import "~sass-vars";
+@import '~sass-vars';
 
-  .single-image-pane-menu {
-    width: 100%;
-    height: 32px; // Should be 30px, but 32px looks better
-    max-height: 32px; // Should be 30px, but 32px looks better
-    background: #dedede;
-    margin-left: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
-    margin-right: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
-  }
-  .fileSelector {
-    border-radius: 15px;
-    background: #E1E1D0;
-    padding: 10px;
-    z-index: 10;
-  }
-  .image-select-box > .image-select-entry {
-    padding: 5px;
-  }
-  .image-select-entry {
-    width: 100%;
-  }
-  .overlay-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-origin: top left;
-  }
-  .overlay-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-origin: top left;
-  }
+.single-image-pane-menu {
+  width: 100%;
+  height: 32px; // Should be 30px, but 32px looks better
+  max-height: 32px; // Should be 30px, but 32px looks better
+  background: #dedede;
+  margin-left: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
+  margin-right: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
+}
+.fileSelector {
+  border-radius: 15px;
+  background: #e1e1d0;
+  padding: 10px;
+  z-index: 10;
+}
+.image-select-box > .image-select-entry {
+  padding: 5px;
+}
+.image-select-entry {
+  width: 100%;
+}
+.overlay-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+.overlay-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
 </style>

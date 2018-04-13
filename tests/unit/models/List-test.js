@@ -3,20 +3,20 @@ import List from '~/models/List.js'
 const Model = List.getModel()
 
 describe('List', () => {
-
   let list
   beforeEach(() => {
-    list = new List({id: 1, name: 'test'})
+    list = new List({ id: 1, name: 'test' })
   })
 
   describe('instantiating', () => {
     it('should accept attributes and a list of items', () => {
-      list = new List({
-        id: 1, name: "test"
-      }, [
-        new Model(),
-        new Model()
-      ])
+      list = new List(
+        {
+          id: 1,
+          name: 'test',
+        },
+        [new Model(), new Model()]
+      )
       expect(list.id).to.equal(1)
       expect(list.length).to.equal(2)
     })
@@ -27,7 +27,6 @@ describe('List', () => {
   })
 
   describe('inserting models', () => {
-
     it('should error out if not receiving a model instance', () => {
       expect(() => {
         list.push({})
@@ -39,40 +38,39 @@ describe('List', () => {
     })
 
     it('should push items on the end of the others', () => {
-      const line = new Model({id: 1, name: 'test'})
-      list.push(new Model({id: 1, name: 'test'}))
-      list.push(line) 
+      const line = new Model({ id: 1, name: 'test' })
+      list.push(new Model({ id: 1, name: 'test' }))
+      list.push(line)
       expect(list.get(1)).to.equal(line)
     })
 
     it('should insert items at a specified index', () => {
-      const line = new Model({id: 1, name: 'test'})
-      list.push(new Model({id: 1, name: 'test'}))
-      list.push(new Model({id: 1, name: 'test'}))
+      const line = new Model({ id: 1, name: 'test' })
+      list.push(new Model({ id: 1, name: 'test' }))
+      list.push(new Model({ id: 1, name: 'test' }))
       list.insert(line, 1)
       expect(list.get(1)).to.equal(line)
     })
 
     it('should insert items at the end of the items if index is more than the length', () => {
-      const line = new Model({id: 1, name: 'test'})
-      list.push(new Model({id: 1, name: 'test'}))
-      list.push(new Model({id: 1, name: 'test'}))
+      const line = new Model({ id: 1, name: 'test' })
+      list.push(new Model({ id: 1, name: 'test' }))
+      list.push(new Model({ id: 1, name: 'test' }))
       list.insert(line, 3)
       expect(list.get(2)).to.equal(line)
     })
 
     it('should know how many items it has', () => {
-      list.push(new Model({id: 1, name: 'test'}))
-      list.push(new Model({id: 1, name: 'test'})) 
+      list.push(new Model({ id: 1, name: 'test' }))
+      list.push(new Model({ id: 1, name: 'test' }))
       expect(list.count()).to.equal(2)
     })
-
   })
 
   describe('removing models', () => {
     it('should delete line at a specified index', () => {
-      list.push(new Model({id: 1, name: 'test'}))
-      list.push(new Model({id: 1, name: 'test'})) 
+      list.push(new Model({ id: 1, name: 'test' }))
+      list.push(new Model({ id: 1, name: 'test' }))
       list.delete(0)
       expect(list.count()).to.equal(1)
     })
@@ -80,8 +78,8 @@ describe('List', () => {
 
   describe('sliceInto: creating new lists from partial lists', () => {
     beforeEach(() => {
-      [1, 2, 3, 4].forEach(id => {
-        list.push(new Model({id, name: `test_${id}`}))
+      ;[1, 2, 3, 4].forEach(id => {
+        list.push(new Model({ id, name: `test_${id}` }))
       })
     })
 
@@ -101,8 +99,8 @@ describe('List', () => {
 
   describe('find', () => {
     beforeEach(() => {
-      [1, 2, 3, 4].forEach(id => {
-        list.push(new Model({id, name: `test_${id}`}))
+      ;[1, 2, 3, 4].forEach(id => {
+        list.push(new Model({ id, name: `test_${id}` }))
       })
     })
 
@@ -114,8 +112,8 @@ describe('List', () => {
 
   describe('findIndex', () => {
     beforeEach(() => {
-      [1, 2, 3, 4].forEach(id => {
-        list.push(new Model({id, name: `test_${id}`}))
+      ;[1, 2, 3, 4].forEach(id => {
+        list.push(new Model({ id, name: `test_${id}` }))
       })
     })
 
@@ -124,13 +122,13 @@ describe('List', () => {
     })
 
     it('by model instance', () => {
-      const model = new Model({id: 5})
+      const model = new Model({ id: 5 })
       list.push(model)
       expect(list.findIndex(model)).to.equal(4)
     })
 
     it('by custom callback', () => {
-      expect(list.findIndex(model => (model.getID() === 1))).to.equal(0)
+      expect(list.findIndex(model => model.getID() === 1)).to.equal(0)
     })
   })
 

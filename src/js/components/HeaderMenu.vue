@@ -19,29 +19,24 @@ import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   computed: {
-    ...mapGetters(['username'])
+    ...mapGetters(['username']),
   },
 
   methods: {
-    ...mapMutations([
-      'setSessionID',
-      'setUsername',
-      'setUserID',
-    ]),
+    ...mapMutations(['setSessionID', 'setUsername', 'setUserID']),
     onLogout() {
       this.setSessionID('')
       this.setUserID('')
       this.setUsername('')
       this.$store.commit('logout')
-      this.$router.push({name: 'login'})
-    }
-  }
+      this.$router.push({ name: 'login' })
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-
-@import "~sass-vars";
+@import '~sass-vars';
 
 .header {
   height: #{$header};
@@ -55,9 +50,9 @@ export default {
   text-align: right;
 }
 
-h3, span {
+h3,
+span {
   color: #fff;
   line-height: calc(#{$header} - #{$spacer * 2});
 }
-
 </style>
