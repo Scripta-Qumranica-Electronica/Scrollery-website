@@ -75,9 +75,8 @@ describe('ColumnComponent', () => {
           })
           sinon.spy(e, 'preventDefault')
 
-          // request the next animation frame to ensure that the line
-          // has been rendered on the DOM so that we can set the range
-          requestAnimationFrame(() => {
+          // set a timeout to give browser time to render
+          setTimeout(() => {
             // grab the text column
             const { element } = wrapper.find('.text-col')
 
@@ -90,7 +89,7 @@ describe('ColumnComponent', () => {
 
             expect(vm.dialogVisible).to.equal(true)
             done()
-          })
+          }, 20)
         })
       })
     })
