@@ -7,6 +7,11 @@
     </el-col>
     <el-col :span="20">
       <div class="right">
+        <i 
+          v-show="working > 0" 
+          class="fa fa-spinner fa-spin fa-fw" 
+          aria-hidden="true"
+          style="color: white"></i>
         <span> {{ $i18n.str('User.LoggedInMessage', {name: username}) }}</span>
         <el-button @click="onLogout">{{ $i18n.str('Logout') }}</el-button>
       </div>
@@ -19,7 +24,7 @@ import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   computed: {
-    ...mapGetters(['username'])
+    ...mapGetters(['username','working'])
   },
 
   methods: {

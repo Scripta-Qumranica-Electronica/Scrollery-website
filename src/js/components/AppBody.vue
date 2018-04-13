@@ -79,17 +79,23 @@ export default {
   created() {
     // Create and populate the menu corpus model.
     this.menuCorpus = new MenuCorpus(this.$store.state.sessionID, this.$store.state.userID, this.$set)
+    this.$store.commit('addWorking')
     this.menuCorpus.populateCombinations()
     .then(res1 => {
+      this.$store.commit('delWorking')
       // Check if routing info exists and populate corpus model based on that
       if(this.$route.params.scrollVersionID !== '~') {
         if (this.$route.params.scrollID !== '~') {
           this.menuCorpus.populateColumnsOfScrollVersion(this.$route.params.scrollVersionID, this.$route.params.scrollID)
+          this.$store.commit('addWorking')
           this.menuCorpus.populateImagesOfScrollVersion(this.$route.params.scrollVersionID, this.$route.params.scrollID)
           .then(res2 => {
+            this.$store.commit('delWorking')
             if(this.$route.params.imageID !== '~') {
+              this.$store.commit('addWorking')
               this.menuCorpus.populateArtefactsofImage(this.$route.params.scrollVersionID, this.$route.params.imageID)
               .then(res3 => {
+                this.$store.commit('delWorking')
                 this.resetRouter()
               })
             } else {

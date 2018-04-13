@@ -249,8 +249,10 @@ export default {
           this.artefact = to.params.artID
           this.scrollVersionID = to.params.scrollVersionID
           if(!this.corpus.artefacts.itemWithID(this.artefact).mask) {
+            this.$store.commit('addWorking')
             this.corpus.artefacts.fetchMask(to.params.scrollVersionID, to.params.artID)
             .then(res => {
+              this.$store.commit('delWorking')
               this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
             })
           } else {

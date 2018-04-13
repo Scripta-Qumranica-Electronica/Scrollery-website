@@ -103,12 +103,16 @@
                 // in the corpus Object.
                 if (this.corpus.combinations.itemWithID(versionID)) {
                     this.corpus.combinations.itemWithID(versionID).images.forEach(image => {
+                        this.$store.commit('addWorking')
                         this.corpus.populateArtefactsofImage(versionID, image)
                         .then(res => {
+                            this.$store.commit('delWorking')
                             this.corpus.images.itemWithID(image).populateItems(image)
                             this.corpus.images.itemWithID(image).artefacts.forEach(artefact => {
+                                this.$store.commit('addWorking')
                                 this.corpus.artefacts.fetchMask(versionID, artefact)
                                 .then(res1 => {
+                                    this.$store.commit('delWorking')
                                     let selectedArtefact = this.corpus.artefacts.itemWithID(artefact)
                                     this.$set(selectedArtefact, 'image', image)
                                     this.$set(selectedArtefact, 'rect', wktParseRect(selectedArtefact.rect))
