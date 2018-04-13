@@ -77,7 +77,7 @@ class MenuObject {
    * @return {Array<Number>}       list of all items
    */
   items() {
-    return (this._itemList)
+    return (this._items)
   }
 
   /**
@@ -102,10 +102,6 @@ class MenuObject {
    */
   itemWithID(id) {
     return (this._items[id] || null)
-  }
-
-  items() {
-      return this._items
   }
 
   /**

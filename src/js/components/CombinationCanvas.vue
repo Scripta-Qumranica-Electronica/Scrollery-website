@@ -5,11 +5,12 @@
             @mousemove="mousemove"
             @mousedown="mousedown"
             ref="svgCanvas">
-            <artefact v-for="(artefact, index) in artefacts" 
-                :key="'combination-art-' + artefact.id" 
+            <artefact v-for="(artefact, index) in artefacts" v-if="artefact.side === 0"
+                :key="'combination-art-' + index" 
                 :artefact-data="artefact"
                 :base-d-p-i="baseDPI"
                 :index="index"
+                :corpus="corpus"
                 ></artefact>
         </svg>
     </div>
@@ -34,6 +35,9 @@
                 type: Number,
                 default: 1.0,
             },
+            corpus: {
+                type: Object,
+            }
         },
         components: {
             'artefact': Artefact
@@ -47,6 +51,7 @@
                 clickOrigin: undefined,
                 selectedArtefactIndex: undefined,
                 selectedArtefactLoc: undefined,
+                versionID: undefined,
             }
         },
         computed: {
@@ -64,7 +69,7 @@
             },
             svgCanvas() {
                 return this.$refs['svgCanvas']
-            }
+            },
         },
         methods: {
             setScrollDimensions(scrollID, versionID) {
@@ -93,22 +98,28 @@
                 this.loadFragments(scrollID, versionID)
             },
             loadFragments(scrollID, versionID) {
-                this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-                        transaction: 'getScrollArtefacts',
-                        scroll_id: scrollID,
-                        scroll_version_id: versionID,
-                        SESSION_ID: this.$store.getters.sessionID
-                    })
-                    .then(res => {
-                        if (res.status === 200 && res.data.results) {
-                            this.artefacts = res.data.results
-                            this.artefacts.forEach(artefact => {
-                                artefact.rect = wktParseRect(artefact.rect)
-                                artefact.poly = wktPolygonToSvg(artefact.poly, artefact.rect)
-                                artefact.matrix = dbMatrixToSVG(JSON.parse(artefact.matrix).matrix)
+                this.artefacts = []
+                // Most of this code should go into a convenience method
+                // in the corpus Object.
+                if (this.corpus.combinations.itemWithID(versionID)) {
+                    this.corpus.combinations.itemWithID(versionID).images.forEach(image => {
+                        this.corpus.populateArtefactsofImage(versionID, image)
+                        .then(res => {
+                            this.corpus.images.itemWithID(image).populateItems(image)
+                            this.corpus.images.itemWithID(image).artefacts.forEach(artefact => {
+                                this.corpus.artefacts.fetchMask(versionID, artefact)
+                                .then(res1 => {
+                                    let selectedArtefact = this.corpus.artefacts.itemWithID(artefact)
+                                    this.$set(selectedArtefact, 'image', image)
+                                    this.$set(selectedArtefact, 'rect', wktParseRect(selectedArtefact.rect))
+                                    this.$set(selectedArtefact, 'poly', wktPolygonToSvg(selectedArtefact.mask, selectedArtefact.rect))
+                                    this.$set(selectedArtefact, 'transformMatrix', dbMatrixToSVG(JSON.parse(selectedArtefact.transformMatrix).matrix))
+                                    this.artefacts.push(selectedArtefact)
+                                })
                             })
-                        }
+                        })
                     })
+                }
             },
             mousedown(event) {
                 if (event.target.nodeName === 'image') {
@@ -157,18 +168,12 @@
                 return pt.matrixTransform(this.svgCanvas.getScreenCTM().inverse());
             },
         },
-        // mounted() {
-        //     if (this.$route.params.scrollVersionID && this.$route.params.scrollID) {
-        //         this.artefacts = []
-        //         this.setScrollDimensions(this.$route.params.scrollID, this.$route.params.scrollVersionID)
-        //     }
-        // },
         watch: {
             '$route' (to, from) {
-                if (to.params.scrollVersionID && to.params.scrollID
+                if (to.params.scrollVersionID !== '~' && to.params.scrollID !== '~'
                     && (to.params.scrollVersionID !== from.params.scrollVersionID 
                     || to.params.scrollID !== from.params.scrollID)) {
-                    this.artefacts = []
+                    this.versionID = to.params.scrollVersionID
                     this.setScrollDimensions(to.params.scrollID, to.params.scrollVersionID)
                 }
             }

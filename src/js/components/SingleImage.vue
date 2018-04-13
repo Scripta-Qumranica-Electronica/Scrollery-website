@@ -1,3 +1,4 @@
+// TODO move menu into its own component
 <template>
   <div style="{width: 100%; height: 100%;}">
     <el-row class="single-image-pane-menu" :gutter="4" type="flex" justify="space-around">
@@ -225,24 +226,6 @@ export default {
       this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
     }
   },
-  // mounted() {
-
-  //   // Fetch image data if we have an imageID
-  //   if (this.$route.params.imageID) {
-  //     this.fetchImages(this.$route.params.imageID)
-  //     this.firstClipMask = this.clipMask = undefined
-  //     this.artefact = undefined
-  //   }
-  //   // Fetch artefact data if we have an artID
-  //   if (this.$route.params.artID) {
-  //     this.artefact = this.$route.params.artID
-  //     this.scrollVersionID = this.$route.params.scrollVersionID
-  //     this.corpus.artefacts.fetchMask(this.scrollVersionID, this.artefactID)
-  //     .then(res => {
-  //       this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
-  //     })
-  //   }
-  // },
   watch: {
     '$route' (to, from) {
       // TODO maybe rethink this to avoid the case where 

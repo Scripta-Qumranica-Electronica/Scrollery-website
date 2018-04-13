@@ -44,6 +44,7 @@ class MenuArtefacts extends MenuObject {
 
               this.set(this._items[artefactID], 'mask', res.data.results[0].poly)
               this.set(this._items[artefactID], 'transformMatrix', res.data.results[0].transform_matrix)
+              this.set(this._items[artefactID], 'rect', res.data.results[0].rect)
               resolve(res.data.results)
             }
         })

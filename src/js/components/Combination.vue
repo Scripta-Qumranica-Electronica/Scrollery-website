@@ -15,7 +15,9 @@
         </el-col>
     </el-row>
     <div class="combination-panel-container">
-        <combination-canvas :global-scale="globalScale"></combination-canvas>
+        <combination-canvas 
+            :global-scale="globalScale"
+            :corpus="corpus"></combination-canvas>
     </div>
   </div>
 </template>
@@ -25,6 +27,11 @@ import CombinationCanvas from './CombinationCanvas.vue'
 export default {
     components: {
         'combination-canvas': CombinationCanvas,
+    },
+    props: {
+        corpus: {
+            type: Object,
+        }
     },
     data() {
         return {

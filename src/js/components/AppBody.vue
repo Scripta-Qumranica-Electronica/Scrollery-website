@@ -35,7 +35,9 @@
             </split-pane>
           </template>
           <template slot="paneR">
-            <combination class="combination-pane"></combination>
+            <combination 
+              class="combination-pane"
+              :corpus="menuCorpus"></combination>
           </template>
         </split-pane>
       </div>
@@ -88,47 +90,52 @@ export default {
             if(this.$route.params.imageID !== '~') {
               this.menuCorpus.populateArtefactsofImage(this.$route.params.scrollVersionID, this.$route.params.imageID)
               .then(res3 => {
-
-                // Trigger a router change here, so we don't need extra mount()
-                // functions in all of our vue components.
-                const scrollID = this.$route.params.scrollID
-                const scrollVersionID = this.$route.params.scrollVersionID
-                const colID = this.$route.params.colID
-                const imageID = this.$route.params.imageID
-                const artID = this.$route.params.artID
-
-                this.$router.push({name: 'workbenchAddress',
-                  params: {
-                    scrollID: '~',
-                    scrollVersionID: '~',
-                    colID: '~',
-                    imageID: '~',
-                    artID: '~'
-                  }
-                }, () => {
-                  // I don't know why the listeners don't pick up on the 
-                  // router change unless I give a tiny delay.
-                  setTimeout(() => {
-                    // Load back the initial values
-                    this.$router.push({
-                      name: 'workbenchAddress',
-                      params: {
-                        scrollID: scrollID,
-                        scrollVersionID: scrollVersionID,
-                        colID: colID,
-                        imageID: imageID,
-                        artID: artID
-                      }
-                    })
-                  },5)
-                })
-
+                this.resetRouter()
               })
+            } else {
+              this.resetRouter()
             }
           })
         }
       }
     })
+  },
+  methods: {
+    resetRouter() {
+      // Trigger a router change here, so we don't need extra mount()
+      // functions in all of our vue components.
+      const scrollID = this.$route.params.scrollID
+      const scrollVersionID = this.$route.params.scrollVersionID
+      const colID = this.$route.params.colID
+      const imageID = this.$route.params.imageID
+      const artID = this.$route.params.artID
+
+      this.$router.push({name: 'workbenchAddress',
+        params: {
+          scrollID: '~',
+          scrollVersionID: '~',
+          colID: '~',
+          imageID: '~',
+          artID: '~'
+        }
+      }, () => {
+        // I don't know why the listeners don't pick up on the 
+        // router change unless I give a tiny delay.
+        setTimeout(() => {
+          // Load back the initial values
+          this.$router.push({
+            name: 'workbenchAddress',
+            params: {
+              scrollID: scrollID,
+              scrollVersionID: scrollVersionID,
+              colID: colID,
+              imageID: imageID,
+              artID: artID
+            }
+          })
+        },5)
+      })
+    }
   }
 }
 </script>
