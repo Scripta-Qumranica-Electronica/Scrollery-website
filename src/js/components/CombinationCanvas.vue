@@ -157,12 +157,12 @@
                 return pt.matrixTransform(this.svgCanvas.getScreenCTM().inverse());
             },
         },
-        mounted() {
-            if (this.$route.params.scrollVersionID && this.$route.params.scrollID) {
-                this.artefacts = []
-                this.setScrollDimensions(this.$route.params.scrollID, this.$route.params.scrollVersionID)
-            }
-        },
+        // mounted() {
+        //     if (this.$route.params.scrollVersionID && this.$route.params.scrollID) {
+        //         this.artefacts = []
+        //         this.setScrollDimensions(this.$route.params.scrollID, this.$route.params.scrollVersionID)
+        //     }
+        // },
         watch: {
             '$route' (to, from) {
                 if (to.params.scrollVersionID && to.params.scrollID

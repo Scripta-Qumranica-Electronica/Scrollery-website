@@ -33,8 +33,6 @@ class MenuCorpus {
     this.columns = new MenuColumns(this.sessionID, this._user, this._set)
     this.images = new MenuImages(this.sessionID, this._user, this._set)
     this.artefacts = new MenuArtefacts(this.sessionID, this._user, this._set)
-
-    this.populateCombinations()
   }
 
   populateCombinations() {
@@ -79,22 +77,6 @@ class MenuCorpus {
   }
 
   populateArtefactsofImage(scrollVersionID, imageID) {
-    return new Promise((resolve, reject) => {
-      this.artefacts.populate({image_id: imageID, version_id: scrollVersionID})
-      .then(res => {
-        let artefactIDArray = []
-        res.forEach(artefact => {
-          artefactIDArray.push(artefact[this.artefacts.itemIDKey])
-        })
-        if (!this.images.itemAtIndex(imageID) || artefactIDArray !== this.images.itemAtIndex(imageID).artefacts) {
-          this.images.changeItemValue(imageID, 'artefacts', artefactIDArray)
-        }
-        resolve(res)
-      })
-    })
-  }
-
-  fetchArtefactData(scrollVersionID, artefactID) {
     return new Promise((resolve, reject) => {
       this.artefacts.populate({image_id: imageID, version_id: scrollVersionID})
       .then(res => {

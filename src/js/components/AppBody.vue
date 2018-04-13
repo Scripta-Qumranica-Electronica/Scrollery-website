@@ -66,7 +66,7 @@ export default {
     return {
       keepMenuOpen: false,
       mouseOver: false,
-      menuCorpus: new MenuCorpus(this.$store.state.sessionID, this.$store.state.userID, this.$set),
+      menuCorpus: MenuCorpus,
     }
   },
   computed: {
@@ -74,6 +74,62 @@ export default {
       return this.mouseOver || this.keepMenuOpen
     },
   },
+  created() {
+    // Create and populate the menu corpus model.
+    this.menuCorpus = new MenuCorpus(this.$store.state.sessionID, this.$store.state.userID, this.$set)
+    this.menuCorpus.populateCombinations()
+    .then(res1 => {
+      // Check if routing info exists and populate corpus model based on that
+      if(this.$route.params.scrollVersionID !== '~') {
+        if (this.$route.params.scrollID !== '~') {
+          this.menuCorpus.populateColumnsOfScrollVersion(this.$route.params.scrollVersionID, this.$route.params.scrollID)
+          this.menuCorpus.populateImagesOfScrollVersion(this.$route.params.scrollVersionID, this.$route.params.scrollID)
+          .then(res2 => {
+            if(this.$route.params.imageID !== '~') {
+              this.menuCorpus.populateArtefactsofImage(this.$route.params.scrollVersionID, this.$route.params.imageID)
+              .then(res3 => {
+
+                // Trigger a router change here, so we don't need extra mount()
+                // functions in all of our vue components.
+                const scrollID = this.$route.params.scrollID
+                const scrollVersionID = this.$route.params.scrollVersionID
+                const colID = this.$route.params.colID
+                const imageID = this.$route.params.imageID
+                const artID = this.$route.params.artID
+
+                this.$router.push({name: 'workbenchAddress',
+                  params: {
+                    scrollID: '~',
+                    scrollVersionID: '~',
+                    colID: '~',
+                    imageID: '~',
+                    artID: '~'
+                  }
+                }, () => {
+                  // I don't know why the listeners don't pick up on the 
+                  // router change unless I give a tiny delay.
+                  setTimeout(() => {
+                    // Load back the initial values
+                    this.$router.push({
+                      name: 'workbenchAddress',
+                      params: {
+                        scrollID: scrollID,
+                        scrollVersionID: scrollVersionID,
+                        colID: colID,
+                        imageID: imageID,
+                        artID: artID
+                      }
+                    })
+                  },5)
+                })
+
+              })
+            }
+          })
+        }
+      }
+    })
+  }
 }
 </script>
 

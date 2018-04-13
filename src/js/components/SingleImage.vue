@@ -144,7 +144,7 @@ export default {
   },
   methods: {
     fetchImages(id) {
-      this.filenames = this.corpus.images.itemWithID(this.$route.params.imageID).getItems()
+      this.filenames = this.corpus.images.itemWithID(id).getItems()
       for (const key in this.filenames) {
         if (this.filenames[key].isMaster) {
           this.$set(this.imageSettings, key, {visible: true, opacity: 1.0})
@@ -225,28 +225,29 @@ export default {
       this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
     }
   },
-  mounted() {
-    // TODO maybe rethink this to avoid the case where 
-    // we have an artID but no imageID
+  // mounted() {
 
-    // Fetch image data if we have an imageID
-    if (this.$route.params.imageID) {
-      this.fetchImages(this.$route.params.imageID)
-      this.firstClipMask = this.clipMask = undefined
-      this.artefact = undefined
-    }
-    // Fetch artefact data if we have an artID
-    if (this.$route.params.artID) {
-      this.artefact = this.$route.params.artID
-      this.scrollVersionID = this.$route.params.scrollVersionID
-      this.corpus.artefacts.fetchMask(this.scrollVersionID, this.artefactID)
-      .then(res => {
-        this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
-      })
-    }
-  },
+  //   // Fetch image data if we have an imageID
+  //   if (this.$route.params.imageID) {
+  //     this.fetchImages(this.$route.params.imageID)
+  //     this.firstClipMask = this.clipMask = undefined
+  //     this.artefact = undefined
+  //   }
+  //   // Fetch artefact data if we have an artID
+  //   if (this.$route.params.artID) {
+  //     this.artefact = this.$route.params.artID
+  //     this.scrollVersionID = this.$route.params.scrollVersionID
+  //     this.corpus.artefacts.fetchMask(this.scrollVersionID, this.artefactID)
+  //     .then(res => {
+  //       this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
+  //     })
+  //   }
+  // },
   watch: {
     '$route' (to, from) {
+      // TODO maybe rethink this to avoid the case where 
+      // we have an artID but no imageID
+
       // Fetch images for image ID if it has changed
       if (to.params.imageID !== '~' 
         && to.params.imageID !== from.params.imageID) {
@@ -264,7 +265,14 @@ export default {
         } else {
           this.artefact = to.params.artID
           this.scrollVersionID = to.params.scrollVersionID
-          this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
+          if(!this.corpus.artefacts.itemWithID(this.artefact).mask) {
+            this.corpus.artefacts.fetchMask(to.params.scrollVersionID, to.params.artID)
+            .then(res => {
+              this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
+            })
+          } else {
+            this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
+          }
         }
         this.lock = false
       }

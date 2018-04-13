@@ -36,16 +36,16 @@ export default {
             selectedColumnID: undefined,
         }
     },
-    created() {
-        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-            transaction: 'getCombs',
-            user: this.$store.getters.userID,
-            SESSION_ID: this.$store.getters.sessionID
-        })
-        .then(res => {
-            this.combinations = res.data.results
-        })
-    },
+    // created() {
+    //     this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+    //         transaction: 'getCombs',
+    //         user: this.$store.getters.userID,
+    //         SESSION_ID: this.$store.getters.sessionID
+    //     })
+    //     .then(res => {
+    //         this.combinations = res.data.results
+    //     })
+    // },
     methods: {
         selectCombination() {
             this.$post('resources/cgi-bin/scrollery-cgi.pl', {
