@@ -88,7 +88,10 @@ class MenuImages {
     constructor() {
         this.items = {
             2: {
-                name: 'test'
+                name: 'test',
+                populateItems: () => {
+                    return 'ok'
+                },
             }
         }
     }
