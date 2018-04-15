@@ -328,7 +328,8 @@ SELECT 	SQE_image.filename AS filename,
 		  SQE_image.is_master,
 		  SQE_image.native_width AS width,
 		  SQE_image.native_height AS height,
-		  image_urls.url AS url
+		  image_urls.url AS url,
+		  image_urls.suffix AS suffix
 FROM SQE_image
 	JOIN image_urls USING(image_urls_id)
 	JOIN edition_catalog USING(edition_catalog_id)

@@ -1,27 +1,66 @@
+import { Record } from 'immutable'
+
 /**
+ * Default values for a new sign object
  * 
- * An image is comprised of all data relevant to a single actual image.
+ * @static
+ * @constant
+ */
+const defaults = {
+  url: '',
+  filename: '',
+  width: 0,
+  height: 0,
+  dpi: 0,
+  type: 0,
+  wavelengthStart: 0,
+  wavelengthEnd: 0,
+  isMaster: 0,
+  suffix: '',
+  editionSide: 0,
+}
+
+/**
+ * Manage all the data related to a sign
+ * 
+ * Signs are immutable, and any mutations create new signs
  * 
  * @class
- */ 
-class Image {
-  constructor(url, filename, width, height, dpi, type, wavelengthStart, wavelengthEnd, isMaster, suffix, editionSide) {
-    this.url = url
-    this.filename = filename
-    this.width = width
-    this.height = height
-    this.dpi = dpi
-    this.type = type
-    this.wavelengthStart = wavelengthStart
-    this.wavelengthEnd = wavelengthEnd
-    this.isMaster = isMaster
-    this.suffix = suffix
-    this.editionSide = editionSide
+ * @extends Record
+ */
+export default class Image extends Record(defaults) {
+
+  constructor(attrs) {
+    super(attrs)
+  }
+
+  /**
+   * @public
+   * @instance
+   * 
+   * @return {string} the sign Id
+   */
+  getID() {
+    return this.id
+  }
+
+  /**
+   * @public
+   * @instance
+   * 
+   * @param {object} attrs A set of attributes to apply to the copy
+   * @return {Sign}        The sign with the new attributes applied
+   */
+  extend(attrs = {}) {
+    attrs = {
+      ...this.toJS(), // only enumerable, own properties
+      ...attrs
+    }
+
+    return new Image(attrs)
   }
 
   getAddress() {
     return `${this.url}${this.filename}/`
   }
 }
-
-export default Image

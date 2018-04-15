@@ -1,6 +1,5 @@
-import { OrderedMap } from 'immutable'
-import Model from './Model.js'
-import Comp from './Comp.js';
+import { OrderedMap, Record } from 'immutable'
+import axios from 'axios'
 
 /**
  * A base class for lists of models. Mainly, this provides an interface to
@@ -15,13 +14,54 @@ class MapList {
    * @param {object={}} [attributes] List attributes 
    * @param {array=[]}  [items]      An initial array of items for the list 
    */
-  constructor(attributes = {}, items = {}) {
-
+  constructor(sessionID, idKey, ajaxPayload, model, attributes = {}) {
+    this._ajaxPayload = Object.assign({}, ajaxPayload, {SESSION_ID: sessionID})
     // todo: safety to ensure props not overwritten
-    Object.assign(this, {timestamp: Date.now(), name: ''}, attributes)
+    Object.assign(this, {timestamp: Date.now()}, attributes)
+    this.idKey = idKey
+    this._hash = undefined
+    this._items = OrderedMap()
+    this.model = model || Record
+  }
 
-    this._items = OrderedMap(items, (key, value) => {
-      return new this.getModel(value)
+  populate(customPayload = {}) {
+    let payload = Object.assign(
+      {}, 
+      this._ajaxPayload, 
+      customPayload
+    )
+
+    return new Promise((resolve, reject) => {
+      try {
+        axios.post('resources/cgi-bin/scrollery-cgi.pl', payload)
+        .then(res => {
+          if (res.status === 200 && res.data.results) {
+
+            // We can store hashes for the returned data
+            // in the future, so we can avoid unnecessary
+            // data transmission.
+            this._hash = res.data.hash
+
+            // Note to self: if you load the data into a 2d array:
+            // [[key1, value1],[key2,[value2]] the keys can be
+            // loaded into an OrderedMap as integers.  If you use
+            // an Object {key1: value1, key2: value2}, then the
+            // keys are converted to strings.
+            let results = []
+            res.data.results.forEach(item => {
+              if (!results[item.version_id] || results[item.version_id] !== item) {
+                const record = new this.model(item)
+                results.push([item[this.idKey], record])
+              }
+            })
+
+            this._items = this._items.merge(results)
+            resolve(res.data.results)
+          }
+        })
+      } catch (err) {
+          reject(err);
+      }
     })
   }
 
@@ -40,7 +80,6 @@ class MapList {
   }
 
   /**
-
    * @returns {Record}  the record class itself
    */
   static getModel() {
@@ -130,6 +169,17 @@ class MapList {
    */
   set(key, value) {
     this._items = this._items.set(key, value)
+  }
+
+    /**
+   * @public 
+   * @instance
+   * 
+   * @param {Object} map the map to merge into this object 
+   * 
+   */
+  merge(map) {
+    this._items = this._items.merge(map)
   }
 
   /**

@@ -54,6 +54,7 @@ import Editor from './editor/Editor.vue'
 import Combination from './Combination.vue'
 
 import MenuCorpus from '~/models/MenuCorpus.js'
+import Corpus from '~/models/Corpus.js'
 
 export default {
   components: {
@@ -69,6 +70,7 @@ export default {
       keepMenuOpen: false,
       mouseOver: false,
       menuCorpus: MenuCorpus,
+      corpus: Corpus,
     }
   },
   computed: {
@@ -77,6 +79,17 @@ export default {
     },
   },
   created() {
+    this.corpus = new Corpus(this.$store.state.sessionID, this.$store.state.userID)
+    this.corpus.populateCombinations()
+    .then(res => {
+      console.log(this.corpus.combinations.get(808))
+      this.corpus.populateImageReferencesOfCombination(808)
+      .then(res1 => {
+        console.log(this.corpus.imageReferences.get(34774))
+        console.log(this.corpus.images.get(7373))
+      })
+    })
+
     // Create and populate the menu corpus model.
     this.menuCorpus = new MenuCorpus(this.$store.state.sessionID, this.$store.state.userID, this.$set)
     this.$store.commit('addWorking')

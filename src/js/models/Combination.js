@@ -24,7 +24,7 @@ const defaults = {
  * @class
  * @extends Record
  */
-export default class Comp extends Record(defaults) {
+export default class Combination extends Record(defaults) {
 
   constructor(attrs) {
     super(attrs)
