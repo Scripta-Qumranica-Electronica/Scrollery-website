@@ -15,7 +15,7 @@
 
     <!-- editing panes -->
     <div id="editing-window" :class='{"open": menuOpen}'>
-      <header-menu></header-menu>
+      <header-menu :corpus="menuCorpus"></header-menu>
       
       <!-- We currently use two nested "split-panes" to hold the individual components.
       Perhaps update to some more advanced system to manage organization

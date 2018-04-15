@@ -2,6 +2,8 @@ import MenuCombinations from './MenuCombinations.js'
 import MenuColumns from './MenuColumns.js'
 import MenuImages from './MenuImages.js'
 import MenuArtefacts from './MenuArtefacts.js'
+import Corpus from './Corpus.js'
+import Comp from './Comp.js'
 
 /* TODO I ignore this for testing until I decide on
  * a set model.  Write tests when that has been
@@ -33,12 +35,32 @@ class MenuCorpus {
     this.columns = new MenuColumns(this.sessionID, this._user, this._set)
     this.images = new MenuImages(this.sessionID, this._user, this._set)
     this.artefacts = new MenuArtefacts(this.sessionID, this._user, this._set)
+
+    this.corpus = undefined
   }
 
   populateCombinations() {
     return new Promise((resolve, reject) => {
       this.combinations.populate()
       .then(res => {
+        // Note to self: if you load the data into and array:
+        // [[key1, value1],[key2,[value2]] the keys can be
+        // loaded into an OrderedMap as integers.  If you use
+        // an Object {key1: value1, key2: value2}, then the
+        // keys are converted to strings.
+        let results = []
+        res.forEach(item => {
+          if (!results[item.version_id] || results[item.version_id] !== item) {
+            const record = new Comp(item)
+            results.push([item.version_id, record])
+          }
+        })
+        this.corpus = new Corpus(
+        {
+          name: 'SQE corpus',
+          id: this.user
+        },
+        results)
         resolve(res)
       })
     }) 

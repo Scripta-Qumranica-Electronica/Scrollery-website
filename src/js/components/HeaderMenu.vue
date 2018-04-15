@@ -1,11 +1,20 @@
 <template>
   <el-row class="header" type="flex" justify="space-between">
-    <el-col :span="4">
+    <el-col :span="8">
       <div>
           <span>SQE</span>
+          <span>{{scrolleryVersion}}</span>
       </div>
     </el-col>
-    <el-col :span="20">
+    <el-col :span="4">
+      <div class="right">
+          <span>{{corpus.corpus 
+                    && corpus.corpus.get(scrollVersionID) 
+                    ? corpus.corpus.get(scrollVersionID).name 
+                    : 'No scroll selected'}}</span>
+      </div>
+    </el-col>
+    <el-col :span="12">
       <div class="right">
         <i 
           v-show="working > 0" 
@@ -21,10 +30,22 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
+import sqeManifest from '../../../sqe-manifest.json'
 
 export default {
+  props: {
+    corpus: Object,
+  },
+
+  data() {
+    return {
+      scrolleryVersion: sqeManifest.version,
+      scrollVersionID: this.$route.params.scrollVersionID >>> 0,
+    }
+  },
+
   computed: {
-    ...mapGetters(['username','working'])
+    ...mapGetters(['username','working']),
   },
 
   methods: {
@@ -39,6 +60,13 @@ export default {
       this.setUsername('')
       this.$store.commit('logout')
       this.$router.push({name: 'login'})
+    }
+  },
+
+  watch: {
+    '$route'(to, from) {
+      if (to.params.scrollVersionID !== from.params.scrollVersionID)
+      this.scrollVersionID = to.params.scrollVersionID >>> 0
     }
   }
 }
