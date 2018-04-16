@@ -10,8 +10,8 @@ const defaults = {
   name: '',
   scroll_id: 0,
   scroll_version_id: 0,
-  columns: [],
-  images: [],
+  cols: [],
+  imageReferences: [],
   artefacts: [],
   rois: []
 }

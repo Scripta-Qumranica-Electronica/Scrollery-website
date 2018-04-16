@@ -24,11 +24,12 @@ class MapList {
     this.model = model || Record
   }
 
-  populate(customPayload = {}) {
+  populate(customPayload = {}, scrollVersionID = undefined) {
     let payload = Object.assign(
       {}, 
       this._ajaxPayload, 
-      customPayload
+      customPayload,
+      scrollVersionID && {scroll_version_id: scrollVersionID}
     )
 
     return new Promise((resolve, reject) => {
@@ -49,7 +50,7 @@ class MapList {
             // keys are converted to strings.
             let results = []
             res.data.results.forEach(item => {
-              if (!results[item.version_id] || results[item.version_id] !== item) {
+              if (!results[this.idKey] || results[this.idKey] !== item) {
                 const record = new this.model(item)
                 results.push([item[this.idKey], record])
               }
@@ -100,7 +101,7 @@ class MapList {
    * @public 
    * @instance
    * 
-   * @param {number} key the item to retrieve 
+   * @param {number} key of the item to retrieve 
    * 
    * @return {Model}       the Model object
    */
@@ -239,8 +240,21 @@ class MapList {
    * 
    * @returns {Object} the items
    */
-  items() {
+  jsItems() {
     return this._items.toJS()
+  }
+
+  /**
+   * Deep copy of the items map as a plain Object
+   * 
+   * @returns {Object} the items
+   */
+  getItems() {
+    return this._items
+  }
+
+  keys() {
+    return this._items.keySeq().toArray()
   }
 }
 

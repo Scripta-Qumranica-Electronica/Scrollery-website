@@ -1,6 +1,8 @@
 import Combinations from './Combinations.js'
 import ImageReferences from './imageReferences.js'
+import Cols from './Cols.js'
 import Images from './Images.js'
+import Artefacts from './Artefacts.js'
 import axios from 'axios'
 
 /* TODO I ignore this for testing until I decide on
@@ -17,7 +19,7 @@ import axios from 'axios'
  * 
  * @class
  */
-class Corpus {
+export default class Corpus {
 
   /**
    * @param {post}          an instance of Axios $post.
@@ -35,13 +37,18 @@ class Corpus {
 
     this.combinations = new Combinations(
       this._user,
-      this._sessionID,
-      'version_id'
+      this._sessionID
     )
     this.imageReferences = new ImageReferences(
       this._sessionID
     )
+    this.cols = new Cols(
+      this._sessionID
+    )
     this.images = new Images(
+      this._sessionID
+    )
+    this.artefacts = new Artefacts(
       this._sessionID
     )
   }
@@ -55,91 +62,87 @@ class Corpus {
     }) 
   }
 
+  populateColumnsOfCombination(scrollID, scrollVersionID) {
+    return new Promise((resolve, reject) => {
+      this.cols.populate({combID: scrollID}, scrollVersionID)
+      .then(res => {
+        scrollVersionID = scrollVersionID >>> 0
+        let cols = []
+        res.forEach(item => {
+          cols.push(item[this.cols.idKey])
+        })
+        let combinationRecord = this.combinations.get(scrollVersionID).toJS()
+        combinationRecord.cols = cols
+        this.combinations.set(scrollVersionID, new this.combinations.model(combinationRecord))
+        console.log(combinationRecord)
+        resolve(res)
+      })
+    }) 
+  }
+
   populateImageReferencesOfCombination(scrollVersionID) {
     return new Promise((resolve, reject) => {
-      this.imageReferences.populate({combID: scrollVersionID})
+      this.imageReferences.populate({combID: scrollVersionID}, scrollVersionID)
       .then(res => {
+        scrollVersionID = scrollVersionID >>> 0
+        let imageRefs = []
         res.forEach(item => {
-          this.populateImagesOfCombination(item.id)
-          .then(res1 => {
-            let images = []
-            res1.forEach(image => {
-              images.push(image.sqe_image_id)
-            })
-            let record = this.imageReferences.get(item.id).toJS()
-            record.images = images
-            this.imageReferences.set(item.id, new this.imageReferences.model(record))
-            resolve(res)
-          })
+          imageRefs.push(item.id)
         })
-      })
-    }) 
-  }
-
-  populateImagesOfCombination(imageReferenceID) {
-    return new Promise((resolve, reject) => {
-      this.images.populate({id: imageReferenceID})
-      .then(res => {
+        let combinationRecord = this.combinations.get(scrollVersionID).toJS()
+        combinationRecord.imageReferences = imageRefs
+        this.combinations.set(scrollVersionID, new this.combinations.model(combinationRecord))
         resolve(res)
       })
     }) 
   }
-  populateImages() {
+
+  populateImagesOfCombination(imageReferenceID, scrollVersionID) {
     return new Promise((resolve, reject) => {
-      this.images.populate(ajaxPayload)
+      this.images.populate({id: imageReferenceID}, scrollVersionID)
       .then(res => {
         resolve(res)
       })
     }) 
   }
 
-  populateColumnsOfScrollVersion(scrollVersionID, combinationID) {
+  populateImagesOfImageReference(imageReferenceID, scrollVersionID) {
     return new Promise((resolve, reject) => {
-      this.columns.populate({version_id: scrollVersionID, combID: combinationID})
+      this.images.populate({id: imageReferenceID}, scrollVersionID)
       .then(res => {
-        let columnIDArray = []
-        res.forEach(column => {
-          columnIDArray.push(column[this.columns.itemIDKey])
-        })
-        if (!this.combinations.itemAtIndex(scrollVersionID) || columnIDArray !== this.combinations.itemAtIndex(scrollVersionID).columns) {
-          this.combinations.changeItemValue(scrollVersionID, 'columns', columnIDArray)
-        }
-        resolve(res)
-      })
-    })
-  }
-
-  populateImagesOfScrollVersion(scrollVersionID, combinationID) {
-    return new Promise((resolve, reject) => {
-      this.images.populate({combID: combinationID})
-      .then(res => {
-        let imageIDArray = []
+        imageReferenceID = imageReferenceID >>> 0
+        let images = []
         res.forEach(image => {
-          imageIDArray.push(image[this.images.itemIDKey])
+          images.push(image[this.images.idKey])
         })
-        if (!this.combinations.itemAtIndex(scrollVersionID) || imageIDArray !== this.combinations.itemAtIndex(scrollVersionID).images) {
-          this.combinations.changeItemValue(scrollVersionID, 'images', imageIDArray)
-        }
+        let imageRefRecord = this.imageReferences.get(imageReferenceID).toJS()
+        imageRefRecord.images = images
+        this.imageReferences.set(imageReferenceID, new this.imageReferences.model(imageRefRecord))
         resolve(res)
       })
-    })
+    }) 
   }
 
-  populateArtefactsofImage(scrollVersionID, imageID) {
+  populateArtefactsOfImageReference(imageReferenceID, scrollVersionID) {
     return new Promise((resolve, reject) => {
-      this.artefacts.populate({image_id: imageID, version_id: scrollVersionID})
+      this.artefacts.populate({image_catalog_id: imageReferenceID}, scrollVersionID)
       .then(res => {
-        let artefactIDArray = []
+        scrollVersionID = scrollVersionID >>> 0
+        imageReferenceID = imageReferenceID >>> 0
+        let artefacts = []
         res.forEach(artefact => {
-          artefactIDArray.push(artefact[this.artefacts.itemIDKey])
+          artefacts.push(artefact[this.artefacts.idKey])
         })
-        if (!this.images.itemAtIndex(imageID) || artefactIDArray !== this.images.itemAtIndex(imageID).artefacts) {
-          this.images.changeItemValue(imageID, 'artefacts', artefactIDArray)
-        }
+        let imageRefRecord = this.imageReferences.get(imageReferenceID).toJS()
+        imageRefRecord.artefacts = artefacts
+        this.imageReferences.set(imageReferenceID, new this.imageReferences.model(imageRefRecord))
+
+        let combinationRecord = this.combinations.get(scrollVersionID).toJS()
+        combinationRecord.artefacts = [...new Set([...combinationRecord.artefacts ,...artefacts])]
+        this.combinations.set(scrollVersionID, new this.combinations.model(combinationRecord))
+
         resolve(res)
       })
-    })
+    }) 
   }
 }
-
-export default Corpus

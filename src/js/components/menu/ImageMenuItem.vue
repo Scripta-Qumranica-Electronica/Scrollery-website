@@ -1,12 +1,12 @@
 <template>
   <div class="clickable-menu-item">
     <span @click="selectImage">
-      {{corpus.images.itemWithID(imageID).institution}}: {{corpus.images.itemWithID(imageID).lvl1}}, {{corpus.images.itemWithID(imageID).lvl2}} {{corpus.images.itemWithID(imageID).side === 0 ? 'recto' : 'verso'}}
+      {{corpus.imageReferences.get(imageID).institution}}: {{corpus.imageReferences.get(imageID).lvl1}}, {{corpus.imageReferences.get(imageID).lvl2}} {{corpus.imageReferences.get(imageID).side === 0 ? 'recto' : 'verso'}}
     </span>
     <div class="children" v-show="open">
         <ul>
           <li @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
-          <li v-if="corpus.images.itemWithID(imageID).artefacts" v-for="artefact in corpus.images.itemWithID(imageID).artefacts" :key="'image-artefact-' + artefact">
+          <li v-if="corpus.imageReferences.get(imageID).artefacts" v-for="artefact in corpus.imageReferences.get(imageID).artefacts" :key="'image-artefact-' + artefact">
             <artefact-menu-item 
               :artefact-i-d="artefact" 
               :scroll-i-d="scrollID"
@@ -83,8 +83,10 @@ export default {
       if (this.open) {
         this.setRouter()
         if (!this.children.length) {
-          this.corpus.populateArtefactsofImage(this.scrollVersionID, this.imageID)
-          this.corpus.images.itemWithID(this.imageID).populateItems(this.imageID)
+          this.corpus.populateArtefactsOfImageReference(this.imageID, this.scrollVersionID)
+          
+          // this.corpus.populateArtefactsofImage(this.scrollVersionID, this.imageID)
+          // this.corpus.images.get(this.imageID).populateItems(this.imageID)
         }
       }
     },

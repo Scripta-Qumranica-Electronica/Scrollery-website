@@ -1,5 +1,5 @@
 <template>
-  <span class="clickable-menu-item" @click="setRouter">Artefact: {{corpus.artefacts.itemWithID(artefactID).name}}</span>
+  <span class="clickable-menu-item" @click="setRouter">Artefact: {{corpus.artefacts.get(artefactID).name}}</span>
 </template>
 
 <script>
@@ -29,29 +29,46 @@ export default {
   },
   methods: {
     setRouter() {
+      const params = this.$route.params
+      if (params.scrollID !== this.scrollID 
+        || params.scrollVersionID !== this.scrollVersionID
+        || params.imageID !== this.imageID
+        || params.artID !== this.artefactID) {
+        this.$router.push({
+          name: 'workbenchAddress',
+          params: {
+            scrollID: this.scrollID,
+            scrollVersionID: this.scrollVersionID,
+            colID: '~',
+            imageID: this.imageID,
+            artID: this.artefactID
+          }
+        })
+      }
       // We should tell our corpus object to try fetching the artefact every
       // time it is clicked in the menu.  The object should eventually have a hash
       // associated with it, and should be prepared to recieve a message back
       // saying "nothing changed" and it can leave the artefact alone.
-      this.corpus.artefacts.fetchMask(this.scrollVersionID, this.artefactID)
-      .then(res => {
-        const params = this.$route.params
-        if (params.scrollID !== this.scrollID 
-          || params.scrollVersionID !== this.scrollVersionID
-          || params.imageID !== this.imageID
-          || params.artID !== this.artefactID) {
-          this.$router.push({
-            name: 'workbenchAddress',
-            params: {
-              scrollID: this.scrollID,
-              scrollVersionID: this.scrollVersionID,
-              colID: '~',
-              imageID: this.imageID,
-              artID: this.artefactID
-            }
-          })
-        }
-      })
+
+      // this.corpus.artefacts.get(this.artefactID).fetchMask(this.scrollVersionID, this.artefactID)
+      // .then(res => {
+      //   const params = this.$route.params
+      //   if (params.scrollID !== this.scrollID 
+      //     || params.scrollVersionID !== this.scrollVersionID
+      //     || params.imageID !== this.imageID
+      //     || params.artID !== this.artefactID) {
+      //     this.$router.push({
+      //       name: 'workbenchAddress',
+      //       params: {
+      //         scrollID: this.scrollID,
+      //         scrollVersionID: this.scrollVersionID,
+      //         colID: '~',
+      //         imageID: this.imageID,
+      //         artID: this.artefactID
+      //       }
+      //     })
+      //   }
+      // })
     },
   },
 }

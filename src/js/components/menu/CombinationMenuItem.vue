@@ -11,24 +11,26 @@
         <ul>
           <li><span>columns</span></li>
           <li 
-            v-for="column in corpus.combinations.itemWithID(versionID).columns" 
+            v-if="corpus.combinations.get(scrollVersionID)"
+            v-for="column in corpus.combinations.get(scrollVersionID).cols" 
             :key="'column-' + column">
             <column-menu-item 
-              :column-i-d="corpus.columns.itemWithID(column).id"
-              :name="corpus.columns.itemWithID(column).name"
+              :column-i-d="corpus.cols.get(column).id"
+              :name="corpus.cols.get(column).name"
               :scroll-i-d="scrollID"
-              :scroll-version-i-d="versionID"
+              :scroll-version-i-d="scrollVersionID"
               :corpus="corpus">
             </column-menu-item>
           </li>
           <li><span>images</span></li>
           <li 
-            v-for="image in corpus.combinations.itemWithID(versionID).images" 
+            v-if="corpus.combinations.get(scrollVersionID)"
+            v-for="image in corpus.combinations.get(scrollVersionID).imageReferences" 
             :key="'menu-image-' + image">
             <image-menu-item 
               :image-i-d="image"
               :scroll-i-d="scrollID"
-              :scroll-version-i-d="versionID"
+              :scroll-version-i-d="scrollVersionID"
               :corpus="corpus">
             </image-menu-item>
           </li>
@@ -45,12 +47,11 @@ import ImageMenuItem from './ImageMenuItem.vue'
 
 export default {
   props: {
-    count: 0,
     name: "",
     scrollDataID: 0,
     scrollID: 0,
     version: 0,
-    versionID: 0,
+    scrollVersionID: 0,
     user: 0,
     menuType: '',
     locked: "",
@@ -85,7 +86,7 @@ export default {
           name: 'workbenchAddress',
           params: {
             scrollID: this.scrollID, 
-            scrollVersionID: this.versionID,
+            scrollVersionID: this.scrollVersionID,
             imageID: '~',
             colID: '~',
             artID: '~'
@@ -98,8 +99,8 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        this.corpus.populateColumnsOfScrollVersion(this.versionID, this.scrollID)
-        this.corpus.populateImagesOfScrollVersion(this.versionID, this.scrollID)
+        this.corpus.populateColumnsOfCombination(this.scrollID, this.scrollVersionID)
+        this.corpus.populateImageReferencesOfCombination(this.scrollVersionID)
       }
     },
     // TODO implement the capability for these functions

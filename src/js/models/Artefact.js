@@ -7,18 +7,12 @@ import { Record } from 'immutable'
  * @constant
  */
 const defaults = {
-  url: '',
-  filename: '',
-  width: 0,
-  height: 0,
-  dpi: 0,
-  type: 0,
-  start: 0,
-  end: 0,
-  is_master: 0,
-  suffix: '',
-  editionSide: 0,
-  artefacts: [],
+  artefact_id: 0,
+  name: '',
+  side: 0,
+  poly: '',
+  transform_matrix: '',
+  rect: {},
 }
 
 /**
@@ -29,7 +23,7 @@ const defaults = {
  * @class
  * @extends Record
  */
-export default class Image extends Record(defaults) {
+export default class Artefact extends Record(defaults) {
 
   constructor(attrs) {
     super(attrs)
@@ -58,10 +52,6 @@ export default class Image extends Record(defaults) {
       ...attrs
     }
 
-    return new Image(attrs)
-  }
-
-  getAddress() {
-    return `${this.url}${this.filename}/`
+    return new Artefact(attrs)
   }
 }

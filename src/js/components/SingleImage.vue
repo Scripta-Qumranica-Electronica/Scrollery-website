@@ -5,17 +5,17 @@
       <el-col :span="8">
         <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple size="mini">
           <el-option
-            v-for="(image, index) in filenames"
-            :key="'selector-' + image.filename"
-            :label="image.type | formatImageType"
-            :value="index">
+            v-for="image of filenames"
+            :key="'selector-' + corpus.images.get(image).filename"
+            :label="corpus.images.get(image).type | formatImageType"
+            :value="image">
             <el-row>
               <el-col :span="2">
                 <span class="drag-handle image-select-entry" style="float: left">☰</span>
               </el-col>
               <el-col :span="8">
                 <span class="image-select-entry">
-                  &nbsp;{{image.type | formatImageType}}
+                  &nbsp;{{corpus.images.get(image).type | formatImageType}}
                 </span>
               </el-col>
               <el-col :span="10">
@@ -25,12 +25,12 @@
                   min="0"
                   max="1.0"
                   step="0.01"
-                  @input="setOpacity(index, $event.target.value)" />
+                  @input="setOpacity(image, $event.target.value)" />
               </el-col>
               <el-col :span="4">
                 <i class="fa fa-eye image-select-entry"
-                  :style="{color: imageSettings[index].visible ? 'green' : 'red'}"
-                  @click="toggleVisible(index)">
+                  :style="{color: imageSettings[image].visible ? 'green' : 'red'}"
+                  @click="toggleVisible(image)">
                 </i>
               </el-col>
             </el-row>
@@ -85,6 +85,7 @@
                   :divisor="imageShrink"
                   :clipping-mask="clipMask"
                   :clip="clippingOn"
+                  :corpus="corpus"
                   ref="currentRoiCanvas">
       </roi-canvas>
       <artefact-canvas  class="overlay-canvas"
@@ -125,7 +126,7 @@ export default {
       scrollVersionID: undefined,
       imageElements: [],
       selectedImageUrls: [],
-      filenames: {},
+      filenames: [],
       masterImage: {},
       imageShrink: 2,
       artefact: undefined,
@@ -145,15 +146,23 @@ export default {
   },
   methods: {
     fetchImages(id) {
-      this.filenames = this.corpus.images.itemWithID(id).getItems()
-      for (const key in this.filenames) {
-        if (this.filenames[key].isMaster) {
-          this.$set(this.imageSettings, key, {visible: true, opacity: 1.0})
-          this.masterImage = this.filenames[key]
-        } else {
-          this.$set(this.imageSettings, key, {visible: false, opacity: 1.0})
-        }
-      }
+      this.$store.commit('addWorking')
+      this.corpus.populateImagesOfImageReference(id, this.$route.params.scrollVersionID)
+      .then(res => {
+        this.filenames = this.corpus.imageReferences.get(id).images
+        this.filenames.forEach(key => {
+          if (this.corpus.images.get(key).is_master) {
+            this.$set(this.imageSettings, key, {visible: true, opacity: 1.0})
+            this.masterImage = this.corpus.images.get(key)
+          } else {
+            this.$set(this.imageSettings, key, {visible: false, opacity: 1.0})
+          }
+        })
+        this.corpus.populateArtefactsOfImageReference(id, this.$route.params.scrollVersionID)
+        .then(res1 => {
+          this.$store.commit('delWorking')
+        })
+      })
     },
     // TODO move the logic for this into the data model.
     setClipMask(mask) {
@@ -248,15 +257,15 @@ export default {
         } else {
           this.artefact = to.params.artID
           this.scrollVersionID = to.params.scrollVersionID
-          if(!this.corpus.artefacts.itemWithID(this.artefact).mask) {
-            this.$store.commit('addWorking')
+          if(!this.corpus.artefacts.get(this.artefact).mask) {
+            // this.$store.commit('addWorking')
             this.corpus.artefacts.fetchMask(to.params.scrollVersionID, to.params.artID)
             .then(res => {
-              this.$store.commit('delWorking')
-              this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
+              // this.$store.commit('delWorking')
+              this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.get(this.artefact).mask)
             })
           } else {
-            this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.itemWithID(this.artefact).mask)
+            this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.get(this.artefact).mask)
           }
         }
         this.lock = false

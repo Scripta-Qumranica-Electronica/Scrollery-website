@@ -1,23 +1,21 @@
-import MenuObject from './MenuObject.js'
-import axios from 'axios'
+import MapList from './MapList.js'
+import Artefact from './Artefact.js'
 
-/**
- * A combination is complete material object.
- * 
- * A combination is comprised of a number of images and columns.
- * 
- * @class
- */
-class MenuArtefacts extends MenuObject {
+export default class Artefacts extends MapList {
 
-  /**
-   * @param {object}          attributes the image attributes
-   * @param {array.<MenuImage>=[]} [images]    an array of images
-   */
-  constructor(sessionID, user, set, itemIDKey, ajaxPayload) {
-    itemIDKey = itemIDKey || 'artefact_id'
-    ajaxPayload = ajaxPayload || {transaction: 'getArtOfImage',}
-    super(sessionID, user, set, itemIDKey, ajaxPayload)
+  constructor(
+    sessionID,
+    idKey,
+    ajaxPayload = undefined,
+    attributes = {})
+  {
+    idKey = idKey || 'artefact_position_id'
+    ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getArtOfImage'}
+    super(sessionID, idKey, ajaxPayload, Artefact, attributes)
+  }
+
+  static getModel() {
+    return Artefact
   }
 
   // We should eventually have a hash associated with each mask,
@@ -54,5 +52,3 @@ class MenuArtefacts extends MenuObject {
     })
   }
 }
-
-export default MenuArtefacts

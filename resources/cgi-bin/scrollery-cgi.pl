@@ -113,10 +113,10 @@ sub getCombs {
 SELECT DISTINCT 
        scroll_data.scroll_id as scroll_id,
        scroll_data.name AS name,
-       scroll_version.scroll_version_id AS version_id,
+       scroll_version.scroll_version_id AS scroll_version_id,
        scroll_data.scroll_data_id AS scroll_data_id,
        scroll_version_group.locked,
-       scroll_version.user_id
+			 scroll_version.user_id
 FROM scroll_version
 	JOIN scroll_version_group USING(scroll_version_group_id)
 	JOIN scroll_data using(scroll_id)
@@ -154,22 +154,25 @@ sub getArtOfImage {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $getArtOfImageQuery = <<'MYSQL';
-SELECT DISTINCT	artefact_shape.artefact_id,
+SELECT DISTINCT	artefact_position.artefact_position_id,
 				artefact_data.name, 
 				catalog_side AS side 
 FROM artefact_shape
 	JOIN artefact_shape_owner USING(artefact_shape_id)
+	JOIN artefact_position USING(artefact_id)
+	JOIN artefact_position_owner USING(artefact_position_id)
 	JOIN artefact_data USING(artefact_id)
 	JOIN artefact_data_owner USING(artefact_data_id)
 	JOIN SQE_image USING(sqe_image_id)
 	JOIN image_catalog USING(image_catalog_id)
 WHERE SQE_image.image_catalog_id = ?
       AND artefact_shape_owner.scroll_version_id = ?
+			AND artefact_position_owner.scroll_version_id = ?
       AND artefact_data_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{image_id}, $json_post->{version_id}, $json_post->{version_id});
+	$sql->execute($json_post->{image_catalog_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 	readResults($sql);
 	return;
 }
@@ -203,7 +206,7 @@ sub getColOfComb {
 	my $json_post = shift;
 	my $getColOfCombQuery = <<'MYSQL';
 		SELECT DISTINCT col_data.name AS name,
-						col_data.col_id AS id
+						col_data.col_id AS col_id
 		FROM col_data
 			JOIN col_data_owner USING(col_data_id)
 			JOIN scroll_to_col USING(col_id)
@@ -212,7 +215,7 @@ sub getColOfComb {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{version_id}, $json_post->{combID});
+	$sql->execute($json_post->{scroll_version_id}, $json_post->{combID});
 	readResults($sql);
 	return;
 }
@@ -718,7 +721,7 @@ sub getScrollArtefacts {
 SELECT DISTINCT artefact_position.artefact_position_id AS id,
                 ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
                 ST_AsText(artefact_shape.region_in_sqe_image) AS poly,
-				artefact_position.transform_matrix AS matrix,
+				artefact_position.transform_matrix AS transform_matrix,
                 image_urls.url AS url,
                 image_urls.suffix AS suffix,
                 SQE_image.filename AS filename,

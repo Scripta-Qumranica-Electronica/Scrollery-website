@@ -8,9 +8,9 @@
     </el-col>
     <el-col :span="4">
       <div class="right">
-          <span>{{corpus.corpus 
-                    && corpus.corpus.get(scrollVersionID) 
-                    ? corpus.corpus.get(scrollVersionID).name 
+          <span>{{corpus.combinations 
+                    && corpus.combinations.get(scrollVersionID) 
+                    ? corpus.combinations.get(scrollVersionID).name 
                     : 'No scroll selected'}}</span>
       </div>
     </el-col>
@@ -40,7 +40,7 @@ export default {
   data() {
     return {
       scrolleryVersion: sqeManifest.version,
-      scrollVersionID: this.$route.params.scrollVersionID >>> 0,
+      scrollVersionID: this.$route.params.scrollVersionID,
     }
   },
 
@@ -65,8 +65,9 @@ export default {
 
   watch: {
     '$route'(to, from) {
-      if (to.params.scrollVersionID !== from.params.scrollVersionID)
-      this.scrollVersionID = to.params.scrollVersionID >>> 0
+      if (to.params.scrollVersionID !== from.params.scrollVersionID){
+        this.scrollVersionID = to.params.scrollVersionID
+      }
     }
   }
 }

@@ -8,14 +8,14 @@
     <main-menu
       :open="menuOpen"
       :keepOpen="keepMenuOpen"
-      :corpus="menuCorpus"
+      :corpus="corpus"
       @mouseenter='mouseOver = true'
       @mouseleave='mouseOver = false'
     />
 
     <!-- editing panes -->
     <div id="editing-window" :class='{"open": menuOpen}'>
-      <header-menu :corpus="menuCorpus"></header-menu>
+      <header-menu :corpus="corpus"></header-menu>
       
       <!-- We currently use two nested "split-panes" to hold the individual components.
       Perhaps update to some more advanced system to manage organization
@@ -27,7 +27,7 @@
               <template slot="paneL">
                 <single-image 
                   class="pane-content single-image-pane"
-                  :corpus="menuCorpus"></single-image>
+                  :corpus="corpus"></single-image>
               </template>
               <template slot="paneR">
                 <editor class="pane-content"></editor>
@@ -37,7 +37,7 @@
           <template slot="paneR">
             <combination 
               class="combination-pane"
-              :corpus="menuCorpus"></combination>
+              :corpus="corpus"></combination>
           </template>
         </split-pane>
       </div>
@@ -53,7 +53,6 @@ import SingleImage from './SingleImage.vue'
 import Editor from './editor/Editor.vue'
 import Combination from './Combination.vue'
 
-import MenuCorpus from '~/models/MenuCorpus.js'
 import Corpus from '~/models/Corpus.js'
 
 export default {
@@ -69,7 +68,6 @@ export default {
     return {
       keepMenuOpen: false,
       mouseOver: false,
-      menuCorpus: MenuCorpus,
       corpus: Corpus,
     }
   },
@@ -79,50 +77,56 @@ export default {
     },
   },
   created() {
+    // Create and populate the corpus model, with existing data
+    // from the router.
+    this.$store.commit('addWorking')
     this.corpus = new Corpus(this.$store.state.sessionID, this.$store.state.userID)
     this.corpus.populateCombinations()
     .then(res => {
-      console.log(this.corpus.combinations.get(808))
-      this.corpus.populateImageReferencesOfCombination(808)
-      .then(res1 => {
-        console.log(this.corpus.imageReferences.get(34774))
-        console.log(this.corpus.images.get(7373))
-      })
-    })
-
-    // Create and populate the menu corpus model.
-    this.menuCorpus = new MenuCorpus(this.$store.state.sessionID, this.$store.state.userID, this.$set)
-    this.$store.commit('addWorking')
-    this.menuCorpus.populateCombinations()
-    .then(res1 => {
       this.$store.commit('delWorking')
-      // Check if routing info exists and populate corpus model based on that
-      if(this.$route.params.scrollVersionID !== '~') {
-        if (this.$route.params.scrollID !== '~') {
-          this.menuCorpus.populateColumnsOfScrollVersion(this.$route.params.scrollVersionID, this.$route.params.scrollID)
-          this.$store.commit('addWorking')
-          this.menuCorpus.populateImagesOfScrollVersion(this.$route.params.scrollVersionID, this.$route.params.scrollID)
-          .then(res2 => {
-            this.$store.commit('delWorking')
-            if(this.$route.params.imageID !== '~') {
-              this.$store.commit('addWorking')
-              this.menuCorpus.populateArtefactsofImage(this.$route.params.scrollVersionID, this.$route.params.imageID)
-              .then(res3 => {
-                this.$store.commit('delWorking')
+      if (this.$route.params.scrollID !== '~') {
+        this.$store.commit('addWorking')
+        this.corpus.populateColumnsOfCombination(
+          this.$route.params.scrollID,
+          this.$route.params.scrollVersionID
+        )
+        this.corpus.populateImageReferencesOfCombination(this.$route.params.scrollVersionID)
+        .then(res1 => {
+          this.$store.commit('delWorking')
+          if(this.$route.params.imageID !== '~') {
+            this.$store.commit('addWorking')
+            this.corpus.populateImagesOfImageReference(
+              this.$route.params.imageID, 
+              this.$route.params.scrollVersionID
+            )
+            .then(res2 => {
+              this.$store.commit('delWorking')
+              if(this.$route.params.artID !== '~') {
+                this.$store.commit('addWorking')
+                this.corpus.populateArtefactsOfImageReference(
+                  this.$route.params.imageID, 
+                  this.$route.params.scrollVersionID
+                )
+                .then(res3 => {
+                  this.$store.commit('delWorking')
+                  this.resetRouter()
+                })
+              } else {
                 this.resetRouter()
-              })
-            } else {
-              this.resetRouter()
-            }
-          })
-        }
+              }
+            })
+          } else {
+            this.resetRouter()
+          }
+        })
       }
     })
   },
   methods: {
     resetRouter() {
       // Trigger a router change here, so we don't need extra mount()
-      // functions in all of our vue components.
+      // functions in all of our vue components.  Is there a more 
+      // elegant way to achieve this?
       const scrollID = this.$route.params.scrollID
       const scrollVersionID = this.$route.params.scrollVersionID
       const colID = this.$route.params.colID

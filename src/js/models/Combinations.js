@@ -10,7 +10,7 @@ class Combinations extends MapList {
     ajaxPayload = undefined,
     attributes = {})
   {
-    idKey = idKey || 'version_id'
+    idKey = idKey || 'scroll_version_id'
     ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getCombs', user: user}
     super(sessionID, idKey, ajaxPayload, Combination, attributes)
   }
