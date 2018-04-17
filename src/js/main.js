@@ -10,7 +10,7 @@ import ajax from './plugins/ajax'
 import routes from './routes'
 import makeStore from './store/make'
 import ElementUI from 'element-ui'
-import locale from 'element-ui/lib/locale'
+import ElementLocale from 'element-ui/lib/locale'
 
 import 'element-ui/lib/theme-chalk/index.css'
 
@@ -26,20 +26,18 @@ const vuexLocalStorage = new VuexPersist({
 Vue.use(Vuex)
 const store = makeStore(Vuex, [vuexLocalStorage.plugin])
 
-// Localization
+// SQE Localization
 Vue.use(i18n, { store })
-
-// element localization
-locale.use('en')
 
 // AJAX
 Vue.use(ajax, { store })
 
 // Element-ui
+ElementLocale.use(store.getters.language)
 Vue.use(ElementUI)
 
-// Turn on the lights
-const app = new Vue({
+// load up the localizations
+new Vue({
   router,
   store,
 }).$mount('#app')

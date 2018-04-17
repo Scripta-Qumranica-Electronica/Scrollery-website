@@ -33,8 +33,9 @@ export default {
         // finish
         return str
       },
-
-      /* istanbul ignore next */
+      num(key, args) {
+        return key
+      },
       load() {
         return new Promise(resolve => {
           switch (store.getters.language) {

@@ -41,10 +41,12 @@ export default {
 
   mounted() {
     // This provides us an async latch to do some async work on initialization.
-    // To be utilized later
-    setTimeout(() => {
-      this.view = 'app-body'
-    }, 700)
+    this.$i18n
+      .load()
+      .then(() => {
+        this.view = 'app-body'
+      })
+      .catch(() => {})
   },
 }
 </script>

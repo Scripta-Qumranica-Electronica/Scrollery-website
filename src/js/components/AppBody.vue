@@ -121,6 +121,7 @@
 
 
 <script>
+import { mapGetters } from 'vuex'
 import HeaderMenu from './HeaderMenu.vue'
 import MainMenu from './menu/MainMenu.vue'
 import SplitPane from 'vue-splitpane'
@@ -150,6 +151,13 @@ export default {
     menuOpen() {
       return this.mouseOver || this.keepMenuOpen
     },
+    ...mapGetters(['sessionID']),
+  },
+  mounted() {
+    // if there's a session hanging around in localStorage, check that
+    if (!this.sessionID) {
+      this.$router.replace('login')
+    }
   },
 }
 </script>
