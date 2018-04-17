@@ -10,8 +10,8 @@ const defaults = {
   artefact_id: 0,
   name: '',
   side: 0,
-  poly: '',
-  transform_matrix: '',
+  mask: '',
+  transform_matrix: [],
   rect: {},
 }
 

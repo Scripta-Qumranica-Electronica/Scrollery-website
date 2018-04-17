@@ -149,7 +149,7 @@ export default {
       this.$store.commit('addWorking')
       this.corpus.populateImagesOfImageReference(id, this.$route.params.scrollVersionID)
       .then(res => {
-        this.filenames = this.corpus.imageReferences.get(id).images
+        this.filenames = this.corpus.imageReferences.get(id >>> 0).images
         this.filenames.forEach(key => {
           if (this.corpus.images.get(key).is_master) {
             this.$set(this.imageSettings, key, {visible: true, opacity: 1.0})
@@ -257,15 +257,16 @@ export default {
         } else {
           this.artefact = to.params.artID
           this.scrollVersionID = to.params.scrollVersionID
-          if(!this.corpus.artefacts.get(this.artefact).mask) {
+          this.corpus.artefacts.fetchMask(to.params.scrollVersionID, to.params.artID)
+          if(this.corpus.artefacts.get(this.artefact).mask === '') {
             // this.$store.commit('addWorking')
             this.corpus.artefacts.fetchMask(to.params.scrollVersionID, to.params.artID)
             .then(res => {
               // this.$store.commit('delWorking')
-              this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.get(this.artefact).mask)
+              this.firstClipMask = this.clipMask = this.corpus.artefacts.get(this.artefact).mask
             })
           } else {
-            this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.get(this.artefact).mask)
+            this.firstClipMask = this.clipMask = this.corpus.artefacts.get(this.artefact).mask
           }
         }
         this.lock = false

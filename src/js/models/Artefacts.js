@@ -1,5 +1,7 @@
 import MapList from './MapList.js'
 import Artefact from './Artefact.js'
+import axios from 'axios'
+import {wktPolygonToSvg, dbMatrixToSVG} from '~/utils/VectorFactory.js'
 
 export default class Artefacts extends MapList {
 
@@ -40,9 +42,11 @@ export default class Artefacts extends MapList {
               // data transmission.
               this.set(this._items[artefactID], 'hash', res.data.results[0].hash)
 
-              this.set(this._items[artefactID], 'mask', res.data.results[0].poly)
-              this.set(this._items[artefactID], 'transformMatrix', res.data.results[0].transform_matrix)
-              this.set(this._items[artefactID], 'rect', res.data.results[0].rect)
+              let newArtefact = this._items[artefactID].toJS()
+              newArtefact.mask =  wktPolygonToSvg(res.data.results[0].poly)
+              newArtefact.transform_matrix = dbMatrixToSVG(JSON.parse(res.data.results[0].transform_matrix).matrix)
+              newArtefact.rect = wktPolygonToSvg(res.data.results[0].rect)
+              this._items.set(artefact, new this.model(newArtefact))
               resolve(res.data.results)
             }
         })
