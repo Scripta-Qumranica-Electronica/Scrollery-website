@@ -144,7 +144,9 @@ export default {
   props: {
     open: Boolean,
     keepOpen: Boolean,
-    corpus: {},
+    corpus: {
+      required: true,
+    },
   },
   data() {
     return {
@@ -155,10 +157,17 @@ export default {
       menuDisplay: 'text',
     }
   },
+  methods: {
+    populateCorpus() {
+      this.corpus.populateCombinations()
+    },
+  },
   mounted() {
     // i18n
     this.combinationsTitle = this.$i18n.str('Combinations')
     this.menuBarsTooltip = this.$i18n.str('Menu.Bars.Tooltip')
+
+    this.populateCorpus()
   },
 }
 </script>

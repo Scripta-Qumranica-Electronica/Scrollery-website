@@ -12,13 +12,12 @@ import MenuArtefacts from './MenuArtefacts.js'
 
 /**
  * A corpus is collection of all consituent objects.
- * 
+ *
  * A corpus is comprised of a number of combinations, columns, images, and artefacts.
- * 
+ *
  * @class
  */
 class MenuCorpus {
-
   /**
    * @param {post}          an instance of Axios $post.
    * @param {user} Number   the user id for the model
@@ -27,34 +26,35 @@ class MenuCorpus {
   constructor(sessionID, user, set) {
     this.sessionID = sessionID
     this._user = user
-    this._set = set || ((object, key, value) => { object[key] = value })
+    this._set =
+      set ||
+      ((object, key, value) => {
+        object[key] = value
+      })
 
     this.combinations = new MenuCombinations(this.sessionID, this._user, this._set)
     this.columns = new MenuColumns(this.sessionID, this._user, this._set)
     this.images = new MenuImages(this.sessionID, this._user, this._set)
     this.artefacts = new MenuArtefacts(this.sessionID, this._user, this._set)
-
-    this.populateCombinations()
   }
 
   populateCombinations() {
     return new Promise((resolve, reject) => {
-      this.combinations.populate()
-      .then(res => {
-        resolve(res)
-      })
-    }) 
+      this.combinations.populate().then(resolve)
+    })
   }
 
   populateColumnsOfScrollVersion(scrollVersionID, combinationID) {
     return new Promise((resolve, reject) => {
-      this.columns.populate({version_id: scrollVersionID, combID: combinationID})
-      .then(res => {
+      this.columns.populate({ version_id: scrollVersionID, combID: combinationID }).then(res => {
         let columnIDArray = []
         res.forEach(column => {
           columnIDArray.push(column[this.columns.itemIDKey])
         })
-        if (!this.combinations.itemAtIndex(scrollVersionID) || columnIDArray !== this.combinations.itemAtIndex(scrollVersionID).columns) {
+        if (
+          !this.combinations.itemAtIndex(scrollVersionID) ||
+          columnIDArray !== this.combinations.itemAtIndex(scrollVersionID).columns
+        ) {
           this.combinations.changeItemValue(scrollVersionID, 'columns', columnIDArray)
         }
         resolve(res)
@@ -64,13 +64,15 @@ class MenuCorpus {
 
   populateImagesOfScrollVersion(scrollVersionID, combinationID) {
     return new Promise((resolve, reject) => {
-      this.images.populate({combID: combinationID})
-      .then(res => {
+      this.images.populate({ combID: combinationID }).then(res => {
         let imageIDArray = []
         res.forEach(image => {
           imageIDArray.push(image[this.images.itemIDKey])
         })
-        if (!this.combinations.itemAtIndex(scrollVersionID) || imageIDArray !== this.combinations.itemAtIndex(scrollVersionID).images) {
+        if (
+          !this.combinations.itemAtIndex(scrollVersionID) ||
+          imageIDArray !== this.combinations.itemAtIndex(scrollVersionID).images
+        ) {
           this.combinations.changeItemValue(scrollVersionID, 'images', imageIDArray)
         }
         resolve(res)
@@ -80,13 +82,15 @@ class MenuCorpus {
 
   populateArtefactsofImage(scrollVersionID, imageID) {
     return new Promise((resolve, reject) => {
-      this.artefacts.populate({image_id: imageID, version_id: scrollVersionID})
-      .then(res => {
+      this.artefacts.populate({ image_id: imageID, version_id: scrollVersionID }).then(res => {
         let artefactIDArray = []
         res.forEach(artefact => {
           artefactIDArray.push(artefact[this.artefacts.itemIDKey])
         })
-        if (!this.images.itemAtIndex(imageID) || artefactIDArray !== this.images.itemAtIndex(imageID).artefacts) {
+        if (
+          !this.images.itemAtIndex(imageID) ||
+          artefactIDArray !== this.images.itemAtIndex(imageID).artefacts
+        ) {
           this.images.changeItemValue(imageID, 'artefacts', artefactIDArray)
         }
         resolve(res)

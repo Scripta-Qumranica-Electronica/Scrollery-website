@@ -21,13 +21,9 @@ export default {
   computed: {
     ...mapGetters(['username']),
   },
-
   methods: {
     ...mapMutations(['setSessionID', 'setUsername', 'setUserID']),
     onLogout() {
-      this.setSessionID('')
-      this.setUserID('')
-      this.setUsername('')
       this.$store.commit('logout')
       this.$router.push({ name: 'login' })
     },

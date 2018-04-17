@@ -8,7 +8,6 @@
 import { mapGetters } from 'vuex'
 
 // components
-
 import Loading from './Loading.vue'
 import AppBody from './AppBody.vue'
 
@@ -36,7 +35,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['userID', 'sessionID']),
+    ...mapGetters(['sessionID']),
   },
 
   mounted() {
