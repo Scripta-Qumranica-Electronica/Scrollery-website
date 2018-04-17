@@ -8,7 +8,6 @@
 import { mapGetters } from 'vuex'
 
 // components
-
 import Loading from './Loading.vue'
 import AppBody from './AppBody.vue'
 
@@ -19,7 +18,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       if (!vm.sessionID.length || vm.userID === -1) {
-        vm.$router.push({ path: '/' })
+        vm.$router.replace('login')
       }
     })
   },
@@ -40,11 +39,12 @@ export default {
   },
 
   mounted() {
-    // This provides us an async latch to do some async work on initialization.
-    // To be utilized later
-    setTimeout(() => {
-      this.view = 'app-body'
-    }, 700)
+    this.$i18n
+      .load()
+      .then(() => {
+        this.view = 'app-body'
+      })
+      .catch(err => console.error(err))
   },
 }
 </script>
