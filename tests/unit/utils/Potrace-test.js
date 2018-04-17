@@ -1,7 +1,7 @@
 import { trace } from '~/utils/Potrace.js'
 
 describe('Potrace.trace', () => {
-  it.skip('should return an SVG path for a canvas', done => {
+  it('should return an SVG path for a canvas', done => {
     let testCanvas = document.createElement('canvas')
     testCanvas.width = 100
     testCanvas.height = 100
@@ -27,7 +27,7 @@ describe('Potrace.trace', () => {
       .catch(done)
   })
 
-  it.skip('should return an SVG path for a canvas with a circle', done => {
+  it('should return an SVG path for a canvas with a circle', done => {
     let testCanvas = document.createElement('canvas')
     testCanvas.width = 100
     testCanvas.height = 100
