@@ -15,7 +15,7 @@ describe('Workbench', () => {
     it('should attempt a redirect if no sessionID/userID provided', () => {
       // stub in a mock router
       vm.$router = {
-        push: sinon.spy(),
+        replace: sinon.spy(),
       }
 
       // call the route guard with the next callback
