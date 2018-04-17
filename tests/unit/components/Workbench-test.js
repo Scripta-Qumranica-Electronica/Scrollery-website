@@ -22,7 +22,7 @@ describe('Workbench', () => {
       vm.$options.beforeRouteEnter(null, null, cb => cb(vm))
 
       // no sessionID set on vm, so route event should have been triggered
-      expect(vm.$router.push.called).to.equal(true)
+      expect(vm.$router.replace.called).to.equal(true)
     })
 
     it('should not attempt a redirect if a sessionID/userID is provided', () => {
@@ -37,7 +37,7 @@ describe('Workbench', () => {
       vm.$options.beforeRouteEnter(null, null, cb => cb(vm))
 
       // no routing event expected
-      expect(vm.$router.push.called).to.equal(false)
+      expect(vm.$router.replace.called).to.equal(false)
     })
   })
 })
