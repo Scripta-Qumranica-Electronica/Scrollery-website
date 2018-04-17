@@ -28,7 +28,7 @@ describe('Workbench', () => {
     it('should not attempt a redirect if a sessionID/userID is provided', () => {
       // stub in a mock router
       vm.$router = {
-        push: sinon.spy(),
+        replace: sinon.spy(),
       }
       vm.$store.commit('setSessionID', 'test')
       vm.$store.commit('setUserID', 1)

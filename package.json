@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "precommit": "lint-staged",
-    "pre-push": "npm test:chrome",
+    "pre-push": "karma start --config karma.conf.js --browsers=Chrome --single-run",
     "prettier": "prettier --config ./.prettierrc.yml --write ./{tests,gstsrc}/**/*.{js,vue}",
     "dev": "webpack --config webpack.dev.js",
     "prod": "webpack --config webpack.prod.js",
