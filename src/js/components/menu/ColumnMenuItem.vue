@@ -1,6 +1,6 @@
 <template>
   <span class="clickable-menu-item" @click="setRouter">
-    {{name}} ({{columnID}})
+    {{column.name}} ({{columnID}})
   </span>
 </template>
 
@@ -9,9 +9,9 @@
 export default {
   props: {
     columnID: Number,
-    name: String,
     scrollVersionID: Number,
     scrollID: Number,
+    column: {},
     corpus: {},
   },
   methods: {
@@ -37,7 +37,5 @@ export default {
       }
     },
   },
-  watch: {
-  }
 }
 </script>

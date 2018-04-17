@@ -1,7 +1,7 @@
 <template>
   <div class="clickable-menu-item">
     <span @click="selectImage">
-      {{corpus.imageReferences.get(imageID).institution}}: {{corpus.imageReferences.get(imageID).lvl1}}, {{corpus.imageReferences.get(imageID).lvl2}} {{corpus.imageReferences.get(imageID).side === 0 ? 'recto' : 'verso'}}
+      {{image.institution}}: {{image.lvl1}}, {{image.lvl2}} {{image.side === 0 ? 'recto' : 'verso'}}
     </span>
     <div class="children" v-show="open">
         <ul>
@@ -47,6 +47,7 @@ export default {
     imageID: Number,
     scrollID: Number,
     scrollVersionID: Number,
+    image: {},
     corpus: {},
   },
   components: {

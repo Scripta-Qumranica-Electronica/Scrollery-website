@@ -31,18 +31,13 @@
           <div>
             <ul class="combination-menu" placeholder="Search for scroll">
               <li v-for="combination in corpus.combinations.keys()" :key="'menu-combination-' + combination">
+                  <!-- Use v-show here so it feels faster -->
                   <combinaton-menu-item
                     v-show="!queryString || 
                       corpus.combinations.get(combination)
                       .name.toLowerCase().indexOf(queryString.toLowerCase()) !== -1"
-                    :name="corpus.combinations.get(combination).name"
-                    :scrollDataID="corpus.combinations.get(combination).scroll_data_id"
-                    :scrollID="corpus.combinations.get(combination).scroll_id"
-                    :version="corpus.combinations.get(combination).version"
-                    :scrollVersionID="corpus.combinations.get(combination).scroll_version_id"
-                    :user="corpus.combinations.get(combination).user_id"
                     :menu-type="menuDisplay"
-                    :locked="corpus.combinations.get(combination).locked"
+                    :combination="corpus.combinations.get(combination)"
                     :corpus="corpus">
                   </combinaton-menu-item>
               </li>
