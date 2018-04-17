@@ -34,8 +34,8 @@ export default {
         return str
       },
 
-      /* istanbul ignore next */
       load() {
+        /* istanbul ignore next */
         return new Promise(resolve => {
           switch (store.getters.language) {
             case 'hb':
