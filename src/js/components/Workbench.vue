@@ -35,7 +35,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['userID', 'sessionID']),
+    ...mapGetters(['sessionID']),
   },
 
   mounted() {

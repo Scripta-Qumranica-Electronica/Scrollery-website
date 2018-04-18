@@ -1421,4 +1421,3 @@ function Potrace(canvas, multiplyFactor) {
       img: imgElement
     };
   }
-  

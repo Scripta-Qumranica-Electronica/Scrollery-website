@@ -28,6 +28,9 @@ class MenuCorpus {
   constructor() {
     this.combinations = new MenuCombinations()
   }
+  populateCombinations() {
+    return new Promise(resolve => resolve())
+  }
   populateColumnsOfScrollVersion(versionID, scrollID) {
     return { versionID: versionID, scrollID: scrollID }
   }

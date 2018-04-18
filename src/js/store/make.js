@@ -19,8 +19,9 @@ export default function(Vuex, plugins) {
     },
     mutations: {
       logout(state) {
-        state.sessionID = ""
-        state.userID = ""
+        state.sessionID = ''
+        state.userID = -1
+        state.username = ''
       },
       setSessionID(state, sessionID) {
         state.sessionID = sessionID
@@ -34,10 +35,10 @@ export default function(Vuex, plugins) {
       setLanguage(state, language) {
         state.language = language
       },
-      loadLanguage(state, {key, data}) {
+      loadLanguage(state, { key, data }) {
         state.languages[key] = data
       },
     },
-    plugins
+    plugins,
   })
 }
