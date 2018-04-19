@@ -86,6 +86,11 @@ export default {
         this.setRouter()
         this.corpus.populateColumnsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
         this.corpus.populateImageReferencesOfCombination(this.combination.scroll_version_id)
+        .then(res => {
+          this.corpus.populateArtefactsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
+          .then(res1 => {
+          })
+        })
       }
     },
     // TODO implement the capability for these functions

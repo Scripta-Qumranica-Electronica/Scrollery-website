@@ -84,7 +84,7 @@ export default {
     this.corpus.populateCombinations()
     .then(res => {
       this.$store.commit('delWorking')
-      if (this.$route.params.scrollID !== '~') {
+      if (this.$route.params.scrollID && this.$route.params.scrollID !== '~') {
         this.$store.commit('addWorking')
         this.corpus.populateColumnsOfCombination(
           this.$route.params.scrollID,

@@ -1,57 +1,70 @@
 <template>
-    <g :transform="'matrix(' + artefactData.transformMatrix.join(', ') + ')'">
+    <g :transform="'matrix(' + svg_matrix.join(', ') + ')'">
         <defs>
-            <path :d="artefactData.poly" :id="'path' + artefactData.image + '-' + artefactData.artefact_id" />
-            <clipPath :id="'clip-' + artefactData.image + '-' + artefactData.artefact_id">
+            <path :d="svg_shape" :id="'path-' + artefact.side + '-' + artefact.artefact_position_id" />
+            <clipPath :id="'clip-' + artefact.side + '-' + artefact.artefact_position_id">
                 <use 
                     stroke="none" 
                     fill="black" 
                     fill-rule="evenodd" 
                     xmlns:xlink="http://www.w3.org/1999/xlink" 
-                    :xlink:href="'#path' + artefactData.image + '-' + artefactData.artefact_id" />
+                    :xlink:href="'#path-' + artefact.side  + '-' + artefact.artefact_position_id" />
             </clipPath>
         </defs>
-        <image 
-            :clip-path="'url(#clip-' + artefactData.image + '-' + artefactData.artefact_id + ')'"
-            :xlink:href="url"
-            :width="artefactData.rect.width ? artefactData.rect.width : 0"
-            :height="artefactData.rect.height ? artefactData.rect.height : 0"
+        <image
+            v-if="images && images[0] && corpus.images.get(images[0])"
+            :clip-path="'url(#clip-' + artefact.side + '-' + artefact.artefact_position_id + ')'"
+            :xlink:href="corpus.images.get(images[0]) | address"
+            :width="svg_rect.width ? svg_rect.width : 0"
+            :height="svg_rect.height ? svg_rect.height : 0"
             :data-index="index"/>
     </g>
 </template>
 
 <script>
+import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG } from '~/utils/VectorFactory.js'
+
 export default {
     props: {
-        artefactData: {},
+        artefact: {},
         baseDPI: {
             type: Number,
             default: 1215,
         },
         index: Number,
-        corpus: {
-            type: Object,
-        },
+        images: [],
+        corpus: {},
     },
-  components: {
-  },
   computed: {
       scale() {
-          return this.baseDPI / this.artefactData.dpi
+          return this.baseDPI / this.artefact.dpi
       },
-      url() {
-        const images = this.corpus.images.itemWithID(this.artefactData.image)._itemList
-        let image = {}
-        images.forEach(item => {
-            if (this.corpus.images.itemWithID(this.artefactData.image)._items[item].isMaster) {
-                image = this.corpus.images.itemWithID(this.artefactData.image)._items[item]
-            }
-        })
-        return  image.url + image.filename
-                + '/' + this.artefactData.rect.x + ',' + this.artefactData.rect.y
-                + ',' + this.artefactData.rect.width + ',' + this.artefactData.rect.height 
-                + '/pct:10/0/' + image.suffix
+      svg_rect() {
+          return wktParseRect(this.artefact.rect)
       },
+      svg_shape() {
+          return wktPolygonToSvg(this.artefact.mask, this.svg_rect)
+      },
+      svg_matrix() {
+          return dbMatrixToSVG(JSON.parse(this.artefact.transform_matrix).matrix)
+      },
+      imageReferences() {
+          return this.corpus.imageReferences.get(this.artefact.image_catalog_id).images
+      }
   },
+  mounted() {
+    console.log(this.artefact.toJS())
+    console.log(this.corpus.artefacts._items.toJS())
+    console.log(this.corpus.images._items.toJS())
+    console.log(this.corpus.imageReferences._items.toJS())
+  },
+  filters: {
+      address(element) {
+        return element.url + element.filename
+                + '/' + this.artefact.rect.x + ',' + this.artefact.rect.y
+                + ',' + this.artefact.rect.width + ',' + this.artefact.rect.height 
+                + '/pct:10/0/' + element.suffix
+      }
+  }
 }
 </script>

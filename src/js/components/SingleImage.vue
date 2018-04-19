@@ -96,7 +96,7 @@
                         :draw-mode="drawingMode"
                         :brush-size="brushCursorSize"
                         :divisor="imageShrink"
-                        :mask = "firstClipMask"
+                        :mask="firstClipMask"
                         :locked="lock"
                         v-on:mask="setClipMask"
                         ref="currentArtCanvas">
@@ -257,16 +257,15 @@ export default {
         } else {
           this.artefact = to.params.artID
           this.scrollVersionID = to.params.scrollVersionID
-          this.corpus.artefacts.fetchMask(to.params.scrollVersionID, to.params.artID)
           if(this.corpus.artefacts.get(this.artefact).mask === '') {
             // this.$store.commit('addWorking')
             this.corpus.artefacts.fetchMask(to.params.scrollVersionID, to.params.artID)
             .then(res => {
               // this.$store.commit('delWorking')
-              this.firstClipMask = this.clipMask = this.corpus.artefacts.get(this.artefact).mask
+              this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.get(this.artefact).mask)
             })
           } else {
-            this.firstClipMask = this.clipMask = this.corpus.artefacts.get(this.artefact).mask
+            this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.get(this.artefact).mask)
           }
         }
         this.lock = false

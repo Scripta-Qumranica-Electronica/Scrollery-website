@@ -24,6 +24,8 @@ export default class Artefacts extends MapList {
   // and should be prepared to recieve a message back from the server
   // saying "nothing changed" and then we can leave the artefact alone.
   fetchMask(scrollVersionID, artefactID) {
+    scrollVersionID = scrollVersionID >>> 0
+    artefactID = artefactID >>> 0
     let payload = {
       transaction: 'getArtefactMask',
       SESSION_ID: this.sessionID,
@@ -41,12 +43,12 @@ export default class Artefacts extends MapList {
               // in the future, so we can avoid unnecessary
               // data transmission.
               this.set(this._items[artefactID], 'hash', res.data.results[0].hash)
-
-              let newArtefact = this._items[artefactID].toJS()
+              
+              let newArtefact = this.get(artefactID).toJS()
               newArtefact.mask =  wktPolygonToSvg(res.data.results[0].poly)
               newArtefact.transform_matrix = dbMatrixToSVG(JSON.parse(res.data.results[0].transform_matrix).matrix)
               newArtefact.rect = wktPolygonToSvg(res.data.results[0].rect)
-              this._items.set(artefact, new this.model(newArtefact))
+              this._items.set(artefactID, new this.model(newArtefact))
               resolve(res.data.results)
             }
         })

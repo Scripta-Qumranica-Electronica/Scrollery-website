@@ -6,7 +6,7 @@
     <div class="children" v-show="open">
         <ul>
           <li @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
-          <li v-if="corpus.imageReferences.get(imageID).artefacts" v-for="artefact in corpus.imageReferences.get(imageID).artefacts" :key="'image-artefact-' + artefact">
+          <li v-if="image.artefacts" v-for="artefact in image.artefacts" :key="'image-artefact-' + artefact">
             <artefact-menu-item 
               :artefact-i-d="artefact" 
               :scroll-i-d="scrollID"

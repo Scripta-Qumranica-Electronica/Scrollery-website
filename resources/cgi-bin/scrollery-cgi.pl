@@ -696,7 +696,7 @@ sub getArtefactMask {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $addArtToCombQuery = <<'MYSQL';
-SELECT ST_AsText(region_in_sqe_image) as poly,
+SELECT ST_AsText(region_in_sqe_image) as mask,
 	transform_matrix,
 	ST_AsText(ST_Envelope(region_in_sqe_image)) AS rect
 	FROM artefact_shape
@@ -718,14 +718,15 @@ sub getScrollArtefacts {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $getScrollArtefactsQuery = <<'MYSQL';
-SELECT DISTINCT artefact_position.artefact_position_id AS id,
+SELECT DISTINCT artefact_position.artefact_position_id AS artefact_position_id,
                 ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
-                ST_AsText(artefact_shape.region_in_sqe_image) AS poly,
+                ST_AsText(artefact_shape.region_in_sqe_image) AS mask,
 				artefact_position.transform_matrix AS transform_matrix,
                 image_urls.url AS url,
                 image_urls.suffix AS suffix,
                 SQE_image.filename AS filename,
-                SQE_image.dpi AS dpi
+                SQE_image.dpi AS dpi,
+				SQE_image.image_catalog_id
 FROM artefact_position_owner
 	JOIN artefact_position USING(artefact_position_id)
 	JOIN artefact_shape USING(artefact_id)

@@ -7,12 +7,13 @@ import { Record } from 'immutable'
  * @constant
  */
 const defaults = {
-  artefact_id: 0,
+  artefact_position_id: 0,
   name: '',
   side: 0,
   mask: '',
-  transform_matrix: [],
-  rect: {},
+  transform_matrix: '',
+  rect: '',
+  image_catalog_id: Number,
 }
 
 /**

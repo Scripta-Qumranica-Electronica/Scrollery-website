@@ -1,15 +1,18 @@
 <template>
     <div :style="dimensions">
-        <svg class="combination-canvas"
+        <svg
+            v-if="corpus.combinations.get(scrollVersionID)" 
+            class="combination-canvas"
             :viewBox="viewBox"
             @mousemove="mousemove"
             @mousedown="mousedown"
             ref="svgCanvas">
-            <artefact v-for="(artefact, index) in artefacts" v-if="artefact.side === 0"
-                :key="'combination-art-' + index" 
-                :artefact-data="artefact"
+            <artefact v-for="artefact of corpus.combinations.get(scrollVersionID).artefacts"
+                v-if="corpus.imageReferences.get(corpus.artefacts.get(artefact.image_catalog_id))"
+                :key="'combination-art-' + artefact" 
+                :artefact="corpus.artefacts.get(artefact)"
                 :base-d-p-i="baseDPI"
-                :index="index"
+                :images="corpus.imageReferences.get(corpus.artefacts.get(artefact.image_catalog_id)).images"
                 :corpus="corpus"
                 ></artefact>
         </svg>
@@ -23,7 +26,7 @@
         wktParseRect,
         dbMatrixToSVG,
         svgMatrixToDB
-    } from '../utils/VectorFactory'
+    } from '~/utils/VectorFactory'
     import Artefact from './Artefact.vue'
     // I will use the rematrix package to directly apply
     // rotation to existing artefact matrices.
@@ -51,7 +54,7 @@
                 clickOrigin: undefined,
                 selectedArtefactIndex: undefined,
                 selectedArtefactLoc: undefined,
-                versionID: undefined,
+                scrollVersionID: undefined,
             }
         },
         computed: {
@@ -95,35 +98,6 @@
                             this.scrollHeight = res.data.results[0].max_y
                         }
                     })
-                this.loadFragments(scrollID, versionID)
-            },
-            loadFragments(scrollID, versionID) {
-                this.artefacts = []
-                // Most of this code should go into a convenience method
-                // in the corpus Object.
-                if (this.corpus.combinations.itemWithID(versionID)) {
-                    this.corpus.combinations.itemWithID(versionID).images.forEach(image => {
-                        // this.$store.commit('addWorking')
-                        this.corpus.populateArtefactsofImage(versionID, image)
-                        .then(res => {
-                            // this.$store.commit('delWorking')
-                            this.corpus.images.itemWithID(image).populateItems(image)
-                            this.corpus.images.itemWithID(image).artefacts.forEach(artefact => {
-                                // this.$store.commit('addWorking')
-                                this.corpus.artefacts.fetchMask(versionID, artefact)
-                                .then(res1 => {
-                                    // this.$store.commit('delWorking')
-                                    let selectedArtefact = this.corpus.artefacts.itemWithID(artefact)
-                                    this.$set(selectedArtefact, 'image', image)
-                                    this.$set(selectedArtefact, 'rect', wktParseRect(selectedArtefact.rect))
-                                    this.$set(selectedArtefact, 'poly', wktPolygonToSvg(selectedArtefact.mask, selectedArtefact.rect))
-                                    this.$set(selectedArtefact, 'transformMatrix', dbMatrixToSVG(JSON.parse(selectedArtefact.transformMatrix).matrix))
-                                    this.artefacts.push(selectedArtefact)
-                                })
-                            })
-                        })
-                    })
-                }
             },
             mousedown(event) {
                 if (event.target.nodeName === 'image') {
@@ -177,7 +151,7 @@
                 if (to.params.scrollVersionID !== '~' && to.params.scrollID !== '~'
                     && (to.params.scrollVersionID !== from.params.scrollVersionID 
                     || to.params.scrollID !== from.params.scrollID)) {
-                    this.versionID = to.params.scrollVersionID
+                    this.scrollVersionID = to.params.scrollVersionID
                     this.setScrollDimensions(to.params.scrollID, to.params.scrollVersionID)
                 }
             }

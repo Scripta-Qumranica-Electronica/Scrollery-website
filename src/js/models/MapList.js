@@ -51,8 +51,13 @@ class MapList {
             // keys are converted to strings.
             let results = []
             res.data.results.forEach(item => {
-              if (!results[this.idKey] || results[this.idKey] !== item) {
-                const record = new this.model(item)
+              let record
+              if (this.get(item[this.idKey]) && this.get(item[this.idKey]).toJS() !== item) {
+                record = this.get(item[this.idKey]).extend(item)
+              } else if (!this.get(item[this.idKey])) {
+                record = new this.model(item)
+              }
+              if (record) {
                 results.push([item[this.idKey], record])
               }
             })

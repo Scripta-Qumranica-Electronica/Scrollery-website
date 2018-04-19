@@ -74,7 +74,6 @@ export default class Corpus {
         let combinationRecord = this.combinations.get(scrollVersionID).toJS()
         combinationRecord.cols = cols
         this.combinations.set(scrollVersionID, new this.combinations.model(combinationRecord))
-        console.log(combinationRecord)
         resolve(res)
       })
     }) 
@@ -123,6 +122,34 @@ export default class Corpus {
     }) 
   }
 
+  populateArtefactsOfCombination(scrollID, scrollVersionID) {
+    return new Promise((resolve, reject) => {
+      this.artefacts.populate(
+        {
+          transaction: 'getScrollArtefacts',
+          scroll_id: scrollID,
+        },
+        scrollVersionID
+      )
+      .then(res => {
+        scrollVersionID = scrollVersionID >>> 0
+        let artefacts = []
+        res.forEach(artefact => {
+          artefacts.push(artefact[this.artefacts.idKey])
+          let imageRefRecord = this.imageReferences.get(artefact.image_catalog_id).toJS()
+          imageRefRecord.artefacts.push(artefact[this.artefacts.idKey])
+          this.imageReferences.set(artefact.image_catalog_id, new this.imageReferences.model(imageRefRecord))
+        })
+
+        let combinationRecord = this.combinations.get(scrollVersionID).toJS()
+        combinationRecord.artefacts = [...new Set([...combinationRecord.artefacts, ...artefacts])]
+        this.combinations.set(scrollVersionID, new this.combinations.model(combinationRecord))
+
+        resolve(res)
+      })
+    }) 
+  }
+
   populateArtefactsOfImageReference(imageReferenceID, scrollVersionID) {
     return new Promise((resolve, reject) => {
       this.artefacts.populate({image_catalog_id: imageReferenceID}, scrollVersionID)
@@ -138,7 +165,7 @@ export default class Corpus {
         this.imageReferences.set(imageReferenceID, new this.imageReferences.model(imageRefRecord))
 
         let combinationRecord = this.combinations.get(scrollVersionID).toJS()
-        combinationRecord.artefacts = [...new Set([...combinationRecord.artefacts ,...artefacts])]
+        combinationRecord.artefacts = [...new Set([...combinationRecord.artefacts, ...artefacts])]
         this.combinations.set(scrollVersionID, new this.combinations.model(combinationRecord))
 
         resolve(res)
