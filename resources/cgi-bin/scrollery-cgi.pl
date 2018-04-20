@@ -156,7 +156,11 @@ sub getArtOfImage {
 	my $getArtOfImageQuery = <<'MYSQL';
 SELECT DISTINCT	artefact_position.artefact_position_id,
 				artefact_data.name, 
-				catalog_side AS side 
+				catalog_side AS side,
+				ST_AsText(artefact_shape.region_in_sqe_image) as mask,
+				artefact_position.transform_matrix,
+				ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
+				SQE_image.image_catalog_id
 FROM artefact_shape
 	JOIN artefact_shape_owner USING(artefact_shape_id)
 	JOIN artefact_position USING(artefact_id)
@@ -340,6 +344,7 @@ FROM SQE_image
 	JOIN discrete_canonical_reference USING(discrete_canonical_reference_id)
 WHERE edition_catalog.edition_side=0
       AND discrete_canonical_reference.column_of_scroll_id = ?
+	  ORDER BY SQE_image.is_master DESC
 MYSQL
 	} elsif ($idType eq 'institution') {
 		$getImagesOfFragmentQuery = <<'MYSQL';

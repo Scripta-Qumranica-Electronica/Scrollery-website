@@ -87,9 +87,9 @@ export default {
         this.corpus.populateColumnsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
         this.corpus.populateImageReferencesOfCombination(this.combination.scroll_version_id)
         .then(res => {
-          this.corpus.populateArtefactsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
-          .then(res1 => {
-          })
+          // this.corpus.populateArtefactsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
+          // .then(res1 => {
+          // })
         })
       }
     },

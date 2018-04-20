@@ -30,11 +30,6 @@ export default class Corpus {
     this._sessionID = sessionID
     this._user = user
 
-    // this.combinations = new MenuCombinations(this.sessionID, this._user, this._set)
-    // this.columns = new MenuColumns(this.sessionID, this._user, this._set)
-    // this.images = new MenuImages(this.sessionID, this._user, this._set)
-    // this.artefacts = new MenuArtefacts(this.sessionID, this._user, this._set)
-
     this.combinations = new Combinations(
       this._user,
       this._sessionID
@@ -96,14 +91,14 @@ export default class Corpus {
     }) 
   }
 
-  populateImagesOfCombination(imageReferenceID, scrollVersionID) {
-    return new Promise((resolve, reject) => {
-      this.images.populate({id: imageReferenceID}, scrollVersionID)
-      .then(res => {
-        resolve(res)
-      })
-    }) 
-  }
+  // populateImagesOfCombination(imageReferenceID, scrollVersionID) {
+  //   return new Promise((resolve, reject) => {
+  //     this.images.populate({id: imageReferenceID}, scrollVersionID)
+  //     .then(res => {
+  //       resolve(res)
+  //     })
+  //   }) 
+  // }
 
   populateImagesOfImageReference(imageReferenceID, scrollVersionID) {
     return new Promise((resolve, reject) => {

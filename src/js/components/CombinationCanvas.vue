@@ -8,11 +8,11 @@
             @mousedown="mousedown"
             ref="svgCanvas">
             <artefact v-for="artefact of corpus.combinations.get(scrollVersionID).artefacts"
-                v-if="corpus.imageReferences.get(corpus.artefacts.get(artefact.image_catalog_id))"
+                v-if="corpus.combinations.get(scrollVersionID) && corpus.artefacts.get(artefact)"
                 :key="'combination-art-' + artefact" 
                 :artefact="corpus.artefacts.get(artefact)"
                 :base-d-p-i="baseDPI"
-                :images="corpus.imageReferences.get(corpus.artefacts.get(artefact.image_catalog_id)).images"
+                :images="corpus.imageReferences.get(corpus.artefacts.get(artefact).image_catalog_id).images"
                 :corpus="corpus"
                 ></artefact>
         </svg>
@@ -151,8 +151,17 @@
                 if (to.params.scrollVersionID !== '~' && to.params.scrollID !== '~'
                     && (to.params.scrollVersionID !== from.params.scrollVersionID 
                     || to.params.scrollID !== from.params.scrollID)) {
-                    this.scrollVersionID = to.params.scrollVersionID
+                    this.scrollVersionID = to.params.scrollVersionID >>> 0
                     this.setScrollDimensions(to.params.scrollID, to.params.scrollVersionID)
+                    this.corpus.populateImageReferencesOfCombination(to.params.scrollVersionID)
+                    .then(res => {
+                        this.corpus.combinations.get(this.scrollVersionID).imageReferences.forEach(reference => {
+                            this.corpus.populateImagesOfImageReference(reference, this.scrollVersionID)
+                            .then(res1 => {
+                                this.corpus.populateArtefactsOfImageReference(reference, this.scrollVersionID)
+                            })
+                        })
+                    })
                 }
             }
         }

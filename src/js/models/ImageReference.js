@@ -54,6 +54,6 @@ export default class ImageReference extends Record(defaults) {
       ...attrs
     }
 
-    return new Image(attrs)
+    return new ImageReference(attrs)
   }
 }

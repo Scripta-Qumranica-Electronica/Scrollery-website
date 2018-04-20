@@ -51,7 +51,7 @@ class MapList {
             // keys are converted to strings.
             let results = []
             res.data.results.forEach(item => {
-              let record
+              let record = undefined
               if (this.get(item[this.idKey]) && this.get(item[this.idKey]).toJS() !== item) {
                 record = this.get(item[this.idKey]).extend(item)
               } else if (!this.get(item[this.idKey])) {

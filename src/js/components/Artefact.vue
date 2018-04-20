@@ -14,7 +14,7 @@
         <image
             v-if="images && images[0] && corpus.images.get(images[0])"
             :clip-path="'url(#clip-' + artefact.side + '-' + artefact.artefact_position_id + ')'"
-            :xlink:href="corpus.images.get(images[0]) | address"
+            :xlink:href="address"
             :width="svg_rect.width ? svg_rect.width : 0"
             :height="svg_rect.height ? svg_rect.height : 0"
             :data-index="index"/>
@@ -26,13 +26,17 @@ import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG } from '~/utils/VectorFact
 
 export default {
     props: {
-        artefact: {},
+        artefact: {
+            type: Object,
+        },
         baseDPI: {
             type: Number,
             default: 1215,
         },
         index: Number,
-        images: [],
+        images: {
+            type: Array,
+        },
         corpus: {},
     },
   computed: {
@@ -50,21 +54,15 @@ export default {
       },
       imageReferences() {
           return this.corpus.imageReferences.get(this.artefact.image_catalog_id).images
+      },
+      address() {
+        return this.corpus.images.get(this.images[0]).url 
+                + this.corpus.images.get(this.images[0]).filename
+                + '/' + this.svg_rect.x + ',' + this.svg_rect.y
+                + ',' + this.svg_rect.width + ',' + this.svg_rect.height 
+                + '/pct:10/0/' 
+                + this.corpus.images.get(this.images[0]).suffix
       }
   },
-  mounted() {
-    console.log(this.artefact.toJS())
-    console.log(this.corpus.artefacts._items.toJS())
-    console.log(this.corpus.images._items.toJS())
-    console.log(this.corpus.imageReferences._items.toJS())
-  },
-  filters: {
-      address(element) {
-        return element.url + element.filename
-                + '/' + this.artefact.rect.x + ',' + this.artefact.rect.y
-                + ',' + this.artefact.rect.width + ',' + this.artefact.rect.height 
-                + '/pct:10/0/' + element.suffix
-      }
-  }
 }
 </script>

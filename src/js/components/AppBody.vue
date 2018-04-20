@@ -69,6 +69,7 @@ export default {
       keepMenuOpen: false,
       mouseOver: false,
       corpus: Corpus,
+      menuLoaded: false,
     }
   },
   computed: {
@@ -83,6 +84,7 @@ export default {
     this.corpus = new Corpus(this.$store.state.sessionID, this.$store.state.userID)
     this.corpus.populateCombinations()
     .then(res => {
+      this.menuLoaded = true
       this.$store.commit('delWorking')
       if (this.$route.params.scrollID && this.$route.params.scrollID !== '~') {
         this.$store.commit('addWorking')

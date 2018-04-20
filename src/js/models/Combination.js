@@ -55,6 +55,6 @@ export default class Combination extends Record(defaults) {
       ...attrs
     }
 
-    return new Comb(attrs)
+    return new Combination(attrs)
   }
 }

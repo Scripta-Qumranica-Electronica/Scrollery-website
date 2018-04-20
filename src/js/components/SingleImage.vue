@@ -255,8 +255,8 @@ export default {
           this.artefact = 'new'
           this.artName = to.params.artID.split('name-')[1]
         } else {
-          this.artefact = to.params.artID
-          this.scrollVersionID = to.params.scrollVersionID
+          this.artefact = to.params.artID >>> 0
+          this.scrollVersionID = to.params.scrollVersionID >>> 0
           if(this.corpus.artefacts.get(this.artefact).mask === '') {
             // this.$store.commit('addWorking')
             this.corpus.artefacts.fetchMask(to.params.scrollVersionID, to.params.artID)
