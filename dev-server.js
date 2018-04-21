@@ -7,7 +7,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const url = require('url')
-app.use(bodyParser.text({ type: '*/*' }))
+app.use(bodyParser.json({ type: 'application/json' }))
 
 const { exec } = require('child_process')
 
@@ -65,10 +65,15 @@ const perl = (req, res) => {
     env.AUTH_TYPE = auth[0]
   }
 
+  var stringifiedEnv = []
+  for (var k in env) {
+    stringifiedEnv.push(`export ${k}="${('' + env[k]).replace(';', ';')}"`)
+  }
+
   const sendErr = msg => res.status(500).send(msg || 'Request Failed')
   exec(
-    `carton exec ${file} 'POSTDATA=${req.body}'`,
-    { cwd: file.substring(0, file.lastIndexOf('/')), maxBuffer: Infinity, env },
+    `${stringifiedEnv.join(' && ')} && carton exec ${file} 'POSTDATA=${JSON.stringify(req.body)}'`,
+    { cwd: file.substring(0, file.lastIndexOf('/')), maxBuffer: Infinity },
     (err, stdout, stderr) => {
       try {
         if (err) {
