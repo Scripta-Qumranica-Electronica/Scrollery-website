@@ -72,7 +72,7 @@ const perl = (req, res) => {
 
   const sendErr = msg => res.status(500).send(msg || 'Request Failed')
   exec(
-    `${stringifiedEnv.join(' && ')} && carton exec ${file} 'POSTDATA=${JSON.stringify(req.body)}'`,
+    `${stringifiedEnv.join(' && ')} && carton exec ${file} '${JSON.stringify(req.body)}'`,
     { cwd: file.substring(0, file.lastIndexOf('/')), maxBuffer: Infinity },
     (err, stdout, stderr) => {
       try {
