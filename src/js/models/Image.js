@@ -1,4 +1,4 @@
-import { Record } from 'immutable'
+import extendModel from './extendModel.js'
 
 /**
  * Default values for a new sign object
@@ -29,38 +29,11 @@ const defaults = {
  * @class
  * @extends Record
  */
-export default class Image extends Record(defaults) {
-
-  constructor(attrs) {
-    super(attrs)
-  }
+export default class Image extends extendModel(defaults) {
 
   /**
-   * @public
-   * @instance
-   * 
-   * @return {string} the sign Id
+   * @return {string} the address of the image file
    */
-  getID() {
-    return this.id
-  }
-
-  /**
-   * @public
-   * @instance
-   * 
-   * @param {object} attrs A set of attributes to apply to the copy
-   * @return {Sign}        The sign with the new attributes applied
-   */
-  extend(attrs = {}) {
-    attrs = {
-      ...this.toJS(), // only enumerable, own properties
-      ...attrs
-    }
-
-    return new Image(attrs)
-  }
-
   getAddress() {
     return `${this.url}${this.filename}/`
   }
