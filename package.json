@@ -1,7 +1,7 @@
 {
   "name": "sqe",
   "description": "Scripta Qumranica Electronica - Digital Tools for the Dead Sea Scrolls",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "scripts": {
     "precommit": "lint-staged",
     "prepush": "karma start --config karma.conf.js --browsers=Chrome --single-run",
@@ -17,7 +17,7 @@
     "posttest_travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "lint-staged": {
-    "*": ["npm run prettier", "git add"]
+    "src/**/*.(js|vue)": ["npm run prettier", "git add"]
   },
   "devDependencies": {
     "@vue/test-utils": "^1.0.0-beta.10",

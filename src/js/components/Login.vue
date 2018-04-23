@@ -11,7 +11,7 @@
       </el-form-item>
       <el-form-item>
         <span slot="label">Password <span class="reqired warningText"></span> <span class="error warningText">{{ passwordErr }}</span></span>
-        <el-input class="loginPassword" type="password" placeholder="Your password" :class='{"error": passwordErr.length}' v-model='password'></el-input>
+        <el-input class="loginPassword" type="password" placeholder="Your password" :class='{"error": passwordErr.length}' v-model='passwd'></el-input>
       </el-form-item>
       <el-form-item label="Language / Sprache / שפה">
         <el-select class="langSelect" v-model="language">
@@ -36,7 +36,7 @@ export default {
     return {
       visible: false,
       user: '',
-      password: '',
+      passwd: '',
       errMsg: '',
       usernameErr: '',
       passwordErr: '',
@@ -45,10 +45,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['username', 'sessionID']),
+    ...mapGetters(['username', 'password', 'sessionID']),
   },
   created() {
     this.user = this.username
+    this.passwd = this.password
 
     // if there's a session hanging around in localStorage, check that
     if (this.sessionID) {
@@ -59,7 +60,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setSessionID', 'setUserID', 'setUsername', 'setLanguage']),
+    ...mapMutations(['setSessionID', 'setUserID', 'setUsername', 'setPassword', 'setLanguage']),
     onSubmit() {
       const isUserValid = this.validateUsername()
       const isPasswordValid = this.validatePassword()
@@ -79,7 +80,7 @@ export default {
       }
     },
     validatePassword() {
-      if (!this.password.trim()) {
+      if (!this.passwd.trim()) {
         this.passwordErr = 'Password is required'
         return false
       } else {
@@ -115,7 +116,7 @@ export default {
     attemptLogin() {
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         USER_NAME: this.user.trim(),
-        PASSWORD: this.password.trim(),
+        PASSWORD: this.passwd.trim(),
         transaction: 'validateSession',
         SCROLLVERSION: 1,
       })
@@ -140,6 +141,7 @@ export default {
           this.setSessionID(res.data.SESSION_ID)
           this.setUserID(res.data.USER_ID)
           this.setUsername(this.user.trim())
+          this.setPassword(this.passwd.trim())
           this.setLanguage(this.language)
 
           // Load language files

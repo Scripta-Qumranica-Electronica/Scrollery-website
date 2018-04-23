@@ -39,7 +39,8 @@ export default {
     this.$post('resources/cgi-bin/scrollery-cgi.pl', {
       transaction: 'getCombs',
       user: this.$store.getters.userID,
-      SESSION_ID: this.$store.getters.sessionID,
+      USER_NAME: this.$store.getters.username,
+      PASSWORD: this.$store.getters.password,
     }).then(res => {
       this.combinations = res.data.results
     })
@@ -50,7 +51,8 @@ export default {
         transaction: 'getColOfComb',
         version_id: this.selectedCombination.version_id,
         combID: this.selectedCombination.scroll_id,
-        SESSION_ID: this.$store.getters.sessionID,
+        USER_NAME: this.$store.getters.username,
+        PASSWORD: this.$store.getters.password,
       }).then(res => {
         this.columns = res.data.results
       })
@@ -63,7 +65,8 @@ export default {
         transaction: 'getSignStreamOfColumn',
         SCROLL_VERSION: scrollVersionID,
         colId: colID,
-        SESSION_ID: this.$store.getters.sessionID,
+        USER_NAME: this.$store.getters.username,
+        PASSWORD: this.$store.getters.password,
       }).then(res => {
         if (res.status === 200 && res.data) {
           this.ssp
