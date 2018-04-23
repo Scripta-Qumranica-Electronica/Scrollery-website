@@ -72,7 +72,8 @@ export default {
         transaction: 'getScrollWidth',
         scroll_id: scrollID,
         scroll_version_id: versionID,
-        SESSION_ID: this.$store.getters.sessionID,
+        USER_NAME: this.$store.getters.username,
+        PASSWORD: this.$store.getters.password,
       }).then(res => {
         if (res.status === 200 && res.data.results) {
           this.scrollWidth = res.data.results[0].max_x
@@ -82,7 +83,8 @@ export default {
         transaction: 'getScrollHeight',
         scroll_id: scrollID,
         scroll_version_id: versionID,
-        SESSION_ID: this.$store.getters.sessionID,
+        USER_NAME: this.$store.getters.username,
+        PASSWORD: this.$store.getters.password,
       }).then(res => {
         if (res.status === 200 && res.data.results) {
           this.scrollHeight = res.data.results[0].max_y
@@ -95,7 +97,8 @@ export default {
         transaction: 'getScrollArtefacts',
         scroll_id: scrollID,
         scroll_version_id: versionID,
-        SESSION_ID: this.$store.getters.sessionID,
+        USER_NAME: this.$store.getters.username,
+        PASSWORD: this.$store.getters.password,
       }).then(res => {
         if (res.status === 200 && res.data.results) {
           this.artefacts = res.data.results
@@ -137,7 +140,8 @@ export default {
           art_id: this.artefacts[this.selectedArtefactIndex].id,
           matrix: svgMatrixToDB(this.artefacts[this.selectedArtefactIndex].matrix),
           version_id: this.$route.params.scrollVersionID,
-          SESSION_ID: this.$store.getters.sessionID,
+          USER_NAME: this.$store.getters.username,
+          PASSWORD: this.$store.getters.password,
         }).then(res => {
           if (res.status === 200 && res.data.returned_info) {
             this.artefacts[this.selectedArtefactIndex].id = res.data.returned_info
