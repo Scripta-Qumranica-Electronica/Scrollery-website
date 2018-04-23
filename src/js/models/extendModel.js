@@ -21,20 +21,21 @@ const makeModel = (defaultValues = {}) => {
       return this.id
     }
 
-  /**
-   * @public
-   * @instance
-   * 
-   * @param  {object}    attrs A set of attributes to apply to the copy
-   * @return {BaseModel}       The new base model extended with new props
-   */
-  extend(attrs = {}) {
-    attrs = {
-      ...this.toJS(), // only enumerable, own properties
-      ...attrs
-    }
+    /**
+     * @public
+     * @instance
+     * 
+     * @param  {object}    attrs A set of attributes to apply to the copy
+     * @return {BaseModel}       The new base model extended with new props
+     */
+    extend(attrs = {}) {
+      attrs = {
+        ...this.toJS(), // only enumerable, own properties
+        ...attrs
+      }
 
-    return new this.constructor(attrs);
+      return new this.constructor(attrs)
+    }
   }
 
   return BaseModel
