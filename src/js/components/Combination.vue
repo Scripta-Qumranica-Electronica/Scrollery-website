@@ -29,9 +29,7 @@ export default {
         'combination-canvas': CombinationCanvas,
     },
     props: {
-        corpus: {
-            type: Object,
-        }
+        corpus: undefined,
     },
     data() {
         return {

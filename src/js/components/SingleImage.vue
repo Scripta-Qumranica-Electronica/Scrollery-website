@@ -1,6 +1,6 @@
-// TODO move menu into its own component
 <template>
   <div style="{width: 100%; height: 100%;}">
+    <!-- TODO move menu into its own component -->
     <el-row class="single-image-pane-menu" :gutter="4" type="flex" justify="space-around">
       <el-col :span="8">
         <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple size="mini">
@@ -275,14 +275,19 @@ export default {
   filters: {
     formatImageType(value) {
       let formattedString = ''
-      if (value == 0) {
-        formattedString += 'Full Color'
-      } else if (value == 1) {
-        formattedString += '940nm'
-      } else if (value == 2) {
-        formattedString += '940nm RL'
-      } else if (value == 3) {
-        formattedString += '940nm RR'
+      switch (value) {
+        case 0:
+          formattedString += 'Full Color'
+          break
+        case 1:
+          formattedString += '940nm'
+          break
+        case 2:
+          formattedString += '940nm RL'
+          break
+        case 3:
+          formattedString += '940nm RR'
+          break
       }
       return formattedString
     }

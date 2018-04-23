@@ -4,14 +4,15 @@ import Col from './Col.js'
 export default class Cols extends MapList {
 
   constructor(
-    sessionID,
+    username,
+    password,
     idKey,
     ajaxPayload = undefined,
     attributes = {})
   {
     idKey = idKey || 'col_id'
     ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getColOfComb'}
-    super(sessionID, idKey, ajaxPayload, Col, attributes)
+    super(username, password, idKey, ajaxPayload, Col, attributes)
   }
 
   static getModel() {

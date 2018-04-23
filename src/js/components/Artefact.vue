@@ -1,5 +1,6 @@
 <template>
-    <g :transform="'matrix(' + svg_matrix.join(', ') + ')'">
+    <g  v-if="artefact.side === 0"
+        :transform="'matrix(' + svg_matrix.join(', ') + ')'">
         <defs>
             <path :d="svg_shape" :id="'path-' + artefact.side + '-' + artefact.artefact_position_id" />
             <clipPath :id="'clip-' + artefact.side + '-' + artefact.artefact_position_id">
@@ -26,9 +27,7 @@ import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG } from '~/utils/VectorFact
 
 export default {
     props: {
-        artefact: {
-            type: Object,
-        },
+        artefact: undefined,
         baseDPI: {
             type: Number,
             default: 1215,

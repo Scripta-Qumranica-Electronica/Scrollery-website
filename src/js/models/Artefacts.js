@@ -6,14 +6,15 @@ import {wktPolygonToSvg, dbMatrixToSVG} from '~/utils/VectorFactory.js'
 export default class Artefacts extends MapList {
 
   constructor(
-    sessionID,
+    username,
+    password,
     idKey,
     ajaxPayload = undefined,
     attributes = {})
   {
     idKey = idKey || 'artefact_position_id'
     ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getArtOfImage'}
-    super(sessionID, idKey, ajaxPayload, Artefact, attributes)
+    super(username, password, idKey, ajaxPayload, Artefact, attributes)
   }
 
   static getModel() {

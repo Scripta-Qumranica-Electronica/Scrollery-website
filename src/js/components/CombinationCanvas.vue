@@ -31,7 +31,6 @@
     // I will use the rematrix package to directly apply
     // rotation to existing artefact matrices.
     import * as Rematrix from 'rematrix'
-
     export default {
         props: {
             globalScale: {
@@ -80,7 +79,6 @@
                         transaction: 'getScrollWidth',
                         scroll_id: scrollID,
                         scroll_version_id: versionID,
-                        SESSION_ID: this.$store.getters.sessionID,
                     })
                     .then(res => {
                         if (res.status === 200 && res.data.results) {
@@ -91,7 +89,6 @@
                         transaction: 'getScrollHeight',
                         scroll_id: scrollID,
                         scroll_version_id: versionID,
-                        SESSION_ID: this.$store.getters.sessionID
                     })
                     .then(res => {
                         if (res.status === 200 && res.data.results) {
@@ -129,7 +126,6 @@
                             art_id: this.artefacts[this.selectedArtefactIndex].id,
                             matrix: svgMatrixToDB(this.artefacts[this.selectedArtefactIndex].matrix),
                             version_id: this.$route.params.scrollVersionID,
-                            SESSION_ID: this.$store.getters.sessionID
                         })
                         .then(res => {
                             if (res.status === 200 && res.data.returned_info) {

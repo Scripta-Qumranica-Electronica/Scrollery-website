@@ -30,7 +30,7 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import sqeManifest from '../../../sqe-manifest.json'
+import sqeManifest from '@/sqe-manifest.json'
 
 export default {
   props: {

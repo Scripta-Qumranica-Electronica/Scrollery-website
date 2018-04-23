@@ -5,14 +5,15 @@ class Combinations extends MapList {
 
   constructor(
     user,
-    sessionID,
+    username, 
+    password,
     idKey,
     ajaxPayload = undefined,
     attributes = {})
   {
     idKey = idKey || 'scroll_version_id'
     ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getCombs', user: user}
-    super(sessionID, idKey, ajaxPayload, Combination, attributes)
+    super(username, password, idKey, ajaxPayload, Combination, attributes)
   }
 
   static getModel() {
