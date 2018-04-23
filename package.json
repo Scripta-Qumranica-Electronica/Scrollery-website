@@ -1,7 +1,7 @@
 {
   "name": "sqe",
   "description": "Scripta Qumranica Electronica - Digital Tools for the Dead Sea Scrolls",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "scripts": {
     "precommit": "lint-staged",
     "prepush": "karma start --config karma.conf.js --browsers=Chrome --single-run",
