@@ -9,6 +9,9 @@ describe("ColumnMenuItem", function() {
     const scrollID = 2
     const scrollVersionID = 2
     const columnID = 2
+    const column = {
+        name: 'none'
+    }
 
     beforeEach(() => {
         wrapper = mount(ColumnMenuItem, {
@@ -16,6 +19,7 @@ describe("ColumnMenuItem", function() {
                 scrollID: scrollID,
                 versionID: scrollVersionID,
                 columnID: columnID,
+                column: column,
             },
             mocks: { 
                 $router: { push },

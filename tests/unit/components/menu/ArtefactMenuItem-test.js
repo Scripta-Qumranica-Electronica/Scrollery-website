@@ -18,7 +18,7 @@ describe("ArtefactMenuItem", function() {
                 scrollID: scrollID,
                 imageID: imageID,
                 scrollVersionID: scrollVersionID,
-                corpus: new MenuCorpus(),
+                corpus: new Corpus(),
             },
             mocks: { 
                 $router: { push },
@@ -46,7 +46,7 @@ describe("ArtefactMenuItem", function() {
     })
 })
 
-class MenuCorpus {
+class Corpus {
 
     /**
      * @param {object}          attributes the image attributes
@@ -54,12 +54,7 @@ class MenuCorpus {
      */
     constructor() {
         this.artefacts = {
-            fetchMask: (version, artefact) => {
-                return new Promise((resolve, reject) => {
-                    resolve('good')
-                })
-            },
-            itemWithID: (id) => {
+            get: (id) => {
                 return {name: 'none'}
             }
         }

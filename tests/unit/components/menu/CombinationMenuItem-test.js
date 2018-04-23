@@ -8,13 +8,21 @@ describe("CombinationMenuItem", function() {
     const push = sinon.spy()
     const scrollID = 2
     const scrollVersionID = 2
+    const combination = {
+        name: 'none',
+        user_id: 1,
+        locked: 1,
+        cols: [],
+        imageReferences: [],
+        scroll_id: 2,
+        scroll_version_id: 2
+    }
 
     beforeEach(() => {
         wrapper = mount(CombinationMenuItem, {
             propsData: {
-                corpus: new MenuCorpus(),
-                scrollID: scrollID,
-                versionID: scrollVersionID,
+                corpus: new Corpus(),
+                combination: combination,
             },
             mocks: { 
                 $router: { push },
@@ -42,32 +50,33 @@ describe("CombinationMenuItem", function() {
     })
 })
 
-class MenuCorpus {
-
-    /**
-     * @param {object}          attributes the image attributes
-     * @param {array.<MenuImage>=[]} [images]    an array of images
-     */
+class Corpus {
     constructor() {
-        this.combinations = new MenuCombinations()
+        this.combinations = new Combinations()
     }
-    populateColumnsOfScrollVersion(versionID, scrollID) {
+    populateColumnsOfCombination(scrollID, versionID) {
         return {versionID: versionID, scrollID: scrollID}
     }
-    populateImagesOfScrollVersion(versionID, scrollID) {
-        return {versionID: versionID, scrollID: scrollID}
+    populateImageReferencesOfCombination(versionID) {
+        return {versionID: versionID}
     }
-  }
+}
 
-class MenuCombinations {
+class Combinations {
     constructor() {
         this.items = {
             2: {
-                name: 'test'
+                name: 'none',
+                user_id: 1,
+                locked: 1,
+                cols: [],
+                imageReferences: [],
+                scroll_id: 2,
+                scroll_version_id: 2
             }
         }
     }
-    itemWithID(id) {
+    get(id) {
         return this.items[id]
     }
 }

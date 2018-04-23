@@ -9,11 +9,18 @@ describe("ImageMenuItem", function() {
     const scrollID = 2
     const scrollVersionID = 2
     const imageID = 2
+    const image = {
+        institution: 'none',
+        lvl1: '1',
+        lvl2: '2',
+        side: 0,
+    }
 
     beforeEach(() => {
         wrapper = mount(ImageMenuItem, {
             propsData: {
-                corpus: new MenuCorpus(),
+                corpus: new Corpus(),
+                image: image,
                 scrollID: scrollID,
                 versionID: scrollVersionID,
                 imageID: imageID,
@@ -50,28 +57,28 @@ describe("ImageMenuItem", function() {
     })
 })
 
-class MenuCorpus {
+class Corpus {
 
     /**
      * @param {object}          attributes the image attributes
      * @param {array.<MenuImage>=[]} [images]    an array of images
      */
     constructor() {
-        this.combinations = new MenuCombinations()
-        this.images = new MenuImages()
+        this.combinations = new Combinations()
+        this.images = new Images()
     }
     populateColumnsOfScrollVersion(versionID, scrollID) {
         return {versionID: versionID, scrollID: scrollID}
     }
-    populateImagesOfScrollVersion(versionID, scrollID) {
-        return {versionID: versionID, scrollID: scrollID}
+    populateArtefactsOfImageReference(imageID, scrollVersionID) {
+        return {scrollVersionID: scrollVersionID, imageID: imageID}
     }
     populateArtefactsofImage(versionID, scrollID) {
         return {versionID: versionID, scrollID: scrollID}
     }
   }
 
-class MenuCombinations {
+class Combinations {
     constructor() {
         this.items = {
             2: {
@@ -84,7 +91,7 @@ class MenuCombinations {
     }
 }
 
-class MenuImages {
+class Images {
     constructor() {
         this.items = {
             2: {

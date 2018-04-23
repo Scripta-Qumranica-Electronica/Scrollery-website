@@ -9,7 +9,9 @@ describe("MainMenu", function() {
     beforeEach(() => {
       wrapper = mount(MainMenu, {
         propsData: {
-            corpus: new MenuCorpus(),
+            corpus: new Corpus(),
+            open: true,
+            keepOpen: true,
         }
       })
       vm = wrapper.vm
@@ -21,14 +23,14 @@ describe("MainMenu", function() {
 
 })
 
-class MenuCorpus {
+class Corpus {
 
     /**
      * @param {object}          attributes the image attributes
      * @param {array.<MenuImage>=[]} [images]    an array of images
      */
     constructor() {
-        this.combinations = new MenuCombinations()
+        this.combinations = new Combinations()
     }
     populateColumnsOfScrollVersion(versionID, scrollID) {
         return {versionID: versionID, scrollID: scrollID}
@@ -38,7 +40,7 @@ class MenuCorpus {
     }
   }
 
-class MenuCombinations {
+class Combinations {
     constructor() {
         this.items = {
             2: {
@@ -46,7 +48,10 @@ class MenuCombinations {
             }
         }
     }
-    itemWithID(id) {
+    get(id) {
         return this.items[id]
+    }
+    keys() {
+        return Object.keys(this.items)
     }
 }
