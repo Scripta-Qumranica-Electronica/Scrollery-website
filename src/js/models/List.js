@@ -1,4 +1,4 @@
-import Model from './Model.js'
+import { Record } from 'immutable'
 
 /**
  * A base class for lists of models. Mainly, this provides an interface to
@@ -49,7 +49,7 @@ class List {
    * @returns {Record}  the record class itself
    */
   static getModel() {
-    return Model
+    return Record
   };
 
   /**
