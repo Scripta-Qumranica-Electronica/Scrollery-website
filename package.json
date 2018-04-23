@@ -17,7 +17,7 @@
     "posttest_travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "lint-staged": {
-    "src/**/*.js": ["npm run prettier", "git add"]
+    "src/**/*.(js|vue)": ["npm run prettier", "git add"]
   },
   "devDependencies": {
     "@vue/test-utils": "^1.0.0-beta.10",
