@@ -1,4 +1,4 @@
-import { Record } from 'immutable'
+import extendModel from './extendModel.js'
 
 /**
  * Default values for a new sign object
@@ -24,35 +24,4 @@ const defaults = {
  * @class
  * @extends Record
  */
-export default class Artefact extends Record(defaults) {
-
-  constructor(attrs) {
-    super(attrs)
-  }
-
-  /**
-   * @public
-   * @instance
-   * 
-   * @return {string} the sign Id
-   */
-  getID() {
-    return this.id
-  }
-
-  /**
-   * @public
-   * @instance
-   * 
-   * @param {object} attrs A set of attributes to apply to the copy
-   * @return {Sign}        The sign with the new attributes applied
-   */
-  extend(attrs = {}) {
-    attrs = {
-      ...this.toJS(), // only enumerable, own properties
-      ...attrs
-    }
-
-    return new Artefact(attrs)
-  }
-}
+export default class Artefact extends extendModel(defaults) { }
