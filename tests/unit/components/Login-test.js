@@ -157,8 +157,8 @@ describe('Login', function() {
 
     it('require a non-empty, non-whitespace password and username to pass', () => {
       const user = 'name'
-      const password = 'password'
-      wrapper.setData({ user, password })
+      const passwd = 'password'
+      wrapper.setData({ user, passwd })
 
       const spy = sinon.spy()
       vm.attemptLogin = spy
@@ -174,13 +174,13 @@ describe('Login', function() {
 
   it('should attempt login on form submit', done => {
     const user = 'name'
-    const password = 'password'
-    wrapper.setData({ user, password })
+    const passwd = 'password'
+    wrapper.setData({ user, passwd })
 
     // patch in method for assertions
     vm.$post = function(url, data) {
       expect(data.USER_NAME).to.equal(user)
-      expect(data.PASSWORD).to.equal(password)
+      expect(data.PASSWORD).to.equal(passwd)
       expect(data.transaction).to.equal('validateSession')
       done()
 
