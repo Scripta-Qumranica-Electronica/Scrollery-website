@@ -8,19 +8,23 @@
     "prettier": "prettier --config ./.prettierrc.yml --write ./{tests,gstsrc}/**/*.{js,vue}",
     "dev": "webpack --config webpack.dev.js",
     "prod": "webpack --config webpack.prod.js",
-    "start": "node ./dev-server.js",
+    "start": "node ./tools/dev_server.js",
     "setup:db": "sh ./bin/init-docker.sh",
     "test": "karma start --config karma.conf.js",
     "test:chrome": "karma start --config karma.conf.js --browsers=Chrome",
-    "test_travis":
-      "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=Chrome,Firefox",
-    "posttest_travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "test_travis": "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=Chrome,Firefox",
+    "posttest_travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "test:server": "mocha ./tests/server/**/*-test.js --timeout=120000 --watch"
   },
   "lint-staged": {
-    "src/**/*.(js|vue)": ["npm run prettier", "git add"]
+    "src/**/*.(js|vue)": [
+      "npm run prettier",
+      "git add"
+    ]
   },
   "devDependencies": {
     "@vue/test-utils": "^1.0.0-beta.10",
+    "app": "file:./tools",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-istanbul": "^4.1.5",
@@ -81,6 +85,7 @@
     "prettier": "^1.12.0",
     "quill": "^1.3.6",
     "rematrix": "^0.2.2",
+    "supertest": "^3.0.0",
     "uuid": "^3.2.1",
     "vue": "^2.5.13",
     "vue-router": "^3.0.1",
