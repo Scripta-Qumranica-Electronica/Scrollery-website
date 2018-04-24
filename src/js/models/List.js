@@ -1,4 +1,6 @@
-import { Record } from 'immutable'
+import extendModel from './extendModel.js'
+
+const Model = extendModel()
 
 /**
  * A base class for lists of models. Mainly, this provides an interface to
@@ -7,7 +9,6 @@ import { Record } from 'immutable'
  * It has a similar API as the array, but is more focused
  */
 class List {
-
 
   /**
    * @param {object={}} [attributes] List attributes 
@@ -49,7 +50,7 @@ class List {
    * @returns {Record}  the record class itself
    */
   static getModel() {
-    return Record
+    return Model
   };
 
   /**
