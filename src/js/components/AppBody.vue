@@ -80,6 +80,7 @@ export default {
   created() {
     // Create and populate the corpus model, with existing data
     // from the router.
+    this.$store.commit('resetWorking')
     this.$store.commit('addWorking')
     this.corpus = new Corpus(this.$store.state.userID, this.$store.state.username, this.$store.state.password)
     this.corpus.populateCombinations()

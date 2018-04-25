@@ -14,6 +14,7 @@
                 :base-d-p-i="baseDPI"
                 :images="corpus.imageReferences.get(corpus.artefacts.get(artefact).image_catalog_id).images"
                 :corpus="corpus"
+                :index="artefact"
                 ></artefact>
         </svg>
     </div>
@@ -96,6 +97,8 @@
                         }
                     })
             },
+            // TODO: I need to now rewrite these mouselistener functions
+            // to work with the new model system.
             mousedown(event) {
                 if (event.target.nodeName === 'image') {
                     this.selectedArtefactIndex = event.target.dataset.index
@@ -149,14 +152,25 @@
                     || to.params.scrollID !== from.params.scrollID)) {
                     this.scrollVersionID = to.params.scrollVersionID >>> 0
                     this.setScrollDimensions(to.params.scrollID, to.params.scrollVersionID)
+                    this.$store.commit('addWorking')
                     this.corpus.populateImageReferencesOfCombination(to.params.scrollVersionID)
                     .then(res => {
+                        this.$store.commit('delWorking')
+                        this.$store.commit('addWorking')
                         this.corpus.populateImagesOfImageReference(
                             this.corpus.combinations.get(this.scrollVersionID).imageReferences, 
                             this.scrollVersionID
                         )
                         .then(res1 => {
-                            this.corpus.populateArtefactsOfImageReference(this.corpus.combinations.get(this.scrollVersionID).imageReferences, this.scrollVersionID)
+                            this.$store.commit('delWorking')
+                            this.$store.commit('addWorking')
+                            this.corpus.populateArtefactsOfImageReference(
+                                this.corpus.combinations.get(this.scrollVersionID).imageReferences, 
+                                this.scrollVersionID
+                            )
+                            .then(res2 => {
+                                this.$store.commit('delWorking')
+                            })
                         })
                     })
                 }

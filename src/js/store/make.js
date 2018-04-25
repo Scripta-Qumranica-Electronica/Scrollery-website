@@ -45,6 +45,9 @@ export default function(Vuex, plugins) {
       loadLanguage(state, { key, data }) {
         state.languages[key] = data
       },
+      resetWorking(state) {
+        state.working = 0
+      },
       addWorking(state) {
         state.working += 1
       },

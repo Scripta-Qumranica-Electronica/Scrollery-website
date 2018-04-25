@@ -149,6 +149,7 @@ export default {
       this.$store.commit('addWorking')
       this.corpus.populateImagesOfImageReference(id, this.$route.params.scrollVersionID)
       .then(res => {
+        this.$store.commit('delWorking')
         this.filenames = this.corpus.imageReferences.get(id >>> 0).images
         this.filenames.forEach(key => {
           if (this.corpus.images.get(key).is_master) {
@@ -158,6 +159,7 @@ export default {
             this.$set(this.imageSettings, key, {visible: false, opacity: 1.0})
           }
         })
+        this.$store.commit('addWorking')
         this.corpus.populateArtefactsOfImageReference(id, this.$route.params.scrollVersionID)
         .then(res1 => {
           this.$store.commit('delWorking')
