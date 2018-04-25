@@ -98,13 +98,6 @@ class MapList {
   }
 
   /**
-   * @returns {Record}  the record class itself
-   */
-  static getModel() {
-    return Model
-  }
-
-  /**
    * @public
    * @instance
    * 
@@ -144,17 +137,17 @@ class MapList {
    * @param {number=-1} beforeKey   The key before which to insert the item, defaults to the end
    */
   insert(item, beforeKey = -1) {
-    if (!(item instanceof this.constructor.getModel())) {
-      throw new TypeError(`Expect an instance of ${this.constructor.getModel().name} in List.prototype.insert`)
+    if (!(item instanceof this.model)) {
+      throw new TypeError(`Expect an instance of ${this.model.name} in List.prototype.insert`)
     }
 
     beforeKey === -1
 
       // insert a item at the end of no number specified
-      ? this._items = this._items.set(item[this.keyLabel], item)
+      ? this._items = this._items.set(item[this.idKey], item)
 
       // otherwise, insert at specified location
-      : this._items = _insertBefore(this._items, beforeKey, item[this.keyLabel], item)
+      : this._items = this._insertBefore(this._items, beforeKey, item[this.idKey], item)
   }
 
   /**
@@ -196,15 +189,15 @@ class MapList {
    * @param {Object} map the map to merge into this object 
    * 
    */
-  merge(map) {
-    this._items = this._items.merge(map)
-  }
+  // merge(map) {
+  //   this._items = this._items.merge(map)
+  // }
 
   /**
    * @param {number} key   key of the item to remove
    */
   delete(key) {
-    if (this._items[key]) this._items = this._items.remove(key)
+    if (this._items[key]) this._items = this._items.delete(key)
   }
 
   /**
@@ -236,9 +229,9 @@ class MapList {
    * 
    * @param {function} cb A callback that returns truthy values when the item matches the criteria
    */
-  find(cb) {
-    return this._items.find(cb)
-  }
+  // find(cb) {
+  //   return this._items.find(cb)
+  // }
 
   /**
    * Forward on to OrderedMap.prototype.findKey
@@ -248,9 +241,9 @@ class MapList {
    * 
    * @param {function} cb A callback that returns truthy values when the item matches the criteria
    */
-  findKey(cb) {
-    return this._items.findKey(cb)
-  }
+  // findKey(cb) {
+  //   return this._items.findKey(cb)
+  // }
 
   /**
    * Deep copy of the items map as a plain Object
