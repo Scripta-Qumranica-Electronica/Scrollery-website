@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use JSON::XS;
+use Ref::Util qw<is_hashref is_arrayref>;
 use MIME::Base64;
 use lib qw(../perl-libs);
 use SQE_CGI;
@@ -61,21 +62,41 @@ sub processCGI {
 		if (!defined $json_post->{requests}){
 			print encode_json({'error', "No requests made."});
 		} else {
-			print '{"replies": [';
-			my $counter = 1;
-			my $repeatLength = scalar @{$json_post->{requests}};
-			foreach my $request (@{$json_post->{requests}}) {
-				if (defined $request->{transaction}) {
-					$action{$request->{transaction}}->($cgi, $request);
-				} else {
-					print encode_json({'error', "Transaction type '" . $request->{transaction} . "' not understood."});
+			if (is_arrayref($json_post->{requests})) {
+				print '{"replies": [';
+				my $counter = 1;
+				my $repeatLength = scalar @{$json_post->{requests}};
+				foreach my $request (@{$json_post->{requests}}) {
+					if (defined $request->{transaction}) {
+						$action{$request->{transaction}}->($cgi, $request);
+					} else {
+						print encode_json({"results" => [{'error' => "Transaction type '" . $request->{transaction} . "' not understood."}]});
+					}
+					if ($counter < $repeatLength) {
+						$counter++;
+						print ",";
+					}
 				}
-				if ($counter < $repeatLength) {
-					$counter++;
-					print ",";
+				print ']}';
+			} elsif (is_hashref($json_post->{requests})){
+				print '{"replies": {';
+				my $counter = 1;
+				my $repeatLength = scalar keys %{$json_post->{requests}};
+				my $lastItem = 0;
+				while (my ($key, $value) = each (%{$json_post->{requests}})) {
+					if ($counter == $repeatLength) {
+						$lastItem = 1;
+					} else {
+						$counter++;
+					}
+					if (defined $value->{transaction}) {
+						$action{$value->{transaction}}->($cgi, $value, $key, $lastItem);
+					} else {
+						print "{'results': {'$key': {'error': 'Transaction type $value->{transaction} not understood.'}}}";
+					}
 				}
+				print '}}';
 			}
-			print ']}';
 		}
 	} else {
 		if (defined $action{$json_post->{transaction}}) {
@@ -89,15 +110,29 @@ sub processCGI {
 # General purpose DB subroutines
 sub readResults {
 	my $sql = shift;
+	my $key = shift;
+	my $lastItem = shift;
 	my @fetchedResults = ();
 	while (my $result = $sql->fetchrow_hashref){
        	push @fetchedResults, $result;
     }
     if (scalar(@fetchedResults) > 0) {
- 		print Encode::decode('utf8', encode_json({results => \@fetchedResults}));
+		if (defined $key) {
+			print "\"$key\":";
+			print Encode::decode('utf8', encode_json(\@fetchedResults));
+		} else {
+			print Encode::decode('utf8', encode_json({results => \@fetchedResults}));
+		}
  	} else {
-    	print '{"results": [{"error":"No results found."}]}';
+		if (defined $key) {
+			print "\"$key\": [{\"error\":\"No results found.\"}]";
+		} else {
+			print '{"results": [{"error":"No results found."}]}';
+		}
  	}
+	if (defined $key && !$lastItem) {
+		print(",")
+	}
 	$sql->finish;
 }
 
@@ -170,6 +205,8 @@ MYSQL
 sub getArtOfImage {
 	my $cgi = shift;
 	my $json_post = shift;
+	my $key = shift;
+	my $lastItem = shift;
 	my $getArtOfImageQuery = <<'MYSQL';
 SELECT DISTINCT	artefact_position.artefact_position_id,
 				artefact_data.name, 
@@ -194,7 +231,7 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{image_catalog_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
-	readResults($sql);
+	readResults($sql, $key, $lastItem);
 	return;
 }
 

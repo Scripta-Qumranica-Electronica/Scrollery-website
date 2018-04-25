@@ -91,6 +91,17 @@ describe('MapList', () => {
             expect(mapList.keys()).to.deep.equal([1])
         })
 
+        it('should return merge a list of several items', () => {
+            const newData = new Model(1, 'new data')
+            mapList.insert(newData)
+            const data1 = new Model(3, 'more data')
+            const data2 = new Model(2, 'even more goodies')
+            const mergeList = [[3, data1], [2, data2]]
+            mapList.merge(mergeList)
+            expect(mapList.count()).to.equal(3)
+            expect(mapList.keys()).to.deep.equal([1,3,2])
+        })
+
         // TODO figure out why this works on Firefox,
         // but fails in phantom.js
         // it('should insert data in the right place', () => {

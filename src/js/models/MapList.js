@@ -189,9 +189,9 @@ class MapList {
    * @param {Object} map the map to merge into this object 
    * 
    */
-  // merge(map) {
-  //   this._items = this._items.merge(map)
-  // }
+  merge(map) {
+    this._items = this._items.merge(map)
+  }
 
   /**
    * @param {number} key   key of the item to remove
