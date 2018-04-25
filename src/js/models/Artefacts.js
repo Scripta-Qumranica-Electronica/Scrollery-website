@@ -10,11 +10,13 @@ export default class Artefacts extends MapList {
     password,
     idKey,
     ajaxPayload = undefined,
-    attributes = {})
+    attributes = {},
+    standardTransaction = undefined)
   {
     idKey = idKey || 'artefact_position_id'
-    ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getArtOfImage'}
-    super(username, password, idKey, ajaxPayload, Artefact, attributes)
+    standardTransaction = 'getArtOfImage'
+    // ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getArtOfImage'}
+    super(username, password, idKey, ajaxPayload, Artefact, attributes, standardTransaction)
   }
 
   static getModel() {

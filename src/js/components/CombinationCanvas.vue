@@ -151,11 +151,12 @@
                     this.setScrollDimensions(to.params.scrollID, to.params.scrollVersionID)
                     this.corpus.populateImageReferencesOfCombination(to.params.scrollVersionID)
                     .then(res => {
-                        this.corpus.combinations.get(this.scrollVersionID).imageReferences.forEach(reference => {
-                            this.corpus.populateImagesOfImageReference(reference, this.scrollVersionID)
-                            .then(res1 => {
-                                this.corpus.populateArtefactsOfImageReference(reference, this.scrollVersionID)
-                            })
+                        this.corpus.populateImagesOfImageReference(
+                            this.corpus.combinations.get(this.scrollVersionID).imageReferences, 
+                            this.scrollVersionID
+                        )
+                        .then(res1 => {
+                            this.corpus.populateArtefactsOfImageReference(this.corpus.combinations.get(this.scrollVersionID).imageReferences, this.scrollVersionID)
                         })
                     })
                 }

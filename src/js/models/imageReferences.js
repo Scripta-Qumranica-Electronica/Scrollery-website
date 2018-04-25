@@ -8,11 +8,13 @@ export default class Images extends MapList {
     password,
     idKey,
     ajaxPayload = undefined,
-    attributes = {})
+    attributes = {},
+    standardTransaction = undefined)
   {
     idKey = idKey || 'id'
-    ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getImgOfComb'}
-    super(username, password, idKey, ajaxPayload, ImageReference, attributes)
+    standardTransaction = 'getImgOfComb'
+    // ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getImgOfComb'}
+    super(username, password, idKey, ajaxPayload, ImageReference, attributes, standardTransaction)
   }
 
   static getModel() {

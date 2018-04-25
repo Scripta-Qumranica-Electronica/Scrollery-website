@@ -17,7 +17,6 @@ sub processCGI {
 	}
 
 	my $json_post = decode_json(''.$cgi->param('POSTDATA'));
-	my $transaction = $json_post->{transaction} || 'unspecified';
 	my %action = (
 		'validateSession'                => \&validateSession,
 		'getCombs'                       => \&getCombs,
@@ -53,18 +52,36 @@ sub processCGI {
 		'setArtRotation' => \&setArtRotation,
 	);
 
-	print $cgi->header(
-				-type    => 'application/json',
-				-charset =>  'utf-8',
-				);
+	# print $cgi->header(
+	# 			-type    => 'application/json',
+	# 			-charset =>  'utf-8',
+	# 			);
 
-	if ($transaction eq 'unspecified'){
-		print encode_json({'error', "No transaction requested."});
-	} else {
-		if (defined $action{$transaction}) {
-			$action{$transaction}->($cgi, $json_post);
+	if (!defined $json_post->{transaction}){
+		if (!defined $json_post->{requests}){
+			print encode_json({'error', "No requests made."});
 		} else {
-			print encode_json({'error', "Transaction type '" . $transaction . "' not understood."});
+			print '{"replies": [';
+			my $counter = 1;
+			my $repeatLength = scalar @{$json_post->{requests}};
+			foreach my $request (@{$json_post->{requests}}) {
+				if (defined $request->{transaction}) {
+					$action{$request->{transaction}}->($cgi, $request);
+				} else {
+					print encode_json({'error', "Transaction type '" . $request->{transaction} . "' not understood."});
+				}
+				if ($counter < $repeatLength) {
+					$counter++;
+					print ",";
+				}
+			}
+			print ']}';
+		}
+	} else {
+		if (defined $action{$json_post->{transaction}}) {
+			$action{$json_post->{transaction}}->($cgi, $json_post);
+		} else {
+			print encode_json({'error', "Transaction type '" . $json_post->{transaction} . "' not understood."});
 		}
 	}
 }
@@ -79,7 +96,7 @@ sub readResults {
     if (scalar(@fetchedResults) > 0) {
  		print Encode::decode('utf8', encode_json({results => \@fetchedResults}));
  	} else {
-    	print 'No results found.';
+    	print '{"results": [{"error":"No results found."}]}';
  	}
 	$sql->finish;
 }

@@ -8,11 +8,13 @@ export default class Cols extends MapList {
     password,
     idKey,
     ajaxPayload = undefined,
-    attributes = {})
+    attributes = {},
+    standardTransaction = undefined)
   {
     idKey = idKey || 'col_id'
-    ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getColOfComb'}
-    super(username, password, idKey, ajaxPayload, Col, attributes)
+    standardTransaction = 'getColOfComb'
+    // ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getColOfComb'}
+    super(username, password, idKey, ajaxPayload, Col, attributes, standardTransaction)
   }
 
   static getModel() {

@@ -14,7 +14,7 @@ class MapList {
    * @param {object={}} [attributes] List attributes 
    * @param {array=[]}  [items]      An initial array of items for the list 
    */
-  constructor(username, password, idKey, ajaxPayload, model, attributes = {}) {
+  constructor(username, password, idKey, ajaxPayload, model, attributes = {}, standardTransaction = undefined) {
     this.username = username
     this.password = password
     this._ajaxPayload = Object.assign(
@@ -31,6 +31,7 @@ class MapList {
     this._hash = undefined
     this._items = OrderedMap()
     this.model = model || Record
+    this.standardTransaction = standardTransaction
   }
 
   populate(customPayload = {}, scrollVersionID = undefined) {
@@ -45,7 +46,7 @@ class MapList {
       try {
         axios.post('resources/cgi-bin/scrollery-cgi.pl', payload)
         .then(res => {
-          if (res.status === 200 && res.data.results) {
+          if (res.status === 200 && res.data.replies) {
 
             // We can store hashes for the returned data
             // in the future, so we can avoid unnecessary
@@ -58,20 +59,22 @@ class MapList {
             // an Object {key1: value1, key2: value2}, then the
             // keys are converted to strings.
             let results = []
-            res.data.results.forEach(item => {
-              let record = undefined
-              if (this.get(item[this.idKey]) && this.get(item[this.idKey]).toJS() !== item) {
-                record = this.get(item[this.idKey]).extend(item)
-              } else if (!this.get(item[this.idKey])) {
-                record = new this.model(item)
-              }
-              if (record) {
-                results.push([item[this.idKey], record])
-              }
+            res.data.replies.forEach(reply => {
+              reply.results.forEach(item => {
+                let record
+                if (this.get(item[this.idKey]) && this.get(item[this.idKey]).toJS() !== item) {
+                  record = this.get(item[this.idKey]).extend(item)
+                } else if (!this.get(item[this.idKey])) {
+                  record = new this.model(item)
+                }
+                if (record) {
+                  results.push([item[this.idKey], record])
+                }
+              })
             })
 
-            this._items = this._items.merge(results)
-            resolve(res.data.results)
+            this.merge(results)
+            resolve(res.data.replies)
           }
         })
       } catch (err) {
@@ -201,7 +204,7 @@ class MapList {
    * @param {number} key   key of the item to remove
    */
   delete(key) {
-    this._items[key] && (this._items = this._items.remove(key))
+    if (this._items[key]) this._items = this._items.remove(key)
   }
 
   /**

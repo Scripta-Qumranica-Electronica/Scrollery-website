@@ -63,35 +63,52 @@ export default class Corpus {
   }
 
   populateColumnsOfCombination(scrollID, scrollVersionID) {
+    if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
+    if (scrollID.constructor !== Array) scrollID = [scrollID]
     return new Promise((resolve, reject) => {
-      this.cols.populate({combID: scrollID}, scrollVersionID)
-      .then(res => {
-        scrollVersionID = scrollVersionID >>> 0
-        let cols = []
-        res.forEach(item => {
-          cols.push(item[this.cols.idKey])
+      let payload = {requests: []}
+      if(scrollID.length === scrollVersionID.length) {
+        scrollVersionID.forEach((id, index) => {
+          payload.requests.push({combID: scrollID[index], scroll_version_id: id, transaction: this.cols.standardTransaction})
         })
-        let combinationRecord = this.combinations.get(scrollVersionID).toJS()
-        combinationRecord.cols = cols
-        this.combinations.set(scrollVersionID, new this.combinations.model(combinationRecord))
-        resolve(res)
-      })
-      .catch(reject)
+        this.cols.populate(payload)
+        .then(res => {
+          res.forEach((reply, index) => {
+            const currentScrollVersionID = scrollVersionID[index] >>> 0 
+            let cols = []
+            reply.results.forEach(item => {
+              if (item[this.cols.idKey]) cols.push(item[this.cols.idKey])
+            })
+            let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+            combinationRecord.cols = cols
+            this.combinations.set(currentScrollVersionID, new this.combinations.model(combinationRecord))
+          })
+          resolve(res)
+        })
+        .catch(reject)
+      } else reject(new Error('The scrollID and scrollVersion inputs were of different lengths.'))
     })
   }
 
   populateImageReferencesOfCombination(scrollVersionID) {
+    if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
+    let payload = {requests: []}
+    scrollVersionID.forEach(id => {
+      payload.requests.push({combID: id, scrollVersionID: id, transaction: this.imageReferences.standardTransaction})
+    })
     return new Promise((resolve, reject) => {
-      this.imageReferences.populate({combID: scrollVersionID}, scrollVersionID)
+      this.imageReferences.populate(payload)
       .then(res => {
-        scrollVersionID = scrollVersionID >>> 0
-        let imageRefs = []
-        res.forEach(item => {
-          imageRefs.push(item.id)
+        res.forEach((reply, index) => {
+          const currentScrollVersionID = scrollVersionID[index] >>> 0 
+          let imageRefs = []
+          reply.results.forEach(imageReference => {
+            if (imageReference.id) imageRefs.push(imageReference.id)
+          })
+          let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+          combinationRecord.imageReferences = imageRefs
+          this.combinations.set(currentScrollVersionID, new this.combinations.model(combinationRecord))
         })
-        let combinationRecord = this.combinations.get(scrollVersionID).toJS()
-        combinationRecord.imageReferences = imageRefs
-        this.combinations.set(scrollVersionID, new this.combinations.model(combinationRecord))
         resolve(res)
       })
       .catch(reject)
@@ -108,20 +125,38 @@ export default class Corpus {
   // }
 
   populateImagesOfImageReference(imageReferenceID, scrollVersionID) {
-    return new Promise((resolve, reject) => {
-      this.images.populate({id: imageReferenceID}, scrollVersionID)
-      .then(res => {
-        imageReferenceID = imageReferenceID >>> 0
-        let images = []
-        res.forEach(image => {
-          images.push(image[this.images.idKey])
-        })
-        let imageRefRecord = this.imageReferences.get(imageReferenceID).toJS()
-        imageRefRecord.images = images
-        this.imageReferences.set(imageReferenceID, new this.imageReferences.model(imageRefRecord))
-        resolve(res)
+    if (imageReferenceID.constructor !== Array) imageReferenceID = [imageReferenceID]
+    // If scrollVersionID is not an array, convert it into one matching the
+    // length of imageReferenceID.
+    if (scrollVersionID.constructor !== Array) {
+      const tempScrollVersionID = scrollVersionID
+      scrollVersionID = []
+      imageReferenceID.forEach(ref => {
+        scrollVersionID.push(tempScrollVersionID)
       })
-      .catch(reject)
+    }
+    return new Promise((resolve, reject) => {
+      if(imageReferenceID.length === scrollVersionID.length) {
+        let payload = {requests: []}
+        imageReferenceID.forEach((id, index) => {
+          payload.requests.push({id: id, scrollVersionID: scrollVersionID[index], transaction: this.images.standardTransaction})
+        })
+        this.images.populate(payload)
+        .then(res => {
+          res.forEach((reply, index) => {
+            const currentImageReferenceID = imageReferenceID[index] >>> 0
+            let images = []
+            reply.results.forEach(image => {
+              if(image[this.images.idKey]) images.push(image[this.images.idKey])
+            })
+            let imageRefRecord = this.imageReferences.get(currentImageReferenceID).toJS()
+            imageRefRecord.images = images
+            this.imageReferences.set(currentImageReferenceID, new this.imageReferences.model(imageRefRecord))
+            })
+          resolve(res)
+        })
+        .catch(reject)
+      } else reject('The imageReferenceID and scrollVersionID inputs were of different lengths.')
     }) 
   }
 
@@ -155,26 +190,43 @@ export default class Corpus {
   }
 
   populateArtefactsOfImageReference(imageReferenceID, scrollVersionID) {
-    return new Promise((resolve, reject) => {
-      this.artefacts.populate({image_catalog_id: imageReferenceID}, scrollVersionID)
-      .then(res => {
-        scrollVersionID = scrollVersionID >>> 0
-        imageReferenceID = imageReferenceID >>> 0
-        let artefacts = []
-        res.forEach(artefact => {
-          artefacts.push(artefact[this.artefacts.idKey])
-        })
-        let imageRefRecord = this.imageReferences.get(imageReferenceID).toJS()
-        imageRefRecord.artefacts = artefacts
-        this.imageReferences.set(imageReferenceID, new this.imageReferences.model(imageRefRecord))
-
-        let combinationRecord = this.combinations.get(scrollVersionID).toJS()
-        combinationRecord.artefacts = [...new Set([...combinationRecord.artefacts, ...artefacts])]
-        this.combinations.set(scrollVersionID, new this.combinations.model(combinationRecord))
-
-        resolve(res)
+    if (imageReferenceID.constructor !== Array) imageReferenceID = [imageReferenceID]
+    // If scrollVersionID is not an array, convert it into one matching the
+    // length of imageReferenceID.
+    if (scrollVersionID.constructor !== Array) {
+      const tempScrollVersionID = scrollVersionID
+      scrollVersionID = []
+      imageReferenceID.forEach(ref => {
+        scrollVersionID.push(tempScrollVersionID)
       })
-      .catch(reject)
+    }
+    return new Promise((resolve, reject) => {
+      if(imageReferenceID.length === scrollVersionID.length) {
+        let payload = {requests: []}
+        imageReferenceID.forEach((id, index) => {
+          payload.requests.push({image_catalog_id: id, scroll_version_id: scrollVersionID[index], transaction: this.artefacts.standardTransaction})
+        })
+        this.artefacts.populate(payload)
+        .then(res => {
+          res.forEach((reply, index) => {
+            const currentScrollVersionID = scrollVersionID[index] >>> 0
+            const currentImageReferenceID = imageReferenceID[index] >>> 0
+            let artefacts = []
+            reply.results.forEach(artefact => {
+              if (artefact[this.artefacts.idKey]) artefacts.push(artefact[this.artefacts.idKey])
+            })
+            let imageRefRecord = this.imageReferences.get(currentImageReferenceID).toJS()
+            imageRefRecord.artefacts = artefacts
+            this.imageReferences.set(currentImageReferenceID, new this.imageReferences.model(imageRefRecord))
+
+            let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+            combinationRecord.artefacts = [...new Set([...combinationRecord.artefacts, ...artefacts])]
+            this.combinations.set(currentScrollVersionID, new this.combinations.model(combinationRecord))
+          })
+          resolve(res)
+        })
+        .catch(reject)
+      } else reject('The imageReferenceID and scrollVersionID inputs were of different lengths.')
     }) 
   }
 }
