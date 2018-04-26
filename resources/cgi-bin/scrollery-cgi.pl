@@ -18,45 +18,6 @@ sub processCGI {
 	}
 
 	my $json_post = decode_json(''.$cgi->param('POSTDATA'));
-	my %action = (
-		'validateSession'                => \&validateSession,
-		'getCombs'                       => \&getCombs,
-		'getArtOfComb'                   => \&getArtOfComb,
-		'getArtOfImage'                  => \&getArtOfImage,
-		'getImgOfComb'                   => \&getImgOfComb,
-		'getColOfComb'                   => \&getColOfComb,
-		'getFragsOfCol'                  => \&getFragsOfCol,
-		'getColOfScrollID'               => \&getColOfScrollID,
-		'getSignStreamOfColumn'          => \&getSignStreamOfColumn,
-		'imagesOfFragment'               => \&getImagesOfFragment,
-		'getIAAEdID'                     => \&getIAAEdID,
-		'canonicalCompositions'          => \&getCanonicalCompositions,
-		'canonicalID1'                   => \&getCanonicalID1,
-		'canonicalID2'                   => \&getCanonicalID2,
-		'getScrollColNameFromDiscCanRef' => \&getScrollColNameFromDiscCanRef,
-		'institutions'                   => \&getInstitutions,
-		'institutionPlates'              => \&getInstitutionPlates,
-		'institutionFragments'           => \&getInstitutionFragments,
-		'imagesOfInstFragments'          => \&imagesOfInstFragments,
-		'institutionArtefacts'           => \&getInstitutionArtefacts,
-		'addArtToComb'                   => \&addArtToComb,
-		'newArtefact'                    => \&newArtefact,
-		'getArtefactMask'                => \&getArtefactMask,
-		'getScrollArtefacts'             => \&getScrollArtefacts,
-		'getScrollWidth'                 => \&getScrollWidth,
-		'getScrollHeight'                => \&getScrollHeight,
-		'newCombination'                 => \&newCombination,
-		'copyCombination'                => \&copyCombination,
-		'nameCombination'                => \&nameCombination,
-		'changeArtefactPoly'             => \&changeArtefactPoly,
-		'setArtPosition' => \&setArtPosition,
-		'setArtRotation' => \&setArtRotation,
-	);
-
-	# print $cgi->header(
-	# 			-type    => 'application/json',
-	# 			-charset =>  'utf-8',
-	# 			);
 
 	if (!defined $json_post->{transaction}){
 		if (!defined $json_post->{requests}){
@@ -67,8 +28,8 @@ sub processCGI {
 				my $counter = 1;
 				my $repeatLength = scalar @{$json_post->{requests}};
 				foreach my $request (@{$json_post->{requests}}) {
-					if (defined $request->{transaction}) {
-						$action{$request->{transaction}}->($cgi, $request);
+					if (defined $request->{transaction} && defined $::{$request->{transaction}}) {
+						$::{$request->{transaction}}($cgi, $request);
 					} else {
 						print encode_json({"results" => [{'error' => "Transaction type '" . $request->{transaction} . "' not understood."}]});
 					}
@@ -89,8 +50,8 @@ sub processCGI {
 					} else {
 						$counter++;
 					}
-					if (defined $value->{transaction}) {
-						$action{$value->{transaction}}->($cgi, $value, $key, $lastItem);
+					if (defined $value->{transaction} && defined $::{$value->{transaction}}) {
+						$::{$value->{transaction}}($cgi, $value, $key, $lastItem);
 					} else {
 						print "{'results': {'$key': {'error': 'Transaction type $value->{transaction} not understood.'}}}";
 					}
@@ -99,8 +60,8 @@ sub processCGI {
 			}
 		}
 	} else {
-		if (defined $action{$json_post->{transaction}}) {
-			$action{$json_post->{transaction}}->($cgi, $json_post);
+		if (defined $json_post->{transaction} && defined $::{$json_post->{transaction}}) {
+			$::{$json_post->{transaction}}($cgi, $json_post);
 		} else {
 			print encode_json({'error', "Transaction type '" . $json_post->{transaction} . "' not understood."});
 		}
@@ -151,7 +112,7 @@ sub handleDBError {
 
 # Various data return methods, see %action for hash table.
 sub validateSession {
-	my $cgi = shift;
+	my ($cgi) = @_;
 	my $dbh = $cgi->dbh;
 
 	$cgi->print('{"SESSION_ID":"'.$cgi->session_id.'", "USER_ID":'.$dbh->user_id.'}');
@@ -159,8 +120,7 @@ sub validateSession {
 }
 
 sub getCombs {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getCombsQuery = <<'MYSQL';
 SELECT DISTINCT 
        scroll_data.scroll_id as scroll_id,
@@ -186,8 +146,7 @@ MYSQL
 }
 
 sub getArtOfComb {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT artefact_position.artefact_id AS id
 FROM artefact_position
@@ -203,10 +162,7 @@ MYSQL
 }
 
 sub getArtOfImage {
-	my $cgi = shift;
-	my $json_post = shift;
-	my $key = shift;
-	my $lastItem = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getArtOfImageQuery = <<'MYSQL';
 SELECT DISTINCT	artefact_position.artefact_position_id,
 				artefact_data.name, 
@@ -236,8 +192,7 @@ MYSQL
 }
 
 sub getImgOfComb {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
 		image_catalog.catalog_number_2 AS lvl2,
@@ -260,8 +215,7 @@ MYSQL
 }
 
 sub getColOfComb {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
 		SELECT DISTINCT col_data.name AS name,
 						col_data.col_id AS col_id
@@ -279,8 +233,7 @@ MYSQL
 }
 
 sub getFragsOfCol {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getFragsOfColQuery = <<'MYSQL';
 		SELECT discrete_canonical_reference.discrete_canonical_reference_id,
 			discrete_canonical_reference.column_name,
@@ -300,8 +253,7 @@ MYSQL
 }
 
 sub getColOfScrollID {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfScrollIDQuery = <<'MYSQL';
 		SELECT scroll.name AS scroll_name,
 			   column_of_scroll.name as col_name
@@ -320,8 +272,7 @@ MYSQL
 }
 
 sub getSignStreamOfColumn {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getScrollsQuery = << 'MYSQL';
 SELECT
 	col_data.name AS col_name,
@@ -375,8 +326,7 @@ MYSQL
 }
 
 sub getImagesOfFragment {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $sql;
 	my $idType = $json_post->{idType};
 	my $getImagesOfFragmentQuery;
@@ -415,8 +365,7 @@ MYSQL
 }
 
 sub getIAAEdID {
-        my $cgi = shift;
-		my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getIAAEdIDQuery = <<'MYSQL';
 		SELECT edition_catalog_to_discrete_reference.edition_id
 		FROM edition_catalog_to_discrete_reference
@@ -433,7 +382,7 @@ MYSQL
 }
 
 sub getCanonicalCompositions {
-	my $cgi = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getCanonicalCompositionsQuery = <<'MYSQL';
 		SELECT DISTINCT composition
 		FROM edition_catalog
@@ -448,8 +397,7 @@ MYSQL
 }
 
 sub getCanonicalID1 {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getCanonicalID1Query = <<'MYSQL';
 		SELECT DISTINCT composition,
 			edition_location_1
@@ -466,8 +414,7 @@ MYSQL
 }
 
 sub getCanonicalID2 {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getCanonicalID2Query = <<'MYSQL';
 		SELECT edition_location_2, edition_catalog_id
 		FROM edition_catalog
@@ -483,31 +430,8 @@ MYSQL
 	return;
 }
 
-sub getScrollColNameFromDiscCanRef {
-	my $cgi = shift;
-	my $json_post = shift;
-	my $frag_id = $cgi->param('frag_id');
-	my $getScrollColNameFromDiscCanRefQuery = <<'MYSQL';
-		SELECT scroll_data.name AS scroll,
-			   col_data.name AS col
-		FROM scroll_to_col
-			INNER JOIN scroll_data
-				ON scroll_data.scroll_id = scroll_to_col.scroll_id
-			INNER JOIN col_data
-				ON col_data.col_id = scroll_to_col.col_id
-			INNER JOIN discrete_canonical_reference
-				ON discrete_canonical_reference.column_of_scroll_id = scroll_to_col.col_id
-		WHERE discrete_canonical_reference.discrete_canonical_reference_id = ?
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getScrollColNameFromDiscCanRefQuery)
-		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($frag_id);
-	readResults($sql);
-	return;
-}
-
 sub getInstitutions {
-	my $cgi = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getInstitutionsQuery = <<'MYSQL';
 		SELECT DISTINCT institution
 		FROM image_catalog
@@ -520,8 +444,7 @@ MYSQL
 }
 
 sub getInstitutionPlates {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getInstitutionPlates = <<'MYSQL';
 		SELECT DISTINCT institution,
 			catalog_number_1 AS catalog_plate
@@ -537,8 +460,7 @@ MYSQL
 }
 
 sub getInstitutionFragments {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getInstitutionFragmentsQuery = <<'MYSQL';
 		SELECT catalog_number_2 AS catalog_fragment,
 			image_catalog_id
@@ -556,8 +478,7 @@ MYSQL
 }
 
 sub imagesOfInstFragments {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getInstitutionFragmentsQuery = <<'MYSQL';
 SELECT DISTINCT	SQE_image.sqe_image_id,
 				SQE_image.filename AS filename,
@@ -585,8 +506,7 @@ MYSQL
 }
 
 sub getInstitutionArtefacts {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getInstitutionArtefactsQuery = <<'MYSQL';
 		SELECT DISTINCT artefact_shape.artefact_id,
 			user_id
@@ -605,8 +525,7 @@ MYSQL
 }
 
 sub getScrollWidth {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getScrollWidthQuery = <<'MYSQL';
 		CALL getScrollWidth(?,?)
 MYSQL
@@ -618,8 +537,7 @@ MYSQL
 }
 
 sub getScrollHeight {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getScrollHeightQuery = <<'MYSQL';
 		CALL getScrollHeight(?,?)
 MYSQL
@@ -634,8 +552,7 @@ MYSQL
 # Then I change the scroll_id of the artefact to match the current scroll_id
 # TODO update for new DB structure.
 sub addArtToComb {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $scroll_version_id =  $json_post->{version_id};
 	$cgi->dbh->set_scrollversion($scroll_version_id);
 	my $addArtToCombQuery = <<'MYSQL';
@@ -655,8 +572,7 @@ MYSQL
 # then create the necessary owner tables by using the SQE API.
 # TODO update for new DB structure.
 sub newArtefact {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $scroll_version_id =  $json_post->{version_id};
 	$cgi->dbh->set_scrollversion($scroll_version_id);
 
@@ -752,8 +668,7 @@ MYSQL
 }
 
 sub getArtefactMask {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $addArtToCombQuery = <<'MYSQL';
 SELECT ST_AsText(region_in_sqe_image) as mask,
 	transform_matrix,
@@ -774,8 +689,7 @@ MYSQL
 }
 
 sub getScrollArtefacts {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getScrollArtefactsQuery = <<'MYSQL';
 SELECT DISTINCT artefact_position.artefact_position_id AS artefact_position_id,
                 ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
@@ -806,8 +720,7 @@ MYSQL
 }
 
 sub newCombination {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $user_id = $cgi->dbh->user_id;
 	my $name = $json_post->{name}; 
 
@@ -851,16 +764,14 @@ MYSQL
 }
 
 sub copyCombination {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	$cgi->dbh->add_owner_to_scroll($json_post->{scroll_id}, $json_post->{scroll_version_id});
 	print '{"scroll_clone": "success"}';
 	return;
 }
 
 sub nameCombination {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $scroll_id = $json_post->{scroll_id};
 	my $scroll_data_id = $json_post->{scroll_data_id};
 	my $version_id = $json_post->{version_id};
@@ -873,8 +784,7 @@ sub nameCombination {
 }
 
 sub changeArtefactPoly {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	$cgi->dbh->set_scrollversion($json_post->{version_id});
 	my ($new_art_id, $new_art_error) = $cgi->dbh->change_value("artefact_shape", $json_post->{artefact_id}, "region_in_sqe_image", ['ST_GEOMFROMTEXT', $json_post->{region_in_sqe_image}]);
 	if ($new_art_error) {
@@ -914,8 +824,7 @@ MYSQL
 }
 
 sub setArtPosition {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	$cgi->dbh->set_scrollversion($json_post->{version_id});
 	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $json_post->{art_id}, "transform_matrix", $json_post->{matrix});
 	handleDBError ($new_id, $error);
@@ -923,8 +832,7 @@ sub setArtPosition {
 }
 
 sub setArtRotation {
-	my $cgi = shift;
-	my $json_post = shift;
+	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $user_id = $cgi->dbh->user_id;
 	$cgi->dbh->set_scrollversion($json_post->{version_id});
 	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $json_post->{art_id}, "rotation", $json_post->{rotation});
