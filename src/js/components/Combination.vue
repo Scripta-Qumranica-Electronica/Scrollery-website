@@ -36,6 +36,13 @@ export default {
       scale: 0.01,
     }
   },
+  computed: {
+    globalScale() {
+      // This returns a logarithmical scale value for
+      // the current slider position.
+      return parseFloat(((1001 * Math.pow(this.scale / 100, 3) + 1) / 100).toFixed(4))
+    },
+  },
   methods: {
     formatTooltip(val) {
       return (this.globalScale * 100).toFixed(2) + '%'
