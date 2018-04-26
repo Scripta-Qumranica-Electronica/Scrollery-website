@@ -42,9 +42,9 @@ describe('AppBody', () => {
 
   describe('router interaction', () => {
     it('should cycle the router', () => {
+      expect(vm.$route.params.scrollID).to.equal(20)
       vm.resetRouter()
       expect(push.called).to.equal(true)
-      expect(vm.$route.params.scrollID).to.equal(20)
     })
   })
 })
