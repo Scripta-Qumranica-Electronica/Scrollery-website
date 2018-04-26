@@ -51,8 +51,8 @@
  * stroke makes the path a bit larger with every
  * draw.
  */
-import {trace} from '../utils/Potrace.js'
-import {clipCanvas} from '../utils/VectorFactory'
+import { trace } from '../utils/Potrace.js'
+import { clipCanvas } from '../utils/VectorFactory'
 
 export default {
   props: {
@@ -94,13 +94,19 @@ export default {
       if (!this.locked) {
         const ctx = this.$refs.maskCanvas.getContext('2d')
         ctx.beginPath()
-        ctx.arc(this.cursorPos.x / this.scale, this.cursorPos.y / this.scale, this.brushSize / 2 / this.scale, 0, 2 * Math.PI)
+        ctx.arc(
+          this.cursorPos.x / this.scale,
+          this.cursorPos.y / this.scale,
+          this.brushSize / 2 / this.scale,
+          0,
+          2 * Math.PI
+        )
         ctx.closePath()
-        if(this.drawMode === 'erase'){
-          ctx.globalCompositeOperation='destination-out'
+        if (this.drawMode === 'erase') {
+          ctx.globalCompositeOperation = 'destination-out'
           ctx.fill()
         } else {
-          ctx.globalCompositeOperation='source-over'
+          ctx.globalCompositeOperation = 'source-over'
           ctx.fillStyle = 'purple'
           ctx.fill()
         }
@@ -114,48 +120,52 @@ export default {
       }
       return returnPos
     },
-    canvasToSVG(){
-      trace(this.$refs.maskCanvas, this.divisor)
-      .then(res => {
+    canvasToSVG() {
+      trace(this.$refs.maskCanvas, this.divisor).then(res => {
         this.$emit('mask', res)
       })
-    }
+    },
   },
   watch: {
-    mask (to, from) {
+    mask(to, from) {
       if (to && from !== to) {
         clipCanvas(this.$refs.maskCanvas, this.mask, this.divisor)
       } else {
         let ctx = this.$refs.maskCanvas.getContext('2d')
         ctx.clearRect(0, 0, this.$refs.maskCanvas.width, this.$refs.maskCanvas.height)
       }
-    }
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-  .artefactOverlay {
-    cursor: none;
-  }
-  .maskCanvas {
-      opacity: 0.3;
-  }
-  .maskCanvas.pulse {
-    opacity: 0.3;
-    animation: pulsate 3s ease-out;
-    animation-iteration-count: infinite;
-  }
+.artefactOverlay {
+  cursor: none;
+}
+.maskCanvas {
+  opacity: 0.3;
+}
+.maskCanvas.pulse {
+  opacity: 0.3;
+  animation: pulsate 3s ease-out;
+  animation-iteration-count: infinite;
+}
 
-  @keyframes pulsate {
-    0%    { opacity:0;}
-    50%   { opacity:0.3;}
-    100%  { opacity:0;}
+@keyframes pulsate {
+  0% {
+    opacity: 0;
   }
-  .cursor {
-    position: absolute;
+  50% {
     opacity: 0.3;
-    pointer-events: none;
   }
+  100% {
+    opacity: 0;
+  }
+}
+.cursor {
+  position: absolute;
+  opacity: 0.3;
+  pointer-events: none;
+}
 </style>
-

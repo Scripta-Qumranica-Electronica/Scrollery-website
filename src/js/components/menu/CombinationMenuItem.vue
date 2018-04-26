@@ -40,7 +40,6 @@
 </template>
 
 <script>
-
 import { mapGetters } from 'vuex'
 import ColumnMenuItem from './ColumnMenuItem.vue'
 import ImageMenuItem from './ImageMenuItem.vue'
@@ -60,21 +59,23 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['username',]),
+    ...mapGetters(['username']),
   },
   methods: {
     setRouter() {
-      if (this.$route.params.scrollID !== this.combination.scroll_id 
-        || this.$route.params.scrollVersionID !== this.combination.scroll_version_id) {
+      if (
+        this.$route.params.scrollID !== this.combination.scroll_id ||
+        this.$route.params.scrollVersionID !== this.combination.scroll_version_id
+      ) {
         this.$router.push({
           name: 'workbenchAddress',
           params: {
-            scrollID: this.combination.scroll_id, 
+            scrollID: this.combination.scroll_id,
             scrollVersionID: this.combination.scroll_version_id,
             imageID: '~',
             colID: '~',
-            artID: '~'
-          }
+            artID: '~',
+          },
         })
       }
     },
@@ -83,30 +84,29 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        this.corpus.populateColumnsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
+        this.corpus.populateColumnsOfCombination(
+          this.combination.scroll_id,
+          this.combination.scroll_version_id
+        )
         this.corpus.populateImageReferencesOfCombination(this.combination.scroll_version_id)
         // .then(res => {
-          // this.corpus.populateArtefactsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
-          // .then(res1 => {
-          // })
+        // this.corpus.populateArtefactsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
+        // .then(res1 => {
+        // })
         // })
       }
     },
     // TODO implement the capability for these functions
     // in the data model.
-    cloneScroll() {
-      
-    },
+    cloneScroll() {},
 
-    lockScroll() {
-
-    }
+    lockScroll() {},
   },
 }
 </script>
 
 <style lang="scss" scoped>
-  .clickable-menu-item {
-    cursor: pointer;
-  }
+.clickable-menu-item {
+  cursor: pointer;
+}
 </style>

@@ -26,42 +26,50 @@
 import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG } from '~/utils/VectorFactory.js'
 
 export default {
-    props: {
-        artefact: undefined,
-        baseDPI: {
-            type: Number,
-            default: 1215,
-        },
-        index: Number,
-        images: {
-            type: Array,
-        },
-        corpus: {},
+  props: {
+    artefact: undefined,
+    baseDPI: {
+      type: Number,
+      default: 1215,
     },
+    index: Number,
+    images: {
+      type: Array,
+    },
+    corpus: {},
+  },
   computed: {
-      scale() {
-          return this.baseDPI / this.artefact.dpi
-      },
-      svg_rect() {
-          return wktParseRect(this.artefact.rect)
-      },
-      svg_shape() {
-          return wktPolygonToSvg(this.artefact.mask, this.svg_rect)
-      },
-      svg_matrix() {
-          return dbMatrixToSVG(JSON.parse(this.artefact.transform_matrix).matrix)
-      },
-      imageReferences() {
-          return this.corpus.imageReferences.get(this.artefact.image_catalog_id).images
-      },
-      address() {
-        return this.corpus.images.get(this.images[0]).url 
-                + this.corpus.images.get(this.images[0]).filename
-                + '/' + this.svg_rect.x + ',' + this.svg_rect.y
-                + ',' + this.svg_rect.width + ',' + this.svg_rect.height 
-                + '/pct:10/0/' 
-                + this.corpus.images.get(this.images[0]).suffix
-      }
+    scale() {
+      return this.baseDPI / this.artefact.dpi
+    },
+    svg_rect() {
+      return wktParseRect(this.artefact.rect)
+    },
+    svg_shape() {
+      return wktPolygonToSvg(this.artefact.mask, this.svg_rect)
+    },
+    svg_matrix() {
+      return dbMatrixToSVG(JSON.parse(this.artefact.transform_matrix).matrix)
+    },
+    imageReferences() {
+      return this.corpus.imageReferences.get(this.artefact.image_catalog_id).images
+    },
+    address() {
+      return (
+        this.corpus.images.get(this.images[0]).url +
+        this.corpus.images.get(this.images[0]).filename +
+        '/' +
+        this.svg_rect.x +
+        ',' +
+        this.svg_rect.y +
+        ',' +
+        this.svg_rect.width +
+        ',' +
+        this.svg_rect.height +
+        '/pct:10/0/' +
+        this.corpus.images.get(this.images[0]).suffix
+      )
+    },
   },
 }
 </script>

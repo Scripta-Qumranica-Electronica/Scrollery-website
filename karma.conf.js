@@ -2,7 +2,13 @@ const webpackConfig = require('./webpack.test.js')
 
 
 module.exports = config => config.set({
-  browsers: ['PhantomJS'],
+  browsers: ['Chrome', 'ChromeHeadless', 'ChromeHeadlessNoSandbox', 'Firefox'],
+  customLaunchers: {
+    ChromeHeadlessNoSandbox: {
+      base: 'ChromeHeadless',
+      flags: ['--no-sandbox'] // needful to run in Travis
+    }
+  },
   frameworks: ['mocha', 'sinon-chai'],
   reporters: ['spec', 'coverage'],
   files: [

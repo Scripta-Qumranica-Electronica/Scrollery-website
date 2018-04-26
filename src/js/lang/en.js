@@ -1,24 +1,26 @@
 module.exports = {
-  "Loading": "Loading",
-  "Combinations": "Combinations",
-  "Artifact": "Artifact",
-  "Fragment": "Fragment",
-  
+  // Globals
+  Loading: 'Loading',
+  Combinations: 'Combinations',
+  Artifact: 'Artifact',
+  Fragment: 'Fragment',
+  'Global.Default': 'Default',
+
   // Auth
-  "Logout": "Logout",
-  "User.LoggedInMessage": "Logged in as: :name:",
+  Logout: 'Logout',
+  'User.LoggedInMessage': 'Logged in as: :name:',
 
   // Errors
-  "Errors.Login": "Please correct errors and resubmit.",
-  "Errors.Unknown": "Unexpected response.",
-  "Errors.ServiceUnavailable": "Unable to connect to the server. Please retry another time.",
+  'Errors.Login': 'Please correct errors and resubmit.',
+  'Errors.Unknown': 'Unexpected response.',
+  'Errors.ServiceUnavailable': 'Unable to connect to the server. Please retry another time.',
 
   // Menu
-  "Menu.Bars.Tooltip": "Click to keep menu open",
-  "New Artefact": "New Artefact",
+  'Menu.Bars.Tooltip': 'Click to keep menu open',
+  'New Artefact': 'New Artefact',
 
   // Editor
-  "Editor.HandOf": "Hand of",
-  "Editor.Fullscreen": "Show fullscreen",
-  "Editor.ToggleReconstructedText": "Toggle reconstructed text"
-};
+  'Editor.HandOf': 'Hand of',
+  'Editor.Fullscreen': 'Show fullscreen',
+  'Editor.ToggleReconstructedText': 'Toggle reconstructed text',
+}

@@ -24,9 +24,7 @@ const vuexLocalStorage = new VuexPersist({
   storage: window.localStorage,
 })
 Vue.use(Vuex)
-const store = makeStore(Vuex, [
-  vuexLocalStorage.plugin
-])
+const store = makeStore(Vuex, [vuexLocalStorage.plugin])
 
 // Localization
 Vue.use(i18n, { store })
@@ -43,6 +41,5 @@ Vue.use(ElementUI)
 // Turn on the lights
 const app = new Vue({
   router,
-  store
+  store,
 }).$mount('#app')
-

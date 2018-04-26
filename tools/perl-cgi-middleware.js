@@ -1,14 +1,5 @@
 const { resolve } = require('path')
-const webpack = require('webpack')
-const middleware = require('webpack-dev-middleware')
-const conf = require('./webpack.server.js')
-const compiler = webpack(conf)
-const express = require('express')
-const app = express()
-const bodyParser = require('body-parser')
 const url = require('url')
-app.use(bodyParser.json({ type: 'application/json' }))
-
 const { exec } = require('child_process')
 
 /**
@@ -19,7 +10,7 @@ var SERVER_PROTOCOL = 'HTTP/1.1'
 var GATEWAY_INTERFACE = 'CGI/1.1'
 
 const perl = (req, res) => {
-  const file = resolve.apply(null, [__dirname].concat(req.url.split('/')))
+  const file = resolve.apply(null, [__dirname, '..'].concat(req.url.split('/')))
 
   /**
    * Perl-CGI expects all of the CGI params to be set as environment variables.
@@ -104,24 +95,4 @@ const perl = (req, res) => {
   )
 }
 
-app.get('/', (req, res) => {
-  res.sendFile(resolve(__dirname, 'index.html'))
-})
-
-app.use(require('webpack-hot-middleware')(compiler))
-const serveWebpack = middleware(compiler, {
-  publicPath: '/dist/',
-})
-app.get(/.*/, (req, res, next) => {
-  if (/\/vendors/.test(req.url) || /\/resources/.test(req.url) || /\/node_modules/.test(req.url)) {
-    res.sendFile(resolve.apply(null, [__dirname].concat(req.url.replace(/\?.*$/, '').split('/'))))
-  } else {
-    serveWebpack(req, res, next)
-  }
-})
-
-app.post(/\.pl/, perl)
-
-app.listen(process.env.PORT || 9090, () =>
-  console.log(`SQE server listening on port ${process.env.PORT || 9090}!`)
-)
+module.exports = perl

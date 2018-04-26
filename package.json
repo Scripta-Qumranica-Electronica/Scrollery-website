@@ -1,19 +1,30 @@
 {
   "name": "sqe",
   "description": "Scripta Qumranica Electronica - Digital Tools for the Dead Sea Scrolls",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "scripts": {
+    "precommit": "lint-staged",
+    "prepush": "karma start --config karma.conf.js --browsers=Chrome --single-run",
+    "prettier": "prettier --config ./.prettierrc.yml --write ./{tests,gstsrc}/**/*.{js,vue}",
     "dev": "webpack --config webpack.dev.js",
     "prod": "webpack --config webpack.prod.js",
-    "start": "node ./dev-server.js",
+    "start": "node ./tools/dev_server.js",
     "setup:db": "sh ./bin/init-docker.sh",
     "test": "karma start --config karma.conf.js",
     "test:chrome": "karma start --config karma.conf.js --browsers=Chrome",
-    "test_travis": "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=PhantomJS,Firefox",
-    "posttest_travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "test_travis": "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=Chrome,Firefox",
+    "posttest_travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "test:server": "mocha ./tests/server/**/*-test.js --timeout=120000 --watch"
+  },
+  "lint-staged": {
+    "src/**/*.(js|vue)": [
+      "npm run prettier",
+      "git add"
+    ]
   },
   "devDependencies": {
     "@vue/test-utils": "^1.0.0-beta.10",
+    "app": "file:./tools",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-istanbul": "^4.1.5",
@@ -31,6 +42,7 @@
     "extract-text-webpack-plugin": "^3.0.2",
     "faker": "^4.1.0",
     "file-loader": "^1.1.11",
+    "husky": "^0.14.3",
     "karma": "^2.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.1",
@@ -42,6 +54,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.32",
     "karma-webpack": "^2.0.9",
+    "lint-staged": "^7.0.4",
     "mocha": "^5.0.0",
     "mocha-lcov-reporter": "^1.3.0",
     "node-sass": "^4.7.2",
@@ -68,7 +81,11 @@
     "body-parser": "^1.18.2",
     "element-ui": "^2.0.11",
     "immutable": "^3.8.2",
+    "prettier": "^1.12.0",
+    "quill": "^1.3.6",
     "rematrix": "^0.2.2",
+    "supertest": "^3.0.0",
+    "uuid": "^3.2.1",
     "vue": "^2.5.13",
     "vue-router": "^3.0.1",
     "vue-splitpane": "^1.0.2",

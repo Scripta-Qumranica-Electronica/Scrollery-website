@@ -61,8 +61,8 @@ export default {
     'main-menu': MainMenu,
     'split-pane': SplitPane,
     'single-image': SingleImage,
-    'editor': Editor,
-    'combination': Combination,
+    editor: Editor,
+    combination: Combination,
   },
   data() {
     return {
@@ -82,9 +82,12 @@ export default {
     // from the router.
     this.$store.commit('resetWorking')
     this.$store.commit('addWorking')
-    this.corpus = new Corpus(this.$store.state.userID, this.$store.state.username, this.$store.state.password)
-    this.corpus.populateCombinations()
-    .then(res => {
+    this.corpus = new Corpus(
+      this.$store.state.userID,
+      this.$store.state.username,
+      this.$store.state.password
+    )
+    this.corpus.populateCombinations().then(res => {
       this.menuLoaded = true
       this.$store.commit('delWorking')
       if (this.$route.params.scrollID && this.$route.params.scrollID !== '~') {
@@ -93,42 +96,45 @@ export default {
           this.$route.params.scrollID,
           this.$route.params.scrollVersionID
         )
-        this.corpus.populateImageReferencesOfCombination(this.$route.params.scrollVersionID)
-        .then(res1 => {
-          this.$store.commit('delWorking')
-          if(this.$route.params.imageID !== '~') {
-            this.$store.commit('addWorking')
-            this.corpus.populateImagesOfImageReference(
-              this.$route.params.imageID, 
-              this.$route.params.scrollVersionID
-            )
-            .then(res2 => {
-              this.$store.commit('delWorking')
-              if(this.$route.params.artID !== '~') {
-                this.$store.commit('addWorking')
-                this.corpus.populateArtefactsOfImageReference(
-                  this.$route.params.imageID, 
+        this.corpus
+          .populateImageReferencesOfCombination(this.$route.params.scrollVersionID)
+          .then(res1 => {
+            this.$store.commit('delWorking')
+            if (this.$route.params.imageID !== '~') {
+              this.$store.commit('addWorking')
+              this.corpus
+                .populateImagesOfImageReference(
+                  this.$route.params.imageID,
                   this.$route.params.scrollVersionID
                 )
-                .then(res3 => {
+                .then(res2 => {
                   this.$store.commit('delWorking')
-                  this.resetRouter()
+                  if (this.$route.params.artID !== '~') {
+                    this.$store.commit('addWorking')
+                    this.corpus
+                      .populateArtefactsOfImageReference(
+                        this.$route.params.imageID,
+                        this.$route.params.scrollVersionID
+                      )
+                      .then(res3 => {
+                        this.$store.commit('delWorking')
+                        this.resetRouter()
+                      })
+                  } else {
+                    this.resetRouter()
+                  }
                 })
-              } else {
-                this.resetRouter()
-              }
-            })
-          } else {
-            this.resetRouter()
-          }
-        })
+            } else {
+              this.resetRouter()
+            }
+          })
       }
     })
   },
   methods: {
     resetRouter() {
       // Trigger a router change here, so we don't need extra mount()
-      // functions in all of our vue components.  Is there a more 
+      // functions in all of our vue components.  Is there a more
       // elegant way to achieve this?
       const scrollID = this.$route.params.scrollID
       const scrollVersionID = this.$route.params.scrollVersionID
@@ -136,50 +142,54 @@ export default {
       const imageID = this.$route.params.imageID
       const artID = this.$route.params.artID
 
-      this.$router.push({name: 'workbenchAddress',
-        params: {
-          scrollID: '~',
-          scrollVersionID: '~',
-          colID: '~',
-          imageID: '~',
-          artID: '~'
+      this.$router.push(
+        {
+          name: 'workbenchAddress',
+          params: {
+            scrollID: '~',
+            scrollVersionID: '~',
+            colID: '~',
+            imageID: '~',
+            artID: '~',
+          },
+        },
+        () => {
+          // I don't know why the listeners don't pick up on the
+          // router change unless I give a tiny delay.
+          setTimeout(() => {
+            // Load back the initial values
+            this.$router.push({
+              name: 'workbenchAddress',
+              params: {
+                scrollID: scrollID,
+                scrollVersionID: scrollVersionID,
+                colID: colID,
+                imageID: imageID,
+                artID: artID,
+              },
+            })
+          }, 5)
         }
-      }, () => {
-        // I don't know why the listeners don't pick up on the 
-        // router change unless I give a tiny delay.
-        setTimeout(() => {
-          // Load back the initial values
-          this.$router.push({
-            name: 'workbenchAddress',
-            params: {
-              scrollID: scrollID,
-              scrollVersionID: scrollVersionID,
-              colID: colID,
-              imageID: imageID,
-              artID: artID
-            }
-          })
-        },5)
-      })
-    }
-  }
+      )
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-
-@import "~sass-vars";
+@import '~sass-vars';
 
 #site {
   width: 100%;
   height: 100vh;
   overflow: hidden;
   font-size: 0;
-  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    '微软雅黑', Arial, sans-serif;
 }
 
 #editing-window,
-#side-menu, {
+#side-menu {
   position: absolute;
   height: 100%;
   vertical-align: top;
@@ -200,8 +210,8 @@ export default {
 
   &.open {
     left: 0;
-  transition: left #{$menuSlideTransitionIn};
-  transition-timing-function: ease-in;
+    transition: left #{$menuSlideTransitionIn};
+    transition-timing-function: ease-in;
   }
 }
 #editing-window {

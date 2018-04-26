@@ -53,6 +53,7 @@ sub processCGI {
 		'setArtRotation' => \&setArtRotation,
 	);
 
+<<<<<<< HEAD
 	# print $cgi->header(
 	# 			-type    => 'application/json',
 	# 			-charset =>  'utf-8',
@@ -98,6 +99,10 @@ sub processCGI {
 				print '}}';
 			}
 		}
+=======
+	if ($transaction eq 'unspecified'){
+		print encode_json({'error', "No transaction requested."});
+>>>>>>> master
 	} else {
 		if (defined $action{$json_post->{transaction}}) {
 			$action{$json_post->{transaction}}->($cgi, $json_post);

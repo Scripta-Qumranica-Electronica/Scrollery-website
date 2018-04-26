@@ -1,24 +1,22 @@
-
 import Sign from '~/models/Sign.js'
 
 describe('Sign', () => {
   it('should be constructible', () => {
     let sign = new Sign({
-      sign_id: "test"
+      sign_id: 'test',
     })
     expect(sign instanceof Sign).to.equal(true)
   })
 
   describe('next sign', () => {
-
     let sign, next
     beforeEach(() => {
       sign = new Sign({
         sign_id: 1,
-        next_sign_id: 2
+        next_sign_id: 2,
       })
       next = new Sign({
-        sign_id: 2
+        sign_id: 2,
       })
     })
 
@@ -26,19 +24,17 @@ describe('Sign', () => {
       expect(sign.hasNext()).to.equal(true)
       expect(next.hasNext()).to.equal(false)
     })
-
   })
 
   describe('previous sign', () => {
-
     let sign, prev
     beforeEach(() => {
       sign = new Sign({
         sign_id: 2,
-        prev_sign_id: 1
+        prev_sign_id: 1,
       })
       prev = new Sign({
-        sign_id: 1
+        sign_id: 1,
       })
     })
 
@@ -46,7 +42,6 @@ describe('Sign', () => {
       expect(sign.hasPrevious()).to.equal(true)
       expect(prev.hasPrevious()).to.equal(false)
     })
-
   })
 
   describe('attributes', () => {
@@ -55,7 +50,7 @@ describe('Sign', () => {
       sign = new Sign({
         sign_id: 1,
         sign: '·',
-        is_reconstructed: true
+        is_reconstructed: true,
       })
     })
 
@@ -68,16 +63,12 @@ describe('Sign', () => {
     })
 
     it('should know about the varieties of whitespace', () => {
-      [
-        { sign: false },
-        { sign: '' },
-        { sign: ' ' },
-        { sign: '&nbsp;' },
-        { sign: '·' }
-      ].forEach(attrs => {
-        sign = new Sign({sign: false})
-        expect(sign.is_whitespace).to.equal(true)
-      })
+      ;[{ sign: false }, { sign: '' }, { sign: ' ' }, { sign: '&nbsp;' }, { sign: '·' }].forEach(
+        attrs => {
+          sign = new Sign({ sign: false })
+          expect(sign.is_whitespace).to.equal(true)
+        }
+      )
     })
 
     it('should know if it is reconstructed', () => {
@@ -86,36 +77,35 @@ describe('Sign', () => {
   })
 
   describe('extending', () => {
-
-    let sign, attrs = {
-      sign_id: 1,
-      sign: '·',
-      is_reconstructed: true
-    }
+    let sign,
+      attrs = {
+        sign_id: 1,
+        sign: '·',
+        is_reconstructed: true,
+      }
     beforeEach(() => {
       sign = new Sign(attrs)
     })
 
     it('should expose an extend method that returns a new sign with the extended attributes', () => {
       let newSign = sign.extend({
-        col_id: 1
+        col_id: 1,
       })
       expect(newSign instanceof Sign).to.equal(true)
       expect(newSign).not.to.equal(sign)
       expect(newSign.reconstructed()).to.equal(sign.reconstructed())
       expect(newSign.col_id).to.equal(1)
     })
-
   })
 
   describe('stringifying with sign.toString()', () => {
-
     describe('whitespace', () => {
-      let sign, attrs = {
-        sign_id: 1,
-        sign: '·',
-        is_reconstructed: true
-      }
+      let sign,
+        attrs = {
+          sign_id: 1,
+          sign: '·',
+          is_reconstructed: true,
+        }
       beforeEach(() => {
         sign = new Sign(attrs)
       })
@@ -126,12 +116,12 @@ describe('Sign', () => {
     })
 
     describe('non-whitespace', () => {
-
-      let sign, attrs = {
-        sign_id: 1,
-        sign: 'א',
-        is_reconstructed: true
-      }
+      let sign,
+        attrs = {
+          sign_id: 1,
+          sign: 'א',
+          is_reconstructed: true,
+        }
       beforeEach(() => {
         sign = new Sign(attrs)
       })
@@ -140,17 +130,16 @@ describe('Sign', () => {
         expect(sign.toString()).to.equal('א')
       })
     })
-
   })
 
   describe('stringifying with sign.toDOMString()', () => {
-
     describe('whitespace', () => {
-      let sign, attrs = {
-        sign_id: 1,
-        sign: '·',
-        is_reconstructed: true
-      }
+      let sign,
+        attrs = {
+          sign_id: 1,
+          sign: '·',
+          is_reconstructed: true,
+        }
       beforeEach(() => {
         sign = new Sign(attrs)
       })
@@ -161,12 +150,12 @@ describe('Sign', () => {
     })
 
     describe('non-whitespace', () => {
-
-      let sign, attrs = {
-        sign_id: 1,
-        sign: 'א',
-        is_reconstructed: true
-      }
+      let sign,
+        attrs = {
+          sign_id: 1,
+          sign: 'א',
+          is_reconstructed: true,
+        }
       beforeEach(() => {
         sign = new Sign(attrs)
       })
@@ -175,6 +164,5 @@ describe('Sign', () => {
         expect(sign.toDOMString()).to.equal('א')
       })
     })
-
   })
 })

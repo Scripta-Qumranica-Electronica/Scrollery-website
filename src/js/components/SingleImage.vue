@@ -108,14 +108,14 @@
 <script>
 import RoiCanvas from './RoiCanvas.vue'
 import ArtefactCanvas from './ArtefactCanvas.vue'
-import {wktPolygonToSvg, svgPolygonToWKT} from '../utils/VectorFactory'
+import { wktPolygonToSvg, svgPolygonToWKT } from '../utils/VectorFactory'
 
 export default {
   props: {
     corpus: {
       required: true,
       type: Object,
-    }
+    },
   },
   components: {
     'roi-canvas': RoiCanvas,
@@ -147,24 +147,26 @@ export default {
   methods: {
     fetchImages(id) {
       this.$store.commit('addWorking')
-      this.corpus.populateImagesOfImageReference(id, this.$route.params.scrollVersionID)
-      .then(res => {
-        this.$store.commit('delWorking')
-        this.filenames = this.corpus.imageReferences.get(id >>> 0).images
-        this.filenames.forEach(key => {
-          if (this.corpus.images.get(key).is_master) {
-            this.$set(this.imageSettings, key, {visible: true, opacity: 1.0})
-            this.masterImage = this.corpus.images.get(key)
-          } else {
-            this.$set(this.imageSettings, key, {visible: false, opacity: 1.0})
-          }
-        })
-        this.$store.commit('addWorking')
-        this.corpus.populateArtefactsOfImageReference(id, this.$route.params.scrollVersionID)
-        .then(res1 => {
+      this.corpus
+        .populateImagesOfImageReference(id, this.$route.params.scrollVersionID)
+        .then(res => {
           this.$store.commit('delWorking')
+          this.filenames = this.corpus.imageReferences.get(id >>> 0).images
+          this.filenames.forEach(key => {
+            if (this.corpus.images.get(key).is_master) {
+              this.$set(this.imageSettings, key, { visible: true, opacity: 1.0 })
+              this.masterImage = this.corpus.images.get(key)
+            } else {
+              this.$set(this.imageSettings, key, { visible: false, opacity: 1.0 })
+            }
+          })
+          this.$store.commit('addWorking')
+          this.corpus
+            .populateArtefactsOfImageReference(id, this.$route.params.scrollVersionID)
+            .then(res1 => {
+              this.$store.commit('delWorking')
+            })
         })
-      })
     },
     // TODO move the logic for this into the data model.
     setClipMask(mask) {
@@ -178,30 +180,28 @@ export default {
           name: this.artName,
           scroll_id: this.$route.params.scrollID,
           version_id: this.$route.params.scrollVersionID,
-        })
-        .then(res => {
-            if (res.status === 200 && res.data.returned_info) {
-	            this.$router.push({
-                name: 'workbenchAddress',
-                params: {
-                  scrollID: this.$route.params.scrollID,
-                  scrollVersionID: this.$route.params.scrollVersionID,
-                  colID: this.$route.params.colID ? this.$route.params.colID : '~',
-                  imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-                  artID: res.data.returned_info
-                }
-              })
-              this.lock = false
-            }
+        }).then(res => {
+          if (res.status === 200 && res.data.returned_info) {
+            this.$router.push({
+              name: 'workbenchAddress',
+              params: {
+                scrollID: this.$route.params.scrollID,
+                scrollVersionID: this.$route.params.scrollVersionID,
+                colID: this.$route.params.colID ? this.$route.params.colID : '~',
+                imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
+                artID: res.data.returned_info,
+              },
+            })
+            this.lock = false
+          }
         })
       } else {
-	      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
           transaction: 'changeArtefactPoly',
           region_in_sqe_image: svgPolygonToWKT(mask),
           artefact_id: this.$route.params.artID,
           version_id: this.$route.params.scrollVersionID,
-	      })
-        .then(res => {
+        }).then(res => {
           if (res.status === 200 && res.data.artefact_id) {
             this.$router.push({
               name: 'workbenchAddress',
@@ -210,8 +210,8 @@ export default {
                 scrollVersionID: this.$route.params.scrollVersionID,
                 colID: this.$route.params.colID ? this.$route.params.colID : '~',
                 imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-                artID: res.data.artefact_id
-              }
+                artID: res.data.artefact_id,
+              },
             })
             this.lock = false
           }
@@ -235,16 +235,15 @@ export default {
     },
     toggleDrawingMode() {
       this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
-    }
+    },
   },
   watch: {
-    '$route' (to, from) {
-      // TODO maybe rethink this to avoid the case where 
+    $route(to, from) {
+      // TODO maybe rethink this to avoid the case where
       // we have an artID but no imageID
 
       // Fetch images for image ID if it has changed
-      if (to.params.imageID !== '~' 
-        && to.params.imageID !== from.params.imageID) {
+      if (to.params.imageID !== '~' && to.params.imageID !== from.params.imageID) {
         this.fetchImages(this.$route.params.imageID)
         this.artefact = undefined
         this.firstClipMask = this.clipMask = undefined
@@ -259,20 +258,25 @@ export default {
         } else {
           this.artefact = to.params.artID >>> 0
           this.scrollVersionID = to.params.scrollVersionID >>> 0
-          if(this.corpus.artefacts.get(this.artefact).mask === '') {
+          if (this.corpus.artefacts.get(this.artefact).mask === '') {
             // this.$store.commit('addWorking')
-            this.corpus.artefacts.fetchMask(to.params.scrollVersionID, to.params.artID)
-            .then(res => {
-              // this.$store.commit('delWorking')
-              this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.get(this.artefact).mask)
-            })
+            this.corpus.artefacts
+              .fetchMask(to.params.scrollVersionID, to.params.artID)
+              .then(res => {
+                // this.$store.commit('delWorking')
+                this.firstClipMask = this.clipMask = wktPolygonToSvg(
+                  this.corpus.artefacts.get(this.artefact).mask
+                )
+              })
           } else {
-            this.firstClipMask = this.clipMask = wktPolygonToSvg(this.corpus.artefacts.get(this.artefact).mask)
+            this.firstClipMask = this.clipMask = wktPolygonToSvg(
+              this.corpus.artefacts.get(this.artefact).mask
+            )
           }
         }
         this.lock = false
       }
-    }
+    },
   },
   filters: {
     formatImageType(value) {
@@ -292,44 +296,44 @@ export default {
           break
       }
       return formattedString
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-  @import "~sass-vars";
+@import '~sass-vars';
 
-  .single-image-pane-menu {
-    width: 100%;
-    height: 32px; // Should be 30px, but 32px looks better
-    max-height: 32px; // Should be 30px, but 32px looks better
-    background: #dedede;
-    margin-left: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
-    margin-right: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
-  }
-  .fileSelector {
-    border-radius: 15px;
-    background: #E1E1D0;
-    padding: 10px;
-    z-index: 10;
-  }
-  .image-select-box > .image-select-entry {
-    padding: 5px;
-  }
-  .image-select-entry {
-    width: 100%;
-  }
-  .overlay-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-origin: top left;
-  }
-  .overlay-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-origin: top left;
-  }
+.single-image-pane-menu {
+  width: 100%;
+  height: 32px; // Should be 30px, but 32px looks better
+  max-height: 32px; // Should be 30px, but 32px looks better
+  background: #dedede;
+  margin-left: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
+  margin-right: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
+}
+.fileSelector {
+  border-radius: 15px;
+  background: #e1e1d0;
+  padding: 10px;
+  z-index: 10;
+}
+.image-select-box > .image-select-entry {
+  padding: 5px;
+}
+.image-select-entry {
+  width: 100%;
+}
+.overlay-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+.overlay-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
 </style>

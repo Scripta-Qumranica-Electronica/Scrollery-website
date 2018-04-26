@@ -3,7 +3,6 @@
 </template>
 
 <script>
-
 export default {
   props: {
     artefactID: {
@@ -30,10 +29,12 @@ export default {
   methods: {
     setRouter() {
       const params = this.$route.params
-      if (params.scrollID !== this.scrollID 
-        || params.scrollVersionID !== this.scrollVersionID
-        || params.imageID !== this.imageID
-        || params.artID !== this.artefactID) {
+      if (
+        params.scrollID !== this.scrollID ||
+        params.scrollVersionID !== this.scrollVersionID ||
+        params.imageID !== this.imageID ||
+        params.artID !== this.artefactID
+      ) {
         this.$router.push({
           name: 'workbenchAddress',
           params: {
@@ -41,8 +42,8 @@ export default {
             scrollVersionID: this.scrollVersionID,
             colID: '~',
             imageID: this.imageID,
-            artID: this.artefactID
-          }
+            artID: this.artefactID,
+          },
         })
       }
       // We should tell our corpus object to try fetching the artefact every
@@ -53,4 +54,3 @@ export default {
   },
 }
 </script>
-

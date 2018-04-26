@@ -2,7 +2,6 @@ import Queue from '~/utils/Queue.js'
 import QueueAction from '~/utils/QueueAction.js'
 
 describe('Queue', () => {
-
   let q, action, init, undo
   beforeEach(() => {
     q = new Queue()
@@ -22,11 +21,10 @@ describe('Queue', () => {
       let action2 = new QueueAction(init, undo)
       q.push(action, action2)
       expect(init.calledTwice).to.equal(true)
-    });
+    })
   })
 
   describe('pop', () => {
-
     it('should allow poping items off the queue and immediately invoke the undo', () => {
       q.push(action)
       q.pop()
@@ -35,7 +33,7 @@ describe('Queue', () => {
 
     it('should pop items off in the reverse order they were pushed on', () => {
       q.push(
-        new QueueAction(init, () => 1), 
+        new QueueAction(init, () => 1),
         new QueueAction(init, () => 2),
         new QueueAction(init, () => 3)
       )
@@ -44,7 +42,6 @@ describe('Queue', () => {
       expect(q.pop()).to.equal(3)
       expect(q.pop()).to.equal(2)
       expect(q.pop()).to.equal(1)
-    });
+    })
   })
-
 })

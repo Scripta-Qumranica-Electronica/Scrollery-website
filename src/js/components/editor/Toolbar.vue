@@ -27,11 +27,10 @@ export default {
   props: {
     state: {
       type: Store,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
-
     /**
      * @type {object} an object representing the current font in use
      */
@@ -44,7 +43,7 @@ export default {
      */
     font() {
       return this.state.getters.font
-    }
+    },
   },
   methods: {
     toggleReconstructedText() {
@@ -58,25 +57,23 @@ export default {
      */
     onFontChange(font) {
       this.state.commit('setFont', font)
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-
-@import "~sass-vars";
+@import '~sass-vars';
 
 .toolbar {
   text-align: right;
   padding: 1px 10px;
   height: 30px;
-  background: rgba($gray, .2);
+  background: rgba($gray, 0.2);
   font-size: 0;
 }
 
 .toolbar-item {
   font-size: 20px;
 }
-
 </style>

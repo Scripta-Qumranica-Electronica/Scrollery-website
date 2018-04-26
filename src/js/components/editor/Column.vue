@@ -1,14 +1,33 @@
 <template>
   <div class="editor-column">
-    <div class="text-col inline text-sbl-hebrew" dir="rtl" contenteditable="true" @keydown="onKeydown" @input="onInput" @paste="onPaste" @copy="onCopy" v-html="colHtmlString">
+    <div
+      class="text-col inline text-sbl-hebrew"
+      dir="rtl" 
+      contenteditable="true"
+      @keydown="onKeydown" 
+      @input="onInput"
+      @paste="onPaste"
+      @copy="onCopy"
+      v-html="colHtmlString"
+    >
     </div><div class="line-number-col inline">
         <p class="line-number" v-for="(line, lineIndex) of column.items()" :key="line.id">{{ lineIndex + 1 }}</p>
     </div>
+    <editing-dialog
+      :line="dialogLine"
+      :sign="dialogSign"
+      :dialogVisible="dialogVisible"
+      @close="onDialogClosed"
+      @change-sign="onDialogChangeSign"
+    />
   </div>
 </template>
 
 <script>
 import KEYS from './key_codes.js'
+
+// components
+import EditingDialog from './dialog/EditingDialog.vue'
 
 // models
 import Column from '~/models/Column.js'
@@ -16,35 +35,42 @@ import Line from '~/models/Line.js'
 import Sign from '~/models/Sign.js'
 
 export default {
+  components: {
+    'editing-dialog': EditingDialog,
+  },
   data() {
     return {
-      colHtmlString: ""
+      colHtmlString: '',
+
+      // props that will be passed into the editor dialog
+      dialogSign: null,
+      dialogLine: null,
+      dialogVisible: false,
     }
   },
   props: {
     column: {
       required: true,
-      type: Column
+      type: Column,
     },
     state: {
-      required: true
-    }
+      required: true,
+    },
   },
   methods: {
-
     /**
      * The converse of reset. Synchronize the column model to the current DOM column
-     * 
+     *
      * @param {HTMLElement} colNode  the DOM element corresponding to this column
      */
-     synchronize(colNode) {
+    synchronize(colNode) {
       // first, gather up the target represenation from the DOM
       let target = []
       for (let i = 0, n = colNode.children.length; i < n; i++) {
         let child = colNode.children[i]
         target.push({
           id: child.dataset.lineId,
-          text: child.innerText
+          text: child.innerText,
         })
       }
       // second, apply to the column model
@@ -53,16 +79,10 @@ export default {
 
     /**
      * For contenteditable divs, the only place we can stop input ... is before keyup
-     * 
+     *
      * Thus, we can intercept some events here, and stub in our own if need be.
      */
     onKeydown(e) {
-
-      // safeguard: ensure trusted input
-      if (!e.isTrusted) {
-        e.preventDefault()
-      }
-
       if (e.metaKey) {
         this.processMetaInput(e)
       }
@@ -70,34 +90,36 @@ export default {
 
     /**
      * Handle meta-key inputs (exact meta key varies by OS. Thes are usually hot keys,
-     * 
-     * OS: 
+     *
+     * OS:
      *  - mac: CMD + key
      *  - windows: ctl + key
-     * 
+     *
      * @param {KeyboardEvent} e triggered event
      */
     processMetaInput(e) {
-      switch(e.keyCode) {
-
+      switch (e.keyCode) {
         /* disallowed actions */
         case KEYS.ALPHA.I: // meta + i = italic
         case KEYS.ALPHA.B: // meta + b = bold
           e.preventDefault()
-          break;
+          break
+
+        case KEYS.ALPHA.O: // meta + o = open dialog
+          this.openDialog(e)
+          break
       }
     },
 
     /**
      * Synchronizes the model with a new line
-     * 
+     *
      * @param {KeyboardEvent} e triggered event
      */
     insertLineAtSelection(e, { line, node }) {
-
       // whereas the line model still reflects the previous state
       // the node should be the newly inserted bit.
-      let newLine = this.column.splitLine(line, (line.length - node.innerText.length))
+      let newLine = this.column.splitLine(line, line.length - node.innerText.length)
 
       // update the lineId on the DOM for next use
       node.dataset.lineId = newLine.getID()
@@ -106,8 +128,7 @@ export default {
     /**
      * @param {InputEvent} e
      */
-     signsChanged(e, { line, node }) {
-
+    signsChanged(e, { line, node }) {
       // synchronize the line > DOM
       line.synchronizeTo(node.innerText)
     },
@@ -116,14 +137,11 @@ export default {
      * @param {InputEvent} e
      */
     signsRemoved(e, { line, node }) {
-
       // determine if the lines are the same as the count of <p> elements
-      // if not, then a line was deleted/merged into 
+      // if not, then a line was deleted/merged into
       if (node.parentElement.children.length !== this.column.length) {
         this.synchronize(node.parentElement)
-
       } else {
-
         // this was a simple removal of a sign, we can handle that
         // via a signsChanged to diff the DOM
         this.signsChanged(e, { line, node })
@@ -148,23 +166,21 @@ export default {
      * @param {InputEvent} e triggered event
      */
     onInput(e) {
-
       switch (e.inputType) {
-
         // inserted block/paragraph
-        case "insertParagraph":
-          this.insertLineAtSelection(e, this.getLineSelection())
-          break;
+        case 'insertParagraph':
+          this.insertLineAtSelection(e, this.getSelection())
+          break
 
         // inserted chars
-        case "insertText":
-          this.signsChanged(e, this.getLineSelection())
+        case 'insertText':
+          this.signsChanged(e, this.getSelection())
           break
 
         // deleted content. Could be line or single char
-        case "deleteContentBackward":
-          this.signsRemoved(e, this.getLineSelection())
-          break;
+        case 'deleteContentBackward':
+          this.signsRemoved(e, this.getSelection())
+          break
 
         // for now, just log out what we're missing
         default:
@@ -173,46 +189,106 @@ export default {
     },
 
     /**
+     * Convenience method for retrieving the selected DOM node and corresponding models
+     *
      * @returns {object} with this shape: {
      *  line: {Line} the line model, where applicable
      *  node: {HtmlElement} the DOM element corresponding to the line
      * }
      */
-    getLineSelection() {
-      let selectedNode = document.getSelection()
+    getSelection() {
+      const selection = document.getSelection()
 
       // safeguard to ensure a workable DOM element is available
-      return (!selectedNode || !selectedNode.anchorNode)
+      return !selection || !selection.anchorNode
         ? {}
-        : this.getLineParent(selectedNode.anchorNode)
+        : this.getLineParent(selection.anchorNode, null, selection)
     },
 
     /**
-     * @param {Node} domNode a dom node to find the correlated parent
+     * A recursive method
+     *
+     * @param {Node} domNode        a dom node to find the correlated parent
+     * @param {Node} init           the initial dom node (usually selection.anchorNode)
+     * @param {Selection} selection The full selection object
+     *
+     * @returns {object} An object containing the initial dom node, line model, sign model,
      */
-    getLineParent(domNode, init) {
-      if (domNode.tagName === "P" && domNode.dataset && domNode.dataset.lineId !== undefined) {
+    getLineParent(domNode, init, selection) {
+      if (domNode.tagName === 'P' && domNode.dataset && domNode.dataset.lineId !== undefined) {
+        // determine the line ID from the HTML dataset
         const id = Number(domNode.dataset.lineId)
+
+        // find the line model
+        const line = this.column.find(line => line.id === id)
         return {
-          init: init,
+          init,
+          line: line || null,
+          sign: line ? line.get(selection.focusOffset) : null,
           node: domNode,
-          line: this.column.find(line => line.id === id)
+          selection,
         }
       }
 
       // recurse up the DOM
-      return domNode.parentElement ? this.getLineParent(domNode.parentElement, init || domNode) : null
-    }
+      return domNode.parentElement
+        ? this.getLineParent(domNode.parentElement, init || domNode, selection)
+        : null
+    },
+
+    /**
+     * Attemps to open the dialog
+     *
+     * @param {KeyboardEvent} [e] triggered event
+     */
+    openDialog(e) {
+      // prevent whatever action got us here.
+      // custom logic will take over
+      e && e.preventDefault()
+
+      const { line, sign, selection } = this.getSelection()
+
+      // todo: show UI error
+      if (!line || !sign) {
+        console.error('Unable to open dialog. Something has broken')
+        return
+      }
+
+      this.dialogLine = line
+      this.dialogSign = sign
+      this.dialogVisible = true
+    },
+
+    /**
+     * Handle when the editing dialog is closed
+     *
+     * @param {mixed} args  The event args
+     */
+    onDialogClosed() {
+      this.dialogLine = null
+      this.dialogSign = null
+      this.dialogVisible = false
+
+      // TODO: reset selection to previous point
+    },
+
+    /**
+     * Handle when the changes it's sign
+     *
+     * @param {Sign} sign  The event args
+     */
+    onDialogChangeSign(sign) {
+      this.dialogSign = sign
+    },
   },
   mounted() {
     this.colHtmlString = this.column.toDOMString()
-  }
+  },
 }
 </script>
 
 <style lang="scss">
-
-@import "~sass-vars";
+@import '~sass-vars';
 
 .editor-column {
   width: 100%;
@@ -266,5 +342,4 @@ export default {
     padding: 0 5px;
   }
 }
-
 </style>

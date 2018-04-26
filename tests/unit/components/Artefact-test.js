@@ -1,4 +1,4 @@
-"use strict"
+'use strict'
 
 import { mount } from '@test'
 import Artefact from '~/components/Artefact.vue'
@@ -29,21 +29,22 @@ describe("Artefact", function() {
             corpus: new MenuCorpus(),
             baseDPI: baseDPI,
         },
+        baseDPI: baseDPI,
       })
-      vm = wrapper.vm
-    })
+    vm = wrapper.vm
+  })
 
-    it('has the proper scale', () => {
-        expect(vm.scale).to.equal(correctScale)
-    })
+  it('has the proper scale', () => {
+    expect(vm.scale).to.equal(correctScale)
+  })
 
-    it('has an SVG g element', () => {
-        expect(wrapper.contains('g')).to.equal(true)
-    })
+  it('has an SVG g element', () => {
+    expect(wrapper.contains('g')).to.equal(true)
+  })
 
-    it('has the proper SVG path', () => {
-        expect(wrapper.contains('g > defs > path')).to.equal(true)
-    })
+  it('has the proper SVG path', () => {
+    expect(wrapper.contains('g > defs > path')).to.equal(true)
+  })
 
     // it('has the proper SVG clipPath', () => {
     //     expect(wrapper.contains(`g > defs > #clip-${imageID}-${artefactID}`)).to.equal(true)

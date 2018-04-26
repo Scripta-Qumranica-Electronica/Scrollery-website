@@ -23,5 +23,4 @@ describe('model', () => {
     const model = new Model()
     expect(model.name).to.equal(name)
   })
-
 })
