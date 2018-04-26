@@ -16,6 +16,10 @@ sub processCGI {
 		print('{"error":"'.@{$error}[1].'"}');
 		exit;
 	}
+	print $cgi->header(
+		-type    => 'application/json',
+		-charset =>  'utf-8',
+	);
 
 	my $json_post = decode_json(''.$cgi->param('POSTDATA'));
 
@@ -134,7 +138,7 @@ FROM scroll_version
 	JOIN scroll_data using(scroll_id)
 	JOIN scroll_data_owner using(scroll_data_id)
 WHERE scroll_version.user_id = ?
-      OR scroll_version.user_id = 0
+      OR scroll_version.user_id = 1
 ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
 	LPAD(SPLIT_STRING(name, "Q", 2), 3, "0")
 MYSQL
