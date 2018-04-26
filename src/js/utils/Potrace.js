@@ -240,7 +240,7 @@ function Potrace(canvas, multiplyFactor) {
         if (ct > 0) {
           return 1
         } else if (ct < 0) {
-        /* istanbul ignore next */
+          /* istanbul ignore next */
           return 0
         }
       }
@@ -601,6 +601,7 @@ function Potrace(canvas, multiplyFactor) {
           k1 = k
           k = nc[k1]
           if (!cyclic(k, i, k1)) {
+            /* istanbul ignore next */
             break
           }
         }
@@ -921,11 +922,11 @@ function Potrace(canvas, multiplyFactor) {
             v[0] = -Q.at(0, 1)
             v[1] = Q.at(0, 0)
           } else if (Q.at(1, 1)) {
-          /* istanbul ignore next */
+            /* istanbul ignore next */
             v[0] = -Q.at(1, 1)
             v[1] = Q.at(1, 0)
           } else {
-          /* istanbul ignore next */
+            /* istanbul ignore next */
             v[0] = 1
             v[1] = 0
           }
@@ -1029,7 +1030,7 @@ function Potrace(canvas, multiplyFactor) {
           alpha = dd > 1 ? 1 - 1.0 / dd : 0
           alpha = alpha / 0.75
         } else {
-        /* istanbul ignore next */
+          /* istanbul ignore next */
           alpha = 4 / 3.0
         }
         curve.alpha0[j] = alpha
@@ -1039,17 +1040,23 @@ function Potrace(canvas, multiplyFactor) {
           curve.c[3 * j + 1] = curve.vertex[j]
           curve.c[3 * j + 2] = p4
         } else {
-        /* istanbul ignore next */
+          /* istanbul ignore next */
           if (alpha < 0.55) {
             alpha = 0.55
           } else if (alpha > 1) {
             alpha = 1
           }
+          /* istanbul ignore next */
           p2 = interval(0.5 + 0.5 * alpha, curve.vertex[i], curve.vertex[j])
+          /* istanbul ignore next */
           p3 = interval(0.5 + 0.5 * alpha, curve.vertex[k], curve.vertex[j])
+          /* istanbul ignore next */
           curve.tag[j] = 'CURVE'
+          /* istanbul ignore next */
           curve.c[3 * j + 0] = p2
+          /* istanbul ignore next */
           curve.c[3 * j + 1] = p3
+          /* istanbul ignore next */
           curve.c[3 * j + 2] = p4
         }
         curve.alpha[j] = alpha
@@ -1324,15 +1331,23 @@ function Potrace(canvas, multiplyFactor) {
           ocurve.beta[i] = curve.beta[mod(j, m)]
           s[i] = t[i] = 1.0
         } else {
-        /* istanbul ignore next */
+          /* istanbul ignore next */
           ocurve.tag[i] = 'CURVE'
+          /* istanbul ignore next */
           ocurve.c[i * 3 + 0] = opt[j].c[0]
+          /* istanbul ignore next */
           ocurve.c[i * 3 + 1] = opt[j].c[1]
+          /* istanbul ignore next */
           ocurve.c[i * 3 + 2] = curve.c[mod(j, m) * 3 + 2]
+          /* istanbul ignore next */
           ocurve.vertex[i] = interval(opt[j].s, curve.c[mod(j, m) * 3 + 2], vert[mod(j, m)])
+          /* istanbul ignore next */
           ocurve.alpha[i] = opt[j].alpha
+          /* istanbul ignore next */
           ocurve.alpha0[i] = opt[j].alpha
+          /* istanbul ignore next */
           s[i] = opt[j].s
+          /* istanbul ignore next */
           t[i] = opt[j].t
         }
         j = pt[j]

@@ -46,6 +46,32 @@ describe('VectorFactory.wktPolygonToSvg', () => {
     // assert expected value
     expect(wktPolygonToSvg(geoJsonPolygon, boundingRect)).to.equal(expectedSvgPolygon)
   })
+
+  it('should convert a GeoJSON Polygon to a valid svg path String', () => {
+    // setup initial state
+    const point1 = {
+      x: 1,
+      y: 1,
+    }
+    const point2 = {
+      x: 5,
+      y: 1,
+    }
+    const point3 = {
+      x: 1,
+      y: 5,
+    }
+    const geoJsonPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${
+      point3.y
+    },${point1.x} ${point1.y}))`
+    //define expected result
+    const expectedSvgPolygon = `M${point1.x} ${point1.y}L${point2.x} ${point2.y}L${point3.x} ${
+      point3.y
+    }L${point1.x} ${point1.y}`
+
+    // assert expected value
+    expect(wktPolygonToSvg(geoJsonPolygon)).to.equal(expectedSvgPolygon)
+  })
 })
 
 describe('VectorFactory.wktPointToSvg', () => {
@@ -115,8 +141,21 @@ describe('VectorFactory.svgPolygonToWKT', () => {
         wkt += ','
       }
     }
+    wkt += '),('
+    svg += 'M'
+    for (let i = 0; i < 20; i++) {
+      svg += `${i} ${i * 10}`
+      wkt += `${i} ${i * 10}`
+      if (i % 2 === 0) {
+        svg += ' L '
+      } else {
+        svg += ' '
+      }
+      if (i !== 19) {
+        wkt += ','
+      }
+    }
     wkt += '))'
-
     // assert expected value
     expect(svgPolygonToWKT(svg)).to.equal(wkt)
   })
