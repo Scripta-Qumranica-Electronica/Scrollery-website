@@ -4,7 +4,18 @@ import HeaderMenu from '~/components/HeaderMenu.vue'
 describe('HeaderMenu', () => {
   let wrapper, vm
   beforeEach(() => {
-    wrapper = mount(HeaderMenu)
+    wrapper = mount(HeaderMenu, {
+      propsData: {
+        corpus: {}
+      },
+      mocks: {
+        $route: {
+          params: {
+            
+          }
+        }
+      }
+    })
     vm = wrapper.vm
   })
   describe('logout', () => {

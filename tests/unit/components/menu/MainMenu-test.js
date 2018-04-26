@@ -32,6 +32,9 @@ class Corpus {
     constructor() {
         this.combinations = new Combinations()
     }
+    populateCombinations() {
+        
+    }
     populateColumnsOfScrollVersion(versionID, scrollID) {
         return {versionID: versionID, scrollID: scrollID}
     }
