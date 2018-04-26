@@ -1,53 +1,60 @@
-'use strict'
+"use strict"
 
 import { mount } from '@test'
 import MainMenu from '~/components/menu/MainMenu.vue'
 
-describe('MainMenu', function() {
-  let wrapper, vm
+describe("MainMenu", function() {
+    let wrapper, vm
 
-  beforeEach(() => {
-    wrapper = mount(MainMenu, {
-      propsData: {
-        corpus: new MenuCorpus(),
-      },
+    beforeEach(() => {
+      wrapper = mount(MainMenu, {
+        propsData: {
+            corpus: new Corpus(),
+            open: true,
+            keepOpen: true,
+        }
+      })
+      vm = wrapper.vm
     })
-    vm = wrapper.vm
-  })
 
-  it('has a div', () => {
-    expect(wrapper.contains('div')).to.equal(true)
-  })
+    it('has a div', () => {
+      expect(wrapper.contains('div')).to.equal(true)
+    })
+
 })
 
-class MenuCorpus {
-  /**
-   * @param {object}          attributes the image attributes
-   * @param {array.<MenuImage>=[]} [images]    an array of images
-   */
-  constructor() {
-    this.combinations = new MenuCombinations()
-  }
-  populateCombinations() {
-    return new Promise(resolve => resolve())
-  }
-  populateColumnsOfScrollVersion(versionID, scrollID) {
-    return { versionID: versionID, scrollID: scrollID }
-  }
-  populateImagesOfScrollVersion(versionID, scrollID) {
-    return { versionID: versionID, scrollID: scrollID }
-  }
-}
+class Corpus {
 
-class MenuCombinations {
-  constructor() {
-    this.items = {
-      2: {
-        name: 'test',
-      },
+    /**
+     * @param {object}          attributes the image attributes
+     * @param {array.<MenuImage>=[]} [images]    an array of images
+     */
+    constructor() {
+        this.combinations = new Combinations()
     }
+    populateCombinations() {
+        
+    }
+    // populateColumnsOfScrollVersion(versionID, scrollID) {
+    //     return {versionID: versionID, scrollID: scrollID}
+    // }
+    // populateImagesOfScrollVersion(versionID, scrollID) {
+    //     return {versionID: versionID, scrollID: scrollID}
+    // }
   }
-  itemWithID(id) {
-    return this.items[id]
-  }
+
+class Combinations {
+    constructor() {
+        this.items = {
+            2: {
+                name: 'test'
+            }
+        }
+    }
+    get(id) {
+        return this.items[id]
+    }
+    keys() {
+        return Object.keys(this.items)
+    }
 }

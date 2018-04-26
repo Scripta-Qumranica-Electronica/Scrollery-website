@@ -30,7 +30,6 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex'
-
 export default {
   data() {
     return {
@@ -50,7 +49,6 @@ export default {
   created() {
     this.user = this.username
     this.passwd = this.password
-
     // if there's a session hanging around in localStorage, check that
     if (this.sessionID) {
       this.validateSession(window.localStorage ? window.localStorage : null)
@@ -131,7 +129,6 @@ export default {
         if (!res) {
           reject(new Error('Login.validateLogin requires a server response'))
         }
-
         if (res.data && res.data.error) {
           this.errMsg = res.data.error
           console.error(res.data)
@@ -143,7 +140,6 @@ export default {
           this.setUsername(this.user.trim())
           this.setPassword(this.passwd.trim())
           this.setLanguage(this.language)
-
           // Load language files
           this.$i18n
             .load()
@@ -175,15 +171,12 @@ export default {
   font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
     '微软雅黑', Arial, sans-serif;
 }
-
 .loginUsername {
   width: 100%;
 }
-
 .loginPassword {
   width: 100%;
 }
-
 .langSelect {
   width: 100%;
 }

@@ -1,4 +1,6 @@
-import Model from './Model.js'
+import extendModel from './extendModel.js'
+
+const Model = extendModel()
 
 /**
  * A base class for lists of models. Mainly, this provides an interface to
@@ -7,7 +9,6 @@ import Model from './Model.js'
  * It has a similar API as the array, but is more focused
  */
 class List {
-
 
   /**
    * @param {object={}} [attributes] List attributes 

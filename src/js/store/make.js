@@ -7,6 +7,7 @@ export default function(Vuex, plugins) {
       password: '',
       language: 'en',
       languages: {},
+      working: 0,
     },
     getters: {
       sessionID: state => state.sessionID,
@@ -18,6 +19,7 @@ export default function(Vuex, plugins) {
       scrollID: state => state.scrollID,
       scrollVersionID: state => state.scrollVersionID,
       colID: state => state.colID,
+      working: state => state.working,
     },
     mutations: {
       logout(state) {
@@ -42,6 +44,15 @@ export default function(Vuex, plugins) {
       },
       loadLanguage(state, { key, data }) {
         state.languages[key] = data
+      },
+      resetWorking(state) {
+        state.working = 0
+      },
+      addWorking(state) {
+        state.working += 1
+      },
+      delWorking(state) {
+        state.working = state.working - 1 >= 0 ? state.working - 1 : 0
       },
     },
     plugins,

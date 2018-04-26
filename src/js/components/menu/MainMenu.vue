@@ -30,20 +30,14 @@
           </div>
           <div>
             <ul class="combination-menu" placeholder="Search for scroll">
-              <li v-for="combination in corpus.combinations._itemList" :key="'menu-combination-' + combination">
+              <li v-for="combination in corpus.combinations.keys()" :key="'menu-combination-' + combination">
+                  <!-- Use v-show here so it feels faster -->
                   <combinaton-menu-item
                     v-show="!queryString || 
-                      corpus.combinations.itemWithID(combination)
+                      corpus.combinations.get(combination)
                       .name.toLowerCase().indexOf(queryString.toLowerCase()) !== -1"
-                    :count="corpus.combinations.itemWithID(combination).count"
-                    :name="corpus.combinations.itemWithID(combination).name"
-                    :scrollDataID="corpus.combinations.itemWithID(combination).scroll_data_id"
-                    :scrollID="corpus.combinations.itemWithID(combination).scroll_id"
-                    :version="corpus.combinations.itemWithID(combination).version"
-                    :versionID="corpus.combinations.itemWithID(combination).version_id"
-                    :user="corpus.combinations.itemWithID(combination).user_id"
                     :menu-type="menuDisplay"
-                    :locked="corpus.combinations.itemWithID(combination).locked"
+                    :combination="corpus.combinations.get(combination)"
                     :corpus="corpus">
                   </combinaton-menu-item>
               </li>

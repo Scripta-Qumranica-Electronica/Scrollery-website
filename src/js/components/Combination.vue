@@ -15,7 +15,9 @@
         </el-col>
     </el-row>
     <div class="combination-panel-container">
-        <combination-canvas :global-scale="globalScale"></combination-canvas>
+        <combination-canvas 
+            :global-scale="globalScale"
+            :corpus="corpus"></combination-canvas>
     </div>
   </div>
 </template>
@@ -26,6 +28,9 @@ export default {
   components: {
     'combination-canvas': CombinationCanvas,
   },
+  props: {
+    corpus: undefined,
+  },
   data() {
     return {
       scale: 0.01,
@@ -35,7 +40,7 @@ export default {
     globalScale() {
       // This returns a logarithmical scale value for
       // the current slider position.
-      return parseFloat((((100 - 1) * Math.pow(this.scale / 100, 3) + 1) / 100).toFixed(4))
+      return parseFloat(((1001 * Math.pow(this.scale / 100, 3) + 1) / 100).toFixed(4))
     },
   },
   methods: {

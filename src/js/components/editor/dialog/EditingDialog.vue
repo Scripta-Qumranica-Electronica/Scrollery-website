@@ -34,7 +34,6 @@
 </template>
 
 <script>
-
 // components
 import Tab from './Tab.vue'
 import CommentsEditor from './CommentsEditor.vue'
@@ -44,27 +43,26 @@ import CommentsEditor from './CommentsEditor.vue'
  */
 export default {
   components: {
-    'tab': Tab,
-    'comments-editor': CommentsEditor
+    tab: Tab,
+    'comments-editor': CommentsEditor,
   },
   props: {
     dialogVisible: {
-      default: false
+      default: false,
     },
     line: {
-      default: null
+      default: null,
     },
     sign: {
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
-      activeName: 'attributes'
+      activeName: 'attributes',
     }
   },
   computed: {
-
     /**
      * @type {array.<Sign>}
      */
@@ -85,10 +83,8 @@ export default {
      * @type {number}
      */
     signIndex() {
-      return this.line && this.sign
-          ? this.line.findIndex(this.sign)
-          : -1
-    }
+      return this.line && this.sign ? this.line.findIndex(this.sign) : -1
+    },
   },
   methods: {
     handleClick(tab, event) {
@@ -100,21 +96,19 @@ export default {
      */
     changeSign(sign) {
       this.$emit('change-sign', sign)
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
-
 .editor-dialog {
-
   & .el-dialog__header {
     padding: 10px;
   }
 
   & .el-dialog__body {
-    padding: 0 10px 20px 10px;    
+    padding: 0 10px 20px 10px;
   }
 
   & .el-dialog__headerbtn {
@@ -143,10 +137,9 @@ export default {
 
       &.edited-sign,
       &:hover {
-        border-bottom: .5px solid #000;
+        border-bottom: 0.5px solid #000;
       }
     }
   }
 }
-
 </style>

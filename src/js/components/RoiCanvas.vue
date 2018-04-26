@@ -20,14 +20,14 @@
     </defs>
     <g pointer-events="none" :clip-path="clip ? 'url(#Clipping-outline)' : 'url(#Full-clipping-outline)'">
       <image v-for="image of images" 
-            :key="'svg-image-' + image.filename"
+            :key="'svg-image-' + corpus.images.get(image).filename"
             class="clippedImg" 
             draggable="false" 
-            :xlink:href="image.url + image.filename + '/full/pct:' + 100 / divisor + '/0/' + image.suffix"
+            :xlink:href="corpus.images.get(image).getAddress() + 'full/pct:' + 100 / divisor + '/0/' + corpus.images.get(image).suffix"
             :width="width / divisor"
             :height="height / divisor"
-            :opacity="image.opacity"
-            :visibility="image.visible ? 'visible' : 'hidden'"></image>
+            :opacity="imageSettings[image].opacity"
+            :visibility="imageSettings[image].visible ? 'visible' : 'hidden'"></image>
     </g>
     <use class="pulsate" v-show="!clip" stroke="blue" fill="none" fill-rule="evenodd" stroke-width="2" href="#Clip-path"></use>
     <g v-for="box of boxes">
@@ -94,9 +94,17 @@ export default {
       type: Array,
       default: [],
     },
+    imageSettings: {
+      type: Object,
+      default: {},
+    },
     divisor: 0,
     clippingMask: '',
     clip: false,
+    corpus: {
+      type: Object,
+      default: {},
+    },
   },
   data() {
     return {

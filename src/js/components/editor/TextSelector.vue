@@ -57,25 +57,36 @@ export default {
         this.columns = res.data.results
       })
     },
-    selectColumn() {
-      this.$emit('selectedColumn', this.selectedCombination.version_id, this.selectedColumnID)
-    },
-    getText(scrollVersionID, colID) {
-      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-        transaction: 'getSignStreamOfColumn',
-        SCROLL_VERSION: scrollVersionID,
-        colId: colID,
-        USER_NAME: this.$store.getters.username,
-        PASSWORD: this.$store.getters.password,
-      }).then(res => {
-        if (res.status === 200 && res.data) {
-          this.ssp
-            .streamToTree(res.data.results, 'prev_sign_id', 'sign_id', 'next_sign_id')
-            .then(formattedNodes => {
-              this.currentText = formattedNodes
-            })
-        }
-      })
+    methods: {
+      selectCombination() {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+          transaction: 'getColOfComb',
+          version_id: this.selectedCombination.version_id,
+          combID: this.selectedCombination.scroll_id,
+          SESSION_ID: this.$store.getters.sessionID,
+        }).then(res => {
+          this.columns = res.data.results
+        })
+      },
+      selectColumn() {
+        this.$emit('selectedColumn', this.selectedCombination.version_id, this.selectedColumnID)
+      },
+      getText(scrollVersionID, colID) {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+          transaction: 'getSignStreamOfColumn',
+          SCROLL_VERSION: scrollVersionID,
+          colId: colID,
+          SESSION_ID: this.$store.getters.sessionID,
+        }).then(res => {
+          if (res.status === 200 && res.data) {
+            this.ssp
+              .streamToTree(res.data.results, 'prev_sign_id', 'sign_id', 'next_sign_id')
+              .then(formattedNodes => {
+                this.currentText = formattedNodes
+              })
+          }
+        })
+      },
     },
   },
 }

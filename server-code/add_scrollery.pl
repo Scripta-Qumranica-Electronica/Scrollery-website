@@ -50,12 +50,12 @@ print $log "Installing $id with new package $modID \n";
 
 # Build the dependencies
 local $CWD = "$tempDir";
-print $log `git pull`;
 if ($type eq 'tag') {
 	print $log `git checkout tags/$id`;
 } elsif ($type eq 'branch') {
 	print $log `git checkout $id`;
 }
+print $log `git pull`;
 print $log `yarn --pure-lockfile --prefer-offline`;
 print $log `npm run prod`;
 local $CWD = "$tempDir/resources/cgi-bin";

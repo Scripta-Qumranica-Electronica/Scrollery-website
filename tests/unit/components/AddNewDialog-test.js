@@ -64,9 +64,9 @@ class MenuCorpus {
     this.images = new MenuImages()
     this.artefacts = new MenuArtefacts()
   }
-  populateColumnsOfScrollVersion(versionID, scrollID) {
-    return { versionID: versionID, scrollID: scrollID }
-  }
+  // populateColumnsOfScrollVersion(versionID, scrollID) {
+  //   return { versionID: versionID, scrollID: scrollID }
+  // }
   populateImagesOfScrollVersion(versionID, scrollID) {
     return new Promise((resolve, reject) => {
       resolve({ versionID: versionID, scrollID: scrollID })

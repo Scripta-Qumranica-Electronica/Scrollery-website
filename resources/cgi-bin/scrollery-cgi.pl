@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use JSON::XS;
+use Ref::Util qw<is_hashref is_arrayref>;
 use MIME::Base64;
 use lib qw(../perl-libs);
 use SQE_CGI;
@@ -17,7 +18,6 @@ sub processCGI {
 	}
 
 	my $json_post = decode_json(''.$cgi->param('POSTDATA'));
-	my $transaction = $json_post->{transaction} || 'unspecified';
 	my %action = (
 		'validateSession'                => \&validateSession,
 		'getCombs'                       => \&getCombs,
@@ -53,13 +53,56 @@ sub processCGI {
 		'setArtRotation' => \&setArtRotation,
 	);
 
-	if ($transaction eq 'unspecified'){
-		print encode_json({'error', "No transaction requested."});
-	} else {
-		if (defined $action{$transaction}) {
-			$action{$transaction}->($cgi, $json_post);
+	# print $cgi->header(
+	# 			-type    => 'application/json',
+	# 			-charset =>  'utf-8',
+	# 			);
+
+	if (!defined $json_post->{transaction}){
+		if (!defined $json_post->{requests}){
+			print encode_json({'error', "No requests made."});
 		} else {
-			print encode_json({'error', "Transaction type '" . $transaction . "' not understood."});
+			if (is_arrayref($json_post->{requests})) {
+				print '{"replies": [';
+				my $counter = 1;
+				my $repeatLength = scalar @{$json_post->{requests}};
+				foreach my $request (@{$json_post->{requests}}) {
+					if (defined $request->{transaction}) {
+						$action{$request->{transaction}}->($cgi, $request);
+					} else {
+						print encode_json({"results" => [{'error' => "Transaction type '" . $request->{transaction} . "' not understood."}]});
+					}
+					if ($counter < $repeatLength) {
+						$counter++;
+						print ",";
+					}
+				}
+				print ']}';
+			} elsif (is_hashref($json_post->{requests})){
+				print '{"replies": {';
+				my $counter = 1;
+				my $repeatLength = scalar keys %{$json_post->{requests}};
+				my $lastItem = 0;
+				while (my ($key, $value) = each (%{$json_post->{requests}})) {
+					if ($counter == $repeatLength) {
+						$lastItem = 1;
+					} else {
+						$counter++;
+					}
+					if (defined $value->{transaction}) {
+						$action{$value->{transaction}}->($cgi, $value, $key, $lastItem);
+					} else {
+						print "{'results': {'$key': {'error': 'Transaction type $value->{transaction} not understood.'}}}";
+					}
+				}
+				print '}}';
+			}
+		}
+	} else {
+		if (defined $action{$json_post->{transaction}}) {
+			$action{$json_post->{transaction}}->($cgi, $json_post);
+		} else {
+			print encode_json({'error', "Transaction type '" . $json_post->{transaction} . "' not understood."});
 		}
 	}
 }
@@ -67,15 +110,29 @@ sub processCGI {
 # General purpose DB subroutines
 sub readResults {
 	my $sql = shift;
+	my $key = shift;
+	my $lastItem = shift;
 	my @fetchedResults = ();
 	while (my $result = $sql->fetchrow_hashref){
        	push @fetchedResults, $result;
     }
     if (scalar(@fetchedResults) > 0) {
- 		print Encode::decode('utf8', encode_json({results => \@fetchedResults}));
+		if (defined $key) {
+			print "\"$key\":";
+			print Encode::decode('utf8', encode_json(\@fetchedResults));
+		} else {
+			print Encode::decode('utf8', encode_json({results => \@fetchedResults}));
+		}
  	} else {
-    	print 'No results found.';
+		if (defined $key) {
+			print "\"$key\": [{\"error\":\"No results found.\"}]";
+		} else {
+			print '{"results": [{"error":"No results found."}]}';
+		}
  	}
+	if (defined $key && !$lastItem) {
+		print(",")
+	}
 	$sql->finish;
 }
 
@@ -108,10 +165,10 @@ sub getCombs {
 SELECT DISTINCT 
        scroll_data.scroll_id as scroll_id,
        scroll_data.name AS name,
-       scroll_version.scroll_version_id AS version_id,
+       scroll_version.scroll_version_id AS scroll_version_id,
        scroll_data.scroll_data_id AS scroll_data_id,
        scroll_version_group.locked,
-       scroll_version.user_id
+			 scroll_version.user_id
 FROM scroll_version
 	JOIN scroll_version_group USING(scroll_version_group_id)
 	JOIN scroll_data using(scroll_id)
@@ -148,21 +205,33 @@ MYSQL
 sub getArtOfImage {
 	my $cgi = shift;
 	my $json_post = shift;
+	my $key = shift;
+	my $lastItem = shift;
 	my $getArtOfImageQuery = <<'MYSQL';
-SELECT DISTINCT artefact_shape.artefact_id, artefact_data.name
+SELECT DISTINCT	artefact_position.artefact_position_id,
+				artefact_data.name, 
+				catalog_side AS side,
+				ST_AsText(artefact_shape.region_in_sqe_image) as mask,
+				artefact_position.transform_matrix,
+				ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
+				SQE_image.image_catalog_id
 FROM artefact_shape
 	JOIN artefact_shape_owner USING(artefact_shape_id)
+	JOIN artefact_position USING(artefact_id)
+	JOIN artefact_position_owner USING(artefact_position_id)
 	JOIN artefact_data USING(artefact_id)
 	JOIN artefact_data_owner USING(artefact_data_id)
 	JOIN SQE_image USING(sqe_image_id)
+	JOIN image_catalog USING(image_catalog_id)
 WHERE SQE_image.image_catalog_id = ?
       AND artefact_shape_owner.scroll_version_id = ?
+			AND artefact_position_owner.scroll_version_id = ?
       AND artefact_data_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{image_id}, $json_post->{version_id}, $json_post->{version_id});
-	readResults($sql);
+	$sql->execute($json_post->{image_catalog_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -171,10 +240,10 @@ sub getImgOfComb {
 	my $json_post = shift;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
-       image_catalog.catalog_number_2 AS lvl2,
-	   image_catalog.catalog_side AS side,
-	image_catalog.institution,
-	   image_catalog.image_catalog_id AS id
+		image_catalog.catalog_number_2 AS lvl2,
+		image_catalog.catalog_side AS side,
+		image_catalog.institution,
+		image_catalog.image_catalog_id AS id
 FROM image_catalog
 	JOIN image_to_edition_catalog USING (image_catalog_id)
 	JOIN edition_catalog USING (edition_catalog_id)
@@ -195,7 +264,7 @@ sub getColOfComb {
 	my $json_post = shift;
 	my $getColOfCombQuery = <<'MYSQL';
 		SELECT DISTINCT col_data.name AS name,
-						col_data.col_id AS id
+						col_data.col_id AS col_id
 		FROM col_data
 			JOIN col_data_owner USING(col_data_id)
 			JOIN scroll_to_col USING(col_id)
@@ -204,7 +273,7 @@ sub getColOfComb {
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{version_id}, $json_post->{combID});
+	$sql->execute($json_post->{scroll_version_id}, $json_post->{combID});
 	readResults($sql);
 	return;
 }
@@ -320,7 +389,8 @@ SELECT 	SQE_image.filename AS filename,
 		  SQE_image.is_master,
 		  SQE_image.native_width AS width,
 		  SQE_image.native_height AS height,
-		  image_urls.url AS url
+		  image_urls.url AS url,
+		  image_urls.suffix AS suffix
 FROM SQE_image
 	JOIN image_urls USING(image_urls_id)
 	JOIN edition_catalog USING(edition_catalog_id)
@@ -328,6 +398,7 @@ FROM SQE_image
 	JOIN discrete_canonical_reference USING(discrete_canonical_reference_id)
 WHERE edition_catalog.edition_side=0
       AND discrete_canonical_reference.column_of_scroll_id = ?
+	  ORDER BY SQE_image.is_master DESC
 MYSQL
 	} elsif ($idType eq 'institution') {
 		$getImagesOfFragmentQuery = <<'MYSQL';
@@ -488,16 +559,18 @@ sub imagesOfInstFragments {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $getInstitutionFragmentsQuery = <<'MYSQL';
-SELECT DISTINCT	SQE_image.filename AS filename,
-		  SQE_image.wavelength_start AS start,
-		  SQE_image.wavelength_end AS end,
-		  SQE_image.is_master,
-		  SQE_image.native_width AS width,
-		  SQE_image.native_height AS height,
-		  SQE_image.type AS type,
-		  image_urls.url AS url,
-		  image_urls.suffix AS suffix,
-		  edition_catalog.edition_side
+SELECT DISTINCT	SQE_image.sqe_image_id,
+				SQE_image.filename AS filename,
+				SQE_image.dpi AS dpi,
+				SQE_image.wavelength_start AS start,
+				SQE_image.wavelength_end AS end,
+				SQE_image.is_master,
+				SQE_image.native_width AS width,
+				SQE_image.native_height AS height,
+				SQE_image.type AS type,
+				image_urls.url AS url,
+				image_urls.suffix AS suffix,
+				edition_catalog.edition_side
 FROM SQE_image
 	JOIN image_urls USING(image_urls_id)
 	LEFT JOIN SQE_image_to_edition_catalog USING(sqe_image_id)
@@ -682,15 +755,20 @@ sub getArtefactMask {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $addArtToCombQuery = <<'MYSQL';
-SELECT ST_AsText(region_in_sqe_image) as poly
+SELECT ST_AsText(region_in_sqe_image) as mask,
+	transform_matrix,
+	ST_AsText(ST_Envelope(region_in_sqe_image)) AS rect
 	FROM artefact_shape
 	JOIN artefact_shape_owner USING(artefact_shape_id)
+	JOIN artefact_position USING(artefact_id)
+	JOIN artefact_position_owner USING(artefact_position_id)
 	WHERE artefact_id = ?
-		AND scroll_version_id = ?
+		AND artefact_shape_owner.scroll_version_id = ?
+		AND artefact_position_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{artID}, $json_post->{scrollVersion});
+	$sql->execute($json_post->{artID}, $json_post->{scrollVersion}, $json_post->{scrollVersion});
 	readResults($sql);
 	return;
 }
@@ -699,14 +777,15 @@ sub getScrollArtefacts {
 	my $cgi = shift;
 	my $json_post = shift;
 	my $getScrollArtefactsQuery = <<'MYSQL';
-SELECT DISTINCT artefact_position.artefact_position_id AS id,
+SELECT DISTINCT artefact_position.artefact_position_id AS artefact_position_id,
                 ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
-                ST_AsText(artefact_shape.region_in_sqe_image) AS poly,
-				artefact_position.transform_matrix AS matrix,
+                ST_AsText(artefact_shape.region_in_sqe_image) AS mask,
+				artefact_position.transform_matrix AS transform_matrix,
                 image_urls.url AS url,
                 image_urls.suffix AS suffix,
                 SQE_image.filename AS filename,
-                SQE_image.dpi AS dpi
+                SQE_image.dpi AS dpi,
+				SQE_image.image_catalog_id
 FROM artefact_position_owner
 	JOIN artefact_position USING(artefact_position_id)
 	JOIN artefact_shape USING(artefact_id)

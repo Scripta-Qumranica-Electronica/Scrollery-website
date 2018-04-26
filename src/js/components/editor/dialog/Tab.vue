@@ -7,12 +7,11 @@
 </template>
 
 <style lang="scss" scoped>
-
 section,
 div {
   &::-webkit-scrollbar {
-      width: 0px;  /* remove scrollbar space */
-      background: transparent;  /* optional: just make scrollbar invisible */
+    width: 0px; /* remove scrollbar space */
+    background: transparent; /* optional: just make scrollbar invisible */
   }
 }
 
