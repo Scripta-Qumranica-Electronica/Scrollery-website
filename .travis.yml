@@ -10,7 +10,9 @@ cache:
   directories:
     - node_modules
 before_script:
-  - sudo apt-get -qq update && sudo apt-get install -y perl carton
+  - sudo apt-get -qq update && sudo apt-get install -y perl cpanm carton
+  - cd resources/cgi-bin && carton install
+  - cd $TRAVIS_BUILD_DIR
   - git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API resources/perl-libs
   - npm run setup:db
   - export DISPLAY=:99.0
