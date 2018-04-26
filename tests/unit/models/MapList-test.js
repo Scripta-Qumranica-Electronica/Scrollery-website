@@ -104,13 +104,13 @@ describe('MapList', () => {
 
         // TODO figure out why this works on Firefox,
         // but fails in phantom.js
-        // it('should insert data in the right place', () => {
-        //     const newData = new Model(1, 'new data')
-        //     mapList.insert(newData)
-        //     const newerData = new Model(2, 'newer data')
-        //     mapList.insert(newerData, 1)
-        //     expect(mapList.get(mapList.getFirstKey())).to.deep.equal(newerData)
-        // })
+        it('should insert data in the right place', () => {
+            const newData = new Model(1, 'new data')
+            mapList.insert(newData)
+            const newerData = new Model(2, 'newer data')
+            mapList.insert(newerData, 1)
+            expect(mapList.get(mapList.getFirstKey())).to.deep.equal(newerData)
+        })
     })
 })
 

@@ -35,12 +35,12 @@ class Corpus {
     populateCombinations() {
         
     }
-    populateColumnsOfScrollVersion(versionID, scrollID) {
-        return {versionID: versionID, scrollID: scrollID}
-    }
-    populateImagesOfScrollVersion(versionID, scrollID) {
-        return {versionID: versionID, scrollID: scrollID}
-    }
+    // populateColumnsOfScrollVersion(versionID, scrollID) {
+    //     return {versionID: versionID, scrollID: scrollID}
+    // }
+    // populateImagesOfScrollVersion(versionID, scrollID) {
+    //     return {versionID: versionID, scrollID: scrollID}
+    // }
   }
 
 class Combinations {

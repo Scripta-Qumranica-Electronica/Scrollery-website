@@ -76,7 +76,7 @@ class Combinations {
             }
         }
     }
-    get(id) {
-        return this.items[id]
-    }
+    // get(id) {
+    //     return this.items[id]
+    // }
 }

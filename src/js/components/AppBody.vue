@@ -87,6 +87,9 @@ export default {
       this.$store.state.username,
       this.$store.state.password
     )
+
+    // TODO: find I way to mock the corpus model for unit tests
+    /* istanbul ignore next */
     this.corpus.populateCombinations().then(res => {
       this.menuLoaded = true
       this.$store.commit('delWorking')
@@ -154,9 +157,7 @@ export default {
           },
         },
         () => {
-          // I don't know why the listeners don't pick up on the
-          // router change unless I give a tiny delay.
-          setTimeout(() => {
+          this.$nextTick(() => {
             // Load back the initial values
             this.$router.push({
               name: 'workbenchAddress',

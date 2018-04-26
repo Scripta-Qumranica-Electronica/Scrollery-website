@@ -80,9 +80,9 @@ class ImageReferences {
         }
     }
 
-    get(id) {
-        return this._items[id]
-    }
+    // get(id) {
+    //     return this._items[id]
+    // }
 }
 
 class Images {
@@ -98,7 +98,7 @@ class Images {
             }
         }
     }
-    get(id) {
-        return this._items[id]
-    }
+    // get(id) {
+    //     return this._items[id]
+    // }
 }

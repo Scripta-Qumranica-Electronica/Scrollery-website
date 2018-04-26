@@ -4,29 +4,31 @@ import axios from 'axios'
 /**
  * A base class for lists of models. Mainly, this provides an interface to
  * work with an ordered array of child-items.
- * 
+ *
  * It has a similar API as the array, but is more focused
  */
 class MapList {
-
-
   /**
-   * @param {object={}} [attributes] List attributes 
-   * @param {array=[]}  [items]      An initial array of items for the list 
+   * @param {object={}} [attributes] List attributes
+   * @param {array=[]}  [items]      An initial array of items for the list
    */
-  constructor(username, password, idKey, ajaxPayload, model, attributes = {}, standardTransaction = undefined) {
+  constructor(
+    username,
+    password,
+    idKey,
+    ajaxPayload,
+    model,
+    attributes = {},
+    standardTransaction = undefined
+  ) {
     this.username = username
     this.password = password
-    this._ajaxPayload = Object.assign(
-      {}, 
-      ajaxPayload, 
-      {
-        USER_NAME: this.username,
-        PASSWORD: this.password,
-      }
-    )
+    this._ajaxPayload = Object.assign({}, ajaxPayload, {
+      USER_NAME: this.username,
+      PASSWORD: this.password,
+    })
     // todo: safety to ensure props not overwritten
-    Object.assign(this, {timestamp: Date.now()}, attributes)
+    Object.assign(this, { timestamp: Date.now() }, attributes)
     this.idKey = idKey
     this._hash = undefined
     this._items = OrderedMap()
@@ -34,20 +36,20 @@ class MapList {
     this.standardTransaction = standardTransaction
   }
 
+  // TODO: mocking for axios in unit test
+  /* istanbul ignore next */
   populate(customPayload = {}, scrollVersionID = undefined) {
     let payload = Object.assign(
-      {}, 
-      this._ajaxPayload, 
+      {},
+      this._ajaxPayload,
       customPayload,
-      scrollVersionID && {scroll_version_id: scrollVersionID}
+      scrollVersionID && { scroll_version_id: scrollVersionID }
     )
 
     return new Promise((resolve, reject) => {
       try {
-        axios.post('resources/cgi-bin/scrollery-cgi.pl', payload)
-        .then(res => {
+        axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
           if (res.status === 200 && res.data.replies) {
-
             // We can store hashes for the returned data
             // in the future, so we can avoid unnecessary
             // data transmission.
@@ -78,14 +80,14 @@ class MapList {
           }
         })
       } catch (err) {
-          reject(err);
+        reject(err)
       }
     })
   }
 
   /**
    * Destroy and clean up memory
-   * 
+   *
    * @public
    * @instance
    */
@@ -100,7 +102,7 @@ class MapList {
   /**
    * @public
    * @instance
-   * 
+   *
    * @return {string} the list id
    */
   getTimestamp() {
@@ -108,11 +110,11 @@ class MapList {
   }
 
   /**
-   * @public 
+   * @public
    * @instance
-   * 
-   * @param {number} key of the item to retrieve 
-   * 
+   *
+   * @param {number} key of the item to retrieve
+   *
    * @return {Model}       the Model object
    */
   get(key) {
@@ -120,19 +122,19 @@ class MapList {
   }
 
   /**
-   * @public 
+   * @public
    * @instance
-   * 
+   *
    * @return {key}       the key of the first object in map
    */
-  getFirstKey(){
+  getFirstKey() {
     return this._items.keySeq().first()
   }
 
   /**
    * @public
    * @instance
-   * 
+   *
    * @param {Model}     item    A map item to insert
    * @param {number=-1} beforeKey   The key before which to insert the item, defaults to the end
    */
@@ -142,18 +144,16 @@ class MapList {
     }
 
     beforeKey === -1
-
-      // insert a item at the end of no number specified
-      ? this._items = this._items.set(item[this.idKey], item)
-
-      // otherwise, insert at specified location
-      : this._items = this._insertBefore(this._items, beforeKey, item[this.idKey], item)
+      ? // insert a item at the end of no number specified
+        (this._items = this._items.set(item[this.idKey], item))
+      : // otherwise, insert at specified location
+        (this._items = this._insertBefore(this._items, beforeKey, item[this.idKey], item))
   }
 
   /**
    * @private
    * @instance
-   * 
+   *
    * @param {OrderedMap}     map    A map item to insert
    * @param {number}  index   The key before which to insert the item
    * @param {number}  key     The key of the item to be inserted
@@ -170,24 +170,24 @@ class MapList {
     })
   }
 
-    /**
-   * @public 
+  /**
+   * @public
    * @instance
-   * 
-   * @param {number} key the item to retrieve 
-   * 
+   *
+   * @param {number} key the item to retrieve
+   *
    * @return {Model}       the Model object
    */
   set(key, value) {
     this._items = this._items.set(key, value)
   }
 
-    /**
-   * @public 
+  /**
+   * @public
    * @instance
-   * 
-   * @param {Object} map the map to merge into this object 
-   * 
+   *
+   * @param {Object} map the map to merge into this object
+   *
    */
   merge(map) {
     this._items = this._items.merge(map)
@@ -203,7 +203,7 @@ class MapList {
   /**
    * @public
    * @instance
-   * 
+   *
    * @return {number} the number of items
    */
   count() {
@@ -213,7 +213,7 @@ class MapList {
   /**
    * @public
    * @instance
-   * 
+   *
    * @param {function} cb       A callback that receives each item and index
    * @param {object}   context  The context within which to run the callback
    */
@@ -223,10 +223,10 @@ class MapList {
 
   /**
    * Forward on to OrderedMap.prototype.find
-   * 
+   *
    * @public
    * @instance
-   * 
+   *
    * @param {function} cb A callback that returns truthy values when the item matches the criteria
    */
   // find(cb) {
@@ -235,10 +235,10 @@ class MapList {
 
   /**
    * Forward on to OrderedMap.prototype.findKey
-   * 
+   *
    * @public
    * @instance
-   * 
+   *
    * @param {function} cb A callback that returns truthy values when the item matches the criteria
    */
   // findKey(cb) {
@@ -247,7 +247,7 @@ class MapList {
 
   /**
    * Deep copy of the items map as a plain Object
-   * 
+   *
    * @returns {Object} the items
    */
   jsItems() {
@@ -256,7 +256,7 @@ class MapList {
 
   /**
    * Deep copy of the items map as a plain Object
-   * 
+   *
    * @returns {Object} the items
    */
   getItems() {

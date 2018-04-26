@@ -67,15 +67,15 @@ class Corpus {
         this.combinations = new Combinations()
         this.images = new Images()
     }
-    populateColumnsOfScrollVersion(versionID, scrollID) {
-        return {versionID: versionID, scrollID: scrollID}
-    }
+    // populateColumnsOfScrollVersion(versionID, scrollID) {
+    //     return {versionID: versionID, scrollID: scrollID}
+    // }
     populateArtefactsOfImageReference(imageID, scrollVersionID) {
         return {scrollVersionID: scrollVersionID, imageID: imageID}
     }
-    populateArtefactsofImage(versionID, scrollID) {
-        return {versionID: versionID, scrollID: scrollID}
-    }
+    // populateArtefactsofImage(versionID, scrollID) {
+    //     return {versionID: versionID, scrollID: scrollID}
+    // }
   }
 
 class Combinations {
@@ -86,9 +86,9 @@ class Combinations {
             }
         }
     }
-    itemWithID(id) {
-        return this.items[id]
-    }
+    // itemWithID(id) {
+    //     return this.items[id]
+    // }
 }
 
 class Images {
@@ -96,13 +96,13 @@ class Images {
         this.items = {
             2: {
                 name: 'test',
-                populateItems: () => {
-                    return 'ok'
-                },
+                // populateItems: () => {
+                //     return 'ok'
+                // },
             }
         }
     }
-    itemWithID(id) {
-        return this.items[id]
-    }
+    // itemWithID(id) {
+    //     return this.items[id]
+    // }
 }
