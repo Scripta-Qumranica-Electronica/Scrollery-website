@@ -12,7 +12,7 @@
     </div>
 
     <!-- Editor Tabs -->
-    <el-tabs v-model="activeName" @tab-click="handleClick">
+    <el-tabs v-model="activeName">
       <el-tab-pane label="Sign Attributes" name="attributes">
         <tab>
           <h1>Attributes</h1>
@@ -87,10 +87,6 @@ export default {
     },
   },
   methods: {
-    handleClick(tab, event) {
-      console.log(tab, event)
-    },
-
     /**
      * @param {Sign} sign  the sign to switch to
      */
