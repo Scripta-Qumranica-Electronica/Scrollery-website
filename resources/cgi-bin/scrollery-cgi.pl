@@ -904,7 +904,7 @@ sub removeSigns {
 	if (defined $key) {
 		print "\"$key\":";
 	} else {
-		print "\"results\":";
+		print "{\"results\":";
 	}
 	print "[";
 
@@ -935,34 +935,37 @@ MYSQL
 		while (my $result = $sql->fetchrow_hashref) {
 			$results{$result->{sign_id}} = $result;
 		}
-		my %changes;
 		if ($results{$sign_id}->{prev_sign_id}) {
+			print "\"$results{$sign_id}->{prev_sign_id}\":";
 			my ($new_id, $error) = $cgi->dbh->change_value(
 				"position_in_stream",
-				$results{$sign_id}->{prev_sign_id},
+				$results{$results{$sign_id}->{prev_sign_id}}->{position_in_stream_id},
 				"next_sign_id",
 				$results{$sign_id}->{next_sign_id}
 			);
 			handleDBError ($new_id, $error);
-			$changes{$results{$sign_id}->{prev_sign_id}} = $new_id;
+			print ",";
 		}
 		if ($results{$sign_id}->{next_sign_id}) {
+			print "\"$results{$sign_id}->{next_sign_id}\":";
 			my ($new_id, $error) = $cgi->dbh->change_value(
 				"position_in_stream",
-				$results{$sign_id}->{next_sign_id},
+				$results{$results{$sign_id}->{next_sign_id}}->{position_in_stream_id},
 				"prev_sign_id",
 				$results{$sign_id}->{prev_sign_id}
 			);
 			handleDBError ($new_id, $error);
-			$changes{$results{$sign_id}->{next_sign_id}} = $new_id;
 		}
-		print Encode::decode('utf8', encode_json(%changes));
+		$cgi->dbh->remove_entry("position_in_stream", $results{$sign_id}->{position_in_stream_id});
 		if ($counter != $repeatLength) {
 			print ",";
 			$counter++;
 		}
 	}
 	print "]";
+	if (!defined $key) {
+		print("}")
+	}
 	if (defined $key && !$lastItem) {
 		print(",")
 	}
