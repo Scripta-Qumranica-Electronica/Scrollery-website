@@ -140,7 +140,11 @@ class MapList {
    */
   insert(item, beforeKey = -1) {
     if (!(item instanceof this.model)) {
-      throw new TypeError(`Expect an instance of ${this.model.name} in List.prototype.insert`)
+      throw new TypeError(
+        `Expect an instance of ${this.model.name} in List.prototype.insert, not ${
+          item.constructor.name
+        }`
+      )
     }
 
     beforeKey === -1

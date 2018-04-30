@@ -257,4 +257,38 @@ export default class Corpus {
       } else reject('The imageReferenceID and scrollVersionID inputs were of different lengths.')
     })
   }
+
+  cloneScroll(scroll_version_id) {
+    const payload = {
+      USER_NAME: this.username,
+      PASSWORD: this.password,
+      requests: [
+        {
+          scroll_version_id: scroll_version_id,
+          transaction: 'copyCombination',
+        },
+      ],
+    }
+    axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
+      if (res.status === 200 && res.data.replies) {
+        // We can store hashes for the returned data
+        // in the future, so we can avoid unnecessary
+        // data transmission.
+        // this._hash = res.data.hash
+
+        res.data.replies.forEach(reply => {
+          reply.results.forEach(item => {
+            let record = new this.combinations.model(item)
+            this.combinations.insert(record, this.combinations.getFirstKey())
+            this.populateColumnsOfCombination(item.scroll_id, item.scroll_version_id)
+            this.populateImageReferencesOfCombination(item.scroll_id, item.scroll_version_id).then(
+              res => {
+                this.populateArtefactsOfCombination(item.scroll_id, item.scroll_version_id)
+              }
+            )
+          })
+        })
+      }
+    })
+  }
 }

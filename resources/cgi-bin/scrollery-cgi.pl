@@ -75,9 +75,7 @@ sub processCGI {
  
 # General purpose DB subroutines
 sub readResults {
-	my $sql = shift;
-	my $key = shift;
-	my $lastItem = shift;
+	my ($sql, $key, $lastItem) = @_;
 	my @fetchedResults = ();
 	while (my $result = $sql->fetchrow_hashref){
        	push @fetchedResults, $result;
@@ -146,7 +144,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{user});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -162,7 +161,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{combID}, $json_post->{version_id});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -192,6 +192,7 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{image_catalog_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
+
 	readResults($sql, $key, $lastItem);
 	return;
 }
@@ -215,7 +216,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{combID});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -233,7 +235,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{scroll_version_id}, $json_post->{combID});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -253,7 +256,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getFragsOfColQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{colID});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -272,7 +276,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfScrollIDQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{discCanRef});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -335,7 +340,8 @@ MYSQL
 		$json_post->{SCROLL_VERSION},
 		$json_post->{SCROLL_VERSION},
 		$json_post->{SCROLL_VERSION});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -374,7 +380,8 @@ MYSQL
 	$sql = $cgi->dbh->prepare_cached($getImagesOfFragmentQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{id});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -391,7 +398,8 @@ MYSQL
         my $sql = $cgi->dbh->prepare_cached($getIAAEdIDQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
         $sql->execute($json_post->{discCanRef});
-        readResults($sql);
+        my $subname = sub_name(__SUB__);
+		readResults($sql, $key, $lastItem);
         return;
 }
 
@@ -406,7 +414,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCanonicalCompositionsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute();
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -423,7 +432,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCanonicalID1Query)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{composition});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -440,7 +450,7 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCanonicalID2Query)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{composition}, $json_post->{edition_location_1});
-	readResults($sql);
+ 	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -453,7 +463,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute();
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -469,7 +480,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionPlates)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{institution});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -487,7 +499,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionFragmentsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{institution}, $json_post->{catalog_number_1});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -515,7 +528,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionFragmentsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{id});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -534,7 +548,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionArtefactsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{catalog_id}, $json_post->{user_id});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -546,7 +561,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollWidthQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -558,7 +574,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollHeightQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -698,7 +715,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{artID}, $json_post->{scrollVersion}, $json_post->{scrollVersion});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -729,7 +747,8 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollArtefactsQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
 	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
-	readResults($sql);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
@@ -781,7 +800,25 @@ sub copyCombination {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $clonedCombination = $cgi->dbh->create_new_scrollversion($json_post->{scroll_version_id});
 	$cgi->dbh->clone_scroll_version($json_post->{scroll_version_id}, $clonedCombination);
-	print "{\"scroll_clone\": \"$clonedCombination\"}";
+		my $getCombQuery = <<'MYSQL';
+SELECT DISTINCT 
+       scroll_data.scroll_id as scroll_id,
+       scroll_data.name AS name,
+       scroll_version.scroll_version_id AS scroll_version_id,
+       scroll_data.scroll_data_id AS scroll_data_id,
+       scroll_version_group.locked,
+			scroll_version.user_id
+FROM scroll_version
+	JOIN scroll_version_group USING(scroll_version_group_id)
+	JOIN scroll_data using(scroll_id)
+	JOIN scroll_data_owner using(scroll_data_id)
+WHERE scroll_version.scroll_version_id = ?
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getCombQuery) or die
+			"Couldn't prepare statement: " . $cgi->dbh->errstr;
+	$sql->execute($clonedCombination);
+
+	readResults($sql, $key, $lastItem);
 	return;
 }
 
