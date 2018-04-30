@@ -295,7 +295,7 @@ SELECT
 	sign_char.sign_char_id,
 	sign_char.is_variant,
 	sign_char.sign,
-	sign_attribute.sequence,
+	sign_char_attribute.sequence,
 	attribute.name AS attribute_name,
 	attribute.type,
 	attribute.description AS attribute_description,
@@ -315,9 +315,9 @@ FROM col_to_line
 	JOIN position_in_stream USING(sign_id)
 	JOIN position_in_stream_owner USING(position_in_stream_id)
 	JOIN sign_char USING(sign_id)
-	LEFT JOIN sign_attribute USING(sign_char_id)
-	JOIN sign_attribute_owner USING(sign_attribute_id)
-	LEFT JOIN attribute_numeric USING(sign_attribute_id)
+	LEFT JOIN sign_char_attribute USING(sign_char_id)
+	JOIN sign_char_attribute_owner USING(sign_char_attribute_id)
+	LEFT JOIN attribute_numeric USING(sign_char_attribute_id)
 	JOIN attribute_value USING(attribute_value_id)
 	LEFT JOIN attribute_value_css USING(attribute_value_id)
 	JOIN attribute USING(attribute_id)
@@ -328,7 +328,7 @@ WHERE col_to_line.col_id = ?
       AND line_to_sign_owner.scroll_version_id = ?
       AND col_data_owner.scroll_version_id = ?
       AND col_to_line_owner.scroll_version_id = ?
-      AND sign_attribute_owner.scroll_version_id = ?
+      AND sign_char_attribute_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare($getScrollsQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
