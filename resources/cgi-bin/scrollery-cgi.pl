@@ -8,6 +8,7 @@ use MIME::Base64;
 use lib qw(../perl-libs);
 use SQE_CGI;
 use Encode;
+use Data::Dumper;
 
 sub processCGI {
 	my ($cgi, $error) = SQE_CGI->new;
@@ -132,13 +133,13 @@ SELECT DISTINCT
        scroll_version.scroll_version_id AS scroll_version_id,
        scroll_data.scroll_data_id AS scroll_data_id,
        scroll_version_group.locked,
-			 scroll_version.user_id
+			scroll_version.user_id
 FROM scroll_version
 	JOIN scroll_version_group USING(scroll_version_group_id)
 	JOIN scroll_data using(scroll_id)
 	JOIN scroll_data_owner using(scroll_data_id)
 WHERE scroll_version.user_id = ?
-      OR scroll_version.user_id = 1
+	OR scroll_version.user_id = 1
 ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
 	LPAD(SPLIT_STRING(name, "Q", 2), 3, "0")
 MYSQL
@@ -283,48 +284,57 @@ SELECT
 	col_data.col_id AS col_id,
 	line_data.name AS line_name,
 	line_data.line_id AS line_id,
-	parent.sign_id AS prev_sign_id,
-	child.sign_id AS sign_id,
-	child.next_sign_id AS next_sign_id,
+	position_in_stream.prev_sign_id,
+	position_in_stream.sign_id,
+	position_in_stream.next_sign_id,
+	sign_char.sign_char_id,
 	sign_char.is_variant,
-	sign_char.sign, 
-	sequence,
+	sign_char.sign,
+	sign_attribute.sequence,
 	attribute.name AS attribute_name,
-	type,
+	attribute.type,
 	attribute.description AS attribute_description,
-	value,
-	string_value,
+	attribute_numeric.value,
+	attribute_value.string_value,
 	attribute_value.description AS attribute_value_description,
-	css
-FROM position_in_stream AS child
-	JOIN position_in_stream AS parent
-		ON parent.next_sign_id = child.sign_id
-	JOIN position_in_stream_owner
-		ON position_in_stream_owner.position_in_stream_id = child.position_in_stream_id
-	JOIN line_to_sign 
-		ON line_to_sign.sign_id = child.sign_id
-	JOIN line_to_sign_owner USING(line_to_sign_id)
-	JOIN line_data USING(line_id)
-	JOIN col_to_line USING(line_id)
+	attribute_value_css.css,
+	sign_char_commentary.commentary
+FROM col_to_line
 	JOIN col_to_line_owner USING(col_to_line_id)
 	JOIN col_data USING(col_id)
-	JOIN sign_char
-		ON sign_char.sign_id = child.sign_id
-	JOIN sign_attribute USING(sign_char_id)
+	JOIN col_data_owner USING(col_data_id)
+	JOIN line_to_sign USING(line_id)
+	JOIN line_to_sign_owner USING(line_to_sign_id)
+	JOIN line_data USING(line_id)
+	JOIN line_data_owner USING(line_data_id)
+	JOIN position_in_stream USING(sign_id)
+	JOIN position_in_stream_owner USING(position_in_stream_id)
+	JOIN sign_char USING(sign_id)
+	LEFT JOIN sign_attribute USING(sign_char_id)
 	JOIN sign_attribute_owner USING(sign_attribute_id)
 	LEFT JOIN attribute_numeric USING(sign_attribute_id)
 	JOIN attribute_value USING(attribute_value_id)
 	LEFT JOIN attribute_value_css USING(attribute_value_id)
 	JOIN attribute USING(attribute_id)
+	LEFT JOIN sign_char_commentary USING(sign_char_id)
 WHERE col_to_line.col_id = ?
-	AND position_in_stream_owner.scroll_version_id = ?
-	AND line_to_sign_owner.scroll_version_id = ?
-	AND col_to_line_owner.scroll_version_id = ?
-	AND sign_attribute_owner.scroll_version_id = ?
+      AND position_in_stream_owner.scroll_version_id = ?
+      AND line_data_owner.scroll_version_id = ?
+      AND line_to_sign_owner.scroll_version_id = ?
+      AND col_data_owner.scroll_version_id = ?
+      AND col_to_line_owner.scroll_version_id = ?
+      AND sign_attribute_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare($getScrollsQuery) or die
 		"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($json_post->{colId}, $json_post->{SCROLL_VERSION}, $json_post->{SCROLL_VERSION}, $json_post->{SCROLL_VERSION}, $json_post->{SCROLL_VERSION});
+	$sql->execute(
+		$json_post->{colId},
+		$json_post->{SCROLL_VERSION},
+		$json_post->{SCROLL_VERSION},
+		$json_post->{SCROLL_VERSION},
+		$json_post->{SCROLL_VERSION},
+		$json_post->{SCROLL_VERSION},
+		$json_post->{SCROLL_VERSION});
 	readResults($sql);
 	return;
 }
@@ -555,22 +565,22 @@ MYSQL
 # First I copy the artefect to a new artefact owner with the currect scroll_version_id
 # Then I change the scroll_id of the artefact to match the current scroll_id
 # TODO update for new DB structure.
-sub addArtToComb {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $scroll_version_id =  $json_post->{version_id};
-	$cgi->dbh->set_scrollversion($scroll_version_id);
-	my $addArtToCombQuery = <<'MYSQL';
-		INSERT IGNORE INTO artefact_owner (artefact_id, scroll_version_id)
-		VALUES(?,?)
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
-		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-    $sql->execute($json_post->{art_id}, $scroll_version_id);
-    $sql->finish;
+# sub addArtToComb {
+# 	my ($cgi, $json_post, $key, $lastItem) = @_;
+# 	my $scroll_version_id =  $json_post->{version_id};
+# 	$cgi->dbh->set_scrollversion($scroll_version_id);
+# 	my $addArtToCombQuery = <<'MYSQL';
+# 		INSERT IGNORE INTO artefact_owner (artefact_id, scroll_version_id)
+# 		VALUES(?,?)
+# MYSQL
+# 	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
+# 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+#     $sql->execute($json_post->{art_id}, $scroll_version_id);
+#     $sql->finish;
 
-	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $json_post->{art_id}, "scroll_id", $json_post->{scroll_id});
-	handleDBError ($new_scroll_data_id, $error);
-}
+# 	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $json_post->{art_id}, "scroll_id", $json_post->{scroll_id});
+# 	handleDBError ($new_scroll_data_id, $error);
+# }
 
 # I should create an artefact, link an artefact_data,
 # then create the necessary owner tables by using the SQE API.
@@ -603,19 +613,19 @@ MYSQL
 	my $artefact_id = $sql->{mysql_insertid};
 
 	# create artefact owner table
-	my $addArtOwnerQuery = <<'MYSQL';
-INSERT INTO artefact_owner (artefact_id, scroll_version_id)
-VALUES(?, ?)
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($addArtOwnerQuery)
-		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($artefact_id, $scroll_version_id);
+# 	my $addArtOwnerQuery = <<'MYSQL';
+# INSERT INTO artefact_owner (artefact_id, scroll_version_id)
+# VALUES(?, ?)
+# MYSQL
+# 	$sql = $cgi->dbh->prepare_cached($addArtOwnerQuery)
+# 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+# 	$sql->execute($artefact_id, $scroll_version_id);
 
-	# Run add value so that undo tracking system follows along
-#	my ($new_artefact_id, $art_error) = $cgi->dbh->add_value("artefact", $artefact_id, "sqe_image_id", $json_post->{sqe_image_id});
-#	if ($artefact_id ne $new_artefact_id) {
-#		handleDBError ($new_artefact_id, $art_error);
-#	}
+# 	Run add value so that undo tracking system follows along
+# 	my ($new_artefact_id, $art_error) = $cgi->dbh->add_value("artefact", $artefact_id, "sqe_image_id", $json_post->{sqe_image_id});
+# 	if ($artefact_id ne $new_artefact_id) {
+# 		handleDBError ($new_artefact_id, $art_error);
+# 	}
 
 	# create artefact_data
 	my $addArtDataQuery = <<'MYSQL';
@@ -769,8 +779,9 @@ MYSQL
 
 sub copyCombination {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
-	$cgi->dbh->add_owner_to_scroll($json_post->{scroll_id}, $json_post->{scroll_version_id});
-	print '{"scroll_clone": "success"}';
+	my $clonedCombination = $cgi->dbh->create_new_scrollversion($json_post->{scroll_version_id});
+	$cgi->dbh->clone_scroll_version($json_post->{scroll_version_id}, $clonedCombination);
+	print "{\"scroll_clone\": \"$clonedCombination\"}";
 	return;
 }
 
@@ -842,6 +853,82 @@ sub setArtRotation {
 	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $json_post->{art_id}, "rotation", $json_post->{rotation});
 	handleDBError ($new_id, $error);
 	return;
+}
+
+# To remove a sign we must the signs on either side of it
+# in the stream and link them together.  Should we also unlink
+# all data connected with that sign?
+sub removeSigns {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my $counter = 1;
+	my $repeatLength = scalar @{$json_post->{sign_id}};
+	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
+
+	if (defined $key) {
+		print "\"$key\":";
+	} else {
+		print "\"results\":";
+	}
+	print "[";
+
+	foreach my $sign_id (@{$json_post->{sign_id}}) {
+		my $sqlSearch = << 'MYSQL';
+SELECT sign_id, next_sign_id, prev_sign_id, position_in_stream_id
+FROM position_in_stream
+	JOIN position_in_stream_owner USING(position_in_stream_id)
+WHERE (sign_id = ?
+       OR next_sign_id = ?
+       OR prev_sign_id = ?)
+      AND scroll_version_id = ?
+ORDER BY next_sign_id = ?,
+	sign_id = ?,
+	prev_sign_id = ?
+MYSQL
+		my $sql = $cgi->dbh->prepare_cached($sqlSearch)
+			or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+		$sql->execute(
+			$sign_id,
+			$sign_id,
+			$sign_id,
+			$json_post->{scroll_version_id},
+			$sign_id,
+			$sign_id,
+			$sign_id);
+		my %results;
+		while (my $result = $sql->fetchrow_hashref) {
+			$results{$result->{sign_id}} = $result;
+		}
+		my %changes;
+		if ($results{$sign_id}->{prev_sign_id}) {
+			my ($new_id, $error) = $cgi->dbh->change_value(
+				"position_in_stream",
+				$results{$sign_id}->{prev_sign_id},
+				"next_sign_id",
+				$results{$sign_id}->{next_sign_id}
+			);
+			handleDBError ($new_id, $error);
+			$changes{$results{$sign_id}->{prev_sign_id}} = $new_id;
+		}
+		if ($results{$sign_id}->{next_sign_id}) {
+			my ($new_id, $error) = $cgi->dbh->change_value(
+				"position_in_stream",
+				$results{$sign_id}->{next_sign_id},
+				"prev_sign_id",
+				$results{$sign_id}->{prev_sign_id}
+			);
+			handleDBError ($new_id, $error);
+			$changes{$results{$sign_id}->{next_sign_id}} = $new_id;
+		}
+		print Encode::decode('utf8', encode_json(%changes));
+		if ($counter != $repeatLength) {
+			print ",";
+			$counter++;
+		}
+	}
+	print "]";
+	if (defined $key && !$lastItem) {
+		print(",")
+	}
 }
 
 processCGI();

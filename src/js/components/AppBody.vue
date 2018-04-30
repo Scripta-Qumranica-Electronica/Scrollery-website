@@ -100,7 +100,10 @@ export default {
           this.$route.params.scrollVersionID
         )
         this.corpus
-          .populateImageReferencesOfCombination(this.$route.params.scrollVersionID)
+          .populateImageReferencesOfCombination(
+            this.$route.params.scrollID,
+            this.$route.params.scrollVersionID
+          )
           .then(res1 => {
             this.$store.commit('delWorking')
             if (this.$route.params.imageID !== '~') {
