@@ -13,19 +13,16 @@ class MapList {
    * @param {array=[]}  [items]      An initial array of items for the list
    */
   constructor(
-    username,
-    password,
+    session_id,
     idKey,
     ajaxPayload,
     model,
     attributes = {},
     standardTransaction = undefined
   ) {
-    this.username = username
-    this.password = password
+    this.session_id = session_id
     this._ajaxPayload = Object.assign({}, ajaxPayload, {
-      USER_NAME: this.username,
-      PASSWORD: this.password,
+      SESSION_ID: this.session_id,
     })
     // todo: safety to ensure props not overwritten
     Object.assign(this, { timestamp: Date.now() }, attributes)

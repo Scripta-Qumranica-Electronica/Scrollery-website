@@ -25,16 +25,15 @@ export default class Corpus {
    * @param {user} Number   the user id for the model
    * @param {set}           the set function which the framework uses for reactivity
    */
-  constructor(user, username, password) {
+  constructor(user, session_id) {
     this._user = user
-    this.username = username
-    this.password = password
+    this.session_id = session_id
 
-    this.combinations = new Combinations(this._user, this.username, this.password)
-    this.imageReferences = new ImageReferences(this.username, this.password)
-    this.cols = new Cols(this.username, this.password)
-    this.images = new Images(this.username, this.password)
-    this.artefacts = new Artefacts(this.username, this.password)
+    this.combinations = new Combinations(this._user, this.session_id)
+    this.imageReferences = new ImageReferences(this.session_id)
+    this.cols = new Cols(this.session_id)
+    this.images = new Images(this.session_id)
+    this.artefacts = new Artefacts(this.session_id)
   }
 
   populateCombinations() {
@@ -260,8 +259,7 @@ export default class Corpus {
 
   cloneScroll(scroll_version_id) {
     const payload = {
-      USER_NAME: this.username,
-      PASSWORD: this.password,
+      SESSION_ID: this.session_id,
       requests: [
         {
           scroll_version_id: scroll_version_id,

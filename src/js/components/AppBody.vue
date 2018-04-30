@@ -82,11 +82,7 @@ export default {
     // from the router.
     this.$store.commit('resetWorking')
     this.$store.commit('addWorking')
-    this.corpus = new Corpus(
-      this.$store.state.userID,
-      this.$store.state.username,
-      this.$store.state.password
-    )
+    this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
 
     // TODO: find I way to mock the corpus model for unit tests
     /* istanbul ignore next */

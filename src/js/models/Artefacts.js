@@ -5,8 +5,7 @@ import { wktPolygonToSvg, dbMatrixToSVG } from '~/utils/VectorFactory.js'
 
 export default class Artefacts extends MapList {
   constructor(
-    username,
-    password,
+    session_id,
     idKey,
     ajaxPayload = undefined,
     attributes = {},
@@ -15,7 +14,7 @@ export default class Artefacts extends MapList {
     idKey = idKey || 'artefact_position_id'
     standardTransaction = 'getArtOfImage'
     // ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getArtOfImage'}
-    super(username, password, idKey, ajaxPayload, Artefact, attributes, standardTransaction)
+    super(session_id, idKey, ajaxPayload, Artefact, attributes, standardTransaction)
   }
 
   // We should eventually have a hash associated with each mask,

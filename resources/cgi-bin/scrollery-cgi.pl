@@ -398,7 +398,7 @@ MYSQL
         my $sql = $cgi->dbh->prepare_cached($getIAAEdIDQuery)
 		or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
         $sql->execute($json_post->{discCanRef});
-        my $subname = sub_name(__SUB__);
+
 		readResults($sql, $key, $lastItem);
         return;
 }
@@ -892,14 +892,14 @@ sub setArtRotation {
 	return;
 }
 
-# To remove a sign we must the signs on either side of it
+# To remove a sign we must get the signs on either side of it
 # in the stream and link them together.  Should we also unlink
 # all data connected with that sign?
 sub removeSigns {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $counter = 1;
 	my $repeatLength = scalar @{$json_post->{sign_id}};
-	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
+	my $scrollVer = $cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
 
 	if (defined $key) {
 		print "\"$key\":";
