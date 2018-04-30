@@ -899,7 +899,7 @@ sub removeSigns {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $counter = 1;
 	my $repeatLength = scalar @{$json_post->{sign_id}};
-	my $scrollVer = $cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
 
 	if (defined $key) {
 		print "\"$key\":";
@@ -968,6 +968,125 @@ MYSQL
 	}
 	if (defined $key && !$lastItem) {
 		print(",")
+	}
+}
+
+sub addSigns() {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my $counter = 1;
+	my $repeatLength = scalar @{$json_post->{sign_id}};
+	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
+
+	if (defined $key) {
+		print "\"$key\":";
+	} else {
+		print "{\"results\":";
+	}
+	print "[";
+
+	foreach my $sign (@{$json_post->{sign_id}}) {
+# 		my $sqlSearch = << 'MYSQL';
+# SELECT sign_id, next_sign_id, prev_sign_id, position_in_stream_id
+# FROM position_in_stream
+# 	JOIN position_in_stream_owner USING(position_in_stream_id)
+# WHERE (sign_id = ?
+#        OR next_sign_id = ?
+#        OR prev_sign_id = ?)
+#       AND scroll_version_id = ?
+# ORDER BY next_sign_id = ?,
+# 	sign_id = ?,
+# 	prev_sign_id = ?
+# MYSQL
+# 		my $sql = $cgi->dbh->prepare_cached($sqlSearch)
+# 			or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+# 		$sql->execute(
+# 			$sign_id,
+# 			$sign_id,
+# 			$sign_id,
+# 			$json_post->{scroll_version_id},
+# 			$sign_id,
+# 			$sign_id,
+# 			$sign_id);
+# 		my %results;
+# 		while (my $result = $sql->fetchrow_hashref) {
+# 			$results{$result->{sign_id}} = $result;
+# 		}
+# 		if ($results{$sign_id}->{prev_sign_id}) {
+# 			print "\"$results{$sign_id}->{prev_sign_id}\":";
+# 			my ($new_id, $error) = $cgi->dbh->change_value(
+# 				"position_in_stream",
+# 				$results{$results{$sign_id}->{prev_sign_id}}->{position_in_stream_id},
+# 				"next_sign_id",
+# 				$results{$sign_id}->{next_sign_id}
+# 			);
+# 			handleDBError ($new_id, $error);
+# 			print ",";
+# 		}
+# 		if ($results{$sign_id}->{next_sign_id}) {
+# 			print "\"$results{$sign_id}->{next_sign_id}\":";
+# 			my ($new_id, $error) = $cgi->dbh->change_value(
+# 				"position_in_stream",
+# 				$results{$results{$sign_id}->{next_sign_id}}->{position_in_stream_id},
+# 				"prev_sign_id",
+# 				$results{$sign_id}->{prev_sign_id}
+# 			);
+# 			handleDBError ($new_id, $error);
+# 		}
+# 		$cgi->dbh->remove_entry("position_in_stream", $results{$sign_id}->{position_in_stream_id});
+		if ($counter != $repeatLength) {
+			print ",";
+			$counter++;
+		}
+	}
+	print "]";
+	if (!defined $key) {
+		print("}")
+	}
+	if (defined $key && !$lastItem) {
+		print(",")
+	}
+}
+
+sub modifySignAttribute() {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my $counter = 1;
+	my $repeatLength = scalar @{$json_post->{signs}};
+	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
+
+	if (defined $key) {
+		print "\"$key\":";
+	} else {
+		print "{\"results\":";
+	}
+	print "[";
+
+	foreach my $sign (@{$json_post->{signs}}) {
+		print "{\"$sign->{sign_char_id}\":[";
+		my $attributeCounter = 1;
+		my $attributeRepeatLength = scalar @{$sign->{attributes}};
+		foreach my $attribute (@{$sign->{attributes}}) {
+			my $new_id = $cgi->dbh->set_sign_char_attribute(
+				$sign->{sign_char_id}, 
+				$attribute->{attribute_value_id}, 
+				$attribute->{attribute_numeric_value}, 
+				$attribute->{sequence});
+			print "{\"$new_id\": {\"attribute_value\": \"$attribute->{attribute_value_id}\", \"numeric_value\": \"$attribute->{attribute_numeric_value}\", \"sequence\": \"$attribute->{sequence})\"}}";
+			if ($attributeCounter != $attributeRepeatLength) {
+				print ",";
+				$attributeCounter++;
+			}
+		}
+		print "]}";
+		if ($counter != $repeatLength) {
+			print ",";
+			$counter++;
+		}
+	}
+	print "]";
+	if (!defined $key) {
+		print("}");
+	} elsif (!$lastItem) {
+		print(",");
 	}
 }
 
