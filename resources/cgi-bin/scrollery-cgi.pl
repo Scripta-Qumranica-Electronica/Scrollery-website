@@ -795,7 +795,13 @@ MYSQL
 	print '{"created": {"scroll_data": ' . $scroll_data_id . ', "scroll_version":' . $scroll_version_id . '}}';
 	return;
 }
-
+sub cloneCombination {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my ($sv, $error) = $cgi->set_scrollversion($json_post->{scroll_version_id});
+	handleDBError ($sv, $error);
+	my $clonedScroll = $cgi->clone_scrollversion();
+	print "{\"new_Scroll_id\": $clonedScroll}";
+}
 sub copyCombination {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $clonedCombination = $cgi->dbh->create_new_scrollversion($json_post->{scroll_version_id});
@@ -1047,7 +1053,7 @@ sub addSigns() {
 	}
 }
 
-sub modifySignAttribute() {
+sub addSignAttribute() {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $counter = 1;
 	my $repeatLength = scalar @{$json_post->{signs}};
@@ -1065,12 +1071,51 @@ sub modifySignAttribute() {
 		my $attributeCounter = 1;
 		my $attributeRepeatLength = scalar @{$sign->{attributes}};
 		foreach my $attribute (@{$sign->{attributes}}) {
-			my $new_id = $cgi->dbh->set_sign_char_attribute(
+			my $new_id = $cgi->set_sign_char_attribute(
 				$sign->{sign_char_id}, 
 				$attribute->{attribute_value_id}, 
-				$attribute->{attribute_numeric_value}, 
-				$attribute->{sequence});
+				$attribute->{attribute_numeric_value});
 			print "{\"$new_id\": {\"attribute_value\": \"$attribute->{attribute_value_id}\", \"numeric_value\": \"$attribute->{attribute_numeric_value}\", \"sequence\": \"$attribute->{sequence})\"}}";
+			if ($attributeCounter != $attributeRepeatLength) {
+				print ",";
+				$attributeCounter++;
+			}
+		}
+		print "]}";
+		if ($counter != $repeatLength) {
+			print ",";
+			$counter++;
+		}
+	}
+	print "]";
+	if (!defined $key) {
+		print("}");
+	} elsif (!$lastItem) {
+		print(",");
+	}
+}
+
+sub removeSignAttribute() {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my $counter = 1;
+	my $repeatLength = scalar @{$json_post->{signs}};
+	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
+
+	if (defined $key) {
+		print "\"$key\":";
+	} else {
+		print "{\"results\":";
+	}
+	print "[";
+
+	foreach my $sign (@{$json_post->{signs}}) {
+		print "{\"$sign->{sign_char_id}\":[";
+		my $attributeCounter = 1;
+		my $attributeRepeatLength = scalar @{$sign->{attributes}};
+		foreach my $attribute (@{$sign->{attributes}}) {
+			$cgi->remove_sign_char_attribute(
+				$attribute->{sign_char_attribute_id});
+			print "{\"$attribute->{sign_char_attribute_id}\": \"deleted\"}";
 			if ($attributeCounter != $attributeRepeatLength) {
 				print ",";
 				$attributeCounter++;
