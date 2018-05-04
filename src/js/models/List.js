@@ -31,6 +31,10 @@ class List {
     )
 
     this._items = []
+    this.__changes = {
+      additions: [],
+      deletions: [],
+    }
 
     // insert each item in turn
     items.forEach(item => this.insert(item))
