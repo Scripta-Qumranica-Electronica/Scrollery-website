@@ -46,6 +46,10 @@ class List {
     })
   }
 
+  getChanges() {
+    return this.__changes
+  }
+
   /**
    * Destroy and clean up memory
    *
@@ -117,8 +121,8 @@ class List {
    * @instance
    */
   hasChanges() {
-    var hasChanges = false
-    for (let i = 0; (item = this._items[i]); i++) {
+    let hasChanges = false
+    for (let i = 0, item; (item = this._items[i]); i++) {
       if (item.hasChanges()) {
         hasChanges = true
         break

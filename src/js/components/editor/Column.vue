@@ -29,6 +29,9 @@ import KEYS from './key_codes.js'
 // components
 import EditingDialog from './dialog/EditingDialog.vue'
 
+// controllers
+import columnController from '~/controllers/column-controller.js'
+
 // models
 import Column from '~/models/Column.js'
 import Line from '~/models/Line.js'
@@ -131,6 +134,12 @@ export default {
     signsChanged(e, { line, node }) {
       // synchronize the line > DOM
       line.synchronizeTo(node.innerText)
+
+      columnController.onChange(
+        this.column,
+        this.$store.getters.sessionID,
+        this.$route.params.scrollVersionID
+      )
     },
 
     /**
