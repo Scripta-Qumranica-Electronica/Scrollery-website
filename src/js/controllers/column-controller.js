@@ -19,7 +19,6 @@ export default {
     axios
       .post('resources/cgi-bin/scrollery-cgi.pl', {
         SESSION_ID,
-        scroll_version_id,
         requests: {
           0: transactions[0],
         },
