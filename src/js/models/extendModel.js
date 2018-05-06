@@ -20,7 +20,7 @@ const makeModel = (defaultValues = {}) => {
    * @extends Immutabe.Record
    */
   class BaseModel extends Record({ ...baseDefaults, ...defaultValues }) {
-    constructor(x) {
+    constructor(x = {}) {
       // add the UUID if not already present in the props
       if (!x.__uuid) {
         x.__uuid = namespacedUuid(`${x.id || Date.now()}`, BaseModel.namespace())

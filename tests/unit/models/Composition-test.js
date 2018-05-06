@@ -2,7 +2,7 @@ import Composition from '~/models/Composition.js'
 import Column from '~/models/Column.js'
 import Line from '~/models/Line.js'
 
-describe('TextModel', () => {
+describe('CompositionModel', () => {
   let text
   beforeEach(() => {
     text = new Composition()

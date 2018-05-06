@@ -158,7 +158,7 @@ class List {
       ? // insert a item at the end of no number specified
         this.push(item)
       : // otherwise, insert at specified location
-        this._items.splice(index, 0, item)
+        this.splice(index, item)
   }
 
   /**
@@ -197,14 +197,14 @@ class List {
    * @param {number} index   index of the item to remove
    */
   delete(index) {
-    const deleted = this._items[index] && this._items.splice(index, 1)
+    const deleted = this._items[index] ? this._items.splice(index, 1)[0] : null
     if (deleted) {
       this.__changes.deletions[deleted.getID()] = deleted
 
       // something can't be added and deleted all at once
       // so remove it from the additions
-      if (this.__changes.additions[item.getID()]) {
-        delete this.__changes.additions[item.getID()]
+      if (this.__changes.additions[deleted.getID()]) {
+        delete this.__changes.additions[deleted.getID()]
       }
     }
   }
