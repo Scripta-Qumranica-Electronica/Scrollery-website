@@ -1,4 +1,4 @@
-#! /usr/bin/perl -CS
+#! /usr/bin/perl
 
 use strict;
 use warnings;
@@ -901,85 +901,6 @@ sub setArtRotation {
 	return;
 }
 
-# To remove a sign we must get the signs on either side of it
-# in the stream and link them together.  Should we also unlink
-# all data connected with that sign?
-# sub removeSigns {
-# 	my ($cgi, $json_post, $key, $lastItem) = @_;
-# 	my $counter = 1;
-# 	my $repeatLength = scalar @{$json_post->{sign_id}};
-# 	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
-
-# 	if (defined $key) {
-# 		print "\"$key\":";
-# 	} else {
-# 		print "{\"results\":";
-# 	}
-# 	print "[{";
-
-# 	foreach my $sign_id (@{$json_post->{sign_id}}) {
-# 		my $sqlSearch = << 'MYSQL';
-# SELECT sign_id, next_sign_id, prev_sign_id, position_in_stream_id
-# FROM position_in_stream
-# 	JOIN position_in_stream_owner USING(position_in_stream_id)
-# WHERE (sign_id = ?
-#        OR next_sign_id = ?
-#        OR prev_sign_id = ?)
-#       AND scroll_version_id = ?
-# ORDER BY next_sign_id = ?,
-# 	sign_id = ?,
-# 	prev_sign_id = ?
-# MYSQL
-# 		my $sql = $cgi->dbh->prepare_cached($sqlSearch)
-# 			or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-# 		$sql->execute(
-# 			$sign_id,
-# 			$sign_id,
-# 			$sign_id,
-# 			$json_post->{scroll_version_id},
-# 			$sign_id,
-# 			$sign_id,
-# 			$sign_id);
-# 		my %results;
-# 		while (my $result = $sql->fetchrow_hashref) {
-# 			$results{$result->{sign_id}} = $result;
-# 		}
-# 		if ($results{$sign_id}->{prev_sign_id}) {
-# 			print "\"$results{$sign_id}->{prev_sign_id}\":";
-# 			my ($new_id, $error) = $cgi->dbh->change_value(
-# 				"position_in_stream",
-# 				$results{$results{$sign_id}->{prev_sign_id}}->{position_in_stream_id},
-# 				"next_sign_id",
-# 				$results{$sign_id}->{next_sign_id}
-# 			);
-# 			handleDBError ($new_id, $error);
-# 			print "},{";
-# 		}
-# 		if ($results{$sign_id}->{next_sign_id}) {
-# 			print "\"$results{$sign_id}->{next_sign_id}\":";
-# 			my ($new_id, $error) = $cgi->dbh->change_value(
-# 				"position_in_stream",
-# 				$results{$results{$sign_id}->{next_sign_id}}->{position_in_stream_id},
-# 				"prev_sign_id",
-# 				$results{$sign_id}->{prev_sign_id}
-# 			);
-# 			handleDBError ($new_id, $error);
-# 		}
-# 		$cgi->dbh->remove_entry("position_in_stream", $results{$sign_id}->{position_in_stream_id});
-# 		if ($counter != $repeatLength) {
-# 			print "},{";
-# 			$counter++;
-# 		}
-# 	}
-# 	print "}]";
-# 	if (!defined $key) {
-# 		print("}")
-# 	}
-# 	if (defined $key && !$lastItem) {
-# 		print(",")
-# 	}
-# }
-
 sub removeSigns {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $counter = 1;
@@ -999,80 +920,27 @@ sub removeSigns {
 	print "}]";
 }
 
-sub addSigns() {
+sub insertSigns() {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $counter = 1;
-	my $repeatLength = scalar @{$json_post->{sign_id}};
+	my $repeatLength = scalar @{$json_post->{signs}};
 	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
+	print "[{";
 
-	if (defined $key) {
-		print "\"$key\":";
-	} else {
-		print "{\"results\":";
-	}
-	print "[";
-
-	foreach my $sign (@{$json_post->{sign_id}}) {
-# 		my $sqlSearch = << 'MYSQL';
-# SELECT sign_id, next_sign_id, prev_sign_id, position_in_stream_id
-# FROM position_in_stream
-# 	JOIN position_in_stream_owner USING(position_in_stream_id)
-# WHERE (sign_id = ?
-#        OR next_sign_id = ?
-#        OR prev_sign_id = ?)
-#       AND scroll_version_id = ?
-# ORDER BY next_sign_id = ?,
-# 	sign_id = ?,
-# 	prev_sign_id = ?
-# MYSQL
-# 		my $sql = $cgi->dbh->prepare_cached($sqlSearch)
-# 			or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-# 		$sql->execute(
-# 			$sign_id,
-# 			$sign_id,
-# 			$sign_id,
-# 			$json_post->{scroll_version_id},
-# 			$sign_id,
-# 			$sign_id,
-# 			$sign_id);
-# 		my %results;
-# 		while (my $result = $sql->fetchrow_hashref) {
-# 			$results{$result->{sign_id}} = $result;
-# 		}
-# 		if ($results{$sign_id}->{prev_sign_id}) {
-# 			print "\"$results{$sign_id}->{prev_sign_id}\":";
-# 			my ($new_id, $error) = $cgi->dbh->change_value(
-# 				"position_in_stream",
-# 				$results{$results{$sign_id}->{prev_sign_id}}->{position_in_stream_id},
-# 				"next_sign_id",
-# 				$results{$sign_id}->{next_sign_id}
-# 			);
-# 			handleDBError ($new_id, $error);
-# 			print ",";
-# 		}
-# 		if ($results{$sign_id}->{next_sign_id}) {
-# 			print "\"$results{$sign_id}->{next_sign_id}\":";
-# 			my ($new_id, $error) = $cgi->dbh->change_value(
-# 				"position_in_stream",
-# 				$results{$results{$sign_id}->{next_sign_id}}->{position_in_stream_id},
-# 				"prev_sign_id",
-# 				$results{$sign_id}->{prev_sign_id}
-# 			);
-# 			handleDBError ($new_id, $error);
-# 		}
-# 		$cgi->dbh->remove_entry("position_in_stream", $results{$sign_id}->{position_in_stream_id});
+	my $prev_sign_id = 0;
+	foreach my $sign (@{$json_post->{signs}}) {
+		if ($counter == 1) {
+			$prev_sign_id = $sign->{previous_sign_id};
+		}
+		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $sign->{next_sign_id}, $prev_sign_id);
+		print "\"$sign->{uuid}\":$prev_sign_id";
 		if ($counter != $repeatLength) {
-			print ",";
+			print "},{";
 			$counter++;
 		}
 	}
-	print "]";
-	if (!defined $key) {
-		print("}")
-	}
-	if (defined $key && !$lastItem) {
-		print(",")
-	}
+
+	print "}]";
 }
 
 sub addSignAttribute() {
