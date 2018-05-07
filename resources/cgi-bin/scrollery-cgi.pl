@@ -912,7 +912,7 @@ sub removeSigns {
 	} else {
 		print "{\"results\":";
 	}
-	print "[";
+	print "[{";
 
 	foreach my $sign_id (@{$json_post->{sign_id}}) {
 		my $sqlSearch = << 'MYSQL';
@@ -950,7 +950,7 @@ MYSQL
 				$results{$sign_id}->{next_sign_id}
 			);
 			handleDBError ($new_id, $error);
-			print ",";
+			print "},{";
 		}
 		if ($results{$sign_id}->{next_sign_id}) {
 			print "\"$results{$sign_id}->{next_sign_id}\":";
@@ -964,11 +964,11 @@ MYSQL
 		}
 		$cgi->dbh->remove_entry("position_in_stream", $results{$sign_id}->{position_in_stream_id});
 		if ($counter != $repeatLength) {
-			print ",";
+			print "},{";
 			$counter++;
 		}
 	}
-	print "]";
+	print "}]";
 	if (!defined $key) {
 		print("}")
 	}
@@ -1106,7 +1106,7 @@ sub removeSignAttribute() {
 	} else {
 		print "{\"results\":";
 	}
-	print "[";
+	print "[{";
 
 	foreach my $sign (@{$json_post->{signs}}) {
 		print "{\"$sign->{sign_char_id}\":[";
@@ -1123,11 +1123,11 @@ sub removeSignAttribute() {
 		}
 		print "]}";
 		if ($counter != $repeatLength) {
-			print ",";
+			print "},{";
 			$counter++;
 		}
 	}
-	print "]";
+	print "}]";
 	if (!defined $key) {
 		print("}");
 	} elsif (!$lastItem) {
