@@ -260,12 +260,12 @@ export default class Corpus {
   cloneScroll(scroll_version_id) {
     const payload = {
       SESSION_ID: this.session_id,
-      requests: [
-        {
+      requests: {
+        cloneScroll: {
           scroll_version_id: scroll_version_id,
           transaction: 'copyCombination',
         },
-      ],
+      },
     }
     axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
       if (res.status === 200 && res.data.replies) {
@@ -274,18 +274,17 @@ export default class Corpus {
         // data transmission.
         // this._hash = res.data.hash
 
-        res.data.replies.forEach(reply => {
-          reply.results.forEach(item => {
-            let record = new this.combinations.model(item)
-            this.combinations.insert(record, this.combinations.getFirstKey())
-            this.populateColumnsOfCombination(item.scroll_id, item.scroll_version_id)
-            this.populateImageReferencesOfCombination(item.scroll_id, item.scroll_version_id).then(
-              res => {
-                this.populateArtefactsOfCombination(item.scroll_id, item.scroll_version_id)
-              }
-            )
-          })
-        })
+        if (res.data.replies.cloneScroll) {
+          const item = res.data.replies.cloneScroll.scroll_data
+          let record = new this.combinations.model(item)
+          this.combinations.insert(record, this.combinations.getFirstKey())
+          this.populateColumnsOfCombination(item.scroll_id, item.scroll_version_id)
+          this.populateImageReferencesOfCombination(item.scroll_id, item.scroll_version_id).then(
+            res => {
+              this.populateArtefactsOfCombination(item.scroll_id, item.scroll_version_id)
+            }
+          )
+        }
       }
     })
   }

@@ -48,17 +48,17 @@ sub processCGI {
 				print '{"replies": {';
 				my $counter = 1;
 				my $repeatLength = scalar keys %{$json_post->{requests}};
-				my $lastItem = 0;
+				my $lastItem = 1;
 				while (my ($key, $value) = each (%{$json_post->{requests}})) {
-					if ($counter == $repeatLength) {
-						$lastItem = 1;
-					} else {
-						$counter++;
-					}
+					print "\"$key\":";
 					if (defined $value->{transaction} && defined $::{$value->{transaction}}) {
 						$::{$value->{transaction}}($cgi, $value, $key, $lastItem);
 					} else {
 						print "{'results': {'$key': {'error': 'Transaction type $value->{transaction} not understood.'}}}";
+					}
+					if ($counter < $repeatLength) {
+						$counter++;
+						print ",";
 					}
 				}
 				print '}}';
@@ -289,7 +289,6 @@ SELECT
 	col_data.col_id AS col_id,
 	line_data.name AS line_name,
 	line_data.line_id AS line_id,
-	position_in_stream.prev_sign_id,
 	position_in_stream.sign_id,
 	position_in_stream.next_sign_id,
 	sign_char.sign_char_id,
@@ -342,6 +341,13 @@ MYSQL
 		$json_post->{SCROLL_VERSION});
 
 	readResults($sql, $key, $lastItem);
+	return;
+}
+
+sub getSignStreamOfFrag {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	$cgi->set_scrollversion($json_post->{SCROLL_VERSION});
+	$cgi->get_text_of_fragment($json_post->{colId});
 	return;
 }
 
@@ -795,18 +801,16 @@ MYSQL
 	print '{"created": {"scroll_data": ' . $scroll_data_id . ', "scroll_version":' . $scroll_version_id . '}}';
 	return;
 }
-sub cloneCombination {
+
+sub copyCombination {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
+	print "{\"set_scroll_version\": ";
 	my ($sv, $error) = $cgi->set_scrollversion($json_post->{scroll_version_id});
 	handleDBError ($sv, $error);
 	my $clonedScroll = $cgi->clone_scrollversion();
-	print "{\"new_Scroll_id\": $clonedScroll}";
-}
-sub copyCombination {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $clonedCombination = $cgi->dbh->create_new_scrollversion($json_post->{scroll_version_id});
-	$cgi->dbh->clone_scroll_version($json_post->{scroll_version_id}, $clonedCombination);
-		my $getCombQuery = <<'MYSQL';
+	print ",\"new_scroll_id\": $clonedScroll, \"scroll_data\":";
+
+	my $getCombsQuery = <<'MYSQL';
 SELECT DISTINCT 
        scroll_data.scroll_id as scroll_id,
        scroll_data.name AS name,
@@ -820,12 +824,11 @@ FROM scroll_version
 	JOIN scroll_data_owner using(scroll_data_id)
 WHERE scroll_version.scroll_version_id = ?
 MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getCombQuery) or die
+	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($clonedCombination);
-
-	readResults($sql, $key, $lastItem);
-	return;
+	$sql->execute($clonedScroll);
+	print Encode::decode('utf8', encode_json($sql->fetchrow_hashref));
+	print "}";
 }
 
 sub nameCombination {
@@ -901,80 +904,99 @@ sub setArtRotation {
 # To remove a sign we must get the signs on either side of it
 # in the stream and link them together.  Should we also unlink
 # all data connected with that sign?
+# sub removeSigns {
+# 	my ($cgi, $json_post, $key, $lastItem) = @_;
+# 	my $counter = 1;
+# 	my $repeatLength = scalar @{$json_post->{sign_id}};
+# 	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
+
+# 	if (defined $key) {
+# 		print "\"$key\":";
+# 	} else {
+# 		print "{\"results\":";
+# 	}
+# 	print "[{";
+
+# 	foreach my $sign_id (@{$json_post->{sign_id}}) {
+# 		my $sqlSearch = << 'MYSQL';
+# SELECT sign_id, next_sign_id, prev_sign_id, position_in_stream_id
+# FROM position_in_stream
+# 	JOIN position_in_stream_owner USING(position_in_stream_id)
+# WHERE (sign_id = ?
+#        OR next_sign_id = ?
+#        OR prev_sign_id = ?)
+#       AND scroll_version_id = ?
+# ORDER BY next_sign_id = ?,
+# 	sign_id = ?,
+# 	prev_sign_id = ?
+# MYSQL
+# 		my $sql = $cgi->dbh->prepare_cached($sqlSearch)
+# 			or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
+# 		$sql->execute(
+# 			$sign_id,
+# 			$sign_id,
+# 			$sign_id,
+# 			$json_post->{scroll_version_id},
+# 			$sign_id,
+# 			$sign_id,
+# 			$sign_id);
+# 		my %results;
+# 		while (my $result = $sql->fetchrow_hashref) {
+# 			$results{$result->{sign_id}} = $result;
+# 		}
+# 		if ($results{$sign_id}->{prev_sign_id}) {
+# 			print "\"$results{$sign_id}->{prev_sign_id}\":";
+# 			my ($new_id, $error) = $cgi->dbh->change_value(
+# 				"position_in_stream",
+# 				$results{$results{$sign_id}->{prev_sign_id}}->{position_in_stream_id},
+# 				"next_sign_id",
+# 				$results{$sign_id}->{next_sign_id}
+# 			);
+# 			handleDBError ($new_id, $error);
+# 			print "},{";
+# 		}
+# 		if ($results{$sign_id}->{next_sign_id}) {
+# 			print "\"$results{$sign_id}->{next_sign_id}\":";
+# 			my ($new_id, $error) = $cgi->dbh->change_value(
+# 				"position_in_stream",
+# 				$results{$results{$sign_id}->{next_sign_id}}->{position_in_stream_id},
+# 				"prev_sign_id",
+# 				$results{$sign_id}->{prev_sign_id}
+# 			);
+# 			handleDBError ($new_id, $error);
+# 		}
+# 		$cgi->dbh->remove_entry("position_in_stream", $results{$sign_id}->{position_in_stream_id});
+# 		if ($counter != $repeatLength) {
+# 			print "},{";
+# 			$counter++;
+# 		}
+# 	}
+# 	print "}]";
+# 	if (!defined $key) {
+# 		print("}")
+# 	}
+# 	if (defined $key && !$lastItem) {
+# 		print(",")
+# 	}
+# }
+
 sub removeSigns {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $counter = 1;
 	my $repeatLength = scalar @{$json_post->{sign_id}};
 	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
-
-	if (defined $key) {
-		print "\"$key\":";
-	} else {
-		print "{\"results\":";
-	}
 	print "[{";
 
 	foreach my $sign_id (@{$json_post->{sign_id}}) {
-		my $sqlSearch = << 'MYSQL';
-SELECT sign_id, next_sign_id, prev_sign_id, position_in_stream_id
-FROM position_in_stream
-	JOIN position_in_stream_owner USING(position_in_stream_id)
-WHERE (sign_id = ?
-       OR next_sign_id = ?
-       OR prev_sign_id = ?)
-      AND scroll_version_id = ?
-ORDER BY next_sign_id = ?,
-	sign_id = ?,
-	prev_sign_id = ?
-MYSQL
-		my $sql = $cgi->dbh->prepare_cached($sqlSearch)
-			or die "Couldn't prepare statement: " . $cgi->dbh->errstr;
-		$sql->execute(
-			$sign_id,
-			$sign_id,
-			$sign_id,
-			$json_post->{scroll_version_id},
-			$sign_id,
-			$sign_id,
-			$sign_id);
-		my %results;
-		while (my $result = $sql->fetchrow_hashref) {
-			$results{$result->{sign_id}} = $result;
-		}
-		if ($results{$sign_id}->{prev_sign_id}) {
-			print "\"$results{$sign_id}->{prev_sign_id}\":";
-			my ($new_id, $error) = $cgi->dbh->change_value(
-				"position_in_stream",
-				$results{$results{$sign_id}->{prev_sign_id}}->{position_in_stream_id},
-				"next_sign_id",
-				$results{$sign_id}->{next_sign_id}
-			);
-			handleDBError ($new_id, $error);
-			print "},{";
-		}
-		if ($results{$sign_id}->{next_sign_id}) {
-			print "\"$results{$sign_id}->{next_sign_id}\":";
-			my ($new_id, $error) = $cgi->dbh->change_value(
-				"position_in_stream",
-				$results{$results{$sign_id}->{next_sign_id}}->{position_in_stream_id},
-				"prev_sign_id",
-				$results{$sign_id}->{prev_sign_id}
-			);
-			handleDBError ($new_id, $error);
-		}
-		$cgi->dbh->remove_entry("position_in_stream", $results{$sign_id}->{position_in_stream_id});
+		$cgi->remove_sign($sign_id);
+		print "\"$sign_id\":\"deleted\"";
 		if ($counter != $repeatLength) {
 			print "},{";
 			$counter++;
 		}
 	}
+
 	print "}]";
-	if (!defined $key) {
-		print("}")
-	}
-	if (defined $key && !$lastItem) {
-		print(",")
-	}
 }
 
 sub addSigns() {
