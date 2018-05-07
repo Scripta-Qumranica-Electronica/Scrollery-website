@@ -289,7 +289,6 @@ SELECT
 	col_data.col_id AS col_id,
 	line_data.name AS line_name,
 	line_data.line_id AS line_id,
-	position_in_stream.prev_sign_id,
 	position_in_stream.sign_id,
 	position_in_stream.next_sign_id,
 	sign_char.sign_char_id,
@@ -342,6 +341,13 @@ MYSQL
 		$json_post->{SCROLL_VERSION});
 
 	readResults($sql, $key, $lastItem);
+	return;
+}
+
+sub getSignStreamOfFrag {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	$cgi->set_scrollversion($json_post->{SCROLL_VERSION});
+	$cgi->get_text_of_fragment($json_post->{colId});
 	return;
 }
 
@@ -795,37 +801,14 @@ MYSQL
 	print '{"created": {"scroll_data": ' . $scroll_data_id . ', "scroll_version":' . $scroll_version_id . '}}';
 	return;
 }
-sub cloneCombination {
+
+sub copyCombination {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
+	print "{\"set_scroll_version\": ";
 	my ($sv, $error) = $cgi->set_scrollversion($json_post->{scroll_version_id});
 	handleDBError ($sv, $error);
 	my $clonedScroll = $cgi->clone_scrollversion();
-	print "{\"new_Scroll_id\": $clonedScroll}";
-}
-sub copyCombination {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $clonedCombination = $cgi->dbh->create_new_scrollversion($json_post->{scroll_version_id});
-	$cgi->dbh->clone_scroll_version($json_post->{scroll_version_id}, $clonedCombination);
-		my $getCombQuery = <<'MYSQL';
-SELECT DISTINCT 
-       scroll_data.scroll_id as scroll_id,
-       scroll_data.name AS name,
-       scroll_version.scroll_version_id AS scroll_version_id,
-       scroll_data.scroll_data_id AS scroll_data_id,
-       scroll_version_group.locked,
-			scroll_version.user_id
-FROM scroll_version
-	JOIN scroll_version_group USING(scroll_version_group_id)
-	JOIN scroll_data using(scroll_id)
-	JOIN scroll_data_owner using(scroll_data_id)
-WHERE scroll_version.scroll_version_id = ?
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getCombQuery) or die
-			"Couldn't prepare statement: " . $cgi->dbh->errstr;
-	$sql->execute($clonedCombination);
-
-	readResults($sql, $key, $lastItem);
-	return;
+	print ",\"new_scroll_id\": $clonedScroll}";
 }
 
 sub nameCombination {
