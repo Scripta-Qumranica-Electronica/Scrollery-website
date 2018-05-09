@@ -132,10 +132,10 @@ export default {
           this.errMsg = res.data.error
           console.error(res.data)
           reject(new Error('Login invalid'))
-        } else if (res.data && res.data.SESSION_ID && res.data.USER_ID) {
+        } else if (res.data && res.data.results.SESSION_ID && res.data.results.USER_ID) {
           // Set store state
-          this.setSessionID(res.data.SESSION_ID)
-          this.setUserID(res.data.USER_ID)
+          this.setSessionID(res.data.results.SESSION_ID)
+          this.setUserID(res.data.results.USER_ID)
           this.setUsername(this.user.trim())
           this.setLanguage(this.language)
           // Load language files
