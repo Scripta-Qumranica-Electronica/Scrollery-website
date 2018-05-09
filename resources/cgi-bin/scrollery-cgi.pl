@@ -1053,7 +1053,7 @@ sub getRoiOfCol() {
 	my ($cgi, $json_post) = @_;
 
 	my $sqlQuery = <<'MYSQL';
-SELECT sign_char_roi_id, sign_char_id, path, transform_matrix
+SELECT sign_char_roi_id, sign_char_id, ST_AsWKT(path) AS path, transform_matrix
 	FROM sign_char_roi
 JOIN sign_char_roi_owner USING(sign_char_roi_id)
 JOIN roi_shape USING(roi_shape_id)
