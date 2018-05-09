@@ -3,6 +3,7 @@ import ImageReferences from './imageReferences.js'
 import Cols from './Cols.js'
 import Images from './Images.js'
 import Artefacts from './Artefacts.js'
+import ROIs from './ROIs.js'
 import axios from 'axios'
 
 /* TODO I ignore this for testing until I decide on
@@ -34,6 +35,7 @@ export default class Corpus {
     this.cols = new Cols(this.session_id)
     this.images = new Images(this.session_id)
     this.artefacts = new Artefacts(this.session_id)
+    this.rois = new ROIs(this.session_id)
   }
 
   populateCombinations() {
@@ -254,6 +256,89 @@ export default class Corpus {
           })
           .catch(reject)
       } else reject('The imageReferenceID and scrollVersionID inputs were of different lengths.')
+    })
+  }
+
+  populateRoiOfCombintation(scrollVersionID) {
+    if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
+    return new Promise((resolve, reject) => {
+      let payload = { requests: [] }
+      scrollVersionID.forEach((id, index) => {
+        payload.requests.push({
+          scroll_version_id: scrollVersionID[index],
+          transaction: 'getRoiOfCombination',
+        })
+      })
+      this.rois
+        .populate(payload)
+        .then(res => {
+          res.forEach((reply, index) => {
+            const currentScrollVersionID = scrollVersionID[index] >>> 0
+            let rois = []
+            reply.results.forEach(roi => {
+              if (roi[this.rois.idKey]) rois.push(roi[this.rois.idKey])
+            })
+
+            let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+            combinationRecord.rois = rois
+            this.combinations.set(
+              currentScrollVersionID,
+              new this.combinations.model(combinationRecord)
+            )
+          })
+          resolve(res)
+        })
+        .catch(reject)
+    })
+  }
+
+  populateRoiOfCol(colID, scrollVersionID) {
+    if (colID.constructor !== Array) colID = [colID]
+    // If scrollVersionID is not an array, convert it into one matching the
+    // length of imageReferenceID.
+    if (scrollVersionID.constructor !== Array) {
+      const tempScrollVersionID = scrollVersionID
+      scrollVersionID = []
+      colID.forEach(ref => {
+        scrollVersionID.push(tempScrollVersionID)
+      })
+    }
+    return new Promise((resolve, reject) => {
+      if (colID.length === scrollVersionID.length) {
+        let payload = { requests: [] }
+        colID.forEach((id, index) => {
+          payload.requests.push({
+            col_id: id,
+            scroll_version_id: scrollVersionID[index],
+            transaction: this.rois.standardTransaction,
+          })
+        })
+        this.rois
+          .populate(payload)
+          .then(res => {
+            res.forEach((reply, index) => {
+              const currentScrollVersionID = scrollVersionID[index] >>> 0
+              const currentColID = colID[index] >>> 0
+              let rois = []
+              reply.results.forEach(roi => {
+                if (roi[this.rois.idKey]) rois.push(roi[this.rois.idKey])
+              })
+
+              let colRecord = this.cols.get(currentColID).toJS()
+              colRecord.rois = rois
+              this.cols.set(currentColID, new this.cols.model(imageRefRecord))
+
+              let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+              combinationRecord.rois = rois
+              this.combinations.set(
+                currentScrollVersionID,
+                new this.combinations.model(combinationRecord)
+              )
+            })
+            resolve(res)
+          })
+          .catch(reject)
+      } else reject('The colID and scrollVersionID inputs were of different lengths.')
     })
   }
 
