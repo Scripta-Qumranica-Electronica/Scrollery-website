@@ -72,7 +72,7 @@ export default {
           params: {
             scrollID: this.scrollID,
             scrollVersionID: this.scrollVersionID,
-            colID: params.colID,
+            colID: this.$route.params.colID,
             imageID: this.imageID,
             artID: '~',
           },
