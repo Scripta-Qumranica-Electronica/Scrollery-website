@@ -33,7 +33,6 @@ sub processCGI {
 				my $counter = 1;
 				my $repeatLength = scalar @{$json_post->{requests}};
 				foreach my $request (@{$json_post->{requests}}) {
-					print '{"results":';
 					if (defined $request->{transaction} && defined $::{$request->{transaction}}) {
 						$::{$request->{transaction}}($cgi, $request);
 					} else {
@@ -41,9 +40,7 @@ sub processCGI {
 					}
 					if ($counter < $repeatLength) {
 						$counter++;
-						print "},{";
-					} else {
-						print "}";
+						print ",";
 					}
 				}
 				print ']}';
@@ -57,7 +54,7 @@ sub processCGI {
 					if (defined $value->{transaction} && defined $::{$value->{transaction}}) {
 						$::{$value->{transaction}}($cgi, $value, $key, $lastItem);
 					} else {
-						print "{'results': {'$key': {'error': 'Transaction type $value->{transaction} not understood.'}}}";
+						print "{'error': 'Transaction type $value->{transaction} not understood.'}";
 					}
 					if ($counter < $repeatLength) {
 						$counter++;
@@ -69,9 +66,9 @@ sub processCGI {
 		}
 	} else {
 		if (defined $json_post->{transaction} && defined $::{$json_post->{transaction}}) {
-			print '{"results":';
+			print "{\"replies\":[";
 			$::{$json_post->{transaction}}($cgi, $json_post);
-			print '}';
+			print "]}";
 		} else {
 			print encode_json({'error', "Transaction type '" . $json_post->{transaction} . "' not understood."});
 		}
@@ -86,7 +83,9 @@ sub readResults {
        	push @fetchedResults, $result;
     }
     if (scalar(@fetchedResults) > 0) {
+		print "{\"results\":";
 		print Encode::decode('utf8', encode_json(\@fetchedResults));
+		print "}";
  	} else {
 		print "{\"error\":\"No results found.\"}";
  	}
@@ -1075,6 +1074,14 @@ MYSQL
 
 	readResults($sql);
 	return;
+}
+
+sub getTextOfFragment() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	print "{";
+	$cgi->get_text_of_fragment($json_post->{col_id}, 'SQE_Format::JSON');
+	print "}";
 }
 
 processCGI();

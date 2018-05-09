@@ -374,4 +374,79 @@ export default class Corpus {
       }
     })
   }
+
+  setRoiOfArtefact(sign_char_roi_id, roi, artefact_position_id, scroll_version_id) {
+    if (sign_char_roi_id.constructor !== Array) sign_char_roi_id = [sign_char_roi_id]
+    if (roi.constructor !== Array) roi = [roi]
+    // If scroll_version_id is not an array, convert it into one matching the
+    // length of imageReferenceID.
+    if (scroll_version_id.constructor !== Array) {
+      const tempScrollVersionID = scroll_version_id
+      scrollVersionID = []
+      sign_char_roi_id.forEach(ref => {
+        scroll_version_id.push(tempScrollVersionID)
+      })
+    }
+    if (artefact_position_id.constructor !== Array) {
+      const tempArtefactPositionID = artefact_position_id
+      artefact_position_id = []
+      sign_char_roi_id.forEach(ref => {
+        artefact_position_id.push(tempArtefactPositionID)
+      })
+    }
+
+    return new Promise((resolve, reject) => {
+      if (
+        sign_char_roi_id.length === roi.length &&
+        sign_char_roi_id.length === scroll_version_id.length &&
+        scroll_version_id.length === artefact_position_id.length
+      ) {
+        let payload = { requests: [] }
+        sign_char_roi_id.forEach((id, index) => {
+          if (sign_char_roi_id.constructor !== String) {
+            payload.requests.push({
+              sign_char_roi_id: id,
+              roi: roi[index],
+              scroll_version_id: scrollVersionID[index],
+              transaction: 'changeROI',
+            })
+          } else {
+            payload.requests.push({
+              roi: roi[index],
+              scroll_version_id: scrollVersionID[index],
+              transaction: 'addRoiToScroll',
+            })
+          }
+        })
+        this.rois
+          .populate(payload)
+          .then(res => {
+            res.forEach((reply, index) => {
+              const currentScrollVersionID = scrollVersionID[index] >>> 0
+              const currentColID = colID[index] >>> 0
+              let rois = []
+              reply.results.forEach(roi => {
+                if (roi[this.rois.idKey]) rois.push(roi[this.rois.idKey])
+              })
+
+              let colRecord = this.cols.get(currentColID).toJS()
+              colRecord.rois = rois
+              this.cols.set(currentColID, new this.cols.model(imageRefRecord))
+
+              let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+              combinationRecord.rois = rois
+              this.combinations.set(
+                currentScrollVersionID,
+                new this.combinations.model(combinationRecord)
+              )
+            })
+            resolve(res)
+          })
+          .catch(reject)
+      } else
+        reject(
+          'The sign_char_roi_id, roi, artefact_position_id, and scroll_version_id inputs were of different lengths.'
+        )
+    })
+  }
 }
