@@ -5,19 +5,17 @@ const Model = extendModel()
 /**
  * A base class for lists of models. Mainly, this provides an interface to
  * work with an ordered array of child-items.
- * 
+ *
  * It has a similar API as the array, but is more focused
  */
 class List {
-
   /**
-   * @param {object={}} [attributes] List attributes 
-   * @param {array=[]}  [items]      An initial array of items for the list 
+   * @param {object={}} [attributes] List attributes
+   * @param {array=[]}  [items]      An initial array of items for the list
    */
   constructor(attributes = {}, items = []) {
-
     // todp: safety to ensure props not overwritten
-    Object.assign(this, {id: Date.now(), name: ''}, attributes)
+    Object.assign(this, { id: Date.now(), name: '' }, attributes)
 
     this._items = []
 
@@ -27,13 +25,13 @@ class List {
     // add a length property that forwards to the `count` method
     Object.defineProperty(this, 'length', {
       get: () => this.count(),
-      writeable: false
+      writeable: false,
     })
   }
 
   /**
    * Destroy and clean up memory
-   * 
+   *
    * @public
    * @instance
    */
@@ -51,12 +49,12 @@ class List {
    */
   static getModel() {
     return Model
-  };
+  }
 
   /**
    * @public
    * @instance
-   * 
+   *
    * @return {string} the list id
    */
   getID() {
@@ -64,42 +62,42 @@ class List {
   }
 
   /**
-   * @public 
+   * @public
    * @instance
-   * 
-   * @param {number} index the item index to retrieve 
-   * 
+   *
+   * @param {number} index the item index to retrieve
+   *
    * @return {Model}       the Model object
    */
   get(index) {
-    return (this._items[index] || null)
+    return this._items[index] || null
   }
 
   /**
    * @public
    * @instance
-   * 
+   *
    * @param {Model}     item    A list item to insert
    * @param {number=-1} index   The index at which to insert the list, defaults to the end
    */
   insert(item, index = -1) {
     if (!(item instanceof this.constructor.getModel())) {
-      throw new TypeError(`Expect an instance of ${this.constructor.getModel().name} in List.prototype.insert`)
+      throw new TypeError(
+        `Expect an instance of ${this.constructor.getModel().name} in List.prototype.insert`
+      )
     }
 
     index === -1
-
-      // insert a item at the end of no number specified
-      ? this.push(item)
-
-      // otherwise, insert at specified location
-      : this._items.splice(index, 0, item)
+      ? // insert a item at the end of no number specified
+        this.push(item)
+      : // otherwise, insert at specified location
+        this._items.splice(index, 0, item)
   }
 
   /**
    * @public
    * @instance
-   * 
+   *
    * @param {Model} item An item to push on to the end of the items
    */
   push(item) {
@@ -119,14 +117,14 @@ class List {
 
   /**
    * Removes a range of items and returns them as a new List
-   * 
+   *
    * @public
    * @instance
-   * 
+   *
    * @param {number} start    the start index
    * @param {number} count    the number of items to slice off
    * @param {List}   [target] the target list
-   * 
+   *
    * @returns {List} A new list with the slice which is either the list or one created on the fly
    */
   sliceInto(start, count, target) {
@@ -142,7 +140,7 @@ class List {
   /**
    * @public
    * @instance
-   * 
+   *
    * @return {number} the number of items
    */
   count() {
@@ -152,7 +150,7 @@ class List {
   /**
    * @public
    * @instance
-   * 
+   *
    * @param {function} cb       A callback that receives each item and index
    * @param {object}   context  The context within which to run the callback
    */
@@ -165,10 +163,10 @@ class List {
 
   /**
    * Forward on to Array.prototype.find
-   * 
+   *
    * @public
    * @instance
-   * 
+   *
    * @param {function} cb A callback that returns truthy values when the item matches the criteria
    */
   find(cb) {
@@ -178,7 +176,7 @@ class List {
   /**
    * @public
    * @instance
-   * 
+   *
    * @param {Record|id|function} criteria  Criteria by which to find an item
    */
   findIndex(criteria) {
@@ -186,19 +184,28 @@ class List {
       return this._items.findIndex(criteria)
     } else {
       return this._items.findIndex(item => {
-        return (criteria instanceof this.constructor.getModel())
-          ? item === criteria            // this is an instance of model
-          : item.getID() === criteria    // criteria is a string, which is assumed to be the id
+        return criteria instanceof this.constructor.getModel()
+          ? item === criteria // this is an instance of model
+          : item.getID() === criteria // criteria is a string, which is assumed to be the id
       })
     }
   }
 
   /**
    * Expose the list items as a plain array
-   * 
+   *
    * @returns {array} the items
    */
   items() {
+    return this._items
+  }
+
+  /**
+   * Expose the list items as a plain array
+   *
+   * @returns {array} the items
+   */
+  toArray() {
     return this._items
   }
 }
