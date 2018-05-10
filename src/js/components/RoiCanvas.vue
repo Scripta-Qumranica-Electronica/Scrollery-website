@@ -85,6 +85,8 @@
 </template>
 
 <script>
+import uuid from 'uuid/v1'
+
 export default {
   props: {
     width: 0,
@@ -155,6 +157,17 @@ export default {
     },
 
     deselectROI() {
+      const id = uuid()
+      this.corpus
+        .setRoiOfArtefact(
+          id,
+          this.selectedBox,
+          this.$route.params.artID,
+          this.$route.params.scrollVersionID
+        )
+        .then(res => {
+          console.log(this.corpus.rois.get(id).toJS())
+        })
       this.mouseMoveType = undefined
       this.oldMousePos = undefined
     },
