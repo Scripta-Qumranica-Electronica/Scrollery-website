@@ -33,24 +33,27 @@ sub processCGI {
 				my $counter = 1;
 				my $repeatLength = scalar @{$json_post->{requests}};
 				foreach my $request (@{$json_post->{requests}}) {
+					# print "{\"results\":";
 					if (defined $request->{transaction} && defined $::{$request->{transaction}}) {
 						$::{$request->{transaction}}($cgi, $request);
 					} else {
 						print encode_json({[{'error' => "Transaction type '" . $request->{transaction} . "' not understood."}]});
 					}
-					if ($counter < $repeatLength) {
-						$counter++;
-						print ",";
-					}
+					# if ($counter < $repeatLength) {
+					# 	$counter++;
+					# 	print "},{";
+					# } else {
+					# 	print "}";
+					# }
 				}
 				print ']}';
 			} elsif (is_hashref($json_post->{requests})){
-				print '{"replies": {';
+				print '{"replies":';
 				my $counter = 1;
 				my $repeatLength = scalar keys %{$json_post->{requests}};
 				my $lastItem = 1;
 				while (my ($key, $value) = each (%{$json_post->{requests}})) {
-					print "\"$key\":";
+					print "{\"$key\":";
 					if (defined $value->{transaction} && defined $::{$value->{transaction}}) {
 						$::{$value->{transaction}}($cgi, $value, $key, $lastItem);
 					} else {
@@ -66,9 +69,7 @@ sub processCGI {
 		}
 	} else {
 		if (defined $json_post->{transaction} && defined $::{$json_post->{transaction}}) {
-			print "{\"replies\":[";
 			$::{$json_post->{transaction}}($cgi, $json_post);
-			print "]}";
 		} else {
 			print encode_json({'error', "Transaction type '" . $json_post->{transaction} . "' not understood."});
 		}
@@ -1036,12 +1037,12 @@ sub removeSignChar() {
 #Give the sign_char_id, a GEOJSON poly, a JSON transform_matrix for the position,
 #a values_set to tell it a human meant to set the value, and I am not sure what exceptional
 #is for.  I don't know yet what it returns.
-sub addROI() {
+sub addRoiToScroll() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
 	$cgi->add_roi(
 		$json_post->{sign_char_id}, 
-		$json_post->{poly}, 
+		$json_post->{path}, 
 		$json_post->{transform_matrix}, 
 		$json_post->{values_set}, 
 		$json_post->{exceptional}

@@ -4,6 +4,7 @@ import Cols from './Cols.js'
 import Images from './Images.js'
 import Artefacts from './Artefacts.js'
 import ROIs from './ROIs.js'
+import { dbMatrixToSVG, svgMatrixToDB } from '~/utils/VectorFactory.js'
 import axios from 'axios'
 
 /* TODO I ignore this for testing until I decide on
@@ -345,31 +346,30 @@ export default class Corpus {
   cloneScroll(scroll_version_id) {
     const payload = {
       SESSION_ID: this.session_id,
-      requests: [
-        {
-          scroll_version_id: scroll_version_id,
-          transaction: 'copyCombination',
-        },
-      ],
+      scroll_version_id: scroll_version_id,
+      transaction: 'copyCombination',
     }
     axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
-      if (res.status === 200 && res.data.replies) {
+      if (res.status === 200 && res.data && res.data.scroll_data) {
         // We can store hashes for the returned data
         // in the future, so we can avoid unnecessary
         // data transmission.
         // this._hash = res.data.hash
 
-        res.data.replies.forEach(reply => {
-          reply.results.forEach(item => {
-            let record = new this.combinations.model(item)
-            this.combinations.insert(record, this.combinations.getFirstKey())
-            this.populateColumnsOfCombination(item.scroll_id, item.scroll_version_id)
-            this.populateImageReferencesOfCombination(item.scroll_id, item.scroll_version_id).then(
-              res => {
-                this.populateArtefactsOfCombination(item.scroll_id, item.scroll_version_id)
-              }
-            )
-          })
+        let record = new this.combinations.model(res.data.scroll_data)
+        this.combinations.insert(record, this.combinations.getFirstKey())
+        this.populateColumnsOfCombination(
+          res.data.scroll_data.scroll_id,
+          res.data.scroll_data.scroll_version_id
+        )
+        this.populateImageReferencesOfCombination(
+          res.data.scroll_data.scroll_id,
+          res.data.scroll_data.scroll_version_id
+        ).then(res => {
+          this.populateArtefactsOfCombination(
+            res.data.scroll_data.scroll_id,
+            res.data.scroll_data.scroll_version_id
+          )
         })
       }
     })
@@ -382,7 +382,7 @@ export default class Corpus {
     // length of imageReferenceID.
     if (scroll_version_id.constructor !== Array) {
       const tempScrollVersionID = scroll_version_id
-      scrollVersionID = []
+      scroll_version_id = []
       sign_char_roi_id.forEach(ref => {
         scroll_version_id.push(tempScrollVersionID)
       })
@@ -403,46 +403,64 @@ export default class Corpus {
       ) {
         let payload = { requests: [] }
         sign_char_roi_id.forEach((id, index) => {
-          if (sign_char_roi_id.constructor !== String) {
-            payload.requests.push({
+          let currentROI = roi[index]
+          let roiMatrix = dbMatrixToSVG(
+            this.artefacts._items.toJS()[artefact_position_id[index]].transform_matrix
+          )
+          roiMatrix[2] = roiMatrix[2] + currentROI.x
+          roiMatrix[5] = roiMatrix[5] + currentROI.y
+          const roiGeoJSONPath = {
+            type: 'Polygon',
+            coordinates: [
+              [0, 0],
+              [currentROI.width, 0],
+              [currentROI.width, currentROI.height],
+              [0, currentROI.height],
+              [0, 0],
+            ],
+          }
+          const roiWKTPath = `Polygon((0 0, ${currentROI.width} 0, ${currentROI.width} ${
+            currentROI.height
+          }, 0 ${currentROI.height}, 0 0))`
+          // Create the roi locally
+          let roiRecord
+          if (!this.rois.get(id)) {
+            roiRecord = new this.rois.model({
               sign_char_roi_id: id,
-              roi: roi[index],
-              scroll_version_id: scrollVersionID[index],
-              transaction: 'changeROI',
+              sign_char_id: 0,
+              path: roiWKTPath,
+              transform_matrix: roiMatrix,
+            })
+          } else {
+            roiRecord = this.rois.get(id).toJS()
+            roiRecord.path = roiWKTPath
+            roiRecord.transform_matrix = roiMatrix
+          }
+          this.rois.set(id, roiRecord)
+
+          // Create the roi on the server database
+          if (isNaN(sign_char_roi_id)) {
+            payload.requests.push({
+              path: roiGeoJSONPath,
+              transform_matrix: svgMatrixToDB(roiMatrix),
+              scroll_version_id: scroll_version_id[index],
+              values_set: 1,
+              exceptional: 0,
+              transaction: 'addRoiToScroll',
             })
           } else {
             payload.requests.push({
-              roi: roi[index],
-              scroll_version_id: scrollVersionID[index],
-              transaction: 'addRoiToScroll',
+              sign_char_roi_id: id,
+              path: roiGeoJSONPath,
+              transform_matrix: svgMatrixToDB(roiMatrix),
+              scroll_version_id: scroll_version_id[index],
+              values_set: 1,
+              exceptional: 0,
+              transaction: 'changeROI',
             })
           }
         })
-        this.rois
-          .populate(payload)
-          .then(res => {
-            res.forEach((reply, index) => {
-              const currentScrollVersionID = scrollVersionID[index] >>> 0
-              const currentColID = colID[index] >>> 0
-              let rois = []
-              reply.results.forEach(roi => {
-                if (roi[this.rois.idKey]) rois.push(roi[this.rois.idKey])
-              })
-
-              let colRecord = this.cols.get(currentColID).toJS()
-              colRecord.rois = rois
-              this.cols.set(currentColID, new this.cols.model(imageRefRecord))
-
-              let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
-              combinationRecord.rois = rois
-              this.combinations.set(
-                currentScrollVersionID,
-                new this.combinations.model(combinationRecord)
-              )
-            })
-            resolve(res)
-          })
-          .catch(reject)
+        console.log(JSON.stringify(payload))
       } else
         reject(
           'The sign_char_roi_id, roi, artefact_position_id, and scroll_version_id inputs were of different lengths.'
