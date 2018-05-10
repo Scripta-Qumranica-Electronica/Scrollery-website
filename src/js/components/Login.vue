@@ -44,11 +44,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['username', 'password', 'sessionID']),
+    ...mapGetters(['username', 'sessionID']),
   },
   created() {
     this.user = this.username
-    this.passwd = this.password
     // if there's a session hanging around in localStorage, check that
     if (this.sessionID) {
       this.validateSession(window.localStorage ? window.localStorage : null)
@@ -58,7 +57,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setSessionID', 'setUserID', 'setUsername', 'setPassword', 'setLanguage']),
+    ...mapMutations(['setSessionID', 'setUserID', 'setUsername', 'setLanguage']),
     onSubmit() {
       const isUserValid = this.validateUsername()
       const isPasswordValid = this.validatePassword()
@@ -138,7 +137,6 @@ export default {
           this.setSessionID(res.data.SESSION_ID)
           this.setUserID(res.data.USER_ID)
           this.setUsername(this.user.trim())
-          this.setPassword(this.passwd.trim())
           this.setLanguage(this.language)
           // Load language files
           this.$i18n

@@ -57,8 +57,8 @@ class Corpus {
     populateColumnsOfCombination(scrollID, versionID) {
         return {versionID: versionID, scrollID: scrollID}
     }
-    populateImageReferencesOfCombination(versionID) {
-        return {versionID: versionID}
+    populateImageReferencesOfCombination(scrollID, versionID) {
+        return {versionID: versionID, scrollID: scrollID}
     }
 }
 

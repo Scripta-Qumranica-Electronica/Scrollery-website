@@ -82,11 +82,7 @@ export default {
     // from the router.
     this.$store.commit('resetWorking')
     this.$store.commit('addWorking')
-    this.corpus = new Corpus(
-      this.$store.state.userID,
-      this.$store.state.username,
-      this.$store.state.password
-    )
+    this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
 
     // TODO: find I way to mock the corpus model for unit tests
     /* istanbul ignore next */
@@ -100,7 +96,10 @@ export default {
           this.$route.params.scrollVersionID
         )
         this.corpus
-          .populateImageReferencesOfCombination(this.$route.params.scrollVersionID)
+          .populateImageReferencesOfCombination(
+            this.$route.params.scrollID,
+            this.$route.params.scrollVersionID
+          )
           .then(res1 => {
             this.$store.commit('delWorking')
             if (this.$route.params.imageID !== '~') {
