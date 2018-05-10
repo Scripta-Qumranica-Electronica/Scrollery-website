@@ -109,7 +109,7 @@ export function svgPolygonToWKT(svg) {
  * used in an SVG element.
  */
 export function dbMatrixToSVG(matrix) {
-  if (matrix.constructor === String) {
+  if (matrix.constructor === String && isJSON(matrix)) {
     matrix = JSON.parse(matrix).matrix
   }
   return matrix.length === 2 && matrix[0].length === 3 && matrix[1].length === 3
@@ -195,4 +195,12 @@ export function clipCanvas(canvas, svgClipPath, divisor) {
     ctx.closePath()
   })
   ctx.fill()
+}
+
+function isJSON(str) {
+  try {
+    return JSON.parse(str) && !!str
+  } catch (e) {
+    return false
+  }
 }
