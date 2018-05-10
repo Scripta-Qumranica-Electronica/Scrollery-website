@@ -1036,17 +1036,35 @@ sub removeSignChar() {
 
 #Give the sign_char_id, a GEOJSON poly, a JSON transform_matrix for the position,
 #a values_set to tell it a human meant to set the value, and I am not sure what exceptional
-#is for.  I don't know yet what it returns.
+#is for.  If you don't provide a sign_char_id, the subroutine automatically gets the lowest
+#sign_char_id in the selected scroll.  I don't know yet what it returns.
 sub addRoiToScroll() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	my $sign_char_id;
+	if (!defined $json_post->{sign_char_id}) {
+		my $sqlQuery = <<'MYSQL';
+SELECT MIN(sign_char_id) as sign_char_id
+FROM sign_char
+JOIN position_in_stream USING (sign_id)
+JOIN position_in_stream_owner USING (position_in_stream_id)
+WHERE position_in_stream_owner.scroll_version_id = ?
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($sqlQuery)
+		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+	$sql->execute($json_post->{scroll_version_id});
+	$sign_char_id = $sql->fetchrow_arrayref()->[0];
+	} else {
+		$sign_char_id = $json_post->{sign_char_id};
+	}
 	$cgi->add_roi(
-		$json_post->{sign_char_id}, 
+		$sign_char_id, 
 		$json_post->{path}, 
 		$json_post->{transform_matrix}, 
 		$json_post->{values_set}, 
 		$json_post->{exceptional}
 	);
+	print "{\"sign_char_id\": $sign_char_id}";
 }
 
 sub getRoiOfCol() {

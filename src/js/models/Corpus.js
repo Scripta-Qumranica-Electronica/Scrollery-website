@@ -401,7 +401,7 @@ export default class Corpus {
         sign_char_roi_id.length === scroll_version_id.length &&
         scroll_version_id.length === artefact_position_id.length
       ) {
-        let payload = { requests: [] }
+        let payload = { requests: [], SESSION_ID: this.session_id }
         sign_char_roi_id.forEach((id, index) => {
           let currentROI = roi[index]
           let roiMatrix = dbMatrixToSVG(
@@ -441,7 +441,7 @@ export default class Corpus {
           // Create the roi on the server database
           if (isNaN(sign_char_roi_id)) {
             payload.requests.push({
-              path: roiGeoJSONPath,
+              path: roiWKTPath,
               transform_matrix: svgMatrixToDB(roiMatrix),
               scroll_version_id: scroll_version_id[index],
               values_set: 1,
@@ -451,7 +451,7 @@ export default class Corpus {
           } else {
             payload.requests.push({
               sign_char_roi_id: id,
-              path: roiGeoJSONPath,
+              path: roiWKTPath,
               transform_matrix: svgMatrixToDB(roiMatrix),
               scroll_version_id: scroll_version_id[index],
               values_set: 1,
@@ -460,7 +460,9 @@ export default class Corpus {
             })
           }
         })
-        console.log(JSON.stringify(payload))
+        axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
+          console.log(res.data)
+        })
       } else
         reject(
           'The sign_char_roi_id, roi, artefact_position_id, and scroll_version_id inputs were of different lengths.'

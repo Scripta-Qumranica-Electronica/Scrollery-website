@@ -158,13 +158,14 @@ export default {
 
     deselectROI() {
       const id = uuid()
+      const roi = {
+        x: this.selectedBox.x * 2,
+        y: this.selectedBox.y * 2,
+        width: this.selectedBox.width * 2,
+        height: this.selectedBox.height * 2,
+      }
       this.corpus
-        .setRoiOfArtefact(
-          id,
-          this.selectedBox,
-          this.$route.params.artID,
-          this.$route.params.scrollVersionID
-        )
+        .setRoiOfArtefact(id, roi, this.$route.params.artID, this.$route.params.scrollVersionID)
         .then(res => {
           console.log(this.corpus.rois.get(id).toJS())
         })
