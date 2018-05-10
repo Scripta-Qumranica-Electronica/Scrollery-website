@@ -2,7 +2,7 @@ import extendModel from './extendModel.js'
 
 /**
  * Default values for a new sign object
- * 
+ *
  * @static
  * @constant
  */
@@ -15,15 +15,15 @@ const defaults = {
   cols: [],
   imageReferences: [],
   artefacts: [],
-  rois: []
+  rois: [],
 }
 
 /**
  * Manage all the data related to a sign
- * 
+ *
  * Signs are immutable, and any mutations create new signs
- * 
+ *
  * @class
  * @extends Record
  */
-export default class Combination extends extendModel(defaults) { } 
+export default class Combination extends extendModel(defaults) {}

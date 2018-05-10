@@ -91,10 +91,19 @@ export default {
       this.$store.commit('delWorking')
       if (this.$route.params.scrollID && this.$route.params.scrollID !== '~') {
         this.$store.commit('addWorking')
-        this.corpus.populateColumnsOfCombination(
-          this.$route.params.scrollID,
-          this.$route.params.scrollVersionID
-        )
+        this.corpus
+          .populateColumnsOfCombination(
+            this.$route.params.scrollID,
+            this.$route.params.scrollVersionID
+          )
+          .then(res => {
+            if (this.$route.params.colID !== '~') {
+              this.corpus.populateRoiOfCol(
+                this.$route.params.colID,
+                this.$route.params.scrollVersionID
+              )
+            }
+          })
         this.corpus
           .populateImageReferencesOfCombination(
             this.$route.params.scrollID,

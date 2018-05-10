@@ -327,7 +327,7 @@ export default class Corpus {
 
               let colRecord = this.cols.get(currentColID).toJS()
               colRecord.rois = rois
-              this.cols.set(currentColID, new this.cols.model(imageRefRecord))
+              this.cols.set(currentColID, new this.cols.model(colRecord))
 
               let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
               combinationRecord.rois = rois
