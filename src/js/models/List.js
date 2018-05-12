@@ -159,10 +159,8 @@ class List {
    */
   insert(item, index = -1) {
     index === -1
-      ? // insert a item at the end of no number specified
-        this.push(item)
-      : // otherwise, insert at specified location
-        this.splice(index, item)
+      ? this.push(item) // insert a item at the end of no number specified
+      : this.splice(index, item) // otherwise, insert at specified location
   }
 
   /**
@@ -295,6 +293,15 @@ class List {
    * @returns {array} the items
    */
   items() {
+    return this._items
+  }
+
+  /**
+   * Expose the list items as a plain array
+   *
+   * @returns {array} the items
+   */
+  toArray() {
     return this._items
   }
 }

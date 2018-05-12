@@ -1,8 +1,10 @@
 import extendModel from './extendModel.js'
+import Attribute from './Attribute.js'
+import AttributeList from './AttributeList.js'
 
 /**
  * Default values for a new sign object
- * 
+ *
  * @static
  * @constant
  */
@@ -31,23 +33,67 @@ const defaults = {
 
   // > line
   line_name: '',
-  line_id: 0
+  line_id: 0,
+
+  // > attributes
+  attributes: new AttributeList(),
 }
 
 /**
  * Manage all the data related to a sign
- * 
+ *
  * Signs are immutable, and any mutations create new signs
- * 
+ *
  * @class
  * @extends Record
  */
 export default class Sign extends extendModel(defaults) {
-
   constructor(attrs) {
     attrs.id = attrs.sign_id
-    attrs.is_whitespace = (!attrs.sign || attrs.sign === '' || attrs.sign === ' ' || attrs.sign === '&nbsp;' || attrs.sign === '·')
+    attrs.is_whitespace =
+      !attrs.sign ||
+      attrs.sign === '' ||
+      attrs.sign === ' ' ||
+      attrs.sign === '&nbsp;' ||
+      attrs.sign === '·'
+
+    // coerce attributes to the a List
+    if (attrs.attributes && !(attrs.attributes instanceof AttributeList)) {
+      attrs.attributes = new AttributeList(
+        {
+          sign_id: attrs.sign_id,
+        },
+        attrs.attributes
+      )
+    }
+
     super(attrs)
+  }
+
+  /**
+   * Add an attribute to the AttributeList
+   *
+   * @param {Attribute|object} attribute  The attribute to add
+   */
+  addAttribute(attribute) {
+    this.attributes.push(attribute instanceof Attribute ? attribute : new Attribute(attribute))
+    return this.attributes.items()
+  }
+
+  /**
+   * Remove an attribute from the Sign
+   *
+   * @param {string} attributeID  The attribute ID to remove from the AttributeList
+   */
+  removeAttribute(attributeID) {
+    // safeguard
+    if (attributeID == null) {
+      return
+    }
+
+    // determine the index of the item to remove
+    let i = this.attributes.findIndex(attributeID)
+    return i >= 0 ? this.attributes.delete(i) : null
   }
 
   /**
@@ -72,14 +118,14 @@ export default class Sign extends extendModel(defaults) {
   }
 
   /**
-   * @returns {string} 
+   * @returns {string}
    */
   toString() {
     return this.is_whitespace ? ' ' : this.sign
   }
 
   /**
-   * @returns {string} 
+   * @returns {string}
    */
   toDOMString() {
     return this.is_whitespace ? '&nbsp;' : this.sign

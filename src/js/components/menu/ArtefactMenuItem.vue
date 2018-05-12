@@ -40,7 +40,7 @@ export default {
           params: {
             scrollID: this.scrollID,
             scrollVersionID: this.scrollVersionID,
-            colID: '~',
+            colID: params.colID,
             imageID: this.imageID,
             artID: this.artefactID,
           },

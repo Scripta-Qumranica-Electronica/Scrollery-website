@@ -22,8 +22,8 @@ describe('LineModel', () => {
     it('should insert signs with the line attributes attached', () => {
       line.push(sign)
 
-      // under the hood, it creates a new instance with the modification
-      expect(line.get(0)).not.to.equal(sign)
+      // under the hood, it modifies the sign instance with new attributes
+      expect(line.get(0)).to.equal(sign)
 
       // and copies in the line.id value
       expect(line.get(0).line_id).to.equal(line.id)

@@ -31,8 +31,8 @@ export default {
             scrollID: this.scrollID,
             scrollVersionID: this.scrollVersionID,
             colID: this.columnID,
-            imageID: '~',
-            artID: '~',
+            imageID: params.imageID,
+            artID: params.artID,
           },
         })
       }

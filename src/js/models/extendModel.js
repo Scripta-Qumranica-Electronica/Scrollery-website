@@ -1,4 +1,4 @@
-import { Record } from 'immutable'
+import Record from './Record'
 import uuid from 'uuid/v1'
 import namespacedUuid from 'uuid/v3'
 
@@ -67,23 +67,6 @@ const makeModel = (defaultValues = {}) => {
      */
     getID() {
       return this.id
-    }
-
-    /**
-     * @public
-     * @instance
-     *
-     * @param  {object}    attrs A set of attributes to apply to the copy
-     * @return {BaseModel}       The new base model extended with new props
-     */
-    extend(attrs = {}) {
-      attrs = {
-        __persisted: Object.keys(attrs).length > 1,
-        ...this.toJS(), // only enumerable, own properties
-        ...attrs,
-      }
-
-      return new this.constructor(attrs)
     }
   }
 
