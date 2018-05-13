@@ -48,7 +48,7 @@ const defaults = {
  * @extends Record
  */
 export default class Sign extends extendModel(defaults) {
-  constructor(attrs) {
+  constructor(attrs, isPersisted) {
     attrs.id = attrs.sign_id
     attrs.is_whitespace =
       !attrs.sign ||
@@ -67,7 +67,7 @@ export default class Sign extends extendModel(defaults) {
       )
     }
 
-    super(attrs)
+    super(attrs, isPersisted)
   }
 
   /**
