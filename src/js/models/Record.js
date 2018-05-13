@@ -139,12 +139,16 @@ function Record(defaults = {}) {
               return values[k].value
             },
             set(value) {
+              // disallow null/undefined -- use default instead
+              // note that non-strict equality == matches null and undefined
+              value = value == null ? props[k] : value
+
               // ensure type-safety of the property set. It must match the default
               if (typeof value !== typeof defaults[k]) {
                 throw new Error(
-                  `Attempting to set property ${key} on the Record with ${value} which is of type ${typeof value}, but expected ${
-                    defaults[k]
-                  }`
+                  `Attempting to set property ${key} on the Record with ${value} which is of type ${typeof value}, but expected ${typeof defaults[
+                    k
+                  ]}`
                 )
               }
 
@@ -152,9 +156,8 @@ function Record(defaults = {}) {
               // otherwise, retain the current value of __persisted
               this.__persisted = value !== values[k].value ? false : this.__persisted
 
-              // disallow null/undefined -- use default instead
-              // not that non-strict equality == matches null and undefined
-              values[k].value = value == null ? props[k] : value
+              // apply the value
+              values[k].value = value
             },
             enumerable: true,
           }
