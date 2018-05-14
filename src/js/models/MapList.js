@@ -60,7 +60,7 @@ class MapList {
             // keys are converted to strings.
             let results = []
             res.data.replies.forEach(reply => {
-              if (!reply.error) {
+              if (reply.error) {
                 return
               }
 
