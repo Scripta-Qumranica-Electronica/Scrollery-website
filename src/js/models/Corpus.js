@@ -70,7 +70,7 @@ export default class Corpus {
               reply.results.forEach(item => {
                 if (item[this.cols.idKey]) cols.push(item[this.cols.idKey])
               })
-              let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+              let combinationRecord = this.combinations.get(currentScrollVersionID)
               combinationRecord.cols = cols
               this.combinations.set(
                 currentScrollVersionID,

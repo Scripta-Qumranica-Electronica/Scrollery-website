@@ -1,5 +1,9 @@
 import Record from './Record'
 
+const baseDefaults = {
+  id: 0,
+}
+
 /**
  *
  * @param {object} defaultValues  Default values for a class that extends
@@ -9,10 +13,13 @@ import Record from './Record'
 const makeModel = (defaultValues = {}) => {
   /**
    * @class
-   * @extends Immutabe.Record
+   * @extends Record
    */
-  class BaseModel extends Record({ id: 0, ...defaultValues }) {
+  class BaseModel extends Record({ ...baseDefaults, ...defaultValues }) {
     /**
+     * @public
+     * @instance
+     *
      * @returns {number} the record ID
      */
     getID() {

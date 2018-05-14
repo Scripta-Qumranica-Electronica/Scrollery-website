@@ -5,7 +5,7 @@ import Column from '~/models/Column.js'
 export default ({ signs = 20, props = {} } = {}) => {
   props = Object.assign(
     {
-      id: faker.random.uuid(),
+      id: faker.random.number(),
       name: faker.random.word(),
     },
     props
@@ -34,7 +34,7 @@ export default ({ signs = 20, props = {} } = {}) => {
     let sign = signFactory.model({
       sign_id: nextSignID,
       prev_sign_id: previousSignId,
-      next_sign_id: faker.random.uuid(),
+      next_sign_id: faker.random.number(),
       line_id: lineID,
       line_name: lineName,
       col_id: col.getID(),
