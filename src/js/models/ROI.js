@@ -7,15 +7,10 @@ import extendModel from './extendModel.js'
  * @constant
  */
 const defaults = {
-  name: '',
-  scroll_id: 0,
-  scroll_version_id: 0,
-  locked: 0,
-  user_id: 0,
-  cols: [],
-  imageReferences: [],
-  artefacts: [],
-  rois: [],
+  sign_char_roi_id: 0,
+  sign_char_id: 0,
+  path: '',
+  transform_matrix: '',
 }
 
 /**
@@ -26,4 +21,4 @@ const defaults = {
  * @class
  * @extends Record
  */
-export default class Combination extends extendModel(defaults) {}
+export default class ROI extends extendModel(defaults) {}

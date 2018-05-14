@@ -65,7 +65,8 @@ export default {
               {
                 id: scrollVersionID,
               },
-              res.data.results
+              res.data.results,
+              true
             )
           } else {
             throw new Error('Unable to retrieve text data')

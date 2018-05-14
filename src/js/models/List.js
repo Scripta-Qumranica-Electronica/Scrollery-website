@@ -15,7 +15,7 @@ class List {
    * @param {object={}} [attributes] List attributes
    * @param {array=[]}  [items]      An initial array of items for the list
    */
-  constructor(attributes = {}, items = []) {
+  constructor(attributes = {}, items = [], isPersisted = false) {
     // todo: safety to ensure props not overwritten
     Object.assign(
       this,
@@ -25,15 +25,15 @@ class List {
 
         // create a list-namespaced uid for the model
         __uuid: namespacedUuid(`${attributes.id || Date.now()}`, List.namespace()),
-        __persisted: false,
+        __persisted: isPersisted,
       },
       attributes
     )
 
     this._items = []
     this.__changes = {
-      additions: [],
-      deletions: [],
+      additions: {},
+      deletions: {},
     }
 
     // insert each item in turn
@@ -46,8 +46,33 @@ class List {
     })
   }
 
+  /**
+   * @public
+   * @instance
+   *
+   * @return {object} The changes object with additions/deletions sub-map
+   */
   getChanges() {
-    return this.__changes
+    return {
+      updates: this._items.reduce((acc, item) => {
+        if (item.hasChanges()) {
+          acc[item.getUUID()] = item
+        }
+        return acc
+      }, {}),
+      ...this.__changes,
+    }
+  }
+
+  markAllPersisted(persistedMap) {
+    this.__changes = {
+      additions: {},
+      deletions: {},
+    }
+
+    this.forEach(item => {
+      item.persisted(persistedMap[item.getUUID()])
+    })
   }
 
   /**
@@ -117,37 +142,32 @@ class List {
   }
 
   /**
+   * The List has changes if it has any unpersisted sub-items with changes
+   * or itself has additions/deletions
+   *
    * @public
    * @instance
+   *
+   * @return {boolean} whether or not the list (including sub-items) has changes
    */
   hasChanges() {
-    let hasChanges = false
-    for (let i = 0, item; (item = this._items[i]); i++) {
-      if (item.hasChanges()) {
-        hasChanges = true
-        break
-      }
-    }
-    return hasChanges
-  }
+    // initial value is set to if the list itself has changes
+    let hasChanges =
+      Object.keys(this.__changes.additions).length > 0 ||
+      Object.keys(this.__changes.deletions).length > 0
 
-  /**
-   * @public
-   * @instance
-   */
-  gatherUnpersistedChanges() {
-    const changes = {
-      additions: {},
-      deletions: {},
-      modified: {},
-    }
-    for (let i = 0; (item = this._items[i]); i++) {
-      if (item.hasChanges()) {
-        hasChanges = true
-        break
+    // the List doesn't have either additions or deletions. Check the sub-items.
+    if (!hasChanges) {
+      for (let i = 0, item; (item = this._items[i]); i++) {
+        if (item.hasChanges()) {
+          hasChanges = true
+          break
+        }
       }
     }
-    return changes
+
+    // finish
+    return hasChanges
   }
 
   /**
@@ -159,10 +179,8 @@ class List {
    */
   insert(item, index = -1) {
     index === -1
-      ? // insert a item at the end of no number specified
-        this.push(item)
-      : // otherwise, insert at specified location
-        this.splice(index, item)
+      ? this.push(item) // insert a item at the end of no number specified
+      : this.splice(index, item) // otherwise, insert at specified location
   }
 
   /**
@@ -174,6 +192,10 @@ class List {
   push(item) {
     if (!(item instanceof this.constructor.getModel())) {
       throw new TypeError(`Expect an instance of ${this.constructor.getModel().name} in push`)
+    }
+
+    if (item.hasChanges()) {
+      this.__changes.additions[item.getUUID()] = item
     }
 
     this._items.push(item)
@@ -193,7 +215,10 @@ class List {
       )
     }
 
-    this.__changes.additions[item.getID()] = item
+    if (item.hasChanges()) {
+      this.__changes.additions[item.getUUID()] = item
+    }
+
     this._items.splice(index, 0, item)
   }
 
@@ -295,6 +320,15 @@ class List {
    * @returns {array} the items
    */
   items() {
+    return this._items
+  }
+
+  /**
+   * Expose the list items as a plain array
+   *
+   * @returns {array} the items
+   */
+  toArray() {
     return this._items
   }
 }

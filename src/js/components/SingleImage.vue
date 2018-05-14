@@ -134,7 +134,7 @@ export default {
       zoom: 0.5,
       scale: 0.2,
       selectedImage: undefined,
-      viewMode: 'ART',
+      viewMode: 'NONE',
       drawingMode: 'draw',
       brushCursorSize: 20,
       clipMask: undefined,
@@ -251,8 +251,8 @@ export default {
 
       // Load new artefact ID if there is one
       if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
+        this.viewMode = 'ART'
         if (to.params.artID.toString().indexOf('name') !== -1) {
-          this.viewMode = 'ART'
           this.artefact = 'new'
           this.artName = to.params.artID.split('name-')[1]
         } else {

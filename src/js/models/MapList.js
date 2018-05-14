@@ -1,4 +1,5 @@
-import { OrderedMap, Record } from 'immutable'
+import { OrderedMap } from 'immutable'
+import Record from './Record'
 import axios from 'axios'
 
 /**
@@ -59,6 +60,10 @@ class MapList {
             // keys are converted to strings.
             let results = []
             res.data.replies.forEach(reply => {
+              if (!reply.error) {
+                return
+              }
+
               reply.results.forEach(item => {
                 let record
                 if (this.get(item[this.idKey]) && this.get(item[this.idKey]).toJS() !== item) {

@@ -1,4 +1,6 @@
 import Sign from '~/models/Sign.js'
+import Attribute from '~/models/Attribute.js'
+import AttributeList from '~/models/AttributeList.js'
 
 describe('Sign', () => {
   it('should be constructible', () => {
@@ -87,12 +89,12 @@ describe('Sign', () => {
       sign = new Sign(attrs)
     })
 
-    it('should expose an extend method that returns a new sign with the extended attributes', () => {
+    it('should expose an extend method that extends it with new attributes', () => {
       let newSign = sign.extend({
         col_id: 1,
       })
       expect(newSign instanceof Sign).to.equal(true)
-      expect(newSign).not.to.equal(sign)
+      expect(newSign).to.equal(sign)
       expect(newSign.reconstructed()).to.equal(sign.reconstructed())
       expect(newSign.col_id).to.equal(1)
     })
@@ -165,4 +167,54 @@ describe('Sign', () => {
       })
     })
   })
+
+  describe('attributes', () => {
+    let sign,
+    attributeID = 12345,
+    attrs = () =>  ({
+      sign_id: 1,
+      sign: 'א',
+      is_reconstructed: false,
+      attributes: [
+        new Attribute({
+          attribute_id: attributeID,
+          attribute_value: 'some_value',
+          attribute_description: 'attribute description'
+        })
+      ]
+    })
+    beforeEach(() => {
+      sign = new Sign(attrs())
+    })
+
+    it('should create a List from the raw attributes', () => {
+      expect((sign.attributes instanceof AttributeList)).to.equal(true)
+    })
+
+    it('should accept a new attribute as an object', () => {
+      sign.addAttribute({
+        attribute_id: 12346,
+        attribute_value: 'some_value',
+        attribute_description: 'attribute description'
+      })
+      expect(sign.attributes.length).to.equal(2)
+    })
+
+    it('should accept a new attribute as an instance of Attribute', () => {
+      const attribute = new Attribute({
+        attribute_id: 12346,
+        attribute_value: 'some_value',
+        attribute_description: 'attribute description'
+      })
+      sign.addAttribute(attribute)
+      expect(sign.attributes.length).to.equal(2)
+      expect(sign.attributes.get(1)).to.equal(attribute)
+    })
+
+    it('should remove an attribute by id', () => {
+      sign.removeAttribute(attributeID)
+      expect(sign.attributes.length).to.equal(0)
+    })
+  })
+
 })

@@ -8,22 +8,22 @@ export default ({ signsCount = 20, colProps = {} }) => {
   let signs = []
   colProps = Object.assign(
     {
-      id: faker.random.uuid(),
+      id: faker.random.number(),
       name: faker.random.word(),
     },
     colProps
   )
 
   let previousSignId = '',
-    nextSignID = faker.random.uuid(),
-    lineID = faker.random.uuid(),
+    nextSignID = faker.random.number(),
+    lineID = faker.random.number(),
     lineName = faker.random.word(),
     signsInLine = 0
   for (var i = 0; i < signsCount; i++) {
     // determine if we should add a new line:
     // algorithm: if > 15 signs and faker says yes.
     if (signsInLine > 15 && faker.random.boolean()) {
-      lineID = faker.random.uuid()
+      lineID = faker.random.number()
       lineName = faker.random.word()
       signsInLine = 0
     }
@@ -35,7 +35,7 @@ export default ({ signsCount = 20, colProps = {} }) => {
     let sign = signFactory.plain({
       sign_id: nextSignID,
       prev_sign_id: previousSignId,
-      next_sign_id: faker.random.uuid(),
+      next_sign_id: faker.random.number(),
       line_id: lineID,
       line_name: lineName,
       col_id: colProps.id,

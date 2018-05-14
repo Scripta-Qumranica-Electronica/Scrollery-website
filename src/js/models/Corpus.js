@@ -3,6 +3,8 @@ import ImageReferences from './imageReferences.js'
 import Cols from './Cols.js'
 import Images from './Images.js'
 import Artefacts from './Artefacts.js'
+import ROIs from './ROIs.js'
+import { dbMatrixToSVG, svgMatrixToDB } from '~/utils/VectorFactory.js'
 import axios from 'axios'
 
 /* TODO I ignore this for testing until I decide on
@@ -34,6 +36,7 @@ export default class Corpus {
     this.cols = new Cols(this.session_id)
     this.images = new Images(this.session_id)
     this.artefacts = new Artefacts(this.session_id)
+    this.rois = new ROIs(this.session_id)
   }
 
   populateCombinations() {
@@ -67,7 +70,7 @@ export default class Corpus {
               reply.results.forEach(item => {
                 if (item[this.cols.idKey]) cols.push(item[this.cols.idKey])
               })
-              let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+              let combinationRecord = this.combinations.get(currentScrollVersionID)
               combinationRecord.cols = cols
               this.combinations.set(
                 currentScrollVersionID,
@@ -257,36 +260,213 @@ export default class Corpus {
     })
   }
 
+  populateRoiOfCombintation(scrollVersionID) {
+    if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
+    return new Promise((resolve, reject) => {
+      let payload = { requests: [] }
+      scrollVersionID.forEach((id, index) => {
+        payload.requests.push({
+          scroll_version_id: scrollVersionID[index],
+          transaction: 'getRoiOfCombination',
+        })
+      })
+      this.rois
+        .populate(payload)
+        .then(res => {
+          res.forEach((reply, index) => {
+            const currentScrollVersionID = scrollVersionID[index] >>> 0
+            let rois = []
+            reply.results.forEach(roi => {
+              if (roi[this.rois.idKey]) rois.push(roi[this.rois.idKey])
+            })
+
+            let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+            combinationRecord.rois = rois
+            this.combinations.set(
+              currentScrollVersionID,
+              new this.combinations.model(combinationRecord)
+            )
+          })
+          resolve(res)
+        })
+        .catch(reject)
+    })
+  }
+
+  populateRoiOfCol(colID, scrollVersionID) {
+    if (colID.constructor !== Array) colID = [colID]
+    // If scrollVersionID is not an array, convert it into one matching the
+    // length of imageReferenceID.
+    if (scrollVersionID.constructor !== Array) {
+      const tempScrollVersionID = scrollVersionID
+      scrollVersionID = []
+      colID.forEach(ref => {
+        scrollVersionID.push(tempScrollVersionID)
+      })
+    }
+    return new Promise((resolve, reject) => {
+      if (colID.length === scrollVersionID.length) {
+        let payload = { requests: [] }
+        colID.forEach((id, index) => {
+          payload.requests.push({
+            col_id: id,
+            scroll_version_id: scrollVersionID[index],
+            transaction: this.rois.standardTransaction,
+          })
+        })
+        this.rois
+          .populate(payload)
+          .then(res => {
+            res.forEach((reply, index) => {
+              const currentScrollVersionID = scrollVersionID[index] >>> 0
+              const currentColID = colID[index] >>> 0
+              let rois = []
+              reply.results.forEach(roi => {
+                if (roi[this.rois.idKey]) rois.push(roi[this.rois.idKey])
+              })
+
+              let colRecord = this.cols.get(currentColID).toJS()
+              colRecord.rois = rois
+              this.cols.set(currentColID, new this.cols.model(colRecord))
+
+              let combinationRecord = this.combinations.get(currentScrollVersionID).toJS()
+              combinationRecord.rois = rois
+              this.combinations.set(
+                currentScrollVersionID,
+                new this.combinations.model(combinationRecord)
+              )
+            })
+            resolve(res)
+          })
+          .catch(reject)
+      } else reject('The colID and scrollVersionID inputs were of different lengths.')
+    })
+  }
+
   cloneScroll(scroll_version_id) {
     const payload = {
       SESSION_ID: this.session_id,
-      requests: [
-        {
-          scroll_version_id: scroll_version_id,
-          transaction: 'copyCombination',
-        },
-      ],
+      scroll_version_id: scroll_version_id,
+      transaction: 'copyCombination',
     }
     axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
-      if (res.status === 200 && res.data.replies) {
+      if (res.status === 200 && res.data && res.data.scroll_data) {
         // We can store hashes for the returned data
         // in the future, so we can avoid unnecessary
         // data transmission.
         // this._hash = res.data.hash
 
-        res.data.replies.forEach(reply => {
-          reply.results.forEach(item => {
-            let record = new this.combinations.model(item)
-            this.combinations.insert(record, this.combinations.getFirstKey())
-            this.populateColumnsOfCombination(item.scroll_id, item.scroll_version_id)
-            this.populateImageReferencesOfCombination(item.scroll_id, item.scroll_version_id).then(
-              res => {
-                this.populateArtefactsOfCombination(item.scroll_id, item.scroll_version_id)
-              }
-            )
-          })
+        let record = new this.combinations.model(res.data.scroll_data)
+        this.combinations.insert(record, this.combinations.getFirstKey())
+        this.populateColumnsOfCombination(
+          res.data.scroll_data.scroll_id,
+          res.data.scroll_data.scroll_version_id
+        )
+        this.populateImageReferencesOfCombination(
+          res.data.scroll_data.scroll_id,
+          res.data.scroll_data.scroll_version_id
+        ).then(res => {
+          this.populateArtefactsOfCombination(
+            res.data.scroll_data.scroll_id,
+            res.data.scroll_data.scroll_version_id
+          )
         })
       }
+    })
+  }
+
+  setRoiOfArtefact(sign_char_roi_id, roi, artefact_position_id, scroll_version_id) {
+    if (sign_char_roi_id.constructor !== Array) sign_char_roi_id = [sign_char_roi_id]
+    if (roi.constructor !== Array) roi = [roi]
+    // If scroll_version_id is not an array, convert it into one matching the
+    // length of imageReferenceID.
+    if (scroll_version_id.constructor !== Array) {
+      const tempScrollVersionID = scroll_version_id
+      scroll_version_id = []
+      sign_char_roi_id.forEach(ref => {
+        scroll_version_id.push(tempScrollVersionID)
+      })
+    }
+    if (artefact_position_id.constructor !== Array) {
+      const tempArtefactPositionID = artefact_position_id
+      artefact_position_id = []
+      sign_char_roi_id.forEach(ref => {
+        artefact_position_id.push(tempArtefactPositionID)
+      })
+    }
+
+    return new Promise((resolve, reject) => {
+      if (
+        sign_char_roi_id.length === roi.length &&
+        sign_char_roi_id.length === scroll_version_id.length &&
+        scroll_version_id.length === artefact_position_id.length
+      ) {
+        let payload = { requests: [], SESSION_ID: this.session_id }
+        sign_char_roi_id.forEach((id, index) => {
+          let currentROI = roi[index]
+          let roiMatrix = dbMatrixToSVG(
+            this.artefacts._items.toJS()[artefact_position_id[index]].transform_matrix
+          )
+          roiMatrix[2] = roiMatrix[2] + currentROI.x
+          roiMatrix[5] = roiMatrix[5] + currentROI.y
+          const roiGeoJSONPath = {
+            type: 'Polygon',
+            coordinates: [
+              [0, 0],
+              [currentROI.width, 0],
+              [currentROI.width, currentROI.height],
+              [0, currentROI.height],
+              [0, 0],
+            ],
+          }
+          const roiWKTPath = `Polygon((0 0, ${currentROI.width} 0, ${currentROI.width} ${
+            currentROI.height
+          }, 0 ${currentROI.height}, 0 0))`
+          // Create the roi locally
+          let roiRecord
+          if (!this.rois.get(id)) {
+            roiRecord = new this.rois.model({
+              sign_char_roi_id: id,
+              sign_char_id: 0,
+              path: roiWKTPath,
+              transform_matrix: roiMatrix,
+            })
+          } else {
+            roiRecord = this.rois.get(id).toJS()
+            roiRecord.path = roiWKTPath
+            roiRecord.transform_matrix = roiMatrix
+          }
+          this.rois.set(id, roiRecord)
+
+          // Create the roi on the server database
+          if (isNaN(sign_char_roi_id)) {
+            payload.requests.push({
+              path: roiWKTPath,
+              transform_matrix: svgMatrixToDB(roiMatrix),
+              scroll_version_id: scroll_version_id[index],
+              values_set: 1,
+              exceptional: 0,
+              transaction: 'addRoiToScroll',
+            })
+          } else {
+            payload.requests.push({
+              sign_char_roi_id: id,
+              path: roiWKTPath,
+              transform_matrix: svgMatrixToDB(roiMatrix),
+              scroll_version_id: scroll_version_id[index],
+              values_set: 1,
+              exceptional: 0,
+              transaction: 'changeROI',
+            })
+          }
+        })
+        axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
+          console.log(res.data)
+        })
+      } else
+        reject(
+          'The sign_char_roi_id, roi, artefact_position_id, and scroll_version_id inputs were of different lengths.'
+        )
     })
   }
 }

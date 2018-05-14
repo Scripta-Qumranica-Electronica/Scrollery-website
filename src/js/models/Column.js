@@ -15,25 +15,43 @@ class Column extends List {
   }
 
   /**
-   * Collapse line changes into array's of signs
+   * Collapse line changes a set of objects
    *
    * @return {object} the changes object with additions, deletions, updates
    */
   getChanges() {
     const signs = {
-      additions: [],
-      deletions: [],
-      updates: [],
+      additions: {},
+      deletions: {},
+      updates: {},
     }
 
     if (this.hasChanges()) {
       this.forEach(line => {
         let { additions, deletions } = line.getChanges()
-        signs.additions = signs.additions.concat(additions)
-        signs.deletions = signs.deletions.concat(deletions)
+        signs.additions = {
+          ...signs.additions,
+          ...additions,
+        }
+        signs.deletions = {
+          ...signs.deletions,
+          ...deletions,
+        }
       })
     }
 
+    return signs
+  }
+
+  flattenToSignStream() {
+    const signs = []
+    signs.map = {}
+    this.forEach(line => {
+      line.forEach(sign => {
+        signs.map[sign.getUUID()] = signs.length
+        signs.push(sign)
+      })
+    })
     return signs
   }
 
@@ -43,21 +61,25 @@ class Column extends List {
    *
    * @param {object|Sign} sign sign to insert
    */
-  insertSign(sign) {
+  insertSign(sign, isPersisted) {
     if (!(sign instanceof Sign)) {
-      sign = new Sign(sign)
+      sign = new Sign(sign, isPersisted)
     }
 
     let line = this.find(line => line.id === sign.line_id)
 
     // Lazy create the line model from the sign.
     if (!line) {
-      line = new Line({
-        id: sign.line_id,
-        name: sign.line_name,
-        col_id: this.id,
-        col_name: this.name,
-      })
+      line = new Line(
+        {
+          id: sign.line_id,
+          name: sign.line_name,
+          col_id: this.id,
+          col_name: this.name,
+        },
+        [],
+        isPersisted
+      )
       this.insert(line)
     }
     line.insert(sign)
