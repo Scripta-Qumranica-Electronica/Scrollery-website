@@ -144,13 +144,13 @@ function Record(defaults = {}) {
               value = value == null ? props[k] : value
 
               // ensure type-safety of the property set. It must match the default
-              if (typeof value !== typeof defaults[k]) {
-                throw new Error(
-                  `Attempting to set property ${key} on the Record with ${value} which is of type ${typeof value}, but expected ${typeof defaults[
-                    k
-                  ]}`
-                )
-              }
+              // if (typeof value !== typeof defaults[k]) {
+              //   throw new Error(
+              //     `Attempting to set property ${key} on the Record with ${value} which is of type ${typeof value}, but expected ${typeof defaults[
+              //       k
+              //     ]}`
+              //   )
+              // }
 
               // only toggle off persisted if it the value doesn't match
               // otherwise, retain the current value of __persisted
