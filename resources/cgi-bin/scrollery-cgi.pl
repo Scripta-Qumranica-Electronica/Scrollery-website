@@ -35,6 +35,9 @@ sub processCGI {
 				foreach my $request (@{$json_post->{requests}}) {
 					# print "{\"results\":";
 					if (defined $request->{transaction} && defined $::{$request->{transaction}}) {
+						# if (defined $request->{scroll_version_id}) {
+						# 	$cgi->set_scrollversion($request->{scroll_version_id});
+						# }
 						$::{$request->{transaction}}($cgi, $request);
 					} else {
 						print encode_json({[{'error' => "Transaction type '" . $request->{transaction} . "' not understood."}]});
@@ -55,7 +58,10 @@ sub processCGI {
 				while (my ($key, $value) = each (%{$json_post->{requests}})) {
 					print "{\"$key\":";
 					if (defined $value->{transaction} && defined $::{$value->{transaction}}) {
-						$::{$value->{transaction}}($cgi, $value, $key, $lastItem);
+						# if (defined $value->{scroll_version_id}) {
+						# 	$cgi->set_scrollversion($value->{scroll_version_id});
+						# }
+						$::{$value->{transaction}}($cgi, $value);
 					} else {
 						print "{'error': 'Transaction type $value->{transaction} not understood.'}";
 					}
@@ -69,6 +75,9 @@ sub processCGI {
 		}
 	} else {
 		if (defined $json_post->{transaction} && defined $::{$json_post->{transaction}}) {
+			# if (defined $json_post->{scroll_version_id}) {
+			# 	$cgi->set_scrollversion($json_post->{scroll_version_id});
+			# }
 			$::{$json_post->{transaction}}($cgi, $json_post);
 		} else {
 			print encode_json({'error', "Transaction type '" . $json_post->{transaction} . "' not understood."});
@@ -894,25 +903,6 @@ sub setArtRotation {
 	return;
 }
 
-sub removeSigns {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $counter = 1;
-	my $repeatLength = scalar @{$json_post->{sign_id}};
-	$cgi->set_scrollversion($json_post->{scroll_version_id});
-	print "[{";
-
-	foreach my $sign_id (@{$json_post->{sign_id}}) {
-		$cgi->remove_sign($sign_id);
-		print "\"$sign_id\":\"deleted\"";
-		if ($counter != $repeatLength) {
-			print "},{";
-			$counter++;
-		}
-	}
-
-	print "}]";
-}
-
 sub insertSigns() {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $counter = 1;
@@ -927,6 +917,25 @@ sub insertSigns() {
 		}
 		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $sign->{next_sign_id}, $prev_sign_id);
 		print "\"$sign->{uuid}\":$prev_sign_id";
+		if ($counter != $repeatLength) {
+			print "},{";
+			$counter++;
+		}
+	}
+
+	print "}]";
+}
+
+sub removeSigns {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my $counter = 1;
+	my $repeatLength = scalar @{$json_post->{sign_id}};
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	print "[{";
+
+	foreach my $sign_id (@{$json_post->{sign_id}}) {
+		$cgi->remove_sign($sign_id);
+		print "\"$sign_id\":\"deleted\"";
 		if ($counter != $repeatLength) {
 			print "},{";
 			$counter++;
@@ -1034,6 +1043,22 @@ sub removeSignChar() {
 	$cgi->remove_sign_char($json_post->{sign_char_id});
 }
 
+#Give a sign_char_id, an attribute_id, and a comment.
+#I don't know yet what it returns.
+sub addSignCharCommentary() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->set_sign_char_commentary($json_post->{sign_char_id}, $json_post->{attribute_id}, $json_post->{commentary});
+}
+
+#Give a sign_char_commentary_id.
+#I don't know yet what it returns.
+sub removeSignCharCommentary() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->remove_sign_char_commentary($json_post->{sign_char_commentary_id});
+}
+
 #Give the sign_char_id, a GEOJSON poly, a JSON transform_matrix for the position,
 #a values_set to tell it a human meant to set the value, and I am not sure what exceptional
 #is for.  If you don't provide a sign_char_id, the subroutine automatically gets the lowest
@@ -1065,6 +1090,14 @@ MYSQL
 		$json_post->{exceptional}
 	);
 	print "{\"sign_char_id\": $sign_char_id}";
+}
+
+#Give a sign_char_roi_id.
+#I don't know yet what it returns.
+sub removeROI() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->remove_roi($json_post->{sign_char_roi_id});
 }
 
 sub getRoiOfCol() {
