@@ -64,11 +64,19 @@ class List {
     }
   }
 
-  markAllPersisted(persistedMap) {
-    this.__changes = {
-      additions: {},
-      deletions: {},
+  /**
+   * Once a list has been persisted, this method receives an
+   * object with all of the updates.
+   *
+   * @param {*} persistedMap
+   */
+  persisted(persistedMap = {}) {
+    // remove each deleted item
+    for (let key in persistedMap.deletions) {
+      delete this.__changes.deletions[key]
     }
+
+    // TODO: updates, additions
 
     this.forEach(item => {
       item.persisted(persistedMap[item.getUUID()])

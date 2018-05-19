@@ -29,20 +29,21 @@ class Column extends List {
     if (this.hasChanges()) {
       this.forEach(line => {
         let { additions, deletions } = line.getChanges()
-        signs.additions = {
-          ...signs.additions,
-          ...additions,
-        }
-        signs.deletions = {
-          ...signs.deletions,
-          ...deletions,
-        }
+        Object.assign(signs.additions, additions || {})
+        Object.assign(signs.deletions, deletions || {})
       })
     }
 
     return signs
   }
 
+  /**
+   * Flatten the column into an flat array.
+   *
+   * @todo Implement an ordered, iteratable map or the like
+   *
+   * @return {array.<Sign>} An array of sign items
+   */
   flattenToSignStream() {
     const signs = []
     signs.map = {}
