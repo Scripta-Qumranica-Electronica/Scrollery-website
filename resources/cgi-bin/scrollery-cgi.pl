@@ -22,7 +22,7 @@ sub processCGI {
 		-charset =>  'utf-8',
 	);
 
-	my $json_post = decode_json(''.$cgi->param('POSTDATA'));
+	my $json_post = $cgi->{CGIDATA};#decode_json(encode("utf8", ''.$cgi->param('POSTDATA')));
 
 	if (!defined $json_post->{transaction}){
 		if (!defined $json_post->{requests}){
@@ -51,12 +51,12 @@ sub processCGI {
 				}
 				print ']}';
 			} elsif (is_hashref($json_post->{requests})){
-				print '{"replies":';
+				print '{"replies":{';
 				my $counter = 1;
 				my $repeatLength = scalar keys %{$json_post->{requests}};
 				my $lastItem = 1;
 				while (my ($key, $value) = each (%{$json_post->{requests}})) {
-					print "{\"$key\":";
+					print "\"$key\":";
 					if (defined $value->{transaction} && defined $::{$value->{transaction}}) {
 						# if (defined $value->{scroll_version_id}) {
 						# 	$cgi->set_scrollversion($value->{scroll_version_id});
@@ -67,7 +67,7 @@ sub processCGI {
 					}
 					if ($counter < $repeatLength) {
 						$counter++;
-						print "},{";
+						print ",";
 					}
 				}
 				print '}}';
@@ -349,7 +349,7 @@ MYSQL
 sub getSignStreamOfFrag {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	$cgi->set_scrollversion($json_post->{SCROLL_VERSION});
-	$cgi->get_text_of_fragment($json_post->{colId});
+	$cgi->get_text_of_fragment($json_post->{col_id});
 	return;
 }
 
@@ -903,7 +903,7 @@ sub setArtRotation {
 	return;
 }
 
-sub insertSigns() {
+sub addSigns() {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $counter = 1;
 	my $repeatLength = scalar @{$json_post->{signs}};
