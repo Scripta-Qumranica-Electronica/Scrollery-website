@@ -89,7 +89,8 @@ const perl = (req, res) => {
           res.status(400).send('Request Failed')
         }
       } catch (err) {
-        sendErr('Request Failed')
+        console.error({err, stderr, stdout})
+        sendErr(stderr || stdout || 'Request Failed')
       }
     }
   )

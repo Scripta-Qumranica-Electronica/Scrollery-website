@@ -13,14 +13,23 @@ const onSuccess = (column, transactions, replies) => {
     updates: {},
   }
   for (let id in replies) {
-    replies[id].forEach(singleAction => {
+    const transaction = transactions[id]
+    replies[id].forEach((singleAction, i) => {
       for (let signUuid in singleAction) {
-        switch (singleAction[signUuid]) {
-          case 'deleted':
-            persistedMap.deletions[signUuid] = true
-            break
-          // todo: additions, updates
+        // the value is the keyword 'deleted', then the corresponding
+        // sign has been removed.
+        if (singleAction[signUuid] === 'deleted') {
+          persistedMap.deletions[signUuid] = true
+
+          // if the value is a number, it's the sign's id after being persisted.
+        } else if (typeof singleAction[signUuid] === 'number') {
+          let signRequested = transaction.signs[i]
+          persistedMap.additions[signUuid] = {
+            next_sign_id: signRequested.next_sign_id || -1,
+            id: singleAction[signUuid],
+          }
         }
+        // need case for updates...
       }
     })
   }

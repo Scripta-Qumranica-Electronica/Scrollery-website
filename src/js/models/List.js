@@ -71,16 +71,23 @@ class List {
    * @param {*} persistedMap
    */
   persisted(persistedMap = {}) {
-    // remove each deleted item
+    // remove each deleted item from the change set
     for (let key in persistedMap.deletions) {
       delete this.__changes.deletions[key]
     }
 
-    // TODO: updates, additions
+    // for each addition, if there's a corresponding property in the
+    // additions map, call persisted on it and remove it from the
+    // cahnge object
+    for (let key in persistedMap.additions) {
+      if (this.__changes.additions[key]) {
+        this.__changes.additions[key].persisted(persistedMap.additions[key])
+      }
+      delete this.__changes.additions[key]
+    }
 
-    this.forEach(item => {
-      item.persisted(persistedMap[item.getUUID()])
-    })
+    // TODO: updates
+    this.forEach(item => item.persisted(persistedMap))
   }
 
   /**
