@@ -4155,6 +4155,10 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+jsts@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/jsts/-/jsts-1.6.0.tgz#ab5d47ca3f9962c4ef94bbe6a317efeacdb41c93"
+
 just-extend@^1.1.26:
   version "1.1.27"
   resolved "https://registry.yarnpkg.com/just-extend/-/just-extend-1.1.27.tgz#ec6e79410ff914e472652abfa0e603c03d60e905"
