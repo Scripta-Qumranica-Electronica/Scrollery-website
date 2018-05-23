@@ -62,12 +62,12 @@ docker container list | grep "SQE_Database"
 done
 
 echo "waiting until database is ready for connections..."
-docker exec -i SQE_Database /usr/bin/mysql --host=127.0.0.1  --user=root --password=none -e "CREATE DATABASE IF NOT EXISTS SQE_Database DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
+docker exec -i SQE_Database /usr/bin/mysql --host=127.0.0.1  --user=root --password=none -e "CREATE DATABASE IF NOT EXISTS SQE_DEV DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
 while [ $? != 0 ]
 do
 sleep 1s
 echo "database not ready yet ..."
-docker exec -i SQE_Database /usr/bin/mysql --host=127.0.0.1  --user=root --password=none -e "CREATE DATABASE IF NOT EXISTS SQE_Database DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
+docker exec -i SQE_Database /usr/bin/mysql --host=127.0.0.1  --user=root --password=none -e "CREATE DATABASE IF NOT EXISTS SQE_DEV DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
 done
 
 # ... then
