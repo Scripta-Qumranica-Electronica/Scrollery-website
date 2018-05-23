@@ -298,6 +298,13 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Test::More 0
       perl 5.006
+  Sub-Identify-0.14
+    pathname: R/RG/RGARCIA/Sub-Identify-0.14.tar.gz
+    provides:
+      Sub::Identify 0.14
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
   Types-Serialiser-1.0
     pathname: M/ML/MLEHMANN/Types-Serialiser-1.0.tar.gz
     provides:

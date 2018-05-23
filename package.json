@@ -9,6 +9,7 @@
     "dev": "webpack --config webpack.dev.js",
     "prod": "webpack --config webpack.prod.js",
     "start": "node ./tools/dev_server.js",
+    "bootstrap": "node ./bin/bootstrap.js",
     "setup:db": "sh ./bin/init-docker.sh",
     "test": "karma start --config karma.conf.js",
     "test:chrome": "karma start --config karma.conf.js --browsers=Chrome",
