@@ -1,20 +1,63 @@
-# Setup
+# Quick Start
+The Scrollery-website comes with a quick start script.  In order to run it, you must already have installed the following dependencies:
+* [Node 8.9.4](https://nodejs.org/en/download/)
+* Npm 5+ (bundled with node)
+* [Yarn](https://yarnpkg.com/en/docs/install)
+* [Perl 5.18+](https://www.perl.org/get.html)
+* [Carton](http://search.cpan.org/~miyagawa/Carton-v1.0.31/lib/Carton.pm)
+    * `(sudo) cpan Carton`
+    * `(sudo) cpanm Carton`
+    * Or in Ubuntu `sudo apt install carton`
+* MariaDB/mysql libraries (for Perl's [DBD::mysql](http://search.cpan.org/dist/DBD-mysql/lib/DBD/mysql.pm))
+    * Ubuntu `sudo apt install libmysqlclient-dev`
+    * Mac `brew install MariaDB` (If you run into problems, perhaps try https://dev.mysql.com/downloads/connector/c/ or `brew install mysql-connector-c`)
+* [Docker](https://docs.docker.com/install/)
+
+If you have all these dependencies installed and agree to using project's the default settings (see descriptions below), then you can simply run the install script to download all necessary packages and build the database.
+
+```bash
+#clone the Scrollery website project
+git clone https://github.com/Scripta-Qumranica-Electronica/Scrollery-website.git
+
+#enter the project folder
+cd Scrollery-website
+
+#built the project (can take several minutes)
+npm run bootstrap
+
+#launch the website
+npm start
+```
+
+If everything runs with no errors, then after executing `npm start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.
+
+You may also run `npm run bootstrap` again after pulling down a new version of the Scrollery-website, and it will make any necessary updates to the dependencies and the database <span style="color:red">(Warning!!! this will overwrite your existing SQE_DEV database)</span>.  After running several times, you may find that your Docker runs out of space, I have found the suggestions [here](https://lebkowski.name/docker-volumes/) to be helpful in such circumstances.
+
+You should use `docker stop SQE-Database` to shutdown the SQE database Docker before rebooting your system, otherwise you may have trouble using it after reboot. In that case, you may clean up the system using `docker rm $(docker ps -q -f status=exited)`, and then start the database Docker again with `docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 sqe-maria:latest`.
+
+# Full Setup Description
 
 The SQE Scrollery website depends on three components to function fully:
 
-1. A local instance on the SQE MariaDB database.
-2. A local installation of the Perl modules that provide a low level API to that database.
+1. [A local instance on the SQE MariaDB database.](https://github.com/Scripta-Qumranica-Electronica/Data-files)
+2. [A local installation of the Perl modules that provide a low level API to that database.](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API)
 3. A local installation of the Scrollery website maintained in this repository.
 
 ## Summary
 
-These instructions will walk you through installing the following on your development machine:
-* Node 8.9.4
-* Npm 5+
-* Yarn
-* Perl 5.18+
-* Carton
-* Docker
+These instructions will walk you through programs and settings involved in running the Scrollery website on your development machine.  The following dependencies are required:
+* [Node 8.9.4](https://nodejs.org/en/download/)
+* Npm 5+ (bundled with node)
+* [Yarn](https://yarnpkg.com/en/docs/install)
+* [Perl 5.18+](https://www.perl.org/get.html)
+* [Carton](http://search.cpan.org/~miyagawa/Carton-v1.0.31/lib/Carton.pm)
+    * `(sudo) cpan Carton`
+    * `(sudo) cpanm Carton`
+    * Or in Ubuntu `sudo apt install carton`
+* MariaDB/mysql libraries (for Perl's [DBD::mysql](http://search.cpan.org/dist/DBD-mysql/lib/DBD/mysql.pm))
+    * Ubuntu `sudo apt install libmysqlclient-dev`
+    * Mac `brew install MariaDB` (If you run into problems, perhaps try https://dev.mysql.com/downloads/connector/c/ or `brew install mysql-connector-c`)
+* [Docker](https://docs.docker.com/install/)
 
 The development environment consists of the following components:
 
@@ -52,18 +95,15 @@ docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 sqe-m
 docker exec -i SQE_Database /tmp/import-docker.sh
 ```
 
-If all of these defaults look good, you can also run `npm run setup:db` from the root of the project, which will build and start the docker container for you.
+Note that you can always run `npm run setup:db` from the root of the project, which will build and start the docker container for you with the default setting.
 
 ## Client
 
 **Prerequisites:**
 
-* Most recent LTS Node version (currently 8.9.4), which can be downloaded [here](https://nodejs.org/en/download/)
+* Most recent LTS Node version (currently 8.9.4), which can be downloaded [here](https://nodejs.org/en/download/), but also check for a system specific install.
 * npm 5+ (bundled with Node)
-* Yarn package manager
-
-(Once npm is installed, run `npm install -g yarn` to install Yarn.)
-
+* Yarn package manager, which can be downloaded [here](https://yarnpkg.com/en/docs/install)
 * Recent version of Perl5 (tested working on 5.18.2 and 5.22.1)
 * Depending on your system settings for Perl, you may need to run the following commands as sudo.
 * You will need the MySQL client and developer libraries in order to compile the Perl database connector DBI::mysql.  The installation procedure for those libraries varies by operating system, most MySQL installation methods will create the necessary files; on Linux you must install the client and the development package (e.g., in Ubuntu `sudo apt install libmysqlclient-dev` should work if you do not already have MariaDB/Mysql client dev libraries installed), on Mac `brew install mariadb` should work if you use homebrew).  If DBI::mysql fails to compile or exits with errors when the cgi scripts are run, this may be due to an incompatability between DBI::mysql and the MariaDB client dev libs, please try installing Mysql (not MariaDB) dev libs and running `(sudo) carton install` again in the `resources/cgi-bin` folder.

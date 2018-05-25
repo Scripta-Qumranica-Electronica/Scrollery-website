@@ -897,7 +897,7 @@ sub addSigns() {
 		if ($counter == 1) {
 			$prev_sign_id = $sign->{previous_sign_id};
 		}
-		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $sign->{next_sign_id}, $prev_sign_id);
+		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $sign->{next_sign_id});
 		print "\"$sign->{uuid}\":$prev_sign_id";
 		if ($counter != $repeatLength) {
 			print "},{";
