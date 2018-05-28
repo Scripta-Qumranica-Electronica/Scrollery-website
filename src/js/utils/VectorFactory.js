@@ -103,10 +103,12 @@ export function svgPolygonToWKT(svg) {
         firstPoint = points[0] + ' ' + points[1]
         for (let i = 0, length = points.length - 3; i <= length; i += 2) {
           wkt += points[i] + ' ' + points[i + 1]
-          if (i + 1 < length) {
-            wkt += ','
+          if (i + 1 === length - 1) {
+            if (points[i] + ' ' + points[i + 1] !== firstPoint) {
+              wkt += ',' + firstPoint
+            }
           } else {
-            if (points[i] + ' ' + points[i + 1] !== firstPoint) wkt += ',' + firstPoint
+            wkt += ','
           }
         }
       }
