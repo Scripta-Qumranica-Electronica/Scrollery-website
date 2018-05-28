@@ -28,5 +28,10 @@ describe('LineModel', () => {
       // and copies in the line.id value
       expect(line.get(0).line_id).to.equal(line.id)
     })
+
+    it('should throw when receiving non-signs', () => {
+      expect(() => line.insert({sign: false}, 1)).to.throw(TypeError)
+      expect(() => line.push({sign: false})).to.throw(TypeError)
+    })
   })
 })

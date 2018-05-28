@@ -243,12 +243,12 @@ class List {
   delete(index) {
     const deleted = this._items[index] ? this._items.splice(index, 1)[0] : null
     if (deleted) {
-      this.__changes.deletions[deleted.getID()] = deleted
-
       // something can't be added and deleted all at once
       // so remove it from the additions
-      if (this.__changes.additions[deleted.getID()]) {
-        delete this.__changes.additions[deleted.getID()]
+      if (this.__changes.additions[deleted.getUUID()]) {
+        delete this.__changes.additions[deleted.getUUID()]
+      } else {
+        this.__changes.deletions[deleted.getUUID()] = deleted
       }
     }
   }

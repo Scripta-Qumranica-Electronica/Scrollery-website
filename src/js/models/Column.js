@@ -20,7 +20,7 @@ class Column extends List {
    * @return {object} the changes object with additions, deletions, updates
    */
   getChanges() {
-    const signs = {
+    const changes = {
       additions: {},
       deletions: {},
       updates: {},
@@ -28,13 +28,14 @@ class Column extends List {
 
     if (this.hasChanges()) {
       this.forEach(line => {
-        let { additions, deletions } = line.getChanges()
-        Object.assign(signs.additions, additions || {})
-        Object.assign(signs.deletions, deletions || {})
+        let { additions, deletions, updates } = line.getChanges()
+        Object.assign(changes.additions, additions || {})
+        Object.assign(changes.deletions, deletions || {})
+        Object.assign(changes.updates, updates || {})
       })
     }
 
-    return signs
+    return changes
   }
 
   /**

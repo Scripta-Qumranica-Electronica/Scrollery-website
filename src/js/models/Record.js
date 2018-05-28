@@ -185,6 +185,12 @@ function Record(defaults = {}) {
     /**
      * @public
      * @instance
+     */
+    destroy() {}
+
+    /**
+     * @public
+     * @instance
      *
      * @return {string} the list instances uuid
      */
