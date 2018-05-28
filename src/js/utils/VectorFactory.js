@@ -9,13 +9,16 @@
 export function wktPolygonToSvg(geoJSON, boundingRect) {
   let svg
   if (geoJSON.substring(0, 9) === 'POLYGON((') {
+    const polygonInitRegex = /POLYGON/g
+    const parenInitRegex = /\(/g
+    const parenEndRegex = /\)/g
     svg = ''
     const polygons = geoJSON.split('),(')
     polygons.forEach(polygon => {
       svg += 'M'
-      polygon = polygon.replace(/POLYGON/g, '')
-      polygon = polygon.replace(/\(/g, '')
-      polygon = polygon.replace(/\)/g, '')
+      polygon = polygon.replace(polygonInitRegex, '')
+      polygon = polygon.replace(parenInitRegex, '')
+      polygon = polygon.replace(parenEndRegex, '')
       var points = polygon.split(',')
 
       if (boundingRect) {
@@ -77,7 +80,10 @@ export function wktParseRect(wkt) {
  */
 export function svgPolygonToWKT(svg) {
   let wkt = undefined
+  svg = svg.trim()
   if (svg.startsWith('M')) {
+    const lineSegmentRegex = /\sL\s|L|L\s|\sL/g
+    const zTerminatorRegex = /Z/g
     wkt = 'POLYGON('
     const polygons = svg.split('M')
     polygons.forEach(poly => {
@@ -87,12 +93,20 @@ export function svgPolygonToWKT(svg) {
         } else {
           wkt += '),('
         }
-        const lines = poly.replace(/L /g, '')
-        const points = lines.split(' ')
+        let firstPoint
+        let points
+        const lines = poly
+          .replace(lineSegmentRegex, ' ')
+          .replace(zTerminatorRegex, '')
+          .trim()
+        points = lines.split(' ')
+        firstPoint = points[0] + ' ' + points[1]
         for (let i = 0, length = points.length - 3; i <= length; i += 2) {
           wkt += points[i] + ' ' + points[i + 1]
-          if (i !== length) {
+          if (i + 1 < length) {
             wkt += ','
+          } else {
+            if (points[i] + ' ' + points[i + 1] !== firstPoint) wkt += ',' + firstPoint
           }
         }
       }
@@ -101,7 +115,6 @@ export function svgPolygonToWKT(svg) {
   }
   return wkt
 }
-
 /* 
  * This function expects the transform matrix 
  * to be in a 2D array: [[a,c,tx],[b,d,ty]].

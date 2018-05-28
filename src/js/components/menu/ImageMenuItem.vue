@@ -85,10 +85,11 @@ export default {
       if (this.open) {
         this.setRouter()
         if (!this.children.length) {
-          this.corpus.populateArtefactsOfImageReference(this.imageID, this.scrollVersionID)
-
-          // this.corpus.populateArtefactsofImage(this.scrollVersionID, this.imageID)
-          // this.corpus.images.get(this.imageID).populateItems(this.imageID)
+          this.corpus
+            .populateArtefactsOfImageReference(this.imageID, this.scrollVersionID)
+            .then(res => {
+              this.corpus.mapRoisAndArtefactsInCombination(this.scrollVersionID)
+            })
         }
       }
     },

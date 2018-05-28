@@ -21,13 +21,7 @@
 </template>
 
 <script>
-import {
-  wktPolygonToSvg,
-  wktPointToSvg,
-  wktParseRect,
-  dbMatrixToSVG,
-  svgMatrixToDB,
-} from '~/utils/VectorFactory'
+import { svgMatrixToDB } from '~/utils/VectorFactory'
 import Artefact from './Artefact.vue'
 // I will use the rematrix package to directly apply
 // rotation to existing artefact matrices.

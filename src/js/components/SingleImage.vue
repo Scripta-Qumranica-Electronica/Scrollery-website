@@ -258,21 +258,21 @@ export default {
         } else {
           this.artefact = to.params.artID >>> 0
           this.scrollVersionID = to.params.scrollVersionID >>> 0
-          if (this.corpus.artefacts.get(this.artefact).mask === '') {
-            // this.$store.commit('addWorking')
-            this.corpus.artefacts
-              .fetchMask(to.params.scrollVersionID, to.params.artID)
-              .then(res => {
-                // this.$store.commit('delWorking')
-                this.firstClipMask = this.clipMask = wktPolygonToSvg(
-                  this.corpus.artefacts.get(this.artefact).mask
-                )
-              })
-          } else {
-            this.firstClipMask = this.clipMask = wktPolygonToSvg(
-              this.corpus.artefacts.get(this.artefact).mask
-            )
-          }
+          // if (this.corpus.artefacts.get(this.artefact).mask === '') {
+          //   // this.$store.commit('addWorking')
+          //   this.corpus.artefacts
+          //     .fetchMask(to.params.scrollVersionID, to.params.artID)
+          //     .then(res => {
+          //       // this.$store.commit('delWorking')
+          //       this.firstClipMask = this.clipMask = wktPolygonToSvg(
+          //         this.corpus.artefacts.get(this.artefact).mask
+          //       )
+          //     })
+          // } else {
+          this.firstClipMask = this.clipMask = wktPolygonToSvg(
+            this.corpus.artefacts.get(this.artefact).mask
+          )
+          // }
         }
         this.lock = false
       }
