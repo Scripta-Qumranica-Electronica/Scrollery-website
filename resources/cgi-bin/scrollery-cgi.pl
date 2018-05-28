@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8::all;
 use JSON::XS;
 use Ref::Util qw<is_hashref is_arrayref>;
 use MIME::Base64;
