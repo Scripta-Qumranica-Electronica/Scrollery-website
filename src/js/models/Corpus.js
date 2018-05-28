@@ -356,20 +356,15 @@ export default class Corpus {
         // data transmission.
         // this._hash = res.data.hash
 
-        let record = new this.combinations.model(res.data.scroll_data)
+        const scroll_data = res.data.scroll_data
+        let record = new this.combinations.model(scroll_data)
         this.combinations.insert(record, this.combinations.getFirstKey())
-        this.populateColumnsOfCombination(
-          res.data.scroll_data.scroll_id,
-          res.data.scroll_data.scroll_version_id
-        )
+        this.populateColumnsOfCombination(scroll_data.scroll_id, scroll_data.scroll_version_id)
         this.populateImageReferencesOfCombination(
-          res.data.scroll_data.scroll_id,
-          res.data.scroll_data.scroll_version_id
+          scroll_data.scroll_id,
+          scroll_data.scroll_version_id
         ).then(res => {
-          this.populateArtefactsOfCombination(
-            res.data.scroll_data.scroll_id,
-            res.data.scroll_data.scroll_version_id
-          )
+          this.populateArtefactsOfCombination(scroll_data.scroll_id, scroll_data.scroll_version_id)
         })
       }
     })
