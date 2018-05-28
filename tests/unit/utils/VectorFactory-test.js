@@ -137,8 +137,9 @@ describe('VectorFactory.svgPolygonToWKT', () => {
       } else {
         svg += ' '
       }
-      if (i !== 19) {
-        wkt += ','
+      wkt += ','
+      if (i === 19) {
+        wkt += '0 0'
       }
     }
     wkt += '),('
