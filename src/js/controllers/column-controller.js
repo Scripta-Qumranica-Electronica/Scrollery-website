@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+/* istanbul ignore next */
+
 /**
  *
  * @param {Column} column
@@ -37,6 +39,7 @@ const onSuccess = (column, transactions, replies) => {
   column.persisted(persistedMap)
 }
 
+/* istanbul ignore next */
 export default {
   /**
    * Persist any changes to the column model
