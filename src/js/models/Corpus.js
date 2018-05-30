@@ -49,6 +49,7 @@ export default class Corpus {
     this.rois = new ROIs(this.session_id)
   }
 
+  /* istanbul ignore next */
   populateCombinations() {
     return new Promise((resolve, reject) => {
       this.combinations
@@ -58,6 +59,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   populateColumnsOfCombination(scrollID, scrollVersionID) {
     if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
     if (scrollID.constructor !== Array) scrollID = [scrollID]
@@ -94,6 +96,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   populateImageReferencesOfCombination(scrollID, scrollVersionID) {
     if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
     if (scrollID.constructor !== Array) scrollID = [scrollID]
@@ -139,6 +142,7 @@ export default class Corpus {
   //   })
   // }
 
+  /* istanbul ignore next */
   populateImagesOfImageReference(imageReferenceID, scrollVersionID) {
     if (imageReferenceID.constructor !== Array) imageReferenceID = [imageReferenceID]
     // If scrollVersionID is not an array, convert it into one matching the
@@ -183,6 +187,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   populateArtefactsOfCombination(scrollID, scrollVersionID) {
     return new Promise((resolve, reject) => {
       this.artefacts
@@ -216,6 +221,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   populateArtefactsOfImageReference(imageReferenceID, scrollVersionID) {
     if (imageReferenceID.constructor !== Array) imageReferenceID = [imageReferenceID]
     // If scrollVersionID is not an array, convert it into one matching the
@@ -270,6 +276,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   populateRoisOfCombination(scrollID, scrollVersionID) {
     if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
     if (scrollID.constructor !== Array) scrollID = [scrollID]
@@ -306,6 +313,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   populateRoiOfCol(colID, scrollVersionID) {
     if (colID.constructor !== Array) colID = [colID]
     // If scrollVersionID is not an array, convert it into one matching the
@@ -356,6 +364,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   cloneScroll(scroll_version_id) {
     const payload = {
       SESSION_ID: this.session_id,
@@ -383,6 +392,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   setRoiOfArtefact(sign_char_roi_id, roi, artefact_position_id, scroll_version_id) {
     if (sign_char_roi_id.constructor !== Array) sign_char_roi_id = [sign_char_roi_id]
     if (roi.constructor !== Array) roi = [roi]
@@ -489,6 +499,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   /*
    *
    * This takes a list of rois ids and a list of artefact ids.
@@ -514,6 +525,7 @@ export default class Corpus {
     })
   }
 
+  /* istanbul ignore next */
   /*
    *
    * This takes a scroll version id. It loops through every combination 

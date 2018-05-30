@@ -107,8 +107,10 @@ function Record(defaults = {}) {
 
             // reset the original values to the current state now
             // the record has been persisted.
-            for (let prop in this) {
-              values[prop].original = this[prop]
+            for (let prop in values) {
+              if (values[prop].original !== this[prop]) {
+                values[prop].original = this[prop]
+              }
             }
 
             // reset persisted
@@ -179,6 +181,12 @@ function Record(defaults = {}) {
     static namespace() {
       return this.uuid || (this.uuid = uuid())
     }
+
+    /**
+     * @public
+     * @instance
+     */
+    destroy() {}
 
     /**
      * @public

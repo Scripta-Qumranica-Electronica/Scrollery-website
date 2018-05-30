@@ -43,4 +43,17 @@ describe('Record', () => {
     expect(record.toJS()).not.to.equal(record)
   })
 
+  it('should track updates to properties', () => {
+    record.name = 'new name'
+    expect(record.changedProperties()).to.include('name')
+  })
+
+  it('should remove tracking of changed properties after being persisted', () => {
+    record.name = 'new name'
+    expect(record.changedProperties()).to.include('name')
+
+    record.persisted({name: 'new name'})
+    expect(Object.keys(record.changedProperties()).length).to.equal(0)
+  })
+
 })

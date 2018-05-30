@@ -20,7 +20,7 @@ class Column extends List {
    * @return {object} the changes object with additions, deletions, updates
    */
   getChanges() {
-    const signs = {
+    const changes = {
       additions: {},
       deletions: {},
       updates: {},
@@ -28,21 +28,23 @@ class Column extends List {
 
     if (this.hasChanges()) {
       this.forEach(line => {
-        let { additions, deletions } = line.getChanges()
-        signs.additions = {
-          ...signs.additions,
-          ...additions,
-        }
-        signs.deletions = {
-          ...signs.deletions,
-          ...deletions,
-        }
+        let { additions, deletions, updates } = line.getChanges()
+        Object.assign(changes.additions, additions || {})
+        Object.assign(changes.deletions, deletions || {})
+        Object.assign(changes.updates, updates || {})
       })
     }
 
-    return signs
+    return changes
   }
 
+  /**
+   * Flatten the column into an flat array.
+   *
+   * @todo Implement an ordered, iteratable map or the like
+   *
+   * @return {array.<Sign>} An array of sign items
+   */
   flattenToSignStream() {
     const signs = []
     signs.map = {}

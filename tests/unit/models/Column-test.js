@@ -101,4 +101,37 @@ describe('ColumnModel', () => {
       expect(newLine.toString()).to.equal(oldStr.slice(5))
     })
   })
+
+  describe('flattenToSignStream', () => {
+    let col, flat
+    beforeEach(() => {
+      col = factory.column({ signs: 30 })
+      flat = col.flattenToSignStream()
+    })
+
+    it('should flatten the column tree to a single array', () => {
+      expect(Array.isArray(flat)).to.equal(true)
+    })
+
+    it('should create a map that contains keys pointing to each item', () => {
+      expect(Object.keys(flat.map).length).to.equal(flat.length)
+    })
+  })
+
+  describe('getChanges', () => {
+    let col, flat
+    beforeEach(() => {
+      col = factory.column({ signs: 30 })
+      flat = col.flattenToSignStream()
+    })
+
+    it('should return changes as an object with signs (rather than lines', () => {
+      let sign = flat[0]
+
+      // use the flat array to modify the signs directly
+      sign.sign = 'a'
+
+      expect(col.getChanges().updates[sign.getUUID()]).to.equal(sign)
+    })
+  })
 })

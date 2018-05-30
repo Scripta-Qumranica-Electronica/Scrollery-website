@@ -64,15 +64,30 @@ class List {
     }
   }
 
-  markAllPersisted(persistedMap) {
-    this.__changes = {
-      additions: {},
-      deletions: {},
+  /**
+   * Once a list has been persisted, this method receives an
+   * object with all of the updates.
+   *
+   * @param {*} persistedMap
+   */
+  persisted(persistedMap = {}) {
+    // remove each deleted item from the change set
+    for (let key in persistedMap.deletions) {
+      delete this.__changes.deletions[key]
     }
 
-    this.forEach(item => {
-      item.persisted(persistedMap[item.getUUID()])
-    })
+    // for each addition, if there's a corresponding property in the
+    // additions map, call persisted on it and remove it from the
+    // cahnge object
+    for (let key in persistedMap.additions) {
+      if (this.__changes.additions[key]) {
+        this.__changes.additions[key].persisted(persistedMap.additions[key])
+      }
+      delete this.__changes.additions[key]
+    }
+
+    // TODO: updates
+    this.forEach(item => item.persisted(persistedMap))
   }
 
   /**
@@ -228,12 +243,12 @@ class List {
   delete(index) {
     const deleted = this._items[index] ? this._items.splice(index, 1)[0] : null
     if (deleted) {
-      this.__changes.deletions[deleted.getID()] = deleted
-
       // something can't be added and deleted all at once
       // so remove it from the additions
-      if (this.__changes.additions[deleted.getID()]) {
-        delete this.__changes.additions[deleted.getID()]
+      if (this.__changes.additions[deleted.getUUID()]) {
+        delete this.__changes.additions[deleted.getUUID()]
+      } else {
+        this.__changes.deletions[deleted.getUUID()] = deleted
       }
     }
   }
