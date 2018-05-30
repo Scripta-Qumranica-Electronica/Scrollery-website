@@ -17,22 +17,22 @@ if [ -d "../resources/data-files" ];
 then
     echo "Fetching changes."
     cd ../resources/data-files
-    git fetch
     git checkout master
+    git fetch --tags
     git pull origin master
 else
     echo "Cloning repository."
     git clone https://github.com/Scripta-Qumranica-Electronica/Data-files.git ../resources/data-files
     # cd into the directory
     cd ../resources/data-files
-    git fetch
+    git fetch --tags
 fi
 
 echo "Checking for desired version"
 if [ -n "${version}" ];
 then
     echo "Checking out tag ${version}."
-    git checkout ${version}
+    git checkout tags/${version}
 else
     echo "Checking out latest master."
     git checkout master
