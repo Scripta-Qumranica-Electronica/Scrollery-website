@@ -1,17 +1,10 @@
 #!/bin/bash
 
-POSITIONAL=()
-while [[ $# -gt 0 ]]
-do
-key="$1"
-
-case $key in
-    -v|--version)
-    version="$2"
-    shift # past argument
-    shift # past value
-    ;;
-esac
+while getopts ":v:" opt; do
+    case "${opt}" in
+    v)  version=$OPTARG
+        ;;
+    esac
 done
 
 echo "Checking for existing perl-libs..."
@@ -20,5 +13,26 @@ if [ -d "../resources/perl-libs" ]; then
   rm -rf ../resources/perl-libs
 fi
 
-git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API.git ../resources/perl-libs -b ${version}
+echo "Checking for Data_Files repository."
+if [ -d "../resources/perl-libs" ];
+then
+    echo "Fetching changes."
+    cd ../resources/perl-libs
+    git fetch
+else
+    echo "Cloning repository."
+    git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API.git ../resources/perl-libs
+    # cd into the directory
+    cd ../resources/perl-libs
+fi
 
+echo "Checking for desired version"
+if [ -n "${version}" ];
+then
+    echo "Checking out tag ${version}."
+    git checkout ${version}
+else
+    echo "Checking out latest master."
+    git checkout master
+    git pull origin master
+fi

@@ -1,18 +1,12 @@
 #!/bin/bash
 
 #TODO maybe add error checking to several of the steps: if [ $? != 0]; then ... fi
-POSITIONAL=()
-while [[ $# -gt 0 ]]
-do
-key="$1"
 
-case $key in
-    -v|--version)
-    version="$2"
-    shift # past argument
-    shift # past value
-    ;;
-esac
+while getopts "v:" opt; do
+    case "$opt" in
+    v)  version=$OPTARG
+        ;;
+    esac
 done
 
 echo "Setting up docker container. This can take a few minutes depending on your network speed."
@@ -36,7 +30,10 @@ if [ -n "${version}" ];
 then
     echo "Checking out tag ${version}."
     git checkout ${version}
-    git pull
+else
+    echo "Checking out latest master."
+    git checkout master
+    git pull origin master
 fi
 
 # Cleanup up any images that might exist if running setup a second time
@@ -61,6 +58,8 @@ echo "not started yet ..."
 docker container list | grep "SQE_Database"
 done
 
+# Note, you may hit an infinite loop if something went wrong
+# with the Docker setup.
 echo "waiting until database is ready for connections..."
 docker exec -i SQE_Database /usr/bin/mysql --host=127.0.0.1  --user=root --password=none -e "CREATE DATABASE IF NOT EXISTS SQE_DEV DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
 while [ $? != 0 ]

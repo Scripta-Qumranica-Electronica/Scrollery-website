@@ -9,12 +9,12 @@ addons:
 cache:
   directories:
     - node_modules
+    - resources/cgi-bin/local
+    - resources/perl-libs
+    - resources/data-files
 before_script:
   - sudo apt-get -qq update && sudo apt-get install -y perl carton
-  - cd resources/cgi-bin && carton install
-  - cd $TRAVIS_BUILD_DIR
-  - git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API resources/perl-libs
-  - npm run setup:db
+  - npm run bootstrap
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 script:

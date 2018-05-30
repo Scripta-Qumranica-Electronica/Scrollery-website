@@ -20,7 +20,7 @@ else
 fi
 
 echo "Checking for yarn..."
-if which docker; then
+if which yarn; then
     echo "${GREEN}✓ You have yarn.${NC}"
 else
     echo "${RED}✗ Error! You need yarn, see: https://yarnpkg.com/en/docs/install${NC}" 1>&2 
@@ -28,7 +28,7 @@ else
 fi
 
 echo "Checking for perl..."
-if which docker; then
+if which perl; then
     echo "${GREEN}✓ You have perl.${NC}"
 else
     echo "${RED}✗ Error! You need perl, see: https://www.perl.org/get.html${NC}" 1>&2 
@@ -36,7 +36,7 @@ else
 fi
 
 echo "Checking for carton..."
-if which docker; then
+if which carton; then
     echo "${GREEN}✓ You have carton.${NC}"
 else
     echo "${RED}✗ Error! You need carton, see: http://search.cpan.org/~miyagawa/Carton-v1.0.31/lib/Carton.pm${NC}" 1>&2 

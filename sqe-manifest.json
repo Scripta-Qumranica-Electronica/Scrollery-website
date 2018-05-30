@@ -3,7 +3,7 @@
     "version": "database-mutations",
     "status": "development",
     "dependencies": {
-        "SQE_DB_API": "0.1.7",
+        "SQE_DB_API": "0.1.8",
         "Data-files": "0.1.12"
     }
 }
