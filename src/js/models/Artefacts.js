@@ -1,12 +1,12 @@
 import MapList from './MapList.js'
 import Artefact from './Artefact.js'
 import axios from 'axios'
-import { wktPolygonToSvg, dbMatrixToSVG } from '~/utils/VectorFactory.js'
+import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG } from '~/utils/VectorFactory.js'
+const svgpath = require('svgpath')
 
 export default class Artefacts extends MapList {
   constructor(
-    username,
-    password,
+    session_id,
     idKey,
     ajaxPayload = undefined,
     attributes = {},
@@ -15,7 +15,7 @@ export default class Artefacts extends MapList {
     idKey = idKey || 'artefact_position_id'
     standardTransaction = 'getArtOfImage'
     // ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getArtOfImage'}
-    super(username, password, idKey, ajaxPayload, Artefact, attributes, standardTransaction)
+    super(session_id, idKey, ajaxPayload, Artefact, attributes, standardTransaction)
   }
 
   // We should eventually have a hash associated with each mask,
@@ -24,33 +24,55 @@ export default class Artefacts extends MapList {
 
   // TODO: mocking for axios in unit test
   /* istanbul ignore next */
-  fetchMask(scrollVersionID, artefactID) {
-    scrollVersionID = scrollVersionID >>> 0
-    artefactID = artefactID >>> 0
-    let payload = {
-      transaction: 'getArtefactMask',
-      SESSION_ID: this.sessionID,
-      scrollVersion: scrollVersionID,
-      artID: artefactID,
-    }
+  populate(customPayload = {}, scrollVersionID = undefined) {
+    let payload = Object.assign(
+      {},
+      this._ajaxPayload,
+      customPayload,
+      scrollVersionID && { scroll_version_id: scrollVersionID }
+    )
 
     return new Promise((resolve, reject) => {
       try {
         axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
-          if (res.status === 200 && res.data.results) {
+          if (res.status === 200 && res.data.replies) {
             // We can store hashes for the returned data
             // in the future, so we can avoid unnecessary
             // data transmission.
-            this.set(this._items[artefactID], 'hash', res.data.results[0].hash)
+            this._hash = res.data.hash
 
-            let newArtefact = this.get(artefactID).toJS()
-            newArtefact.mask = wktPolygonToSvg(res.data.results[0].poly)
-            newArtefact.transform_matrix = dbMatrixToSVG(
-              JSON.parse(res.data.results[0].transform_matrix).matrix
-            )
-            newArtefact.rect = wktPolygonToSvg(res.data.results[0].rect)
-            this._items.set(artefactID, new this.model(newArtefact))
-            resolve(res.data.results)
+            // Note to self: if you load the data into a 2d array:
+            // [[key1, value1],[key2,[value2]] the keys can be
+            // loaded into an OrderedMap as integers.  If you use
+            // an Object {key1: value1, key2: value2}, then the
+            // keys are converted to strings.
+            let results = []
+            res.data.replies.forEach(reply => {
+              if (reply.error) {
+                return
+              }
+
+              reply.results.forEach(item => {
+                let record
+                if (this.get(item[this.idKey]) && this.get(item[this.idKey]).toJS() !== item) {
+                  record = this.get(item[this.idKey]).extend(item)
+                } else if (!this.get(item[this.idKey])) {
+                  record = new this.model(item)
+                }
+                if (record) {
+                  record.svgInCombination = svgpath(
+                    wktPolygonToSvg(record.mask, wktParseRect(record.rect))
+                  )
+                    .matrix(dbMatrixToSVG(record.transform_matrix))
+                    .round()
+                    .toString()
+                  results.push([item[this.idKey], record])
+                }
+              })
+            })
+
+            this.merge(results)
+            resolve(res.data.replies)
           }
         })
       } catch (err) {
@@ -58,4 +80,47 @@ export default class Artefacts extends MapList {
       }
     })
   }
+
+  // TODO: mocking for axios in unit test
+  /* istanbul ignore next */
+
+  // TODO I think this should be deprecated, it is wrong to some extent
+  // anway.  We always grab the mask when first initializing the artefact
+  // record.
+
+  // fetchMask(scrollVersionID, artefactID) {
+  //   console.log('Fetched mask:', artefactID)
+  //   scrollVersionID = scrollVersionID >>> 0
+  //   artefactID = artefactID >>> 0
+  //   let payload = {
+  //     transaction: 'getArtefactMask',
+  //     SESSION_ID: this.sessionID,
+  //     scrollVersion: scrollVersionID,
+  //     artID: artefactID,
+  //   }
+
+  //   return new Promise((resolve, reject) => {
+  //     try {
+  //       axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
+  //         if (res.status === 200 && res.data.results) {
+  //           // We can store hashes for the returned data
+  //           // in the future, so we can avoid unnecessary
+  //           // data transmission.
+  //           this.set(this._items[artefactID], 'hash', res.data.results[0].hash)
+
+  //           let newArtefact = this.get(artefactID).toJS()
+  //           newArtefact.mask = wktPolygonToSvg(res.data.results[0].poly)
+  //           newArtefact.transform_matrix = dbMatrixToSVG(
+  //             JSON.parse(res.data.results[0].transform_matrix).matrix
+  //           )
+  //           newArtefact.rect = wktPolygonToSvg(res.data.results[0].rect)
+  //           this._items.set(artefactID, new this.model(newArtefact))
+  //           resolve(res.data.results)
+  //         }
+  //       })
+  //     } catch (err) {
+  //       reject(err)
+  //     }
+  //   })
+  // }
 }

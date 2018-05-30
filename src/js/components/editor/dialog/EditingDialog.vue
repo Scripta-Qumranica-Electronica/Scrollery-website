@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="Editor Dialog" :visible="dialogVisible" class="editor-dialog" @close="$emit('close')">
+  <el-dialog title="Editor" :visible="dialogVisible" width="70vw" class="editor-dialog" @close="$emit('close')">
 
     <!-- Display the sign in context of the line -->
     <div class="line-subheader">
@@ -15,7 +15,7 @@
     <el-tabs v-model="activeName">
       <el-tab-pane label="Sign Attributes" name="attributes">
         <tab>
-          <h1>Attributes</h1>
+          <attributes-editor :sign="sign"></attributes-editor>
         </tab>
       </el-tab-pane>
       <el-tab-pane label="Comments" name="comments">
@@ -36,6 +36,7 @@
 <script>
 // components
 import Tab from './Tab.vue'
+import AttributesEditor from './attributes/AttributesEditor.vue'
 import CommentsEditor from './CommentsEditor.vue'
 
 /**
@@ -44,6 +45,7 @@ import CommentsEditor from './CommentsEditor.vue'
 export default {
   components: {
     tab: Tab,
+    'attributes-editor': AttributesEditor,
     'comments-editor': CommentsEditor,
   },
   props: {

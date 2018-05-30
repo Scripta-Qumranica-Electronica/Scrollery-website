@@ -1,12 +1,12 @@
 <template>
   <div>
-    <span class="clickable-menu-item" @click="selectCombination">{{combination.name}}{{combination.user_id ? ` - ${username}` : ''}}</span>
-    <i class="fa fa-clone" @click="cloneScroll"></i>
+    <span class="clickable-menu-item" @click="selectCombination">{{combination.name}}{{combination.user_id !== 1 ? ` - ${username}` : ' - default'}}</span>
     <i 
       class="fa" 
       :class="{'fa-lock': combination.locked, 'fa-unlock': !combination.locked}" 
       :style="{color: combination.locked ? 'red' : 'green'}"
       @click="lockScroll"></i>
+    <i class="fa fa-clone" @click="corpus.cloneScroll(combination.scroll_version_id)"></i>
     <!-- Use v-if here so we don't waste space on the DOM -->
     <div class="children" v-if="open">
         <ul>
@@ -88,17 +88,19 @@ export default {
           this.combination.scroll_id,
           this.combination.scroll_version_id
         )
-        this.corpus.populateImageReferencesOfCombination(this.combination.scroll_version_id)
-        // .then(res => {
-        // this.corpus.populateArtefactsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
-        // .then(res1 => {
-        // })
-        // })
+        this.corpus
+          .populateImageReferencesOfCombination(
+            this.combination.scroll_id,
+            this.combination.scroll_version_id
+          )
+          .then(res => {
+            this.corpus.populateRoisOfCombination(
+              this.combination.scroll_id,
+              this.combination.scroll_version_id
+            )
+          })
       }
     },
-    // TODO implement the capability for these functions
-    // in the data model.
-    cloneScroll() {},
 
     lockScroll() {},
   },

@@ -218,6 +218,16 @@ DISTRIBUTIONS
       HTML::Tagset 3.20
     requirements:
       ExtUtils::MakeMaker 0
+  Import-Into-1.002005
+    pathname: H/HA/HAARG/Import-Into-1.002005.tar.gz
+    provides:
+      Import::Into 1.002005
+    requirements:
+      ExtUtils::MakeMaker 0
+      Module::Runtime 0
+      perl 5.006
+      strict 0
+      warnings 0
   JSON-XS-3.04
     pathname: M/ML/MLEHMANN/JSON-XS-3.04.tar.gz
     provides:
@@ -259,6 +269,16 @@ DISTRIBUTIONS
     requirements:
       Test::More 0
       YAML 0
+  Module-Runtime-0.016
+    pathname: Z/ZE/ZEFRAM/Module-Runtime-0.016.tar.gz
+    provides:
+      Module::Runtime 0.016
+    requirements:
+      Module::Build 0
+      Test::More 0.41
+      perl 5.006
+      strict 0
+      warnings 0
   Package-Constants-0.06
     pathname: B/BI/BINGOS/Package-Constants-0.06.tar.gz
     provides:
@@ -267,6 +287,16 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Test::More 0
       perl 5.006
+  PerlIO-utf8_strict-0.007
+    pathname: L/LE/LEONT/PerlIO-utf8_strict-0.007.tar.gz
+    provides:
+      PerlIO::utf8_strict 0.007
+    requirements:
+      ExtUtils::MakeMaker 0
+      XSLoader 0
+      perl 5.008
+      strict 0
+      warnings 0
   Ref-Util-0.203
     pathname: A/AR/ARC/Ref-Util-0.203.tar.gz
     provides:
@@ -342,3 +372,22 @@ DISTRIBUTIONS
       common::sense 3.74
     requirements:
       ExtUtils::MakeMaker 0
+  utf8-all-0.024
+    pathname: H/HA/HAYOBAAN/utf8-all-0.024.tar.gz
+    provides:
+      utf8::all 0.024
+    requirements:
+      Carp 0
+      Encode 0
+      ExtUtils::MakeMaker 0
+      Import::Into 0
+      PerlIO::utf8_strict 0
+      Symbol 0
+      charnames 0
+      feature 0
+      open 0
+      parent 0
+      perl 5.010
+      strict 0
+      utf8 0
+      warnings 0

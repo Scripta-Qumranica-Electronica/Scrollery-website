@@ -2,7 +2,7 @@ import extendModel from './extendModel.js'
 
 /**
  * Default values for a new sign object
- * 
+ *
  * @static
  * @constant
  */
@@ -11,6 +11,7 @@ const defaults = {
   name: '',
   side: 0,
   mask: '',
+  svgInCombination: '',
   transform_matrix: '',
   rect: '',
   image_catalog_id: Number,
@@ -18,10 +19,10 @@ const defaults = {
 
 /**
  * Manage all the data related to a sign
- * 
+ *
  * Signs are immutable, and any mutations create new signs
- * 
+ *
  * @class
  * @extends Record
  */
-export default class Artefact extends extendModel(defaults) { }
+export default class Artefact extends extendModel(defaults) {}

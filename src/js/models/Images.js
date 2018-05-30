@@ -3,8 +3,7 @@ import Image from './Image.js'
 
 export default class Images extends MapList {
   constructor(
-    username,
-    password,
+    session_id,
     idKey,
     ajaxPayload = undefined,
     attributes = {},
@@ -13,6 +12,6 @@ export default class Images extends MapList {
     idKey = idKey || 'sqe_image_id'
     standardTransaction = 'imagesOfInstFragments'
     // ajaxPayload = ajaxPayload ? ajaxPayload : '{transaction: 'imagesOfInstFragments'}'
-    super(username, password, idKey, ajaxPayload, Image, attributes, standardTransaction)
+    super(session_id, idKey, ajaxPayload, Image, attributes, standardTransaction)
   }
 }

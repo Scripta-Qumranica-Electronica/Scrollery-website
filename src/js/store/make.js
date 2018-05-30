@@ -4,7 +4,6 @@ export default function(Vuex, plugins) {
       sessionID: '',
       userID: -1,
       username: '',
-      password: '',
       language: 'en',
       languages: {},
       working: 0,
@@ -13,7 +12,6 @@ export default function(Vuex, plugins) {
       sessionID: state => state.sessionID,
       userID: state => state.userID,
       username: state => state.username,
-      password: state => state.password,
       language: state => state.language,
       languages: state => state.languages,
       scrollID: state => state.scrollID,
@@ -35,9 +33,6 @@ export default function(Vuex, plugins) {
       },
       setUsername(state, name) {
         state.username = name
-      },
-      setPassword(state, passwd) {
-        state.password = passwd
       },
       setLanguage(state, language) {
         state.language = language

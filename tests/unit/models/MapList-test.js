@@ -4,15 +4,13 @@ import MapList from '~/models/MapList.js'
 describe('MapList', () => {
 
     let mapList
-    let username = 'username'
-    let password = 'password'
+    let session_id = 'session'
     let idKey = 'key'
     let ajaxPayload = {}
 
     beforeEach(() => {
         mapList = new MapList(
-            username,
-            password,
+            session_id,
             idKey,
             ajaxPayload,
             Model
@@ -22,8 +20,7 @@ describe('MapList', () => {
     describe('instantiating', () => {
         it('should accept attributes', () => {
             mapList = new MapList(
-                username,
-                password,
+                session_id,
                 idKey,
                 ajaxPayload,
                 Model,

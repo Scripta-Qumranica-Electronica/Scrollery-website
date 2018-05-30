@@ -9,25 +9,28 @@
 export function wktPolygonToSvg(geoJSON, boundingRect) {
   let svg
   if (geoJSON.substring(0, 9) === 'POLYGON((') {
+    const polygonInitRegex = /POLYGON/g
+    const parenInitRegex = /\(/g
+    const parenEndRegex = /\)/g
     svg = ''
-    const polygons = geoJSON.split("\),\(")
+    const polygons = geoJSON.split('),(')
     polygons.forEach(polygon => {
       svg += 'M'
-      polygon = polygon.replace(/POLYGON/g, "")
-      polygon = polygon.replace(/\(/g, "")
-      polygon = polygon.replace(/\)/g, "")
-      var points = polygon.split(",")
+      polygon = polygon.replace(polygonInitRegex, '')
+      polygon = polygon.replace(parenInitRegex, '')
+      polygon = polygon.replace(parenEndRegex, '')
+      var points = polygon.split(',')
 
       if (boundingRect) {
         points.forEach(point => {
-          if (svg.slice(-1) !== 'M'){
+          if (svg.slice(-1) !== 'M') {
             svg += 'L'
           }
           svg += `${point.split(' ')[0] - boundingRect.x} ${point.split(' ')[1] - boundingRect.y}`
         })
       } else {
         points.forEach(point => {
-          if (svg.slice(-1) !== 'M'){
+          if (svg.slice(-1) !== 'M') {
             svg += 'L'
           }
           svg += `${point.split(' ')[0]} ${point.split(' ')[1]}`
@@ -43,12 +46,12 @@ export function wktPolygonToSvg(geoJSON, boundingRect) {
  * point into an SVG path.
  */
 export function wktPointToSvg(geoJSON) {
-    return geoJSON.substring(0, 6) === 'POINT(' 
-        ? {
-            x: parseFloat(geoJSON.split(' ')[0].replace('POINT(', '')),
-            y: parseFloat(geoJSON.split(' ')[1])
-        }
-        : undefined
+  return geoJSON.substring(0, 6) === 'POINT('
+    ? {
+        x: parseFloat(geoJSON.split(' ')[0].replace('POINT(', '')),
+        y: parseFloat(geoJSON.split(' ')[1]),
+      }
+    : undefined
 }
 
 /*
@@ -57,18 +60,18 @@ export function wktPointToSvg(geoJSON) {
  * that to a JSON object with an x-origin,
  * y-origin, width, and hieght.
  */
-export function wktParseRect(geoJSON) {
-    let svg
-    if (geoJSON.substring(0, 9) === 'POLYGON((') {
-        const rect = geoJSON.replace('POLYGON((', '')
-        const coords = rect.split(',')
-        const x = parseInt(coords[0].split(' ')[0])
-        const y = parseInt(coords[0].split(' ')[1])
-        const width = parseInt(coords[2].split(' ')[0]) - x
-        const height = parseInt(coords[2].split(' ')[1]) - y
-        svg = { x, y, width, height }
-    }
-    return svg
+export function wktParseRect(wkt) {
+  let returnRect
+  if (wkt.substring(0, 9) === 'POLYGON((') {
+    const rect = wkt.replace('POLYGON((', '')
+    const coords = rect.split(',')
+    const x = parseInt(coords[0].split(' ')[0])
+    const y = parseInt(coords[0].split(' ')[1])
+    const width = parseInt(coords[2].split(' ')[0]) - x
+    const height = parseInt(coords[2].split(' ')[1]) - y
+    returnRect = { x, y, width, height }
+  }
+  return returnRect
 }
 
 /*
@@ -76,30 +79,80 @@ export function wktParseRect(geoJSON) {
  * converts it to a WKT Polygon.
  */
 export function svgPolygonToWKT(svg) {
-    let wkt = undefined
-    if (svg.startsWith("M")) {
-        wkt = 'POLYGON('
-        const polygons = svg.split("M")
-        polygons.forEach(poly => {
-            if (poly) {
-                if (wkt === 'POLYGON(') {
-                    wkt += '('
-                } else {
-                    wkt += '),('
-                }
-                const lines = poly.replace(/L /g, '')
-                const points = lines.split(' ')
-                for (let i = 0, length = points.length - 3; i <= length; i += 2) {
-                    wkt += points[i] + ' ' + points[i+1]
-                    if (i !== length) {
-                        wkt += ','
-                    }
-                }
+  let wkt = undefined
+  svg = svg.trim()
+  if (svg.startsWith('M')) {
+    const lineSegmentRegex = /\sL\s|L|L\s|\sL/g
+    const zTerminatorRegex = /Z/g
+    wkt = 'POLYGON('
+    const polygons = svg.split('M')
+    polygons.forEach(poly => {
+      if (poly) {
+        if (wkt === 'POLYGON(') {
+          wkt += '('
+        } else {
+          wkt += '),('
+        }
+        let firstPoint
+        let points
+        const lines = poly
+          .replace(lineSegmentRegex, ' ')
+          .replace(zTerminatorRegex, '')
+          .trim()
+        points = lines.split(' ')
+        firstPoint = points[0] + ' ' + points[1]
+        for (let i = 0, length = points.length - 1; i <= length; i += 2) {
+          wkt += points[i] + ' ' + points[i + 1]
+          if (i + 2 > length) {
+            if (points[i] + ' ' + points[i + 1] !== firstPoint) {
+              wkt += ',' + firstPoint
             }
-        })
-        wkt += '))'
-    }
-	return wkt
+          } else {
+            wkt += ','
+          }
+        }
+      }
+    })
+    wkt += '))'
+  }
+  return wkt
+}
+
+/*
+ * This function receives an SVG path and 
+ * converts it to a WKT Polygon.
+ */
+export function svgPolygonToGeoJSON(svg) {
+  let json = undefined
+  svg = svg.trim()
+  if (svg.startsWith('M')) {
+    json = { type: 'Polygon', coordinates: [] }
+    const lineSegmentRegex = /\sL\s|L|L\s|\sL/g
+    const zTerminatorRegex = /Z/g
+    const polygons = svg.split('M')
+    polygons.forEach((poly, index) => {
+      if (poly) {
+        json.coordinates.push([])
+        let firstPoint
+        let points
+        const lines = poly
+          .replace(lineSegmentRegex, ' ')
+          .replace(zTerminatorRegex, '')
+          .trim()
+        points = lines.split(' ')
+        firstPoint = [Number(points[0]), Number(points[1])]
+        for (let i = 0, length = points.length - 1; i <= length; i += 2) {
+          json.coordinates[index - 1].push([Number(points[i]), Number(points[i + 1])])
+          if (i + 2 > length) {
+            if (Number(points[i]) !== firstPoint[0] || Number(points[i + 1]) !== firstPoint[1]) {
+              json.coordinates[index - 1].push(firstPoint)
+            }
+          }
+        }
+      }
+    })
+  }
+  return json
 }
 
 /* 
@@ -109,20 +162,12 @@ export function svgPolygonToWKT(svg) {
  * used in an SVG element.
  */
 export function dbMatrixToSVG(matrix) {
-    return matrix.length === 2 &&
-    matrix[0].length === 3 &&
-    matrix[1].length === 3
-    ?
-        [
-            matrix[0][0],
-            matrix[1][0],
-            matrix[0][1],
-            matrix[1][1],
-            matrix[0][2],
-            matrix[1][2]
-        ] 
-    :
-        undefined
+  if (matrix.constructor === String && isJSON(matrix)) {
+    matrix = JSON.parse(matrix).matrix
+  }
+  return matrix.length === 2 && matrix[0].length === 3 && matrix[1].length === 3
+    ? [matrix[0][0], matrix[1][0], matrix[0][1], matrix[1][1], matrix[0][2], matrix[1][2]]
+    : undefined
 }
 
 /* 
@@ -131,11 +176,11 @@ export function dbMatrixToSVG(matrix) {
  * 2D transform matrix as stored in the database.
  */
 export function svgMatrixToDB(matrix) {
-    return Array.isArray(matrix) && matrix.length === 6
-    ?
-        `{"matrix": [[${matrix[0]},${matrix[2]},${matrix[4]}],[${matrix[1]},${matrix[3]},${matrix[5]}]]}`
-    :
-        undefined
+  return Array.isArray(matrix) && matrix.length === 6
+    ? `{"matrix": [[${matrix[0]},${matrix[2]},${matrix[4]}],[${matrix[1]},${matrix[3]},${
+        matrix[5]
+      }]]}`
+    : undefined
 }
 
 /* 
@@ -144,28 +189,26 @@ export function svgMatrixToDB(matrix) {
  * transform matrix.
  */
 export function matrix6To16(matrix) {
-    return Array.isArray(matrix) && matrix.length === 6
-    ?
-        [
-            matrix[0],
-            matrix[1],
-            0,
-            0,
-            matrix[2],
-            matrix[3],
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            matrix[4],
-            matrix[5],
-            0,
-            1
-        ]
-    :
-        undefined
+  return Array.isArray(matrix) && matrix.length === 6
+    ? [
+        matrix[0],
+        matrix[1],
+        0,
+        0,
+        matrix[2],
+        matrix[3],
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        matrix[4],
+        matrix[5],
+        0,
+        1,
+      ]
+    : undefined
 }
 
 /* 
@@ -174,18 +217,9 @@ export function matrix6To16(matrix) {
  * transform matrix.
  */
 export function matrix16To6(matrix) {
-    return Array.isArray(matrix) && matrix.length === 16
-    ?
-        [
-            matrix[0],
-            matrix[1],
-            matrix[4],
-            matrix[5],
-            matrix[12],
-            matrix[13]
-        ]
-    :
-        undefined
+  return Array.isArray(matrix) && matrix.length === 16
+    ? [matrix[0], matrix[1], matrix[4], matrix[5], matrix[12], matrix[13]]
+    : undefined
 }
 
 /*
@@ -197,8 +231,8 @@ export function matrix16To6(matrix) {
 export function clipCanvas(canvas, svgClipPath, divisor) {
   divisor = divisor ? divisor : 1
   let ctx = canvas.getContext('2d')
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.globalCompositeOperation='source-over'
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.globalCompositeOperation = 'source-over'
   ctx.fillStyle = 'purple'
   const polygons = svgClipPath.split('M').slice(1)
   ctx.beginPath()
@@ -214,4 +248,12 @@ export function clipCanvas(canvas, svgClipPath, divisor) {
     ctx.closePath()
   })
   ctx.fill()
+}
+
+function isJSON(str) {
+  try {
+    return JSON.parse(str) && !!str
+  } catch (e) {
+    return false
+  }
 }

@@ -134,7 +134,7 @@ export default {
       zoom: 0.5,
       scale: 0.2,
       selectedImage: undefined,
-      viewMode: 'ART',
+      viewMode: 'NONE',
       drawingMode: 'draw',
       brushCursorSize: 20,
       clipMask: undefined,
@@ -251,28 +251,28 @@ export default {
 
       // Load new artefact ID if there is one
       if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
+        this.viewMode = 'ART'
         if (to.params.artID.toString().indexOf('name') !== -1) {
-          this.viewMode = 'ART'
           this.artefact = 'new'
           this.artName = to.params.artID.split('name-')[1]
         } else {
           this.artefact = to.params.artID >>> 0
           this.scrollVersionID = to.params.scrollVersionID >>> 0
-          if (this.corpus.artefacts.get(this.artefact).mask === '') {
-            // this.$store.commit('addWorking')
-            this.corpus.artefacts
-              .fetchMask(to.params.scrollVersionID, to.params.artID)
-              .then(res => {
-                // this.$store.commit('delWorking')
-                this.firstClipMask = this.clipMask = wktPolygonToSvg(
-                  this.corpus.artefacts.get(this.artefact).mask
-                )
-              })
-          } else {
-            this.firstClipMask = this.clipMask = wktPolygonToSvg(
-              this.corpus.artefacts.get(this.artefact).mask
-            )
-          }
+          // if (this.corpus.artefacts.get(this.artefact).mask === '') {
+          //   // this.$store.commit('addWorking')
+          //   this.corpus.artefacts
+          //     .fetchMask(to.params.scrollVersionID, to.params.artID)
+          //     .then(res => {
+          //       // this.$store.commit('delWorking')
+          //       this.firstClipMask = this.clipMask = wktPolygonToSvg(
+          //         this.corpus.artefacts.get(this.artefact).mask
+          //       )
+          //     })
+          // } else {
+          this.firstClipMask = this.clipMask = wktPolygonToSvg(
+            this.corpus.artefacts.get(this.artefact).mask
+          )
+          // }
         }
         this.lock = false
       }

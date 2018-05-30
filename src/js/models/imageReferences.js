@@ -3,8 +3,7 @@ import ImageReference from './ImageReference.js'
 
 export default class Images extends MapList {
   constructor(
-    username,
-    password,
+    session_id,
     idKey,
     ajaxPayload = undefined,
     attributes = {},
@@ -13,6 +12,6 @@ export default class Images extends MapList {
     idKey = idKey || 'id'
     standardTransaction = 'getImgOfComb'
     // ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getImgOfComb'}
-    super(username, password, idKey, ajaxPayload, ImageReference, attributes, standardTransaction)
+    super(session_id, idKey, ajaxPayload, ImageReference, attributes, standardTransaction)
   }
 }

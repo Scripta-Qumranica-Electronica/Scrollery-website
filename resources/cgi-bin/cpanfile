@@ -11,3 +11,4 @@ requires "Package::Constants", "0.06";
 requires "Ref::Util", "0.203";
 requires "CGI", "4.38";
 requires "Math::Geometry::Planar", "1.18";
+requires "utf8::all", "0.024",
