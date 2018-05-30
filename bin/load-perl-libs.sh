@@ -7,13 +7,7 @@ while getopts ":v:" opt; do
     esac
 done
 
-echo "Checking for existing perl-libs..."
-if [ -d "../resources/perl-libs" ]; then
-  echo "Removing old perl-libs..."
-  rm -rf ../resources/perl-libs
-fi
-
-echo "Checking for Data_Files repository."
+echo "Checking for perl-libs repository."
 if [ -d "../resources/perl-libs/.git" ];
 then
     echo "Fetching changes."
