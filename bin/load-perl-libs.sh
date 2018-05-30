@@ -14,7 +14,7 @@ if [ -d "../resources/perl-libs" ]; then
 fi
 
 echo "Checking for Data_Files repository."
-if [ -d "../resources/perl-libs" ];
+if [ -d "../resources/perl-libs/.git" ];
 then
     echo "Fetching changes."
     cd ../resources/perl-libs
