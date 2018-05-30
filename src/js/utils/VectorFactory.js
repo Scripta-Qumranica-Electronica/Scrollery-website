@@ -117,6 +117,44 @@ export function svgPolygonToWKT(svg) {
   }
   return wkt
 }
+
+/*
+ * This function receives an SVG path and 
+ * converts it to a WKT Polygon.
+ */
+export function svgPolygonToGeoJSON(svg) {
+  let json = undefined
+  svg = svg.trim()
+  if (svg.startsWith('M')) {
+    json = { type: 'Polygon', coordinates: [] }
+    const lineSegmentRegex = /\sL\s|L|L\s|\sL/g
+    const zTerminatorRegex = /Z/g
+    const polygons = svg.split('M')
+    polygons.forEach((poly, index) => {
+      if (poly) {
+        json.coordinates.push([])
+        let firstPoint
+        let points
+        const lines = poly
+          .replace(lineSegmentRegex, ' ')
+          .replace(zTerminatorRegex, '')
+          .trim()
+        points = lines.split(' ')
+        firstPoint = [Number(points[0]), Number(points[1])]
+        for (let i = 0, length = points.length - 1; i <= length; i += 2) {
+          json.coordinates[index - 1].push([Number(points[i]), Number(points[i + 1])])
+          if (i + 2 > length) {
+            if (Number(points[i]) !== firstPoint[0] || Number(points[i + 1]) !== firstPoint[1]) {
+              json.coordinates[index - 1].push(firstPoint)
+            }
+          }
+        }
+      }
+    })
+  }
+  return json
+}
+
 /* 
  * This function expects the transform matrix 
  * to be in a 2D array: [[a,c,tx],[b,d,ty]].

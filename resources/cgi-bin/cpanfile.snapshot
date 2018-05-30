@@ -50,8 +50,8 @@ DISTRIBUTIONS
       Data::Dumper 0
       ExtUtils::MakeMaker 0
       perl 5.008001
-  DBI-1.641
-    pathname: T/TI/TIMB/DBI-1.641.tar.gz
+  DBI-1.640
+    pathname: T/TI/TIMB/DBI-1.640.tar.gz
     provides:
       Bundle::DBI 12.008696
       DBD::DBM 0.08
@@ -107,7 +107,7 @@ DISTRIBUTIONS
       DBD::Sponge::dr 12.010003
       DBD::Sponge::st 12.010003
       DBDI 12.015129
-      DBI 1.641
+      DBI 1.640
       DBI::Const::GetInfo::ANSI 2.008697
       DBI::Const::GetInfo::ODBC 2.011374
       DBI::Const::GetInfoReturn 2.008697
@@ -147,9 +147,10 @@ DISTRIBUTIONS
       DBI::SQL::Nano::Table_ 1.015544
       DBI::Util::CacheMemory 0.010315
       DBI::Util::_accessor 0.009479
-      DBI::common 1.641
+      DBI::common 1.640
     requirements:
       ExtUtils::MakeMaker 6.48
+      Storable 2.16
       Test::Simple 0.90
       perl 5.008
   Data-UUID-1.221
@@ -159,10 +160,10 @@ DISTRIBUTIONS
     requirements:
       Digest::MD5 0
       ExtUtils::MakeMaker 0
-  Encode-2.98
-    pathname: D/DA/DANKOGAI/Encode-2.98.tar.gz
+  Encode-2.95
+    pathname: D/DA/DANKOGAI/Encode-2.95.tar.gz
     provides:
-      Encode 2.98
+      Encode 2.95
       Encode::Alias 2.24
       Encode::Byte 2.04
       Encode::CJKConstants 2.02
@@ -174,7 +175,7 @@ DISTRIBUTIONS
       Encode::Encoding 2.08
       Encode::GSM0338 2.07
       Encode::Guess 2.07
-      Encode::Internal 2.98
+      Encode::Internal 2.95
       Encode::JP 2.04
       Encode::JP::H2Z 2.02
       Encode::JP::JIS7 2.08
@@ -185,12 +186,12 @@ DISTRIBUTIONS
       Encode::MIME::Name 1.03
       Encode::Symbol 2.02
       Encode::TW 2.03
-      Encode::UTF_EBCDIC 2.98
-      Encode::Unicode 2.17
+      Encode::UTF_EBCDIC 2.95
+      Encode::Unicode 2.16
       Encode::Unicode::UTF7 2.10
-      Encode::XS 2.98
-      Encode::utf8 2.98
-      encoding 2.22
+      Encode::XS 2.95
+      Encode::utf8 2.95
+      encoding 2.21
     requirements:
       Exporter 5.57
       ExtUtils::MakeMaker 0
@@ -296,11 +297,11 @@ DISTRIBUTIONS
       perl 5.008
       strict 0
       warnings 0
-  Ref-Util-0.204
-    pathname: A/AR/ARC/Ref-Util-0.204.tar.gz
+  Ref-Util-0.203
+    pathname: A/AR/ARC/Ref-Util-0.203.tar.gz
     provides:
-      Ref::Util 0.204
-      Ref::Util::PP 0.204
+      Ref::Util 0.203
+      Ref::Util::PP 0.203
     requirements:
       Exporter 5.57
       ExtUtils::MakeMaker 0
@@ -316,17 +317,24 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       XSLoader 0
       perl 5.006
-  Scalar-List-Utils-1.50
-    pathname: P/PE/PEVANS/Scalar-List-Utils-1.50.tar.gz
+  Scalar-List-Utils-1.49
+    pathname: P/PE/PEVANS/Scalar-List-Utils-1.49.tar.gz
     provides:
-      List::Util 1.50
-      List::Util::XS 1.50
-      Scalar::Util 1.50
-      Sub::Util 1.50
+      List::Util 1.49
+      List::Util::XS 1.49
+      Scalar::Util 1.49
+      Sub::Util 1.49
     requirements:
       ExtUtils::MakeMaker 0
       Test::More 0
       perl 5.006
+  Sub-Identify-0.14
+    pathname: R/RG/RGARCIA/Sub-Identify-0.14.tar.gz
+    provides:
+      Sub::Identify 0.14
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
   Types-Serialiser-1.0
     pathname: M/ML/MLEHMANN/Types-Serialiser-1.0.tar.gz
     provides:

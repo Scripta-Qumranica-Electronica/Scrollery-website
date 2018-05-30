@@ -3,6 +3,7 @@ import {
   wktPointToSvg,
   wktParseRect,
   svgPolygonToWKT,
+  svgPolygonToGeoJSON,
   dbMatrixToSVG,
   svgMatrixToDB,
   matrix6To16,
@@ -160,6 +161,41 @@ describe('VectorFactory.svgPolygonToWKT', () => {
     wkt += '))'
     // assert expected value
     expect(svgPolygonToWKT(svg)).to.equal(wkt)
+  })
+})
+
+describe('VectorFactory.svgPolygonToGeoJSON', () => {
+  it('should return undefined when unrecognized input passed', () => {
+    expect(svgPolygonToGeoJSON('INCORRECT')).to.equal(undefined)
+  })
+
+  it('should convert an SVG path to a GeoJSON representation', () => {
+    // Setup the input and result
+    const svg = 'M0 0 10 0 10 10 0 10M1 1 1 3 3 3 3 1'
+    const geoJSON = 
+    {
+      type:'Polygon',
+      coordinates:
+      [
+        [
+          [0,0],
+          [10,0],
+          [10,10],
+          [0,10],
+          [0,0]
+        ],
+        [
+          [1,1],
+          [1,3],
+          [3,3],
+          [3,1],
+          [1,1]
+        ]
+      ]
+    }
+    // assert expected value
+    expect(JSON.stringify(svgPolygonToGeoJSON(svg)))
+    .to.equal(JSON.stringify(geoJSON))
   })
 })
 

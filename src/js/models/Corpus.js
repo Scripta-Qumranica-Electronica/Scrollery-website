@@ -4,10 +4,18 @@ import Cols from './Cols.js'
 import Images from './Images.js'
 import Artefacts from './Artefacts.js'
 import ROIs from './ROIs.js'
-import { dbMatrixToSVG, svgMatrixToDB, svgPolygonToWKT } from '~/utils/VectorFactory.js'
-const jsts = require('jsts')
+import {
+  dbMatrixToSVG,
+  svgMatrixToDB,
+  svgPolygonToWKT,
+  svgPolygonToGeoJSON,
+  wktParseRect,
+} from '~/utils/VectorFactory.js'
 import axios from 'axios'
 import { wktPolygonToSvg } from '../utils/VectorFactory.js'
+
+import { polygon } from '@turf/helpers'
+import booleanOverlap from '@turf/boolean-overlap'
 
 /* TODO I ignore this for testing until I decide on
  * a set model.  Write tests when that has been
@@ -409,8 +417,9 @@ export default class Corpus {
           let roiMatrix = dbMatrixToSVG(
             this.artefacts.get(artefact_position_id[index]).transform_matrix
           )
-          roiMatrix[4] = roiMatrix[4] + currentROI.x
-          roiMatrix[5] = roiMatrix[5] + currentROI.y
+          const artefactRect = wktParseRect(this.artefacts.get(artefact_position_id[index]).rect)
+          roiMatrix[4] = roiMatrix[4] + currentROI.x - artefactRect.x
+          roiMatrix[5] = roiMatrix[5] + currentROI.y - artefactRect.y
           const roiGeoJSONPath = {
             type: 'Polygon',
             coordinates: [
@@ -488,20 +497,19 @@ export default class Corpus {
    * 
    */
   mapRoisToArtefacts(rois, artefacts) {
-    const reader = new jsts.io.WKTReader()
     artefacts.forEach(artefactID => {
       rois.forEach(roiID => {
-        if (
-          !reader
-            .read(svgPolygonToWKT(this.artefacts.get(artefactID).svgInCombination))
-            .intersection(svgPolygonToWKT(this.rois.get(roiID).svgInCombination))
-            .isEmpty()
-        ) {
-          let update = this.artefacts.get(artefactID).toJS()
-          update.rois.push(roiID)
-          this.artefacts.set(artefactID, new this.artefacts.model(update))
-          console.log(roiID, 'is inside', artefactID)
-        }
+        // if (
+        //   !reader
+        //     .read(svgPolygonToWKT(this.artefacts.get(artefactID).svgInCombination))
+        //     .intersection(svgPolygonToWKT(this.rois.get(roiID).svgInCombination))
+        //     .isEmpty()
+        // ) {
+        //   let update = this.artefacts.get(artefactID).toJS()
+        //   update.rois.push(roiID)
+        //   this.artefacts.set(artefactID, new this.artefacts.model(update))
+        //   console.log(roiID, 'is inside', artefactID)
+        // }
       })
     })
   }
@@ -514,39 +522,42 @@ export default class Corpus {
    * 
    */
   mapRoisAndArtefactsInCombination(scroll_version_id) {
-    const reader = new jsts.io.WKTReader()
+    console.time('overLapSearch')
     this.combinations.get(scroll_version_id).artefacts.forEach(artefactID => {
-      let artefactSVG = reader.read(
-        svgPolygonToWKT(this.artefacts.get(artefactID).svgInCombination)
+      let currentArtefact = polygon(
+        svgPolygonToGeoJSON(this.artefacts.get(artefactID).svgInCombination).coordinates
       )
       // console.log(artefactSVG.toText())
-      if (!artefactSVG.isValid()) {
-        console.log('Artefact', artefactID, 'is invalid, trying to fix.')
-        console.log(wktPolygonToSvg(artefactSVG.toText()))
-        artefactSVG = artefactSVG.buffer(0)
-        console.log(artefactSVG.toText())
-        if (!artefactSVG.isValid()) {
-          console.log('Cannot fix artefact', artefactID, '.')
-        }
-      }
-      this.combinations.get(scroll_version_id).rois.forEach(roiID => {
-        let roiSVG = reader.read(svgPolygonToWKT(this.rois.get(roiID).svgInCombination))
 
-        // console.log(roiSVG.toText())
-        if (roiSVG.isValid() && artefactSVG.isValid()) {
-          let intersection = artefactSVG.intersection(roiSVG)
-          if (!intersection.isEmpty()) {
-            let update = this.artefacts.get(artefactID).toJS()
-            update.rois.push(roiID)
-            this.artefacts.set(artefactID, new this.artefacts.model(update))
-            console.log(roiID, 'is inside', artefactID)
-          }
+      this.combinations.get(scroll_version_id).rois.forEach(roiID => {
+        let currentROI = polygon(
+          svgPolygonToGeoJSON(this.rois.get(roiID).svgInCombination).coordinates
+        )
+        if (booleanOverlap(currentArtefact, currentROI)) {
+          console.log('We have overlap between ROI', roiID, 'and Artefact', artefactID)
+          console.log(currentArtefact)
+          console.log(currentROI)
         } else {
-          if (!roiSVG.isValid()) {
-            console.log('ROI', roiID, 'is invalid.')
-          }
+          console.log('No overlap')
         }
+        // let roiSVG = reader.read(svgPolygonToWKT(this.rois.get(roiID).svgInCombination))
+
+        // // console.log(roiSVG.toText())
+        // if (roiSVG.isValid() && artefactSVG.isValid()) {
+        //   let intersection = artefactSVG.intersection(roiSVG)
+        //   if (!intersection.isEmpty()) {
+        //     let update = this.artefacts.get(artefactID).toJS()
+        //     update.rois.push(roiID)
+        //     this.artefacts.set(artefactID, new this.artefacts.model(update))
+        //     console.log(roiID, 'is inside', artefactID)
+        //   }
+        // } else {
+        //   if (!roiSVG.isValid()) {
+        //     console.log('ROI', roiID, 'is invalid.')
+        //   }
+        // }
       })
     })
+    console.timeEnd('overLapSearch')
   }
 }
