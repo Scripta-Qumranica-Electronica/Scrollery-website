@@ -9,9 +9,6 @@ addons:
 cache:
   directories:
     - node_modules
-    - resources/cgi-bin/local
-    - resources/perl-libs
-    - resources/data-files
 before_script:
   - sudo apt-get -qq update && sudo apt-get install -y perl carton
   - npm run bootstrap
