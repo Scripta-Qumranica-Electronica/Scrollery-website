@@ -13,7 +13,7 @@ echo "Setting up docker container. This can take a few minutes depending on your
 
 # clone the data repository
 echo "Checking for Data_Files repository."
-if [ -d "../resources/data-files" ];
+if [ -d "../resources/data-files/.git" ];
 then
     echo "Fetching changes."
     cd ../resources/data-files
