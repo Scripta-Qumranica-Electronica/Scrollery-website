@@ -18,11 +18,14 @@ then
     echo "Fetching changes."
     cd ../resources/data-files
     git fetch
+    git checkout master
+    git pull origin master
 else
     echo "Cloning repository."
     git clone https://github.com/Scripta-Qumranica-Electronica/Data-files.git ../resources/data-files
     # cd into the directory
     cd ../resources/data-files
+    git fetch
 fi
 
 echo "Checking for desired version"
