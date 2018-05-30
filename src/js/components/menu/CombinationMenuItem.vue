@@ -88,15 +88,17 @@ export default {
           this.combination.scroll_id,
           this.combination.scroll_version_id
         )
-        this.corpus.populateImageReferencesOfCombination(
-          this.combination.scroll_id,
-          this.combination.scroll_version_id
-        )
-        // .then(res => {
-        // this.corpus.populateArtefactsOfCombination(this.combination.scroll_id, this.combination.scroll_version_id)
-        // .then(res1 => {
-        // })
-        // })
+        this.corpus
+          .populateImageReferencesOfCombination(
+            this.combination.scroll_id,
+            this.combination.scroll_version_id
+          )
+          .then(res => {
+            this.corpus.populateRoisOfCombination(
+              this.combination.scroll_id,
+              this.combination.scroll_version_id
+            )
+          })
       }
     },
 

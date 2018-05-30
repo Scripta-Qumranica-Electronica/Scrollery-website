@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8::all;
 use JSON::XS;
 use Ref::Util qw<is_hashref is_arrayref>;
 use MIME::Base64;
@@ -1105,6 +1106,37 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($sqlQuery) or die
 		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
 	$sql->execute($json_post->{col_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
+
+	readResults($sql);
+	return;
+}
+
+sub getRoisOfCombination() {
+	my ($cgi, $json_post) = @_;
+
+	my $sqlQuery = <<'MYSQL';
+SELECT sign_char_roi_id, sign_char_id, ST_AsWKT(path) AS path, transform_matrix
+	FROM sign_char_roi
+JOIN sign_char_roi_owner USING(sign_char_roi_id)
+JOIN roi_shape USING(roi_shape_id)
+JOIN roi_position USING(roi_position_id)
+JOIN sign_char USING(sign_char_id)
+JOIN line_to_sign USING(sign_id)
+JOIN line_to_sign_owner USING(line_to_sign_id)
+JOIN col_to_line USING(line_id)
+JOIN col_to_line_owner USING(col_to_line_id)
+JOIN scroll_to_col USING(col_id)
+JOIN scroll_to_col_owner USING(scroll_to_col_id)
+WHERE scroll_to_col.scroll_id = ?
+	AND sign_char_roi_owner.scroll_version_id = ?
+	AND line_to_sign_owner.scroll_version_id = ?
+	AND col_to_line_owner.scroll_version_id = ?
+	AND scroll_to_col_owner.scroll_version_id = ?
+MYSQL
+
+	my $sql = $cgi->dbh->prepare_cached($sqlQuery) or die
+		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 
 	readResults($sql);
 	return;

@@ -58,7 +58,9 @@ class Corpus {
         return {versionID: versionID, scrollID: scrollID}
     }
     populateImageReferencesOfCombination(scrollID, versionID) {
-        return {versionID: versionID, scrollID: scrollID}
+        return new Promise(resolve => {
+            resolve ({versionID: versionID, scrollID: scrollID})
+        })
     }
 }
 

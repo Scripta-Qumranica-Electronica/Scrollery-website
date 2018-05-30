@@ -10,6 +10,7 @@ const defaults = {
   sign_char_roi_id: 0,
   sign_char_id: 0,
   path: '',
+  svgInCombination: '',
   transform_matrix: '',
 }
 

@@ -71,7 +71,9 @@ class Corpus {
     //     return {versionID: versionID, scrollID: scrollID}
     // }
     populateArtefactsOfImageReference(imageID, scrollVersionID) {
-        return {scrollVersionID: scrollVersionID, imageID: imageID}
+        return new Promise(resolve => {
+            resolve({scrollVersionID: scrollVersionID, imageID: imageID})
+        }) 
     }
     // populateArtefactsofImage(versionID, scrollID) {
     //     return {versionID: versionID, scrollID: scrollID}

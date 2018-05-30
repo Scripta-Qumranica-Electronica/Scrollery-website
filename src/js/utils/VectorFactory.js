@@ -9,13 +9,16 @@
 export function wktPolygonToSvg(geoJSON, boundingRect) {
   let svg
   if (geoJSON.substring(0, 9) === 'POLYGON((') {
+    const polygonInitRegex = /POLYGON/g
+    const parenInitRegex = /\(/g
+    const parenEndRegex = /\)/g
     svg = ''
     const polygons = geoJSON.split('),(')
     polygons.forEach(polygon => {
       svg += 'M'
-      polygon = polygon.replace(/POLYGON/g, '')
-      polygon = polygon.replace(/\(/g, '')
-      polygon = polygon.replace(/\)/g, '')
+      polygon = polygon.replace(polygonInitRegex, '')
+      polygon = polygon.replace(parenInitRegex, '')
+      polygon = polygon.replace(parenEndRegex, '')
       var points = polygon.split(',')
 
       if (boundingRect) {
@@ -77,7 +80,10 @@ export function wktParseRect(wkt) {
  */
 export function svgPolygonToWKT(svg) {
   let wkt = undefined
+  svg = svg.trim()
   if (svg.startsWith('M')) {
+    const lineSegmentRegex = /\sL\s|L|L\s|\sL/g
+    const zTerminatorRegex = /Z/g
     wkt = 'POLYGON('
     const polygons = svg.split('M')
     polygons.forEach(poly => {
@@ -87,11 +93,21 @@ export function svgPolygonToWKT(svg) {
         } else {
           wkt += '),('
         }
-        const lines = poly.replace(/L /g, '')
-        const points = lines.split(' ')
-        for (let i = 0, length = points.length - 3; i <= length; i += 2) {
+        let firstPoint
+        let points
+        const lines = poly
+          .replace(lineSegmentRegex, ' ')
+          .replace(zTerminatorRegex, '')
+          .trim()
+        points = lines.split(' ')
+        firstPoint = points[0] + ' ' + points[1]
+        for (let i = 0, length = points.length - 1; i <= length; i += 2) {
           wkt += points[i] + ' ' + points[i + 1]
-          if (i !== length) {
+          if (i + 2 > length) {
+            if (points[i] + ' ' + points[i + 1] !== firstPoint) {
+              wkt += ',' + firstPoint
+            }
+          } else {
             wkt += ','
           }
         }
@@ -100,6 +116,43 @@ export function svgPolygonToWKT(svg) {
     wkt += '))'
   }
   return wkt
+}
+
+/*
+ * This function receives an SVG path and 
+ * converts it to a WKT Polygon.
+ */
+export function svgPolygonToGeoJSON(svg) {
+  let json = undefined
+  svg = svg.trim()
+  if (svg.startsWith('M')) {
+    json = { type: 'Polygon', coordinates: [] }
+    const lineSegmentRegex = /\sL\s|L|L\s|\sL/g
+    const zTerminatorRegex = /Z/g
+    const polygons = svg.split('M')
+    polygons.forEach((poly, index) => {
+      if (poly) {
+        json.coordinates.push([])
+        let firstPoint
+        let points
+        const lines = poly
+          .replace(lineSegmentRegex, ' ')
+          .replace(zTerminatorRegex, '')
+          .trim()
+        points = lines.split(' ')
+        firstPoint = [Number(points[0]), Number(points[1])]
+        for (let i = 0, length = points.length - 1; i <= length; i += 2) {
+          json.coordinates[index - 1].push([Number(points[i]), Number(points[i + 1])])
+          if (i + 2 > length) {
+            if (Number(points[i]) !== firstPoint[0] || Number(points[i + 1]) !== firstPoint[1]) {
+              json.coordinates[index - 1].push(firstPoint)
+            }
+          }
+        }
+      }
+    })
+  }
+  return json
 }
 
 /* 

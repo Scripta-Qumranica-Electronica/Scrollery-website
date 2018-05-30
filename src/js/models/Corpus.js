@@ -4,8 +4,18 @@ import Cols from './Cols.js'
 import Images from './Images.js'
 import Artefacts from './Artefacts.js'
 import ROIs from './ROIs.js'
-import { dbMatrixToSVG, svgMatrixToDB } from '~/utils/VectorFactory.js'
+import {
+  dbMatrixToSVG,
+  svgMatrixToDB,
+  svgPolygonToWKT,
+  svgPolygonToGeoJSON,
+  wktParseRect,
+} from '~/utils/VectorFactory.js'
 import axios from 'axios'
+import { wktPolygonToSvg } from '../utils/VectorFactory.js'
+
+import { polygon } from '@turf/helpers'
+import booleanOverlap from '@turf/boolean-overlap'
 
 /* TODO I ignore this for testing until I decide on
  * a set model.  Write tests when that has been
@@ -22,7 +32,6 @@ import axios from 'axios'
  * @class
  */
 export default class Corpus {
-  /* istanbul ignore next */
   /**
    * @param {post}          an instance of Axios $post.
    * @param {user} Number   the user id for the model
@@ -268,14 +277,17 @@ export default class Corpus {
   }
 
   /* istanbul ignore next */
-  populateRoiOfCombintation(scrollVersionID) {
+  populateRoisOfCombination(scrollID, scrollVersionID) {
     if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
+    if (scrollID.constructor !== Array) scrollID = [scrollID]
+
     return new Promise((resolve, reject) => {
       let payload = { requests: [] }
       scrollVersionID.forEach((id, index) => {
         payload.requests.push({
+          scroll_id: scrollID[index],
           scroll_version_id: scrollVersionID[index],
-          transaction: 'getRoiOfCombination',
+          transaction: 'getRoisOfCombination',
         })
       })
       this.rois
@@ -366,20 +378,15 @@ export default class Corpus {
         // data transmission.
         // this._hash = res.data.hash
 
-        let record = new this.combinations.model(res.data.scroll_data)
+        const scroll_data = res.data.scroll_data
+        let record = new this.combinations.model(scroll_data)
         this.combinations.insert(record, this.combinations.getFirstKey())
-        this.populateColumnsOfCombination(
-          res.data.scroll_data.scroll_id,
-          res.data.scroll_data.scroll_version_id
-        )
+        this.populateColumnsOfCombination(scroll_data.scroll_id, scroll_data.scroll_version_id)
         this.populateImageReferencesOfCombination(
-          res.data.scroll_data.scroll_id,
-          res.data.scroll_data.scroll_version_id
+          scroll_data.scroll_id,
+          scroll_data.scroll_version_id
         ).then(res => {
-          this.populateArtefactsOfCombination(
-            res.data.scroll_data.scroll_id,
-            res.data.scroll_data.scroll_version_id
-          )
+          this.populateArtefactsOfCombination(scroll_data.scroll_id, scroll_data.scroll_version_id)
         })
       }
     })
@@ -412,14 +419,17 @@ export default class Corpus {
         sign_char_roi_id.length === scroll_version_id.length &&
         scroll_version_id.length === artefact_position_id.length
       ) {
-        let payload = { requests: [], SESSION_ID: this.session_id }
+        let payload = { requests: {}, SESSION_ID: this.session_id }
         sign_char_roi_id.forEach((id, index) => {
           let currentROI = roi[index]
+          console.log(artefact_position_id[index])
+          console.log(this.artefacts.get(artefact_position_id[index]))
           let roiMatrix = dbMatrixToSVG(
-            this.artefacts._items.toJS()[artefact_position_id[index]].transform_matrix
+            this.artefacts.get(artefact_position_id[index]).transform_matrix
           )
-          roiMatrix[2] = roiMatrix[2] + currentROI.x
-          roiMatrix[5] = roiMatrix[5] + currentROI.y
+          const artefactRect = wktParseRect(this.artefacts.get(artefact_position_id[index]).rect)
+          roiMatrix[4] = roiMatrix[4] + currentROI.x - artefactRect.x
+          roiMatrix[5] = roiMatrix[5] + currentROI.y - artefactRect.y
           const roiGeoJSONPath = {
             type: 'Polygon',
             coordinates: [
@@ -451,16 +461,16 @@ export default class Corpus {
 
           // Create the roi on the server database
           if (isNaN(sign_char_roi_id)) {
-            payload.requests.push({
+            payload.requests[id] = {
               path: roiWKTPath,
               transform_matrix: svgMatrixToDB(roiMatrix),
               scroll_version_id: scroll_version_id[index],
               values_set: 1,
               exceptional: 0,
               transaction: 'addRoiToScroll',
-            })
+            }
           } else {
-            payload.requests.push({
+            payload.requests[id] = {
               sign_char_roi_id: id,
               path: roiWKTPath,
               transform_matrix: svgMatrixToDB(roiMatrix),
@@ -468,16 +478,98 @@ export default class Corpus {
               values_set: 1,
               exceptional: 0,
               transaction: 'changeROI',
-            })
+            }
           }
         })
         axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
-          console.log(res.data)
+          for (const [key, value] of Object.entries(res.data.replies)) {
+            //TODO I really need the CGI API to return for me the sign_char_roi_id.
+            //This function is WRONG in that it uses the sign_char_id for the index,
+            //the sign_char_roi_id is supposed to be used for that instead.
+            let roi = this.rois.get(key).toJS()
+            roi.sign_char_id = value.sign_char_id
+            this.rois.delete(key)
+            this.rois.set(value.sign_char_id, new this.rois.model(roi))
+          }
         })
       } else
         reject(
           'The sign_char_roi_id, roi, artefact_position_id, and scroll_version_id inputs were of different lengths.'
         )
     })
+  }
+
+  /* istanbul ignore next */
+  /*
+   *
+   * This takes a list of rois ids and a list of artefact ids.
+   * It loops through every combination and adds the roi id
+   * to any artefact that it overlaps.
+   * 
+   */
+  mapRoisToArtefacts(rois, artefacts) {
+    artefacts.forEach(artefactID => {
+      rois.forEach(roiID => {
+        // if (
+        //   !reader
+        //     .read(svgPolygonToWKT(this.artefacts.get(artefactID).svgInCombination))
+        //     .intersection(svgPolygonToWKT(this.rois.get(roiID).svgInCombination))
+        //     .isEmpty()
+        // ) {
+        //   let update = this.artefacts.get(artefactID).toJS()
+        //   update.rois.push(roiID)
+        //   this.artefacts.set(artefactID, new this.artefacts.model(update))
+        //   console.log(roiID, 'is inside', artefactID)
+        // }
+      })
+    })
+  }
+
+  /* istanbul ignore next */
+  /*
+   *
+   * This takes a scroll version id. It loops through every combination 
+   * of roi and artefact, then adds the roi id
+   * to any artefact that it overlaps.
+   * 
+   */
+  mapRoisAndArtefactsInCombination(scroll_version_id) {
+    console.time('overLapSearch')
+    this.combinations.get(scroll_version_id).artefacts.forEach(artefactID => {
+      let currentArtefact = polygon(
+        svgPolygonToGeoJSON(this.artefacts.get(artefactID).svgInCombination).coordinates
+      )
+      // console.log(artefactSVG.toText())
+
+      this.combinations.get(scroll_version_id).rois.forEach(roiID => {
+        let currentROI = polygon(
+          svgPolygonToGeoJSON(this.rois.get(roiID).svgInCombination).coordinates
+        )
+        if (booleanOverlap(currentArtefact, currentROI)) {
+          console.log('We have overlap between ROI', roiID, 'and Artefact', artefactID)
+          console.log(currentArtefact)
+          console.log(currentROI)
+        } else {
+          console.log('No overlap')
+        }
+        // let roiSVG = reader.read(svgPolygonToWKT(this.rois.get(roiID).svgInCombination))
+
+        // // console.log(roiSVG.toText())
+        // if (roiSVG.isValid() && artefactSVG.isValid()) {
+        //   let intersection = artefactSVG.intersection(roiSVG)
+        //   if (!intersection.isEmpty()) {
+        //     let update = this.artefacts.get(artefactID).toJS()
+        //     update.rois.push(roiID)
+        //     this.artefacts.set(artefactID, new this.artefacts.model(update))
+        //     console.log(roiID, 'is inside', artefactID)
+        //   }
+        // } else {
+        //   if (!roiSVG.isValid()) {
+        //     console.log('ROI', roiID, 'is invalid.')
+        //   }
+        // }
+      })
+    })
+    console.timeEnd('overLapSearch')
   }
 }
