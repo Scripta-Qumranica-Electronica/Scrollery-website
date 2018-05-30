@@ -1,8 +1,5 @@
 <template>
     <div class="text-pane" :class='{fullscreen}'>
-        <div v-if="!colInRouter">
-            <text-selector @selectedColumn="getText"></text-selector>
-        </div>
         <toolbar :state="state" @fullscreen="toggleFullScreen" />
         <composition :text="text" :state="state" />
     </div>
@@ -12,7 +9,6 @@
 import KEY_CODES from './key_codes.js'
 import CompositionModel from '~/models/Composition.js'
 import Composition from './Composition.vue'
-import TextSelector from './TextSelector.vue'
 import Toolbar from './Toolbar.vue'
 
 import editorStore from './EditorStore.js'
@@ -20,7 +16,6 @@ import editorStore from './EditorStore.js'
 export default {
   components: {
     composition: Composition,
-    'text-selector': TextSelector,
     toolbar: Toolbar,
   },
   computed: {

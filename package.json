@@ -13,9 +13,10 @@
     "setup:db": "sh ./bin/init-docker.sh",
     "test": "karma start --config karma.conf.js",
     "test:chrome": "karma start --config karma.conf.js --browsers=Chrome",
-    "test_travis": "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=Chrome,Firefox",
-    "posttest_travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "test:server": "mocha ./tests/server/**/*-test.js --timeout=120000 --watch"
+    "test:ci": "npm run test:travis && npm run test:server",
+    "test:travis": "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=Chrome,Firefox",
+    "posttest:travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "test:server": "mocha ./tests/server/**/*-test.js"
   },
   "lint-staged": {
     "src/**/*.(js|vue)": [
