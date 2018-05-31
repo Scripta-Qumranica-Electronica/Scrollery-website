@@ -33,11 +33,16 @@ describe('Workbench', () => {
       vm.$store.commit('setSessionID', 'test')
       vm.$store.commit('setUserID', 1)
 
+      // expect userID and sessionID to be properly set
+      expect(vm.$store.getters.sessionID).to.equal('test')
+      expect(vm.$store.getters.userID).to.equal(1)
+
       // call the route guard with the next callback
       vm.$options.beforeRouteEnter(null, null, cb => cb(vm))
 
       // no routing event expected
       expect(vm.$router.replace.called).to.equal(false)
+
     })
   })
 })
