@@ -8,6 +8,9 @@
 <script>
 import KEY_CODES from './key_codes.js'
 import CompositionModel from '~/models/Composition.js'
+import Line from '~/models/Line.js'
+import Column from '~/models/Column.js'
+import Sign from '~/models/Sign.js'
 import Composition from './Composition.vue'
 import Toolbar from './Toolbar.vue'
 
@@ -49,20 +52,35 @@ export default {
      * @param {string} colID           The Column ID
      */
     getText(scrollVersionID, colID) {
+      // todo: empty existing columns
+
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-        transaction: 'getSignStreamOfColumn',
-        SCROLL_VERSION: scrollVersionID,
-        colId: colID,
+        transaction: 'getTextOfFragment',
+        scroll_version_id: scrollVersionID,
+        col_id: colID,
       })
         .then(res => {
           if (res.status === 200 && res.data) {
-            this.text = CompositionModel.fromSigns(
-              {
-                id: scrollVersionID,
-              },
-              res.data.results,
-              true
-            )
+            const scroll = res.data.text[0]
+            const column = scroll.fragments[0]
+
+            const colModel = new Column({
+              id: column.fragment_id,
+              name: column.fragment_name,
+            })
+            this.text.insert(colModel)
+
+            for (let i = 0, line; (line = column.lines[i]); i++) {
+              let lineModel = new Line({
+                id: line.line_id,
+                name: line.line_name,
+              })
+              colModel.push(lineModel)
+
+              for (let j = 0, rawSign; (rawSign = line.signs[j]); j++) {
+                lineModel.push(new Sign(rawSign))
+              }
+            }
           } else {
             throw new Error('Unable to retrieve text data')
           }

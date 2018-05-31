@@ -20,7 +20,6 @@ describe('login', () => {
         }
 
         assert(res.body.SESSION_ID.length > 5)
-        console.log(res)
         done()
       })
   })

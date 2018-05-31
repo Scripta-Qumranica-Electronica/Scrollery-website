@@ -1,13 +1,20 @@
-import Record from './Record.js'
+import extendModel from './extendModel.js'
 
 const defaults = {
   attribute_id: 0,
-  attribute: '',
-  attribute_value: '',
-  attribute_description: '',
+  attribute_name: '',
+  values: [],
 }
 
-export default class Attribute extends Record(defaults) {
+export default class Attribute extends extendModel(defaults) {
+  constructor(attrs, isPersisted) {
+    if (!Array.isArray(attrs.values)) {
+      attrs.values = [attrs.values]
+    }
+
+    super(attrs, isPersisted)
+  }
+
   /**
    * @return {number}
    */
