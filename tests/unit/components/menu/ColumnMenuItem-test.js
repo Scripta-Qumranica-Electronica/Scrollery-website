@@ -18,7 +18,7 @@ describe("ColumnMenuItem", function() {
             propsData: {
                 scrollID: 20,
                 scrollVersionID: 324,
-                columnID: 23,
+                columnID: 2,
                 column: column,
             },
             mocks: { 
@@ -27,7 +27,7 @@ describe("ColumnMenuItem", function() {
                     params: { 
                         scrollID: 20,
                         scrollVersionID: 324,
-                        colID: 23,
+                        colID: 2,
                     }
                 },
             }
@@ -35,15 +35,13 @@ describe("ColumnMenuItem", function() {
         vm = wrapper.vm
     })
     
-    // This does run over all the code, but
-    // I should be able to test a little bit more 
-    // like checking the router and the name in the span.
-    it('responds properly to clicks', () => {
+    it('responds properly to clicks with no change', () => {
         wrapper.find('span').trigger('click')
 
         // assertions 
-        // expect(push.firstCall.args[0].params.scrollID).to.include({ scrollID })
-        // expect(push.firstCall.args[0].params.scrollVersionID).to.include({ scrollVersionID })
+        expect(push.firstCall.args[0].params.scrollID).to.equal(20)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(324)
+        expect(push.firstCall.args[0].params.colID).to.equal(2)
     })
 
     beforeEach(() => {
@@ -68,15 +66,13 @@ describe("ColumnMenuItem", function() {
         vm = wrapper.vm
     })
     
-    // This does run over all the code, but
-    // I should be able to test a little bit more 
-    // like checking the router and the name in the span.
-    it('responds properly to clicks', () => {
+    it('responds properly to clicks with all changes', () => {
         wrapper.find('span').trigger('click')
 
         // assertions 
-        // expect(push.firstCall.args[0].params.scrollID).to.include({ scrollID })
-        // expect(push.firstCall.args[0].params.scrollVersionID).to.include({ scrollVersionID })
+        expect(push.firstCall.args[0].params.scrollID).to.equal(20)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(324)
+        expect(push.firstCall.args[0].params.colID).to.equal(2)
     })
 
     beforeEach(() => {
@@ -101,15 +97,13 @@ describe("ColumnMenuItem", function() {
         vm = wrapper.vm
     })
     
-    // This does run over all the code, but
-    // I should be able to test a little bit more 
-    // like checking the router and the name in the span.
-    it('responds properly to clicks', () => {
+    it('responds properly to clicks with same scrollID', () => {
         wrapper.find('span').trigger('click')
 
         // assertions 
-        // expect(push.firstCall.args[0].params.scrollID).to.include({ scrollID })
-        // expect(push.firstCall.args[0].params.scrollVersionID).to.include({ scrollVersionID })
+        expect(push.firstCall.args[0].params.scrollID).to.equal(20)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(324)
+        expect(push.firstCall.args[0].params.colID).to.equal(2)
     })
 
     beforeEach(() => {
@@ -134,14 +128,12 @@ describe("ColumnMenuItem", function() {
         vm = wrapper.vm
     })
     
-    // This does run over all the code, but
-    // I should be able to test a little bit more 
-    // like checking the router and the name in the span.
-    it('responds properly to clicks', () => {
+    it('responds properly to clicks with same scrollID and scrollVersionID', () => {
         wrapper.find('span').trigger('click')
-
+        
         // assertions 
-        // expect(push.firstCall.args[0].params.scrollID).to.include({ scrollID })
-        // expect(push.firstCall.args[0].params.scrollVersionID).to.include({ scrollVersionID })
+        expect(push.firstCall.args[0].params.scrollID).to.equal(20)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(324)
+        expect(push.firstCall.args[0].params.colID).to.equal(2)
     })
 })
