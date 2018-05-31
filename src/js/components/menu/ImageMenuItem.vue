@@ -64,7 +64,7 @@ export default {
     setRouter() {
       if (
         this.$route.params.scrollID !== this.scrollID ||
-        this.$route.params.scrollVersionID !== this.versionID ||
+        this.$route.params.scrollVersionID !== this.scrollVersionID ||
         this.$route.params.imageID !== this.imageID
       ) {
         this.$router.push({

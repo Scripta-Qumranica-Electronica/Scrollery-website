@@ -16,8 +16,41 @@ describe("ColumnMenuItem", function() {
     beforeEach(() => {
         wrapper = mount(ColumnMenuItem, {
             propsData: {
+                scrollID: 20,
+                scrollVersionID: 324,
+                columnID: 23,
+                column: column,
+            },
+            mocks: { 
+                $router: { push },
+                $route: {
+                    params: { 
+                        scrollID: 20,
+                        scrollVersionID: 324,
+                        colID: 23,
+                    }
+                },
+            }
+        })
+        vm = wrapper.vm
+    })
+    
+    // This does run over all the code, but
+    // I should be able to test a little bit more 
+    // like checking the router and the name in the span.
+    it('responds properly to clicks', () => {
+        wrapper.find('span').trigger('click')
+
+        // assertions 
+        // expect(push.firstCall.args[0].params.scrollID).to.include({ scrollID })
+        // expect(push.firstCall.args[0].params.scrollVersionID).to.include({ scrollVersionID })
+    })
+
+    beforeEach(() => {
+        wrapper = mount(ColumnMenuItem, {
+            propsData: {
                 scrollID: scrollID,
-                versionID: scrollVersionID,
+                scrollVersionID: scrollVersionID,
                 columnID: columnID,
                 column: column,
             },
@@ -27,7 +60,73 @@ describe("ColumnMenuItem", function() {
                     params: { 
                         scrollID: 20,
                         scrollVersionID: 324,
-                        columnID: 23,
+                        colID: 23,
+                    }
+                },
+            }
+        })
+        vm = wrapper.vm
+    })
+    
+    // This does run over all the code, but
+    // I should be able to test a little bit more 
+    // like checking the router and the name in the span.
+    it('responds properly to clicks', () => {
+        wrapper.find('span').trigger('click')
+
+        // assertions 
+        // expect(push.firstCall.args[0].params.scrollID).to.include({ scrollID })
+        // expect(push.firstCall.args[0].params.scrollVersionID).to.include({ scrollVersionID })
+    })
+
+    beforeEach(() => {
+        wrapper = mount(ColumnMenuItem, {
+            propsData: {
+                scrollID: 20,
+                scrollVersionID: scrollVersionID,
+                columnID: columnID,
+                column: column,
+            },
+            mocks: { 
+                $router: { push },
+                $route: {
+                    params: { 
+                        scrollID: 20,
+                        scrollVersionID: 324,
+                        colID: 23,
+                    }
+                },
+            }
+        })
+        vm = wrapper.vm
+    })
+    
+    // This does run over all the code, but
+    // I should be able to test a little bit more 
+    // like checking the router and the name in the span.
+    it('responds properly to clicks', () => {
+        wrapper.find('span').trigger('click')
+
+        // assertions 
+        // expect(push.firstCall.args[0].params.scrollID).to.include({ scrollID })
+        // expect(push.firstCall.args[0].params.scrollVersionID).to.include({ scrollVersionID })
+    })
+
+    beforeEach(() => {
+        wrapper = mount(ColumnMenuItem, {
+            propsData: {
+                scrollID: 20,
+                scrollVersionID: 324,
+                columnID: columnID,
+                column: column,
+            },
+            mocks: { 
+                $router: { push },
+                $route: {
+                    params: { 
+                        scrollID: 20,
+                        scrollVersionID: 324,
+                        colID: 23,
                     }
                 },
             }
