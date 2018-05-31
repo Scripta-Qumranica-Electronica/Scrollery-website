@@ -1026,6 +1026,14 @@ sub removeSignChar() {
 	$cgi->remove_sign_char($json_post->{sign_char_id});
 }
 
+#DON'T USE THIS YET.
+sub changeSignChar() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->add_sign_char_variant($json_post->{sign_id}, $json_post->{character}, $json_post->{main});
+	$cgi->remove_sign_char($json_post->{sign_char_id});
+}
+
 #Give a sign_char_id, an attribute_id, and a comment.
 #I don't know yet what it returns.
 sub addSignCharCommentary() {
@@ -1148,6 +1156,20 @@ sub getTextOfFragment() {
 	print "{";
 	$cgi->get_text_of_fragment($json_post->{col_id}, 'SQE_Format::JSON');
 	print "}";
+}
+
+sub getListOfAttributes() {
+	my ($cgi, $json_post) = @_;
+	my $query = <<'MYSQL';
+	SELECT * FROM attribute
+JOIN attribute_value USING(attribute_id)
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($query) or die
+		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+	$sql->execute();
+
+	readResults($sql);
+	return;
 }
 
 processCGI();
