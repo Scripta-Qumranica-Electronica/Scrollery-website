@@ -55,7 +55,6 @@ export default {
   },
   data() {
     return {
-      children: [],
       open: false,
       dialogVisible: false,
     }
@@ -84,13 +83,11 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        if (!this.children.length) {
-          this.corpus
-            .populateArtefactsOfImageReference(this.imageID, this.scrollVersionID)
-            .then(res => {
-              this.corpus.mapRoisAndArtefactsInCombination(this.scrollVersionID)
-            })
-        }
+        this.corpus
+          .populateArtefactsOfImageReference(this.imageID, this.scrollVersionID)
+          .then(res => {
+            this.corpus.mapRoisAndArtefactsInCombination(this.scrollVersionID)
+          })
       }
     },
 
