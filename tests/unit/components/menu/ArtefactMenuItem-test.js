@@ -167,9 +167,6 @@ describe("ArtefactMenuItem", function() {
         vm = wrapper.vm
     })
     
-    // This does run over all the code, but
-    // I should be able to test a little bit more 
-    // like checking the router and the name in the span.
     it('responds properly to clicks with same scrollID, scrollVersionID, and imageID', () => {
         wrapper.find('span').trigger('click')
 
