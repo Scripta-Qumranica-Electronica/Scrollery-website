@@ -14,9 +14,6 @@ export default function(Vuex, plugins) {
       username: state => state.username,
       language: state => state.language,
       languages: state => state.languages,
-      scrollID: state => state.scrollID,
-      scrollVersionID: state => state.scrollVersionID,
-      colID: state => state.colID,
       working: state => state.working,
     },
     mutations: {

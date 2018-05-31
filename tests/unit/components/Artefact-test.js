@@ -46,6 +46,14 @@ describe("Artefact", function() {
     expect(wrapper.contains('g > defs > path')).to.equal(true)
   })
 
+  it('gets an image reference', () => {
+    expect(vm.imageReferences).to.deep.equal([0,1,2,3,4])
+  })
+
+  it('calculates a proper file path', () => {
+    expect(vm.address).to.equal('urlfilename/0,0,1,1/pct:10/0/suffix')
+  })
+
     // it('has the proper SVG clipPath', () => {
     //     expect(wrapper.contains(`g > defs > #clip-${imageID}-${artefactID}`)).to.equal(true)
     // })
@@ -80,9 +88,9 @@ class ImageReferences {
         }
     }
 
-    // get(id) {
-    //     return this._items[id]
-    // }
+    get(id) {
+        return this._items[id]
+    }
 }
 
 class Images {
@@ -93,12 +101,12 @@ class Images {
                 isMaster: 1,
                 //Maybe in the future we put in a real image
                 url: 'url',
-                fileName: 'filename',
+                filename: 'filename',
                 suffix: 'suffix'
             }
         }
     }
-    // get(id) {
-    //     return this._items[id]
-    // }
+    get(id) {
+        return this._items[id]
+    }
 }
