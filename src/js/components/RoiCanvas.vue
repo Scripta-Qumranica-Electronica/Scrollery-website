@@ -93,6 +93,7 @@
 
 <script>
 import uuid from 'uuid/v1'
+import { wktParseRect } from '~/utils/VectorFactory.js'
 
 export default {
   props: {
@@ -131,6 +132,13 @@ export default {
     },
     fullImageMask() {
       return `M0 0L${this.width} 0L${this.width} ${this.height}L0 ${this.height}`
+    },
+    calculateTranslate() {
+      const artefactTransform = JSON.parse(this.corpus.artefacts.get(artefactID).transform_matrix)
+        .matrix
+      const artefactRect = wktParseRect(this.corpus.artefacts.get(artefactID).rect)
+      return `translate(${artefactRect.x - artefactTransform[0][2]} ${artefactRect.y -
+        artefactTransform[1][2]})`
     },
   },
   methods: {
