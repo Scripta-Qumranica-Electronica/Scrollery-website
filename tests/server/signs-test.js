@@ -3,7 +3,6 @@ const request = require('supertest')
 const assert = require('assert')
 
 describe('Sign functionality', () => {
-
   let sessionID
   before(() => {
     return request(app)
@@ -19,22 +18,23 @@ describe('Sign functionality', () => {
       })
   })
 
-  const send = payload => request(app)
-  .post('/resources/cgi-bin/scrollery-cgi.pl')
-  .send({
-    ...payload,
-    SESSION_ID: sessionID
-  })
+  const send = payload =>
+    request(app)
+      .post('/resources/cgi-bin/scrollery-cgi.pl')
+      .send({
+        ...payload,
+        SESSION_ID: sessionID,
+      })
 
   it('should attempt to login the test/asdf user', done => {
     return send({
       transaction: 'getTextOfFragment',
       scroll_version_id: 808,
-      col_id: 9111
+      col_id: 9111,
     })
-    .expect(200)
-    .then(res => {
-      console.log(res.body)
-    })
+      .expect(200)
+      .then(res => {
+        console.log(res.body)
+      })
   })
 })

@@ -77,9 +77,7 @@ export default class Char extends extendModel(defaults) {
    *
    * @returns {boolean} whether or not this char is reconstructed
    */
-  reconstructed() {
-    return this.is_reconstructed
-  }
+  // reconstructed() {}
 
   /**
    * @todo
