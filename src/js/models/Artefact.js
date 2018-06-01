@@ -15,6 +15,7 @@ const defaults = {
   transform_matrix: '',
   rect: '',
   image_catalog_id: Number,
+  rois: [],
 }
 
 /**

@@ -16,6 +16,9 @@
                 :corpus="corpus"
                 :index="artefact"
                 ></artefact>
+            <g v-for="roi of corpus.combinations.get(scrollVersionID).rois" fill="none">
+              <path :d="corpus.rois.get(roi).svgInCombination" stroke="red" stroke-width="4"/>
+            </g>
         </svg>
     </div>
 </template>
@@ -45,6 +48,7 @@ export default {
       scrollWidth: 10000,
       scrollHeight: 1500,
       artefacts: [],
+      rois: [],
       baseDPI: 1215,
       clickOrigin: undefined,
       selectedArtefactIndex: undefined,

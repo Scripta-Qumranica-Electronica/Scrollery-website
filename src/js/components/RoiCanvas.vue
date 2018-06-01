@@ -81,6 +81,13 @@
               stroke-opacity="0.8" 
               @mousedown="selectROI($event, box, 'resizeWH')"/>
     </g>
+    <g v-for="roi of corpus.artefacts.get(artefactID).rois" fill="none">
+      <path 
+        :d="corpus.rois.get(roi).svgInCombination" 
+        stroke="red" 
+        stroke-width="4" 
+        transform="scale(0.5 0.5)"/>
+    </g>
   </svg>
 </template>
 
@@ -107,6 +114,7 @@ export default {
       type: Object,
       default: {},
     },
+    artefactID: 0,
   },
   data() {
     return {

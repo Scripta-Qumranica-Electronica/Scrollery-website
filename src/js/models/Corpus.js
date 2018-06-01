@@ -490,6 +490,16 @@ export default class Corpus {
             roi.sign_char_id = value.sign_char_id
             this.rois.delete(key)
             this.rois.set(value.sign_char_id, new this.rois.model(roi))
+            console.log(this.rois._items.toJS())
+            console.log(this.combinations.get(scroll_version_id[0]).toJS())
+            let currentCombination = this.combinations.get(scroll_version_id[0]).toJS()
+            currentCombination.rois = [value.sign_char_id, ...currentCombination.rois]
+            this.combinations.delete(scroll_version_id[0])
+            this.combinations.set(
+              scroll_version_id[0],
+              new this.combinations.model(currentCombination)
+            )
+            console.log(this.combinations.get(scroll_version_id[0]).toJS())
           }
         })
       } else
@@ -549,6 +559,10 @@ export default class Corpus {
           console.log('We have overlap between ROI', roiID, 'and Artefact', artefactID)
           console.log(currentArtefact)
           console.log(currentROI)
+          let currentArtefactData = this.artefacts.get(artefactID).toJS()
+          currentArtefactData.rois = [roiID, ...currentArtefactData.rois]
+          this.artefacts.delete(artefactID)
+          this.artefacts.set(artefactID, new this.artefacts.model(currentArtefactData))
         } else {
           console.log('No overlap')
         }

@@ -86,6 +86,7 @@
                   :clipping-mask="clipMask"
                   :clip="clippingOn"
                   :corpus="corpus"
+                  :artefact-i-d="artefact"
                   ref="currentRoiCanvas">
       </roi-canvas>
       <artefact-canvas  class="overlay-canvas"
