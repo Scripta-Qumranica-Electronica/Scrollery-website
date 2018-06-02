@@ -1,3 +1,4 @@
+import EventEmitter from './EventEmitter'
 import extendModel from './extendModel.js'
 import uuid from 'uuid/v1'
 import namespacedUuid from 'uuid/v3'
@@ -9,13 +10,18 @@ const Model = extendModel()
  * work with an ordered array of child-items.
  *
  * It has a similar API as the array, but is more focused
+ *
+ * @extends EventEmitter
  */
-class List {
+class List extends EventEmitter {
   /**
    * @param {object={}} [attributes] List attributes
    * @param {array=[]}  [items]      An initial array of items for the list
    */
   constructor(attributes = {}, items = [], isPersisted = false) {
+    // event emitter behavior
+    super()
+
     // todo: safety to ensure props not overwritten
     Object.assign(
       this,
@@ -191,11 +197,21 @@ class List {
    *
    * @param {Model}     item    A list item to insert
    * @param {number=-1} index   The index at which to insert the list, defaults to the end
+   *
+   * @return {number}   the inserted items index
    */
   insert(item, index = -1) {
-    index === -1
-      ? this.push(item) // insert a item at the end of no number specified
-      : this.splice(index, item) // otherwise, insert at specified location
+    const newIndex =
+      index === -1
+        ? this.push(item) // insert a item at the end of no number specified
+        : this.splice(index, item) // otherwise, insert at specified location
+
+    this.emit('insert', {
+      index: newIndex,
+      item,
+    })
+
+    return newIndex
   }
 
   /**
@@ -203,6 +219,7 @@ class List {
    * @instance
    *
    * @param {Model} item An item to push on to the end of the items
+   * @return {number}    the inserted model's index
    */
   push(item) {
     if (!(item instanceof this.constructor.getModel())) {
@@ -214,14 +231,26 @@ class List {
     }
 
     this._items.push(item)
+
+    // calculate the new index for any listeners
+    // and for return value
+    const newIndex = this._items.length
+    this.emit('push', {
+      index: newIndex,
+      item,
+    })
+
+    return newIndex
   }
 
   /**
    * @public
    * @instance
    *
-   * @param {Model} item An item to push on to the end of the items
-   * @param {Model} item An item to push on to the end of the items
+   * @param {number} index the index to splice into
+   * @param {Model}  item  An item to insert in the items
+   *
+   * @return {number} the inserted models index
    */
   splice(index, item) {
     if (!(item instanceof this.constructor.getModel())) {
@@ -234,7 +263,11 @@ class List {
       this.__changes.additions[item.getUUID()] = item
     }
 
+    // insert and emit
     this._items.splice(index, 0, item)
+    this.emit('splice', { index, item })
+
+    return index
   }
 
   /**
@@ -250,6 +283,8 @@ class List {
       } else {
         this.__changes.deletions[deleted.getUUID()] = deleted
       }
+
+      this.emit('delete', { index, deleted })
     }
   }
 

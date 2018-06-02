@@ -60,7 +60,7 @@ export default {
       transactions.push({
         transaction: 'removeSigns',
         scroll_version_id,
-        sign_id: deletedKeys,
+        sign_id: deletedKeys.map(key => deletions[key].getID()),
       })
     }
 
