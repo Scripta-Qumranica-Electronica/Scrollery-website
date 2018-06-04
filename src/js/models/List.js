@@ -42,6 +42,16 @@ class List extends EventEmitter {
       deletions: {},
     }
 
+    this.on(['insert', 'push', 'splice'], ({ item, index }) => {
+      item.on('change', this._itemChanged.bind(this, item))
+
+      if (item instanceof List) {
+        item.on('delete', ({ item, index }) => this.emit('delete'))
+      }
+
+      this.emit('addition', { item, index })
+    })
+
     // insert each item in turn
     items.forEach(item => this.insert(item))
 
@@ -49,6 +59,19 @@ class List extends EventEmitter {
     Object.defineProperty(this, 'length', {
       get: () => this.count(),
       writeable: false,
+    })
+  }
+
+  /**
+   * @protected
+   * @instance
+   *
+   * @param {Model}  item
+   * @param {object} args
+   */
+  _itemChanged(item, args) {
+    this.emit('change', {
+      item,
     })
   }
 

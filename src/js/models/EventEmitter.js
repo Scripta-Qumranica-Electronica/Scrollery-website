@@ -38,45 +38,57 @@ export default class EventEmitter {
   /**
    * Subscribe to an event
    *
-   * @param {string}   name    Name of the event to listen to
+   * @param {string[]|string}   names    Name of the event to listen to
    * @param {function} handler The handler function
    */
-  on(name, handler) {
-    if (!name || typeof handler !== 'function') {
+  on(names, handler) {
+    if (!names || typeof handler !== 'function') {
       throw new TypeError(
-        'EventEmitter.prototype.on requires a name (String) and handler (Function)'
+        'EventEmitter.prototype.on requires a name (String[]) and handler (Function)'
       )
     }
 
-    if (!this.__events[name]) {
-      this.__events[name] = []
+    if (!Array.isArray(names)) {
+      names = [names]
     }
 
-    this.__events[name].push(handler)
+    for (let i = 0, name; (name = names[i]); i++) {
+      if (!this.__events[name]) {
+        this.__events[name] = []
+      }
+
+      this.__events[name].push(handler)
+    }
   }
 
   /**
    * Un-subscribe from an event
    *
-   * @param {string}   name       The event to listen to
+   * @param {string[]|string}   names       The event to listen to
    * @param {function} handler    The event handler to remove
    */
-  off(name, handler) {
+  off(names, handler) {
     if (!name || typeof handler !== 'function') {
       throw new TypeError(
         'EventEmitter.prototype.off requires a name (String) and handler (Function)'
       )
     }
 
-    let handlers = this.__events[name]
+    if (!Array.isArray(names)) {
+      names = [names]
+    }
 
-    if (handlers && handlers.length) {
-      // filter out the function that was subscribed
-      handlers = this.__events[name] = handlers.filter(func => func !== handler)
+    for (let i = 0, name; (name = names[i]); i++) {
+      let handlers = this.__events[name]
 
-      // if there are no longer handlers, remove the memory alotment
-      if (!handlers.length) {
-        delete this.__events[name]
+      if (handlers && handlers.length) {
+        // filter out the function that was subscribed
+        handlers = this.__events[name] = handlers.filter(func => func !== handler)
+
+        // if there are no longer handlers, remove the memory alotment
+        if (!handlers.length) {
+          delete this.__events[name]
+        }
       }
     }
   }
