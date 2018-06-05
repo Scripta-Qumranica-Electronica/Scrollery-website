@@ -101,12 +101,12 @@ export default class ColumnPersistanceService extends PersistanceService {
         transaction: 'removeSigns',
         scroll_version_id: this.scroll_version_id,
 
-        // turn `scroll_id` into an array of ids
+        // turn `sign_id` into an array of ids for deletion
         sign_id: deletedKeys.map(key => deletions[key].getID()),
       })
     }
 
-    // Gather all additions into requests
+    // Gather all additions into a single transaction
     if (Object.keys(additions).length) {
       const signStream = this.column.flattenToSignStream()
 
@@ -141,8 +141,6 @@ export default class ColumnPersistanceService extends PersistanceService {
 
   /**
    * Persist any changes to the column model
-   *
-   * @todo Debounce requests to every 500ms or so, and not concurrent.
    *
    * @param {Column} column               The column model to persist
    */
