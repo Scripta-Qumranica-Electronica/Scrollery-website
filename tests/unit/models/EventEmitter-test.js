@@ -78,6 +78,7 @@ describe('EventEmitter', () => {
       // wire subscribers
       event.on(['event1', 'event2'], handler)
 
+      // emit both events
       event.emit('event1')
       event.emit('event2')
     })
