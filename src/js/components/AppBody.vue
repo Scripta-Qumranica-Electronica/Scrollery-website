@@ -17,16 +17,27 @@
     <div id="editing-window" :class='{"open": menuOpen}'>
       <header-menu :corpus="corpus"></header-menu>
       
-      <!-- For the earliest alpha version, only two panels are needed.-->
+      <!-- We currently use two nested "split-panes" to hold the individual components.
+      Perhaps update to some more advanced system to manage organization
+      and display of these components -->
       <div class="editing-pane-container">
-        <split-pane split="vertical">
+        <split-pane :min-percent="20" :default-percent="30" split="horizontal">
           <template slot="paneL">
-            <single-image 
-              class="pane-content single-image-pane"
-              :corpus="corpus"></single-image>
+            <split-pane split="vertical">
+              <template slot="paneL">
+                <single-image 
+                  class="pane-content single-image-pane"
+                  :corpus="corpus"></single-image>
+              </template>
+              <template slot="paneR">
+                <editor class="pane-content"></editor>
+              </template>
+            </split-pane>
           </template>
           <template slot="paneR">
-            <editor class="pane-content"></editor>
+            <combination 
+              class="combination-pane"
+              :corpus="corpus"></combination>
           </template>
         </split-pane>
       </div>
