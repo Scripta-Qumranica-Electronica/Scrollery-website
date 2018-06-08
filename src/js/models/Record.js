@@ -1,3 +1,4 @@
+import EventEmitter from './EventEmitter'
 import cloneDeep from 'lodash/cloneDeep'
 import uuid from 'uuid/v1'
 import namespacedUuid from 'uuid/v3'
@@ -29,13 +30,16 @@ function Record(defaults = {}) {
    * value rather than null/undefined. you can also use Record.prototype.clear(propName)
    * for the same behavior.
    */
-  return class BaseRecord {
+  return class BaseRecord extends EventEmitter {
     /**
      *
      * @param {object}  props        Initial property values
      * @param {boolean} isPersisted
      */
     constructor(props = {}, isPersisted = false) {
+      // default event emitter behavior
+      super()
+
       // a closure variable to track the property definitions
       const propDefinitions = {}
 
@@ -53,7 +57,15 @@ function Record(defaults = {}) {
             return privates.__persisted
           },
           set(persisted) {
+            const lastPersistedStated = privates.__persisted
+
             privates.__persisted = Boolean(persisted)
+
+            if (lastPersistedStated !== privates.__persisted) {
+              this.emit('persisted-state-change', {
+                persisted: privates.__persisted,
+              })
+            }
           },
           enumerable: true,
         },
@@ -159,7 +171,15 @@ function Record(defaults = {}) {
               this.__persisted = value !== values[k].value ? false : this.__persisted
 
               // apply the value
+              var oldValue = values[k].value
               values[k].value = value
+
+              // emit a change
+              this.emit('change', {
+                propertyName: k,
+                newValue: value,
+                oldValue,
+              })
             },
             enumerable: true,
           }

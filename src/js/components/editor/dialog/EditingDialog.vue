@@ -23,12 +23,15 @@
           <comments-editor />
         </tab>
       </el-tab-pane>
-      <!-- <el-tab-pane label="ROI" title="Regions of Interest" name="roi">
+      <el-tab-pane label="ROI" title="Regions of Interest" name="roi">
         ROI
-      </el-tab-pane> -->
-      <!-- <el-tab-pane label="Variants" name="variants">
+      </el-tab-pane>
+      <el-tab-pane label="Parallels" name="parellels">
+        <h2>Parallels</h2>
+    </el-tab-pane>
+      <el-tab-pane label="Variants" name="variants">
           <h2>Variants</h2>
-      </el-tab-pane> -->
+      </el-tab-pane>
     </el-tabs>
   </el-dialog>
 </template>
