@@ -125,7 +125,7 @@ sub readResults {
     }
     if (scalar(@fetchedResults) > 0) {
 		print "{\"results\":";
-		print encode_json(\@fetchedResults);
+		print Encode::decode('utf-8', encode_json(\@fetchedResults));
 		print "}";
  	} else {
 		print "{\"error\":\"No results found.\"}";
