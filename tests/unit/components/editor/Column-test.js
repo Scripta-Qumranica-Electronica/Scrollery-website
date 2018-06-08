@@ -20,6 +20,14 @@ const columnFactory = () =>
       }),
       column: factory.column(),
     },
+    mocks: {
+
+      // route is accessed during mount. Just need a simple
+      // stub of the $route global to avoid hard errors.
+      $route: {
+        params: {}
+      }
+    }
   })
 
 describe('ColumnComponent', () => {

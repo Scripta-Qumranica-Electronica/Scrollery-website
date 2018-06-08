@@ -30,7 +30,7 @@ import KEYS from './key_codes.js'
 import EditingDialog from './dialog/EditingDialog.vue'
 
 // controllers
-import columnController from '~/controllers/column-controller.js'
+import ColumnPersistanceService from '~/controllers/column-persistance-service.js'
 
 // models
 import Column from '~/models/Column.js'
@@ -134,12 +134,6 @@ export default {
     signsChanged(e, { line, node }) {
       // synchronize the line > DOM
       line.synchronizeTo(node.innerText)
-
-      columnController.onChange(
-        this.column,
-        this.$store.getters.sessionID,
-        this.$route.params.scrollVersionID
-      )
     },
 
     /**
@@ -291,6 +285,12 @@ export default {
     },
   },
   mounted() {
+    this.persistanceService = new ColumnPersistanceService(
+      this.column,
+      this.$route.params.scrollVersionID,
+      this.$store.getters.sessionID
+    )
+
     this.colHtmlString = this.column.toDOMString()
   },
 }
