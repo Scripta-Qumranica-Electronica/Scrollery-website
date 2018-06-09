@@ -172,6 +172,31 @@ describe('Login', function() {
     })
   })
 
+  it('should show an error message on failure', done => {
+    const user = 'name'
+    const passwd = 'password'
+    wrapper.setData({ user, passwd })
+
+    vm.$18n = {
+      str: key => key
+    }
+    vm.$post = () => (new Promise((resolve, reject) => {
+      reject({})
+
+      // since the `catch` block is handled asychronously,
+      // use setTimeout to wait until Vue has updates the
+      // VM.
+      // TODO: figure out better way to not use setTimeout
+      setTimeout(() => {
+        expect(vm.errMsg.length > 0).to.equal(true)
+        done()
+      }, 5)
+    }))
+
+    // trigger form submission
+    wrapper.vm.onSubmit()
+  })
+
   it('should attempt login on form submit', done => {
     const user = 'name'
     const passwd = 'password'

@@ -21,6 +21,7 @@
 </template>
 
 <script>
+/* istanbul ignore next */
 import { svgMatrixToDB } from '~/utils/VectorFactory'
 import Artefact from './Artefact.vue'
 // I will use the rematrix package to directly apply

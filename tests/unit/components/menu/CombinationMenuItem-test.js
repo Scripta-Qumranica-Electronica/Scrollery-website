@@ -36,17 +36,44 @@ describe("CombinationMenuItem", function() {
         })
         vm = wrapper.vm
     })
-    
-    // This does run over all the code, but
-    // I should be able to test a little bit more 
-    // like checking the router and the name in the span.
+
     it('responds properly to clicks', () => {
         wrapper.find('span').trigger('click')
         expect(wrapper.vm.open).to.equal(true)
 
-        // assertions 
-        // expect(push.firstCall.args[0].params.scrollID).to.include({ scrollID })
-        // expect(push.firstCall.args[0].params.scrollVersionID).to.include({ scrollVersionID })
+        // assertions
+        expect(push.firstCall.args[0].name).to.equal("workbenchAddress")
+        expect(push.firstCall.args[0].params.scrollID).to.equal(2)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(2)
+    })
+
+    beforeEach(() => {
+        wrapper = mount(CombinationMenuItem, {
+            propsData: {
+                corpus: new Corpus(),
+                combination: combination,
+            },
+            mocks: { 
+                $router: { push },
+                $route: {
+                    params: { 
+                        scrollID: 2,
+                        scrollVersionID: 324,
+                    }
+                },
+            }
+        })
+        vm = wrapper.vm
+    })
+    
+    it('responds properly to clicks', () => {
+        wrapper.find('span').trigger('click')
+        expect(wrapper.vm.open).to.equal(true)
+
+        // assertions
+        expect(push.firstCall.args[0].name).to.equal("workbenchAddress")
+        expect(push.firstCall.args[0].params.scrollID).to.equal(2)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(2)
     })
 })
 

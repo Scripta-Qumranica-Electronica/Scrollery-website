@@ -16,8 +16,39 @@ describe("ColumnMenuItem", function() {
     beforeEach(() => {
         wrapper = mount(ColumnMenuItem, {
             propsData: {
+                scrollID: 20,
+                scrollVersionID: 324,
+                columnID: 2,
+                column: column,
+            },
+            mocks: { 
+                $router: { push },
+                $route: {
+                    params: { 
+                        scrollID: 20,
+                        scrollVersionID: 324,
+                        colID: 2,
+                    }
+                },
+            }
+        })
+        vm = wrapper.vm
+    })
+    
+    it('responds properly to clicks with no change', () => {
+        wrapper.find('span').trigger('click')
+
+        // assertions 
+        expect(push.firstCall.args[0].params.scrollID).to.equal(20)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(324)
+        expect(push.firstCall.args[0].params.colID).to.equal(2)
+    })
+
+    beforeEach(() => {
+        wrapper = mount(ColumnMenuItem, {
+            propsData: {
                 scrollID: scrollID,
-                versionID: scrollVersionID,
+                scrollVersionID: scrollVersionID,
                 columnID: columnID,
                 column: column,
             },
@@ -27,7 +58,7 @@ describe("ColumnMenuItem", function() {
                     params: { 
                         scrollID: 20,
                         scrollVersionID: 324,
-                        columnID: 23,
+                        colID: 23,
                     }
                 },
             }
@@ -35,14 +66,74 @@ describe("ColumnMenuItem", function() {
         vm = wrapper.vm
     })
     
-    // This does run over all the code, but
-    // I should be able to test a little bit more 
-    // like checking the router and the name in the span.
-    it('responds properly to clicks', () => {
+    it('responds properly to clicks with all changes', () => {
         wrapper.find('span').trigger('click')
 
         // assertions 
-        // expect(push.firstCall.args[0].params.scrollID).to.include({ scrollID })
-        // expect(push.firstCall.args[0].params.scrollVersionID).to.include({ scrollVersionID })
+        expect(push.firstCall.args[0].params.scrollID).to.equal(20)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(324)
+        expect(push.firstCall.args[0].params.colID).to.equal(2)
+    })
+
+    beforeEach(() => {
+        wrapper = mount(ColumnMenuItem, {
+            propsData: {
+                scrollID: 20,
+                scrollVersionID: scrollVersionID,
+                columnID: columnID,
+                column: column,
+            },
+            mocks: { 
+                $router: { push },
+                $route: {
+                    params: { 
+                        scrollID: 20,
+                        scrollVersionID: 324,
+                        colID: 23,
+                    }
+                },
+            }
+        })
+        vm = wrapper.vm
+    })
+    
+    it('responds properly to clicks with same scrollID', () => {
+        wrapper.find('span').trigger('click')
+
+        // assertions 
+        expect(push.firstCall.args[0].params.scrollID).to.equal(20)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(324)
+        expect(push.firstCall.args[0].params.colID).to.equal(2)
+    })
+
+    beforeEach(() => {
+        wrapper = mount(ColumnMenuItem, {
+            propsData: {
+                scrollID: 20,
+                scrollVersionID: 324,
+                columnID: columnID,
+                column: column,
+            },
+            mocks: { 
+                $router: { push },
+                $route: {
+                    params: { 
+                        scrollID: 20,
+                        scrollVersionID: 324,
+                        colID: 23,
+                    }
+                },
+            }
+        })
+        vm = wrapper.vm
+    })
+    
+    it('responds properly to clicks with same scrollID and scrollVersionID', () => {
+        wrapper.find('span').trigger('click')
+        
+        // assertions 
+        expect(push.firstCall.args[0].params.scrollID).to.equal(20)
+        expect(push.firstCall.args[0].params.scrollVersionID).to.equal(324)
+        expect(push.firstCall.args[0].params.colID).to.equal(2)
     })
 })

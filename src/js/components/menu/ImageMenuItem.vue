@@ -55,7 +55,6 @@ export default {
   },
   data() {
     return {
-      children: [],
       open: false,
       dialogVisible: false,
     }
@@ -64,7 +63,7 @@ export default {
     setRouter() {
       if (
         this.$route.params.scrollID !== this.scrollID ||
-        this.$route.params.scrollVersionID !== this.versionID ||
+        this.$route.params.scrollVersionID !== this.scrollVersionID ||
         this.$route.params.imageID !== this.imageID
       ) {
         this.$router.push({
@@ -84,13 +83,11 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        if (!this.children.length) {
-          this.corpus
-            .populateArtefactsOfImageReference(this.imageID, this.scrollVersionID)
-            .then(res => {
-              this.corpus.mapRoisAndArtefactsInCombination(this.scrollVersionID)
-            })
-        }
+        this.corpus
+          .populateArtefactsOfImageReference(this.imageID, this.scrollVersionID)
+          .then(res => {
+            this.corpus.mapRoisAndArtefactsInCombination(this.scrollVersionID)
+          })
       }
     },
 

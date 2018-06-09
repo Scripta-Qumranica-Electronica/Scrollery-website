@@ -22,7 +22,7 @@ export default {
       const params = this.$route.params
       if (
         params.scrollID !== this.scrollID ||
-        params.scrollVersionID !== this.versionID ||
+        params.scrollVersionID !== this.scrollVersionID ||
         params.colID !== this.columnID
       ) {
         this.$router.push({
