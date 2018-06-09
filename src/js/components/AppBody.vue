@@ -17,27 +17,16 @@
     <div id="editing-window" :class='{"open": menuOpen}'>
       <header-menu :corpus="corpus"></header-menu>
       
-      <!-- We currently use two nested "split-panes" to hold the individual components.
-      Perhaps update to some more advanced system to manage organization
-      and display of these components -->
+      <!-- For the earliest alpha version, only two panels are needed.-->
       <div class="editing-pane-container">
-        <split-pane :min-percent="20" :default-percent="30" split="horizontal">
+        <split-pane split="vertical">
           <template slot="paneL">
-            <split-pane split="vertical">
-              <template slot="paneL">
-                <single-image 
-                  class="pane-content single-image-pane"
-                  :corpus="corpus"></single-image>
-              </template>
-              <template slot="paneR">
-                <editor class="pane-content"></editor>
-              </template>
-            </split-pane>
+            <single-image 
+              class="pane-content single-image-pane"
+              :corpus="corpus"></single-image>
           </template>
           <template slot="paneR">
-            <combination 
-              class="combination-pane"
-              :corpus="corpus"></combination>
+            <editor class="pane-content"></editor>
           </template>
         </split-pane>
       </div>
@@ -51,7 +40,6 @@ import MainMenu from './menu/MainMenu.vue'
 import SplitPane from 'vue-splitpane'
 import SingleImage from './SingleImage.vue'
 import Editor from './editor/Editor.vue'
-import Combination from './Combination.vue'
 
 import Corpus from '~/models/Corpus.js'
 
@@ -62,7 +50,6 @@ export default {
     'split-pane': SplitPane,
     'single-image': SingleImage,
     editor: Editor,
-    combination: Combination,
   },
   data() {
     return {
