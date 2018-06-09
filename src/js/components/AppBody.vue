@@ -40,7 +40,6 @@ import MainMenu from './menu/MainMenu.vue'
 import SplitPane from 'vue-splitpane'
 import SingleImage from './SingleImage.vue'
 import Editor from './editor/Editor.vue'
-import Combination from './Combination.vue'
 
 import Corpus from '~/models/Corpus.js'
 
@@ -51,7 +50,6 @@ export default {
     'split-pane': SplitPane,
     'single-image': SingleImage,
     editor: Editor,
-    combination: Combination,
   },
   data() {
     return {
