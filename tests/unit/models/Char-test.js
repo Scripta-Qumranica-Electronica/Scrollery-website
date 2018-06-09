@@ -1,5 +1,6 @@
 import Char from '~/models/Char.js'
-
+import Attribute from '~/models/Attribute.js'
+import AttributeList from '~/models/AttributeList.js'
 
 const mockData = {
   "sign_char_id": 998006,
@@ -41,52 +42,51 @@ describe('Char', () => {
     char = new Char(mockData)
   })
 
-  // describe('attributes', () => {
-  //   let sign,
-  //   attributeID = 12345,
-  //   attrs = () =>  ({
-  //     sign_id: 1,
-  //     sign: 'א',
-  //     is_reconstructed: false,
-  //     attributes: [
-  //       new Attribute({
-  //         attribute_id: attributeID,
-  //         attribute_value: 'some_value',
-  //         attribute_description: 'attribute description'
-  //       })
-  //     ]
-  //   })
-  //   beforeEach(() => {
-  //     sign = new Sign(attrs())
-  //   })
+  describe('attributes', () => {
+    let char,
+    attributeID = 12345,
+    attrs = () => ({
+      sign_char_id: 1,
+      sign_char: 'א',
+      attributes: [
+        {
+          attribute_id: attributeID,
+          attribute_value: 'some_value',
+          attribute_description: 'attribute description'
+        }
+      ]
+    })
+    beforeEach(() => {
+      char = new Char(attrs())
+    })
 
-  //   it('should create a List from the raw attributes', () => {
-  //     expect((sign.attributes instanceof AttributeList)).to.equal(true)
-  //   })
+    it('should create a List from the raw attributes', () => {
+      expect((char.attributes instanceof AttributeList)).to.equal(true)
+    })
 
-  //   it('should accept a new attribute as an object', () => {
-  //     sign.addAttribute({
-  //       attribute_id: 12346,
-  //       attribute_value: 'some_value',
-  //       attribute_description: 'attribute description'
-  //     })
-  //     expect(sign.attributes.length).to.equal(2)
-  //   })
+    it('should accept a new attribute as an object', () => {
+      char.addAttribute({
+        attribute_id: 12346,
+        attribute_value: 'some_value',
+        attribute_description: 'attribute description'
+      })
+      expect(char.attributes.length).to.equal(2)
+    })
 
-  //   it('should accept a new attribute as an instance of Attribute', () => {
-  //     const attribute = new Attribute({
-  //       attribute_id: 12346,
-  //       attribute_value: 'some_value',
-  //       attribute_description: 'attribute description'
-  //     })
-  //     sign.addAttribute(attribute)
-  //     expect(sign.attributes.length).to.equal(2)
-  //     expect(sign.attributes.get(1)).to.equal(attribute)
-  //   })
+    it('should accept a new attribute as an instance of Attribute', () => {
+      const attribute = new Attribute({
+        attribute_id: 12346,
+        attribute_value: 'some_value',
+        attribute_description: 'attribute description'
+      })
+      char.addAttribute(attribute)
+      expect(char.attributes.length).to.equal(2)
+      expect(char.attributes.get(1)).to.equal(attribute)
+    })
 
-  //   it('should remove an attribute by id', () => {
-  //     sign.removeAttribute(attributeID)
-  //     expect(sign.attributes.length).to.equal(0)
-  //   })
-  // })
+    it('should remove an attribute by id', () => {
+      char.removeAttribute(attributeID)
+      expect(char.attributes.length).to.equal(0)
+    })
+  })
 })

@@ -1,6 +1,7 @@
-import { mount, factory } from '@test'
+import { mount } from '@test'
 import Editor from '~/components/editor/Editor.vue'
 import Column from '~/models/Column.js'
+import getTextOfFragment from './getTextOfFragment.json'
 
 /**
  * Create a $route object with only the properties
@@ -17,34 +18,22 @@ let makeRoute = (colID = 1, scrollVersionID = 2) => ({
 })
 
 /**
- * Mock an API response to retrieve the text. This uses the
- * signStream factory to generate any number of sign streams
+ * Mock an API response to retrieve the text.
  *
  * @param {number=200} [status]     The HTTP status code to return
- * @param {number=0}   [signsCount] The number of signs to use in the response
- * @param {number=1}   [colID]      The column ID to use for all of the signs.
  *
  * @returns {Promise} A promise that resolves with the response
  */
-let mockAPIResponse = (status = 200, signsCount = 0, colID = 1) => {
+let mockAPIResponse = (status = 200) => {
   return new Promise((resolve, reject) => {
     if (status > 400) {
       reject(new Error('mock api err'))
     } else {
       resolve({
         status,
-        data: {
-          results: signsCount
-            ? // if there's a signCount > 0, then create the signStream
-              factory.signStream({
-                signsCount,
-                colProps: {
-                  id: colID,
-                },
-              })
-            : // otherwise, empty
-              [],
-        },
+        data: status === 200
+          ? getTextOfFragment
+          : {text: []},
       })
     }
   })
@@ -155,7 +144,7 @@ describe('Editor', () => {
       let wrapper = mountEditor({})
 
       // prepare a stubbed response
-      wrapper.vm.$post.returns(mockAPIResponse(200, 20, colID))
+      wrapper.vm.$post.returns(mockAPIResponse())
 
       // trigger a retrieval of that column
       wrapper.setData({
@@ -167,7 +156,7 @@ describe('Editor', () => {
       let interval = setInterval(() => {
         if (wrapper.vm.text.length) {
           expect(wrapper.vm.text.get(0) instanceof Column).to.equal(true)
-          clearTimeout(interval)
+          clearInterval(interval)
           done()
         }
       }, 1)

@@ -29,16 +29,29 @@ const defaults = {
  */
 export default class Sign extends extendModel(defaults) {
   constructor(attrs, isPersisted) {
+    // When sign streams split, next_sign_ids is an array of all next signs
+    // For consistency, we make this a single one
+    attrs.next_sign_ids = attrs.next_sign_ids || []
     if (!Array.isArray(attrs.next_sign_ids)) {
       attrs.next_sign_ids = [attrs.next_sign_ids]
     }
 
+    // A sign can have multiple characters. If there isn't an array,
+    // coerace it to an array.
+    attrs.chars = attrs.chars || []
     if (!Array.isArray(attrs.chars)) {
       attrs.chars = [attrs.chars]
     }
     attrs.chars = attrs.chars.map(char => new Char(char))
 
     super(attrs, isPersisted)
+  }
+
+  /**
+   * @return {number} the sign id
+   */
+  getID() {
+    return this.sign_id
   }
 
   /**
@@ -49,16 +62,43 @@ export default class Sign extends extendModel(defaults) {
   }
 
   /**
-   * @returns {string}
+   * For now, simply return the first char, but plan for needing to return the main
+   * char when there are multiple. It will likely be indicated by a flag on the char itself
+   *
+   * @public
+   * @return {Char} the char object
    */
-  toString() {
-    return this.chars[0].toString()
+  getMainChar() {
+    return this.chars[0]
   }
 
   /**
+   * @public
+   * @instance
+   *
+   * @return {boolean} whether or not the sign is a whitespace
+   */
+  isWhitespace() {
+    return this.getMainChar().is_whitespace
+  }
+
+  /**
+   * @public
+   * @instance
+   *
+   * @returns {string}
+   */
+  toString() {
+    return this.getMainChar().toString()
+  }
+
+  /**
+   * @public
+   * @instance
+   *
    * @returns {string}
    */
   toDOMString() {
-    return this.chars[0].toDOMString()
+    return this.getMainChar().toDOMString()
   }
 }

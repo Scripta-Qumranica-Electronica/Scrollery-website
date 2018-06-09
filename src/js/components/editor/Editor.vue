@@ -61,26 +61,38 @@ export default {
       })
         .then(res => {
           if (res.status === 200 && res.data) {
+            // reset the composition
+            this.text = new CompositionModel()
+
             const scroll = res.data.text[0]
             const column = scroll.fragments[0]
 
-            const colModel = new Column({
-              id: column.fragment_id,
-              name: column.fragment_name,
-            })
-            this.text.insert(colModel)
-
+            // iterate through each line and add it to a lines array
+            const lines = []
             for (let i = 0, line; (line = column.lines[i]); i++) {
               let lineModel = new Line({
                 id: line.line_id,
                 name: line.line_name,
               })
-              colModel.push(lineModel)
+              lines.push(lineModel)
 
+              // iterate through each sign in the line and add it to the
+              // the line model
               for (let j = 0, rawSign; (rawSign = line.signs[j]); j++) {
                 lineModel.push(new Sign(rawSign))
               }
             }
+
+            // finally insert new column into the text.
+            this.text.insert(
+              new Column(
+                {
+                  id: column.fragment_id,
+                  name: column.fragment_name,
+                },
+                lines
+              )
+            )
           } else {
             throw new Error('Unable to retrieve text data')
           }

@@ -30,18 +30,18 @@ export default class Char extends extendModel(defaults) {
       attrs.attributes = attrs.attributes ? [attrs.attributes] : []
     }
 
-    attrs.id = attrs.sign_id
+    // coerce attributes to the a List
+    if (attrs.attributes && !(attrs.attributes instanceof AttributeList)) {
+      attrs.attributes = new AttributeList({}, attrs.attributes.map(a => new Attribute(a)))
+    }
+
+    attrs.id = attrs.sign_char_id
     attrs.is_whitespace =
       !attrs.sign_char ||
       attrs.sign_char === '' ||
       attrs.sign_char === ' ' ||
       attrs.sign_char === '&nbsp;' ||
       attrs.sign_char === '·'
-
-    // coerce attributes to the a List
-    if (attrs.attributes && !(attrs.attributes instanceof AttributeList)) {
-      attrs.attributes = new AttributeList({}, attrs.attributes.map(a => new Attribute(a)))
-    }
 
     super(attrs, isPersisted)
   }
@@ -71,13 +71,6 @@ export default class Char extends extendModel(defaults) {
     let i = this.attributes.findIndex(attributeID)
     return i >= 0 ? this.attributes.delete(i) : null
   }
-
-  /**
-   * @todo
-   *
-   * @returns {boolean} whether or not this char is reconstructed
-   */
-  // reconstructed() {}
 
   /**
    * @todo

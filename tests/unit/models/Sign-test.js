@@ -15,7 +15,7 @@ describe('Sign', () => {
     beforeEach(() => {
       sign = new Sign({
         sign_id: 1,
-        next_sign_id: 2,
+        next_sign_ids: [2],
       })
       next = new Sign({
         sign_id: 2,
@@ -28,31 +28,14 @@ describe('Sign', () => {
     })
   })
 
-  describe('previous sign', () => {
-    let sign, prev
-    beforeEach(() => {
-      sign = new Sign({
-        sign_id: 2,
-        prev_sign_id: 1,
-      })
-      prev = new Sign({
-        sign_id: 1,
-      })
-    })
-
-    it('should know if it has a previous sign', () => {
-      expect(sign.hasPrevious()).to.equal(true)
-      expect(prev.hasPrevious()).to.equal(false)
-    })
-  })
-
   describe('attributes', () => {
     let sign
     beforeEach(() => {
       sign = new Sign({
         sign_id: 1,
-        sign: '·',
-        is_reconstructed: true,
+        chars: {
+          sign_char: '·'
+        },
       })
     })
 
@@ -61,42 +44,20 @@ describe('Sign', () => {
     })
 
     it('should know if it is a whitespace character', () => {
-      expect(sign.is_whitespace).to.equal(true)
+      expect(sign.isWhitespace()).to.equal(true)
     })
 
     it('should know about the varieties of whitespace', () => {
-      ;[{ sign: false }, { sign: '' }, { sign: ' ' }, { sign: '&nbsp;' }, { sign: '·' }].forEach(
-        attrs => {
-          sign = new Sign({ sign: false })
-          expect(sign.is_whitespace).to.equal(true)
+      ;[false, '', ' ', '&nbsp;', '·'].forEach(
+        signChar => {
+          sign = new Sign({ 
+            chars: [
+              {sign_char: signChar}
+            ]
+           })
+          expect(sign.getMainChar().is_whitespace).to.equal(true)
         }
       )
-    })
-
-    it('should know if it is reconstructed', () => {
-      expect(sign.reconstructed()).to.equal(true)
-    })
-  })
-
-  describe('extending', () => {
-    let sign,
-      attrs = {
-        sign_id: 1,
-        sign: '·',
-        is_reconstructed: true,
-      }
-    beforeEach(() => {
-      sign = new Sign(attrs)
-    })
-
-    it('should expose an extend method that extends it with new attributes', () => {
-      let newSign = sign.extend({
-        col_id: 1,
-      })
-      expect(newSign instanceof Sign).to.equal(true)
-      expect(newSign).to.equal(sign)
-      expect(newSign.reconstructed()).to.equal(sign.reconstructed())
-      expect(newSign.col_id).to.equal(1)
     })
   })
 
@@ -105,8 +66,11 @@ describe('Sign', () => {
       let sign,
         attrs = {
           sign_id: 1,
-          sign: '·',
-          is_reconstructed: true,
+          chars: [
+            {
+              sign_char: '·'
+            }
+          ]
         }
       beforeEach(() => {
         sign = new Sign(attrs)
@@ -121,8 +85,11 @@ describe('Sign', () => {
       let sign,
         attrs = {
           sign_id: 1,
-          sign: 'א',
-          is_reconstructed: true,
+          chars: [
+            {
+              sign_char: 'א',
+            }
+          ]
         }
       beforeEach(() => {
         sign = new Sign(attrs)
@@ -139,8 +106,11 @@ describe('Sign', () => {
       let sign,
         attrs = {
           sign_id: 1,
-          sign: '·',
-          is_reconstructed: true,
+          chars: [
+            {
+              sign_char: '·',
+            }
+          ]
         }
       beforeEach(() => {
         sign = new Sign(attrs)
@@ -155,8 +125,11 @@ describe('Sign', () => {
       let sign,
         attrs = {
           sign_id: 1,
-          sign: 'א',
-          is_reconstructed: true,
+          chars: [
+            {
+              sign_char: 'א',
+            }
+          ]
         }
       beforeEach(() => {
         sign = new Sign(attrs)

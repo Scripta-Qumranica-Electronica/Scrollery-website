@@ -8,53 +8,6 @@ describe('CompositionModel', () => {
     text = new Composition()
   })
 
-  it('should create a text from a stream', () => {
-    expect(Composition.fromSigns([]) instanceof Composition).to.equal(true)
-  })
-
-  describe('adding columns', () => {
-    it('should push a column', () => {
-      text.push(new Column({ id: 1, name: 'test' }))
-      text.push(new Column({ id: 1, name: 'test' }))
-      expect(text.count()).to.equal(2)
-    })
-
-    it('should validate the type on insert', () => {
-      expect(() => {
-        text.push({})
-      }).to.throw(TypeError)
-
-      expect(() => {
-        text.insert({}, 1)
-      }).to.throw(TypeError)
-    })
-
-    it('should insert a column at a specified inded', () => {
-      const col = new Column({ id: 1, name: 'test' })
-      text.push(new Column({ id: 1, name: 'test' }))
-      text.push(new Column({ id: 1, name: 'test' }))
-      text.insert(col, 1)
-      expect(text.get(1)).to.equal(col)
-    })
-
-    it('should insert a column at the end if no specified inded', () => {
-      const col = new Column({ id: 1, name: 'test' })
-      text.push(new Column({ id: 1, name: 'test' }))
-      text.push(new Column({ id: 1, name: 'test' }))
-      text.insert(col)
-      expect(text.get(2)).to.equal(col)
-    })
-  })
-
-  describe('removing columns', () => {
-    it('should delete columns at a specified index', () => {
-      text.push(new Column({ id: 1, name: 'test' }))
-      text.push(new Column({ id: 1, name: 'test' }))
-      text.delete(0)
-      expect(text.count()).to.equal(1)
-    })
-  })
-
   describe('inserting lines', () => {
     it('should ensure there is a valid column to insert at', () => {
       expect(() => {
