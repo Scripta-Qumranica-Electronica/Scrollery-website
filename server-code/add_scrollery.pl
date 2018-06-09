@@ -72,7 +72,7 @@ print $log `/bin/cp -rf $tempDir/resources $installDir`;
 
 # Patch the Perl cgi scripts to use the proper paths.
 #local $CWD = "$installDir/resources/cgi-bin";
-edit_file { s@use lib qw\(\.\./perl-libs\);@use lib qw\($installDir/resources/cgi-bin/local/lib/perl5\);\nuse lib qw\(/var/www/html/development\);\nuse lib qw\(/var/www/html/development/SQE_API\)@g } $installDir . '/resources/cgi-bin/scrollery-cgi.pl';
+edit_file { s@use lib qw\(\.\./perl-libs\);@use lib qw\($installDir/resources/cgi-bin/local/lib/perl5\);\nuse lib qw\(/var/www/html/development\);\nuse lib qw\(/var/www/html/development/SQE_API\);@g } $installDir . '/resources/cgi-bin/scrollery-cgi.pl';
 edit_file { s@use SQE_@use SQE_API\:\:SQE_@g } $installDir . '/resources/cgi-bin/scrollery-cgi.pl';
 edit_file { s!Encode\:\:decode\('utf8', encode_json\(\\\@fetchedResults\)\)!encode_json\(\\\@fetchedResults\)!g } $installDir . '/resources/cgi-bin/scrollery-cgi.pl';
 
