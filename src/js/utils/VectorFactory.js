@@ -120,7 +120,7 @@ export function svgPolygonToWKT(svg) {
 
 /*
  * This function receives an SVG path and 
- * converts it to a WKT Polygon.
+ * converts it to a GeoJSON Polygon.
  */
 export function svgPolygonToGeoJSON(svg) {
   let json = undefined
@@ -153,6 +153,43 @@ export function svgPolygonToGeoJSON(svg) {
     })
   }
   return json
+}
+
+/*
+ * This function receives an SVG path and 
+ * converts it to a Clipper Polygon.
+ */
+export function svgPolygonToClipper(svg) {
+  let clipper = undefined
+  svg = svg.trim()
+  if (svg.startsWith('M')) {
+    clipper = []
+    const lineSegmentRegex = /\sL\s|L|L\s|\sL/g
+    const zTerminatorRegex = /Z/g
+    const polygons = svg.split('M')
+    polygons.forEach((poly, index) => {
+      if (poly) {
+        clipper.push([])
+        let firstPoint
+        let points
+        const lines = poly
+          .replace(lineSegmentRegex, ' ')
+          .replace(zTerminatorRegex, '')
+          .trim()
+        points = lines.split(' ')
+        firstPoint = { X: Number(points[0]), Y: Number(points[1]) }
+        for (let i = 0, length = points.length - 1; i <= length; i += 2) {
+          clipper[index - 1].push({ X: Number(points[i]), Y: Number(points[i + 1]) })
+          if (i + 2 > length) {
+            if (Number(points[i]) !== firstPoint.X || Number(points[i + 1]) !== firstPoint.Y) {
+              clipper[index - 1].push(firstPoint)
+            }
+          }
+        }
+      }
+    })
+  }
+  return clipper
 }
 
 /* 

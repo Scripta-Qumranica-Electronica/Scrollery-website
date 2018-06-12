@@ -52,7 +52,12 @@
  * draw.
  */
 import { trace } from '../utils/Potrace.js'
-import { clipCanvas } from '../utils/VectorFactory'
+import { clipCanvas, svgPolygonToGeoJSON, svgPolygonToClipper } from '../utils/VectorFactory'
+import { polygon } from '@turf/helpers'
+import union from '@turf/union'
+import difference from '@turf/difference'
+import normalizeClipperPolygons from 'js-clipper/formatter'
+import ClipperLib from 'js-clipper/clipper'
 
 export default {
   props: {
@@ -73,6 +78,7 @@ export default {
       },
       mouseOver: false,
       drawing: false,
+      editingCanvas: document.createElement('canvas'),
     }
   },
   methods: {
@@ -102,13 +108,33 @@ export default {
           2 * Math.PI
         )
         ctx.closePath()
+
+        const editingCTX = this.editingCanvas.getContext('2d')
+        editingCTX.beginPath()
+        editingCTX.arc(
+          this.cursorPos.x / this.scale,
+          this.cursorPos.y / this.scale,
+          this.brushSize / 2 / this.scale,
+          0,
+          2 * Math.PI
+        )
+        editingCTX.closePath()
+
         if (this.drawMode === 'erase') {
           ctx.globalCompositeOperation = 'destination-out'
           ctx.fill()
+
+          editingCTX.globalCompositeOperation = 'source-over'
+          editingCTX.fillStyle = 'purple'
+          editingCTX.fill()
         } else {
           ctx.globalCompositeOperation = 'source-over'
           ctx.fillStyle = 'purple'
           ctx.fill()
+
+          editingCTX.globalCompositeOperation = 'source-over'
+          editingCTX.fillStyle = 'purple'
+          editingCTX.fill()
         }
       }
     },
@@ -121,18 +147,76 @@ export default {
       return returnPos
     },
     canvasToSVG() {
-      trace(this.$refs.maskCanvas, this.divisor).then(res => {
-        this.$emit('mask', res)
+      // trace(this.$refs.maskCanvas, this.divisor).then(res => {
+      //   this.$emit('mask', res)
+      // })
+      trace(this.editingCanvas, this.divisor).then(res => {
+        const newClipperPolygon = svgPolygonToClipper(res)
+        let cpr = new ClipperLib.Clipper()
+        cpr.AddPaths(this.currentTurfPolygon, ClipperLib.PolyType.ptSubject, true)
+        cpr.AddPaths(newClipperPolygon, ClipperLib.PolyType.ptClip, true)
+        let solution_paths = new ClipperLib.Paths()
+        if (this.drawMode === 'erase') {
+          console.log('erase')
+          let succeeded = cpr.Execute(
+            ClipperLib.ClipType.ctDifference,
+            solution_paths,
+            ClipperLib.PolyFillType.pftNonZero,
+            ClipperLib.PolyFillType.pftNonZero
+          )
+        } else {
+          console.log('draw')
+          let succeeded = cpr.Execute(
+            ClipperLib.ClipType.ctUnion,
+            solution_paths,
+            ClipperLib.PolyFillType.pftNonZero,
+            ClipperLib.PolyFillType.pftNonZero
+          )
+        }
+        let ctx = this.editingCanvas.getContext('2d')
+        ctx.clearRect(0, 0, this.editingCanvas.width, this.editingCanvas.height)
+        this.$emit('mask', this.paths2string(solution_paths))
+        // console.log(JSON.stringify(solution_paths))
+        // console.log(this.paths2string(solution_paths))
+        // console.log(turfEditPolygon)
+        // console.log(newClipperPolygon)
       })
+    },
+    paths2string(paths, scale) {
+      var svgpath = '',
+        i,
+        j
+      if (!scale) scale = 1
+      for (i = 0; i < paths.length; i++) {
+        for (j = 0; j < paths[i].length; j++) {
+          if (!j) svgpath += 'M'
+          else svgpath += 'L'
+          svgpath += paths[i][j].X / scale + ' ' + paths[i][j].Y / scale
+        }
+        svgpath += 'Z'
+      }
+      if (svgpath == '') svgpath = 'M0 0'
+      return svgpath
     },
   },
   watch: {
     mask(to, from) {
       if (to && from !== to) {
         clipCanvas(this.$refs.maskCanvas, this.mask, this.divisor)
+        this.currentTurfPolygon = svgPolygonToClipper(this.mask)
       } else {
         let ctx = this.$refs.maskCanvas.getContext('2d')
         ctx.clearRect(0, 0, this.$refs.maskCanvas.width, this.$refs.maskCanvas.height)
+      }
+    },
+    width(to, from) {
+      if (to && from !== to) {
+        this.editingCanvas.width = to
+      }
+    },
+    height(to, from) {
+      if (to && from !== to) {
+        this.editingCanvas.height = to
       }
     },
   },
