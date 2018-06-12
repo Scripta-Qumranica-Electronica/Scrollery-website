@@ -87,7 +87,7 @@ describe('EventEmitter', () => {
 
   describe('prototype.off', () => {
 
-    it('should remove event listeners', () => {
+    it('should remove event listeners', done => {
       let count = 0
 
       const handler1 = () => {
