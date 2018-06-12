@@ -19,6 +19,52 @@ sub processCGI {
 		exit;
 	}
 
+	my %actions = (
+		validateSession => \&validateSession,
+		getCombs => \&getCombs,
+		getArtOfComb => \&getArtOfComb,
+		getArtOfImage => \&getArtOfImage,
+		getImgOfComb => \&getImgOfComb,
+		getColOfComb => \&getColOfComb,
+		getFragsOfCol => \&getFragsOfCol,
+		getColOfScrollID => \&getColOfScrollID,
+		getSignStreamOfColumn => \&getSignStreamOfColumn,
+		getSignStreamOfFrag => \&getSignStreamOfFrag,
+		getImagesOfFragment => \&getImagesOfFragment,
+		getIAAEdID => \&getIAAEdID,
+		getCanonicalCompositions => \&getCanonicalCompositions,
+		getCanonicalID1 => \&getCanonicalID1,
+		getCanonicalID2 => \&getCanonicalID2,
+		getInstitutions => \&getInstitutions,
+		getInstitutionPlates => \&getInstitutionPlates,
+		getInstitutionFragments => \&getInstitutionFragments,
+		imagesOfInstFragments => \&imagesOfInstFragments,
+		getInstitutionArtefacts => \&getInstitutionArtefacts,
+		getScrollWidth => \&getScrollWidth,
+		getScrollHeight => \&getScrollHeight,
+		newArtefact => \&newArtefact,
+		getArtefactMask => \&getArtefactMask,
+		getScrollArtefacts => \&getScrollArtefacts,
+		newCombination => \&newCombination,
+		copyCombination => \&copyCombination,
+		nameCombination => \&nameCombination,
+		changeArtefactPoly => \&changeArtefactPoly,
+		setArtPosition => \&setArtPosition,
+		setArtRotation => \&setArtRotation,
+		addSigns => \&addSigns,
+		removeSigns => \&removeSigns,
+		addSignAttribute => \&addSignAttribute,
+		removeSignAttribute => \&removeSignAttribute,
+		addSignCharVariant => \&addSignCharVariant,
+		removeSignChar => \&removeSignChar,
+		addSignCharCommentary => \&addSignCharCommentary,
+		removeSignCharCommentary => \&removeSignCharCommentary,
+		addRoiToScroll => \&addRoiToScroll,
+		removeROI => \&removeROI,
+		getRoiOfCol => \&getRoiOfCol,
+		getRoisOfCombination => \&getRoisOfCombination,
+		getTextOfFragment => \&getTextOfFragment
+	);
 	my $json_post = $cgi->{CGIDATA};
 
 	if (!defined $json_post->{transaction}){
@@ -30,10 +76,14 @@ sub processCGI {
 				my $counter = 1;
 				my $repeatLength = scalar @{$json_post->{requests}};
 				foreach my $request (@{$json_post->{requests}}) {
-					if (defined $request->{transaction} && defined $::{$request->{transaction}}) {
-						$::{$request->{transaction}}($cgi, $request);
+					if (defined $request->{transaction} && defined $actions{$request->{transaction}}) {
+						$actions{$request->{transaction}}->($cgi, $request);
 					} else {
 						print encode_json({[{'error' => "Transaction type '" . $request->{transaction} . "' not understood."}]});
+					}
+					if ($counter < $repeatLength) {
+						$counter++;
+						print ",";
 					}
 				}
 				print ']}';
@@ -44,8 +94,8 @@ sub processCGI {
 				my $lastItem = 1;
 				while (my ($key, $value) = each (%{$json_post->{requests}})) {
 					print "\"$key\":";
-					if (defined $value->{transaction} && defined $::{$value->{transaction}}) {
-						$::{$value->{transaction}}($cgi, $value);
+					if (defined $value->{transaction} && defined $actions{$value->{transaction}}) {
+						$actions{$value->{transaction}}->($cgi, $value);
 					} else {
 						print "{'error': 'Transaction type $value->{transaction} not understood.'}";
 					}
@@ -58,8 +108,8 @@ sub processCGI {
 			}
 		}
 	} else {
-		if (defined $json_post->{transaction} && defined $::{$json_post->{transaction}}) {
-			$::{$json_post->{transaction}}($cgi, $json_post);
+		if (defined $json_post->{transaction} && defined $actions{$json_post->{transaction}}) {
+			$actions{$json_post->{transaction}}->($cgi, $json_post);
 		} else {
 			print encode_json({'error', "Transaction type '" . $json_post->{transaction} . "' not understood."});
 		}
