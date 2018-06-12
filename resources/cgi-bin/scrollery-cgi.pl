@@ -944,11 +944,12 @@ sub addSigns() {
 	print "[{";
 
 	my $prev_sign_id = 0;
+	my $next_sign_id = $json_post->{signs}->[-1]->{next_sign_id};
 	foreach my $sign (@{$json_post->{signs}}) {
 		if ($counter == 1) {
 			$prev_sign_id = $sign->{previous_sign_id};
 		}
-		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $sign->{next_sign_id});
+		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $next_sign_id);
 		print "\"$sign->{uuid}\":$prev_sign_id";
 		if ($counter != $repeatLength) {
 			print "},{";
