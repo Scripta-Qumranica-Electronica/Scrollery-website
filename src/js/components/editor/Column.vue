@@ -291,6 +291,8 @@ export default {
       this.$store.getters.sessionID
     )
 
+    setTimeout(() => this.persistanceService.engage(), 500)
+
     this.colHtmlString = this.column.toDOMString()
   },
 }

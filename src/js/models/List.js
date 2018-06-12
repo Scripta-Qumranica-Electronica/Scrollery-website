@@ -47,6 +47,7 @@ class List extends EventEmitter {
 
       if (item instanceof List) {
         item.on('delete', ({ item, index }) => this.emit('delete'))
+        item.on('addition', ({ item, index }) => this.emit('addition'))
       }
 
       this.emit('addition', { item, index })
@@ -116,7 +117,9 @@ class List extends EventEmitter {
     }
 
     // TODO: updates
-    this.forEach(item => item.persisted(persistedMap))
+    this.forEach(item => {
+      item.persisted(persistedMap)
+    })
   }
 
   /**
