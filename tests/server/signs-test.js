@@ -26,7 +26,7 @@ describe('Sign functionality', () => {
         SESSION_ID: sessionID,
       })
 
-  it('should attempt to login the test/asdf user', done => {
+  it('should attempt to get the text of a fragment', () => {
     return send({
       transaction: 'getTextOfFragment',
       scroll_version_id: 808,
@@ -34,6 +34,7 @@ describe('Sign functionality', () => {
     })
       .expect(200)
       .then(res => {
+        console.log('Response:')
         console.log(res.body)
       })
   })
