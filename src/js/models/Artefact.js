@@ -8,6 +8,8 @@ import extendModel from './extendModel.js'
  */
 const defaults = {
   artefact_position_id: 0,
+  artefact_id: 0,
+  artefact_shape_id: 0,
   name: '',
   side: 0,
   mask: '',

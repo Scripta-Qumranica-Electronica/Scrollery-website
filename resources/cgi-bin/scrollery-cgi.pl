@@ -203,6 +203,8 @@ sub getArtOfImage {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getArtOfImageQuery = <<'MYSQL';
 SELECT DISTINCT	artefact_position.artefact_position_id,
+				artefact_shape.artefact_shape_id AS artefact_shape_id,
+				artefact_position.artefact_id AS artefact_id,
 				artefact_data.name, 
 				catalog_side AS side,
 				ST_AsText(artefact_shape.region_in_sqe_image) as mask,
@@ -765,6 +767,8 @@ sub getScrollArtefacts {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getScrollArtefactsQuery = <<'MYSQL';
 SELECT DISTINCT artefact_position.artefact_position_id AS artefact_position_id,
+				artefact_shape.artefact_shape_id AS artefact_shape_id,
+				artefact_position.artefact_id AS artefact_id,
                 ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
                 ST_AsText(artefact_shape.region_in_sqe_image) AS mask,
 				artefact_position.transform_matrix AS transform_matrix,
@@ -881,40 +885,37 @@ sub nameCombination {
 
 sub changeArtefactPoly {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
-	$cgi->dbh->set_scrollversion($json_post->{version_id});
-	my ($new_art_id, $new_art_error) = $cgi->dbh->change_value("artefact_shape", $json_post->{artefact_id}, "region_in_sqe_image", ['ST_GEOMFROMTEXT', $json_post->{region_in_sqe_image}]);
-	if ($new_art_error) {
-		handleDBError ($new_art_id, $new_art_error);
-	}
-
-	my $getArtDataQuery = <<'MYSQL';
-SELECT artefact_data_id
-FROM artefact_data
-WHERE artefact_id = ?
+	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
+	my $artefact_shape_id_query = <<'MYSQL';
+	SELECT artefact_shape.artefact_shape_id
+	FROM artefact_shape
+		JOIN artefact_shape_owner USING(artefact_shape_id)
+		JOIN artefact_position USING(artefact_id)
+		JOIN artefact_position_owner USING(artefact_position_id)
+	WHERE artefact_position.artefact_position_id = ?
+		AND artefact_position_owner.scroll_version_id = ?
+		AND artefact_shape_owner.scroll_version_id = ?
 MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getArtDataQuery)
+	my $sql = $cgi->dbh->prepare_cached($artefact_shape_id_query)
 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{artefact_id});
-	my $artefact_data_id = $sql->fetchrow_arrayref()->[0];
-	my ($new_art_data_id, $data_error) = $cgi->dbh->change_value("artefact_data", $artefact_data_id, "artefact_id", $new_art_id);
-	if ($data_error) {
-		handleDBError ($new_art_data_id, $data_error);
-	}
+	$sql->execute($json_post->{artefact_position_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
+	my $artefact_shape_id = $sql->fetchrow_arrayref()->[0];
 
-	my $getArtPosQuery = <<'MYSQL';
-SELECT artefact_position_id
-FROM artefact_position
-WHERE artefact_id = ?
+	# my ($new_art_shape_id, $new_art_error) = $cgi->dbh->change_value("artefact_shape", $artefact_shape_id, "region_in_sqe_image", ['ST_GEOMFROMTEXT', $json_post->{region_in_sqe_image}]);
+	# if ($new_art_error) {
+	# 	handleDBError ($new_art_shape_id, $new_art_error);
+	# }
+
+	my $changeArtefactMaskQuery = <<'MYSQL';
+	UPDATE artefact_shape
+	SET region_in_sqe_image = ST_GEOMFROMTEXT(?)
+	WHERE artefact_shape_id = ?
 MYSQL
-	$sql = $cgi->dbh->prepare_cached($getArtPosQuery)
+	$sql = $cgi->dbh->prepare_cached($changeArtefactMaskQuery)
 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{artefact_id});
-	my $artefact_pos_id = $sql->fetchrow_arrayref()->[0];
-	my ($new_art_pos_id, $pos_error) = $cgi->dbh->change_value("artefact_position", $artefact_pos_id, "artefact_id", $new_art_id);
-	if ($pos_error) {
-		handleDBError ($new_art_data_id, $pos_error);
-	}
-	print '{"artefact_id": ' . $new_art_id . ', "artefact_data_id": ' . $new_art_pos_id . ', "artefact_position_id": ' . $new_art_pos_id . '}';
+	$sql->execute($json_post->{region_in_sqe_image}, $artefact_shape_id);
+
+	print '{"artefact_shape_id":' . $artefact_shape_id . ', "artefact_position_id":' . $json_post->{artefact_position_id} . '}';
 
 	return;
 }

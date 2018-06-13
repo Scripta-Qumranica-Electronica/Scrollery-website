@@ -176,10 +176,6 @@ export default {
         let ctx = this.editingCanvas.getContext('2d')
         ctx.clearRect(0, 0, this.editingCanvas.width, this.editingCanvas.height)
         this.$emit('mask', this.paths2string(solution_paths))
-        // console.log(JSON.stringify(solution_paths))
-        // console.log(this.paths2string(solution_paths))
-        // console.log(turfEditPolygon)
-        // console.log(newClipperPolygon)
       })
     },
     paths2string(paths, scale) {

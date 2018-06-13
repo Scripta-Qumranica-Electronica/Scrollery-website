@@ -1,3 +1,10 @@
+/* TODO I ignore this for testing until I decide on
+ * a set model.  Write tests when that has been
+ * determined!
+ */
+
+/* istanbul ignore next */
+
 import Combinations from './Combinations.js'
 import ImageReferences from './imageReferences.js'
 import Cols from './Cols.js'
@@ -16,13 +23,6 @@ import { wktPolygonToSvg } from '../utils/VectorFactory.js'
 
 import { polygon } from '@turf/helpers'
 import booleanOverlap from '@turf/boolean-overlap'
-
-/* TODO I ignore this for testing until I decide on
- * a set model.  Write tests when that has been
- * determined!
- */
-
-/* istanbul ignore next */
 
 /**
  * A corpus is collection of all consituent objects.
@@ -96,7 +96,6 @@ export default class Corpus {
     })
   }
 
-  /* istanbul ignore next */
   populateImageReferencesOfCombination(scrollID, scrollVersionID) {
     if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
     if (scrollID.constructor !== Array) scrollID = [scrollID]
@@ -141,8 +140,6 @@ export default class Corpus {
   //     })
   //   })
   // }
-
-  /* istanbul ignore next */
   populateImagesOfImageReference(imageReferenceID, scrollVersionID) {
     if (imageReferenceID.constructor !== Array) imageReferenceID = [imageReferenceID]
     // If scrollVersionID is not an array, convert it into one matching the
@@ -187,7 +184,6 @@ export default class Corpus {
     })
   }
 
-  /* istanbul ignore next */
   populateArtefactsOfCombination(scrollID, scrollVersionID) {
     return new Promise((resolve, reject) => {
       this.artefacts
@@ -221,7 +217,6 @@ export default class Corpus {
     })
   }
 
-  /* istanbul ignore next */
   populateArtefactsOfImageReference(imageReferenceID, scrollVersionID) {
     if (imageReferenceID.constructor !== Array) imageReferenceID = [imageReferenceID]
     // If scrollVersionID is not an array, convert it into one matching the
@@ -276,7 +271,6 @@ export default class Corpus {
     })
   }
 
-  /* istanbul ignore next */
   populateRoisOfCombination(scrollID, scrollVersionID) {
     if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
     if (scrollID.constructor !== Array) scrollID = [scrollID]
@@ -313,7 +307,6 @@ export default class Corpus {
     })
   }
 
-  /* istanbul ignore next */
   populateRoiOfCol(colID, scrollVersionID) {
     if (colID.constructor !== Array) colID = [colID]
     // If scrollVersionID is not an array, convert it into one matching the
@@ -364,7 +357,6 @@ export default class Corpus {
     })
   }
 
-  /* istanbul ignore next */
   cloneScroll(scroll_version_id) {
     const payload = {
       SESSION_ID: this.session_id,
@@ -392,7 +384,57 @@ export default class Corpus {
     })
   }
 
-  /* istanbul ignore next */
+  changeArtefactMask(region_in_sqe_image, artefact_position_id, scroll_version_id) {
+    if (region_in_sqe_image !== Array) region_in_sqe_image = [region_in_sqe_image]
+    if (artefact_position_id !== Array) artefact_position_id = [artefact_position_id]
+    return new Promise((resolve, reject) => {
+      if (region_in_sqe_image.length === artefact_position_id.length) {
+        if (
+          scroll_version_id === Array &&
+          region_in_sqe_image.length !== scroll_version_id.length
+        ) {
+          reject(
+            'The mask, artefact_shape_id, and scroll_version_id inputs were of different lengths.'
+          )
+        } else {
+          const singleScrollVersionID = scroll_version_id
+          scroll_version_id = []
+          for (let i = 0, length = region_in_sqe_image.length; i < length; i++) {
+            scroll_version_id.push(singleScrollVersionID)
+          }
+          let payload = { requests: [], SESSION_ID: this.session_id }
+          for (let index = 0, mask; (mask = region_in_sqe_image[index]); index++) {
+            const maskWKT = svgPolygonToWKT(mask)
+            payload.requests.push({
+              region_in_sqe_image: maskWKT,
+              artefact_position_id: artefact_position_id[index],
+              scroll_version_id: scroll_version_id[index],
+              transaction: 'changeArtefactPoly',
+            })
+            let currentArtefact = this.artefacts.get(artefact_position_id[index]).toJS()
+            currentArtefact.mask = maskWKT
+            this.artefacts.set(
+              artefact_position_id[index],
+              new this.artefacts.model(currentArtefact)
+            )
+          }
+          axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
+            if (res.status === 200 && res.data) {
+              for (let index = 0, artefact; (artefact = replies[index]); index++) {
+                currentArtefact = this.artefacts.get(artefact.artefact_id).toJS()
+                currentArtefact.artefact_shape_id = artefact.artefact_shape_id
+                this.artefacts.set(artefact.artefact_id, new this.artefacts.model(currentArtefact))
+              }
+              resolve(res.data)
+            }
+          })
+        }
+      } else {
+        reject('The mask and artefact_shape_id inputs were of different lengths.')
+      }
+    })
+  }
+
   setRoiOfArtefact(sign_char_roi_id, roi, artefact_position_id, scroll_version_id) {
     if (sign_char_roi_id.constructor !== Array) sign_char_roi_id = [sign_char_roi_id]
     if (roi.constructor !== Array) roi = [roi]
@@ -499,7 +541,6 @@ export default class Corpus {
     })
   }
 
-  /* istanbul ignore next */
   /*
    *
    * This takes a list of rois ids and a list of artefact ids.
@@ -525,7 +566,6 @@ export default class Corpus {
     })
   }
 
-  /* istanbul ignore next */
   /*
    *
    * This takes a scroll version id. It loops through every combination 

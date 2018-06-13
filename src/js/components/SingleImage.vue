@@ -170,53 +170,11 @@ export default {
     },
     // TODO move the logic for this into the data model.
     setClipMask(mask) {
-      // this.lock = true
-      this.clipMask = mask
-      // if (this.artefact === 'new') {
-      //   this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-      //     transaction: 'newArtefact',
-      //     image_id: this.$route.params.imageID,
-      //     region_in_master_image: svgPolygonToWKT(mask),
-      //     name: this.artName,
-      //     scroll_id: this.$route.params.scrollID,
-      //     version_id: this.$route.params.scrollVersionID,
-      //   }).then(res => {
-      //     if (res.status === 200 && res.data.returned_info) {
-      //       this.$router.push({
-      //         name: 'workbenchAddress',
-      //         params: {
-      //           scrollID: this.$route.params.scrollID,
-      //           scrollVersionID: this.$route.params.scrollVersionID,
-      //           colID: this.$route.params.colID ? this.$route.params.colID : '~',
-      //           imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-      //           artID: res.data.returned_info,
-      //         },
-      //       })
-      //       this.lock = false
-      //     }
-      //   })
-      // } else {
-      //   this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-      //     transaction: 'changeArtefactPoly',
-      //     region_in_sqe_image: svgPolygonToWKT(mask),
-      //     artefact_id: this.$route.params.artID,
-      //     version_id: this.$route.params.scrollVersionID,
-      //   }).then(res => {
-      //     if (res.status === 200 && res.data.artefact_id) {
-      //       this.$router.push({
-      //         name: 'workbenchAddress',
-      //         params: {
-      //           scrollID: this.$route.params.scrollID,
-      //           scrollVersionID: this.$route.params.scrollVersionID,
-      //           colID: this.$route.params.colID ? this.$route.params.colID : '~',
-      //           imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-      //           artID: res.data.artefact_id,
-      //         },
-      //       })
-      //       this.lock = false
-      //     }
-      //   })
-      // }
+      this.corpus.changeArtefactMask(
+        mask,
+        this.corpus.artefacts.get(this.$route.params.artID).artefact_position_id,
+        this.$route.params.scrollVersionID
+      )
     },
     toggleMask() {
       this.clippingOn = !this.clippingOn
