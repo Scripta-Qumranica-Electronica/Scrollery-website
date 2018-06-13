@@ -83,7 +83,7 @@
                   :images="filenames"
                   :image-settings="imageSettings"
                   :divisor="imageShrink"
-                  :clipping-mask="clipMask"
+                  :clipping-mask="$route.params.artID === '~' || !corpus.artefacts.get($route.params.artID) ? undefined : corpus.artefacts.get($route.params.artID).mask"
                   :clip="clippingOn"
                   :corpus="corpus"
                   ref="currentRoiCanvas">
@@ -177,7 +177,12 @@ export default {
       )
     },
     toggleMask() {
-      this.clippingOn = !this.clippingOn
+      if (
+        this.corpus.artefacts.get(this.$route.params.artID) &&
+        this.corpus.artefacts.get(this.$route.params.artID).mask
+      ) {
+        this.clippingOn = !this.clippingOn
+      }
     },
     delSelectedRoi() {
       this.$refs.currentRoiCanvas.deleteSelectedRoi()
@@ -205,6 +210,9 @@ export default {
         this.fetchImages(this.$route.params.imageID)
         this.artefact = undefined
         this.firstClipMask = this.clipMask = undefined
+        if (to.params.artID === '~') {
+          this.clippingOn = false
+        }
       }
 
       // Load new artefact ID if there is one
