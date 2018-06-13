@@ -109,6 +109,10 @@ export default class ColumnPersistanceService extends PersistanceService {
   _gatherTransactions({ additions, deletions, updates }) {
     const transactions = []
 
+    // create a new object so that the additions
+    // aren't modified by reference
+    additions = { ...additions }
+
     // Gather all deletions into a single transaction
     const deletedKeys = Object.keys(deletions)
     if (deletedKeys.length) {
@@ -125,26 +129,110 @@ export default class ColumnPersistanceService extends PersistanceService {
     if (Object.keys(additions).length) {
       const signStream = this.column.flattenToSignStream()
 
-      let signs = []
-      for (let key in additions) {
-        let sign = additions[key]
+      // the additions are an object keys by UUID, which provide no
+      // guarantee of set order ... additionally, there are potentially
+      // multiple runs of sequential signs to gath. Essentially, we have
+      // to contend with multiple linked lists that are not ordered in any way
+      let signRuns = []
 
-        // we need to grab the next and subsequent sign, if any.
-        let prev = signStream[signStream.map[sign.getUUID()] - 1]
-        let next = signStream[signStream.map[sign.getUUID()] + 1]
+      // a recursive function to create a run
+      const getPreviousFromAdditions = (uuid, run) => {
+        let prev = signStream[signStream.map[uuid] - 1]
 
-        signs.push({
-          sign: sign.toString(),
-          uuid: sign.getUUID(),
-          previous_sign_id: prev ? prev.getID() || prev.getUUID() : '',
-          next_sign_id: next ? next.getID() || next.getUUID() : '',
-        })
+        // there's a previous sign
+        if (prev) {
+          // check to see if it's also an addition
+          let prevUuid = prev.getUUID()
+          if (additions[prevUuid]) {
+            // remove it from the additions once handled
+            delete additions[prevUuid]
+
+            // if so, we add it in to the run and ...
+            run.unshift({
+              sign: prev.toString(),
+              uuid: prevUuid,
+            })
+            // .. recurse backwards
+            return getPreviousFromAdditions(prevUuid, run)
+
+            // otherwise, if the run has items in it, we can
+            // se the prev_sign_id to the item.
+          } else if (run.length) {
+            run[0].previous_sign_id = prev.getID()
+          }
+        }
+
+        // break out of recursion
+        return run
       }
 
-      transactions.push({
-        transaction: 'addSigns',
-        scroll_version_id: this.scroll_version_id,
-        signs,
+      const getNextFromAdditions = (uuid, run) => {
+        let next = signStream[signStream.map[uuid] + 1]
+
+        // there's a next sign
+        if (next) {
+          // check to see if it's also an addition
+          let nextUuid = next.getUUID()
+          if (additions[nextUuid]) {
+            // remove it from the additions once handled
+            delete additions[nextUuid]
+
+            // if so, we push it onto to the run and ...
+            run.push({
+              sign: next.toString(),
+              uuid: nextUuid,
+            })
+            // .. recurse forwards
+            return getNextFromAdditions(nextUuid, run)
+
+            // otherwise, if the run has items in it, we can
+            // set the next_sign_id to the next item.
+          } else if (run.length) {
+            run[run.length - 1].next_sign_id = next.getID()
+          }
+        }
+
+        // break out of recursion
+        return run
+      }
+
+      // for loop calculates the keys in the additions object on every
+      // pass through the loop. The
+      for (
+        let i = 0, uuids = Object.keys(additions), uuid;
+        uuids.length > 0;
+        uuids = Object.keys(additions)
+      ) {
+        let sign = additions[(uuid = uuids.pop())]
+
+        // delete the addition from the additions
+        // since it's now been handles
+        delete additions[uuid]
+
+        // create the run going backwards
+        let run = getPreviousFromAdditions(uuid, [])
+
+        // add in the sign from the current iteration to the end
+        // of the run
+        run.push({
+          sign: sign.toString(),
+          uuid: sign.getUUID(),
+        })
+
+        // add any signs that follow
+        run = getNextFromAdditions(uuid, run)
+        signRuns.push(run)
+      }
+
+      // each sign run becomes it's own transaction
+      // which should start/end with the appropriate
+      // prev/next sign id
+      signRuns.forEach(run => {
+        transactions.push({
+          transaction: 'addSigns',
+          scroll_version_id: this.scroll_version_id,
+          signs: run,
+        })
       })
     }
 
