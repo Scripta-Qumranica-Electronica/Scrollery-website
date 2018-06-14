@@ -44,19 +44,8 @@
 </template>
 
 <script>
-/*
- * The mask seems to dilate with every edit.
- * Check for fix, perhaps something to do with
- * potrace algorithm, or perhaps the vector path
- * stroke makes the path a bit larger with every
- * draw.
- */
 import { trace } from '../utils/Potrace.js'
 import { clipCanvas, svgPolygonToGeoJSON, svgPolygonToClipper } from '../utils/VectorFactory'
-import { polygon } from '@turf/helpers'
-import union from '@turf/union'
-import difference from '@turf/difference'
-import normalizeClipperPolygons from 'js-clipper/formatter'
 import ClipperLib from 'js-clipper/clipper'
 
 export default {
