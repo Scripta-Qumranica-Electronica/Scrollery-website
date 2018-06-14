@@ -402,25 +402,33 @@ export default class Corpus {
       scroll_version_id: scroll_version_id,
       transaction: 'copyCombination',
     }
-    axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
-      if (res.status === 200 && res.data && res.data.scroll_data) {
-        // We can store hashes for the returned data
-        // in the future, so we can avoid unnecessary
-        // data transmission.
-        // this._hash = res.data.hash
+    axios
+      .post('resources/cgi-bin/scrollery-cgi.pl', payload)
+      .then(res => {
+        if (res.status === 200 && res.data && res.data.scroll_data) {
+          // We can store hashes for the returned data
+          // in the future, so we can avoid unnecessary
+          // data transmission.
+          // this._hash = res.data.hash
 
-        const scroll_data = res.data.scroll_data
-        let record = new this.combinations.model(scroll_data)
-        this.combinations.insert(record, this.combinations.getFirstKey())
-        this.populateColumnsOfCombination(scroll_data.scroll_id, scroll_data.scroll_version_id)
-        this.populateImageReferencesOfCombination(
-          scroll_data.scroll_id,
-          scroll_data.scroll_version_id
-        ).then(res => {
-          this.populateArtefactsOfCombination(scroll_data.scroll_id, scroll_data.scroll_version_id)
-        })
-      }
-    })
+          const scroll_data = res.data.scroll_data
+          let record = new this.combinations.model(scroll_data)
+          this.combinations.insert(record, this.combinations.getFirstKey())
+          this.populateColumnsOfCombination(scroll_data.scroll_id, scroll_data.scroll_version_id)
+          this.populateImageReferencesOfCombination(
+            scroll_data.scroll_id,
+            scroll_data.scroll_version_id
+          ).then(res => {
+            this.populateArtefactsOfCombination(
+              scroll_data.scroll_id,
+              scroll_data.scroll_version_id
+            )
+          })
+        }
+      })
+      .catch(error => {
+        console.log(error.response)
+      })
   }
 
   /* TODO I ignore this for testing until I decide on
@@ -430,12 +438,16 @@ export default class Corpus {
 
   /* istanbul ignore next */
   changeArtefactMask(region_in_sqe_image, artefact_position_id, scroll_version_id) {
-    if (region_in_sqe_image !== Array) region_in_sqe_image = [region_in_sqe_image]
-    if (artefact_position_id !== Array) artefact_position_id = [artefact_position_id]
+    region_in_sqe_image = Array.isArray(region_in_sqe_image)
+      ? region_in_sqe_image
+      : [region_in_sqe_image]
+    artefact_position_id = Array.isArray(artefact_position_id)
+      ? artefact_position_id
+      : [artefact_position_id]
     return new Promise((resolve, reject) => {
       if (region_in_sqe_image.length === artefact_position_id.length) {
         if (
-          scroll_version_id === Array &&
+          Array.isArray(scroll_version_id) &&
           region_in_sqe_image.length !== scroll_version_id.length
         ) {
           reject(
@@ -463,16 +475,24 @@ export default class Corpus {
               new this.artefacts.model(currentArtefact)
             )
           }
-          axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
-            if (res.status === 200 && res.data) {
-              for (let index = 0, artefact; (artefact = res.data.replies[index]); index++) {
-                let currentArtefact = this.artefacts.get(artefact.artefact_position_id).toJS()
-                currentArtefact.artefact_shape_id = artefact.artefact_shape_id
-                this.artefacts.set(artefact.artefact_id, new this.artefacts.model(currentArtefact))
+          axios
+            .post('resources/cgi-bin/scrollery-cgi.pl', payload)
+            .then(res => {
+              if (res.status === 200 && res.data) {
+                for (let index = 0, artefact; (artefact = res.data.replies[index]); index++) {
+                  let currentArtefact = this.artefacts.get(artefact.artefact_position_id).toJS()
+                  currentArtefact.artefact_shape_id = artefact.artefact_shape_id
+                  this.artefacts.set(
+                    artefact.artefact_id,
+                    new this.artefacts.model(currentArtefact)
+                  )
+                }
+                resolve(res.data)
               }
-              resolve(res.data)
-            }
-          })
+            })
+            .catch(error => {
+              console.log(error.response)
+            })
         }
       } else {
         reject('The mask and artefact_shape_id inputs were of different lengths.')
@@ -574,17 +594,22 @@ export default class Corpus {
             }
           }
         })
-        axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
-          for (const [key, value] of Object.entries(res.data.replies)) {
-            //TODO I really need the CGI API to return for me the sign_char_roi_id.
-            //This function is WRONG in that it uses the sign_char_id for the index,
-            //the sign_char_roi_id is supposed to be used for that instead.
-            let roi = this.rois.get(key).toJS()
-            roi.sign_char_id = value.sign_char_id
-            this.rois.delete(key)
-            this.rois.set(value.sign_char_id, new this.rois.model(roi))
-          }
-        })
+        axios
+          .post('resources/cgi-bin/scrollery-cgi.pl', payload)
+          .then(res => {
+            for (const [key, value] of Object.entries(res.data.replies)) {
+              //TODO I really need the CGI API to return for me the sign_char_roi_id.
+              //This function is WRONG in that it uses the sign_char_id for the index,
+              //the sign_char_roi_id is supposed to be used for that instead.
+              let roi = this.rois.get(key).toJS()
+              roi.sign_char_id = value.sign_char_id
+              this.rois.delete(key)
+              this.rois.set(value.sign_char_id, new this.rois.model(roi))
+            }
+          })
+          .catch(error => {
+            console.log(error.response)
+          })
       } else
         reject(
           'The sign_char_roi_id, roi, artefact_position_id, and scroll_version_id inputs were of different lengths.'
