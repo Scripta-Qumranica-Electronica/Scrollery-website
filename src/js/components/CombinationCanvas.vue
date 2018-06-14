@@ -21,7 +21,10 @@
 </template>
 
 <script>
-/* istanbul ignore next */
+/**
+ * TODO add unit tests and remove istanbul ignore next
+ * as this is prepared for release (end of September 2018).
+ */
 import { svgMatrixToDB } from '~/utils/VectorFactory'
 import Artefact from './Artefact.vue'
 // I will use the rematrix package to directly apply
@@ -40,7 +43,7 @@ export default {
   components: {
     artefact: Artefact,
   },
-  data() {
+  data /* istanbul ignore next */() {
     return {
       scrollWidth: 10000,
       scrollHeight: 1500,
@@ -53,24 +56,26 @@ export default {
     }
   },
   computed: {
-    canvasWidth() {
+    canvasWidth /* istanbul ignore next */() {
       return `${this.scrollWidth * this.globalScale}`
     },
-    canvasHeight() {
+    canvasHeight /* istanbul ignore next */() {
       return `${this.scrollHeight * this.globalScale}`
     },
-    viewBox() {
+    viewBox /* istanbul ignore next */() {
       return `0 0 ${this.scrollWidth} ${this.scrollHeight}`
     },
-    dimensions() {
+    dimensions /* istanbul ignore next */() {
       return `width: ${this.canvasWidth}px; height: ${this.canvasHeight}px;`
     },
-    svgCanvas() {
+    svgCanvas /* istanbul ignore next */() {
       return this.$refs['svgCanvas']
     },
   },
   methods: {
     setScrollDimensions(scrollID, versionID) {
+      /* istanbul ignore next */
+
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getScrollWidth',
         scroll_id: scrollID,
@@ -80,6 +85,8 @@ export default {
           this.scrollWidth = res.data.results[0].max_x
         }
       })
+      /* istanbul ignore next */
+
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getScrollHeight',
         scroll_id: scrollID,
@@ -93,6 +100,8 @@ export default {
     // TODO: I need to now rewrite these mouselistener functions
     // to work with the new model system.
     mousedown(event) {
+      /* istanbul ignore next */
+
       if (event.target.nodeName === 'image') {
         this.selectedArtefactIndex = event.target.dataset.index
         this.selectedArtefactLoc = this.artefacts[this.selectedArtefactIndex].matrix
@@ -101,6 +110,8 @@ export default {
       }
     },
     mousemove(event) {
+      /* istanbul ignore next */
+
       if (this.clickOrigin && this.selectedArtefactIndex) {
         const currentLoc = this.pointInSvg(event.clientX, event.clientY)
         this.artefacts[this.selectedArtefactIndex].matrix = [
@@ -114,6 +125,8 @@ export default {
       }
     },
     mouseup(event) {
+      /* istanbul ignore next */
+
       if (this.clickOrigin && this.selectedArtefactIndex) {
         this.clickOrigin = this.selectedArtefactLoc = undefined
         window.removeEventListener('mouseup', this.mouseup)
@@ -131,14 +144,24 @@ export default {
       }
     },
     pointInSvg(x, y) {
+      /* istanbul ignore next */
+
       const pt = this.svgCanvas.createSVGPoint()
+      /* istanbul ignore next */
+
       pt.x = x
+      /* istanbul ignore next */
+
       pt.y = y
+      /* istanbul ignore next */
+
       return pt.matrixTransform(this.svgCanvas.getScreenCTM().inverse())
     },
   },
   watch: {
     $route(to, from) {
+      /* istanbul ignore next */
+
       if (
         to.params.scrollVersionID !== '~' &&
         to.params.scrollID !== '~' &&

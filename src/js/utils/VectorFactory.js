@@ -6,36 +6,60 @@
  * Otherwise, we just add each point to the string 
  * unaltered. 
  */
-export function wktPolygonToSvg(geoJSON, boundingRect) {
+export function wktPolygonToSvg(wkt, boundingRect) {
   let svg
-  if (geoJSON.substring(0, 9) === 'POLYGON((') {
+  if (wkt.substring(0, 9) === 'POLYGON((') {
     const polygonInitRegex = /POLYGON/g
     const parenInitRegex = /\(/g
     const parenEndRegex = /\)/g
     svg = ''
-    const polygons = geoJSON.split('),(')
+    const polygons = wkt.split('),(')
+    /**
+     * This can be sped up by multithreading the parsing of each polygon,
+     * and also by building the string in a more modular fashion
+     * so that we don't neet to check if (svg.slice(-1) !== 'M') for
+     * every point in the polygon (i.e..
+     */
     polygons.forEach(polygon => {
       svg += 'M'
+      let currentPolygonSVG = ''
       polygon = polygon.replace(polygonInitRegex, '')
       polygon = polygon.replace(parenInitRegex, '')
       polygon = polygon.replace(parenEndRegex, '')
-      var points = polygon.split(',')
+      const points = polygon.split(',')
+      const length = points.length
+      let firstPoint
 
       if (boundingRect) {
-        points.forEach(point => {
-          if (svg.slice(-1) !== 'M') {
-            svg += 'L'
+        firstPoint = `${points[0].split(' ')[0] - boundingRect.x} ${points[0].split(' ')[1] -
+          boundingRect.y}`
+        for (let i = 0, point; (point = points[i]); i++) {
+          currentPolygonSVG += 'L'
+          currentPolygonSVG += `${point.split(' ')[0] - boundingRect.x} ${point.split(' ')[1] -
+            boundingRect.y}`
+          if (i === length - 1) {
+            if (
+              `${point.split(' ')[0] - boundingRect.x} ${point.split(' ')[1] - boundingRect.y}` !==
+              firstPoint
+            ) {
+              currentPolygonSVG += `L${firstPoint}`
+            }
           }
-          svg += `${point.split(' ')[0] - boundingRect.x} ${point.split(' ')[1] - boundingRect.y}`
-        })
+        }
       } else {
-        points.forEach(point => {
-          if (svg.slice(-1) !== 'M') {
-            svg += 'L'
+        firstPoint = `${points[0].split(' ')[0]} ${points[0].split(' ')[1]}`
+        for (let i = 0, point; (point = points[i]); i++) {
+          currentPolygonSVG += 'L'
+          currentPolygonSVG += `${point.split(' ')[0]} ${point.split(' ')[1]}`
+          if (i === length - 1) {
+            if (`${point.split(' ')[0]} ${point.split(' ')[1]}` !== firstPoint) {
+              currentPolygonSVG += `L${firstPoint}`
+            }
           }
-          svg += `${point.split(' ')[0]} ${point.split(' ')[1]}`
-        })
+        }
       }
+      //Delete the first L from the string and add it to the svg variable
+      svg += currentPolygonSVG.substring(1)
     })
   }
   return svg
@@ -133,18 +157,17 @@ export function svgPolygonToGeoJSON(svg) {
     polygons.forEach((poly, index) => {
       if (poly) {
         json.coordinates.push([])
-        let firstPoint
-        let points
-        const lines = poly
+        const points = poly
           .replace(lineSegmentRegex, ' ')
           .replace(zTerminatorRegex, '')
           .trim()
-        points = lines.split(' ')
-        firstPoint = [Number(points[0]), Number(points[1])]
-        for (let i = 0, length = points.length - 1; i <= length; i += 2) {
-          json.coordinates[index - 1].push([Number(points[i]), Number(points[i + 1])])
-          if (i + 2 > length) {
-            if (Number(points[i]) !== firstPoint[0] || Number(points[i + 1]) !== firstPoint[1]) {
+          .split(' ')
+        const length = points.length
+        const firstPoint = [Number(points[0]), Number(points[1])]
+        for (let i = 0, point1, point2; (point1 = points[i]) && (point2 = points[i + 1]); i += 2) {
+          json.coordinates[index - 1].push([Number(point1), Number(point2)])
+          if (i + 2 === length) {
+            if (Number(point1) !== firstPoint[0] || Number(point2) !== firstPoint[1]) {
               json.coordinates[index - 1].push(firstPoint)
             }
           }
