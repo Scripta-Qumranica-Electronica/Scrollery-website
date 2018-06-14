@@ -1,10 +1,3 @@
-/* TODO I ignore this for testing until I decide on
- * a set model.  Write tests when that has been
- * determined!
- */
-
-/* istanbul ignore next */
-
 import Combinations from './Combinations.js'
 import ImageReferences from './imageReferences.js'
 import Cols from './Cols.js'
@@ -49,6 +42,11 @@ export default class Corpus {
     this.rois = new ROIs(this.session_id)
   }
 
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
   /* istanbul ignore next */
   populateCombinations() {
     return new Promise((resolve, reject) => {
@@ -58,6 +56,11 @@ export default class Corpus {
         .catch(reject)
     })
   }
+
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
 
   /* istanbul ignore next */
   populateColumnsOfCombination(scrollID, scrollVersionID) {
@@ -96,6 +99,12 @@ export default class Corpus {
     })
   }
 
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   populateImageReferencesOfCombination(scrollID, scrollVersionID) {
     if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
     if (scrollID.constructor !== Array) scrollID = [scrollID]
@@ -132,14 +141,12 @@ export default class Corpus {
     })
   }
 
-  // populateImagesOfCombination(imageReferenceID, scrollVersionID) {
-  //   return new Promise((resolve, reject) => {
-  //     this.images.populate({id: imageReferenceID}, scrollVersionID)
-  //     .then(res => {
-  //       resolve(res)
-  //     })
-  //   })
-  // }
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   populateImagesOfImageReference(imageReferenceID, scrollVersionID) {
     if (imageReferenceID.constructor !== Array) imageReferenceID = [imageReferenceID]
     // If scrollVersionID is not an array, convert it into one matching the
@@ -184,6 +191,12 @@ export default class Corpus {
     })
   }
 
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   populateArtefactsOfCombination(scrollID, scrollVersionID) {
     return new Promise((resolve, reject) => {
       this.artefacts
@@ -217,6 +230,12 @@ export default class Corpus {
     })
   }
 
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   populateArtefactsOfImageReference(imageReferenceID, scrollVersionID) {
     if (imageReferenceID.constructor !== Array) imageReferenceID = [imageReferenceID]
     // If scrollVersionID is not an array, convert it into one matching the
@@ -271,6 +290,12 @@ export default class Corpus {
     })
   }
 
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   populateRoisOfCombination(scrollID, scrollVersionID) {
     if (scrollVersionID.constructor !== Array) scrollVersionID = [scrollVersionID]
     if (scrollID.constructor !== Array) scrollID = [scrollID]
@@ -307,6 +332,12 @@ export default class Corpus {
     })
   }
 
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   populateRoiOfCol(colID, scrollVersionID) {
     if (colID.constructor !== Array) colID = [colID]
     // If scrollVersionID is not an array, convert it into one matching the
@@ -357,6 +388,12 @@ export default class Corpus {
     })
   }
 
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   cloneScroll(scroll_version_id) {
     const payload = {
       SESSION_ID: this.session_id,
@@ -384,6 +421,12 @@ export default class Corpus {
     })
   }
 
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   changeArtefactMask(region_in_sqe_image, artefact_position_id, scroll_version_id) {
     if (region_in_sqe_image !== Array) region_in_sqe_image = [region_in_sqe_image]
     if (artefact_position_id !== Array) artefact_position_id = [artefact_position_id]
@@ -435,6 +478,12 @@ export default class Corpus {
     })
   }
 
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   setRoiOfArtefact(sign_char_roi_id, roi, artefact_position_id, scroll_version_id) {
     if (sign_char_roi_id.constructor !== Array) sign_char_roi_id = [sign_char_roi_id]
     if (roi.constructor !== Array) roi = [roi]
@@ -548,6 +597,12 @@ export default class Corpus {
    * to any artefact that it overlaps.
    * 
    */
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   mapRoisToArtefacts(rois, artefacts) {
     artefacts.forEach(artefactID => {
       rois.forEach(roiID => {
@@ -573,6 +628,12 @@ export default class Corpus {
    * to any artefact that it overlaps.
    * 
    */
+  /* TODO I ignore this for testing until I decide on
+  * a set model.  Write tests when that has been
+  * determined!
+  */
+
+  /* istanbul ignore next */
   mapRoisAndArtefactsInCombination(scroll_version_id) {
     console.time('overLapSearch')
     this.combinations.get(scroll_version_id).artefacts.forEach(artefactID => {
