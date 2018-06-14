@@ -168,10 +168,9 @@ export default {
             })
         })
     },
-    // TODO move the logic for this into the data model.
-    setClipMask(mask) {
+    setClipMask(svgMask) {
       this.corpus.changeArtefactMask(
-        mask,
+        svgMask,
         this.corpus.artefacts.get(this.$route.params.artID).artefact_position_id,
         this.$route.params.scrollVersionID
       )

@@ -143,9 +143,6 @@ export default {
       return returnPos
     },
     canvasToSVG() {
-      // trace(this.$refs.maskCanvas, this.divisor).then(res => {
-      //   this.$emit('mask', res)
-      // })
       trace(this.editingCanvas, this.divisor).then(res => {
         const newClipperPolygon = svgPolygonToClipper(res)
         let cpr = new ClipperLib.Clipper()

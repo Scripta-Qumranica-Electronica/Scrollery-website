@@ -448,8 +448,8 @@ export default class Corpus {
             scroll_version_id.push(singleScrollVersionID)
           }
           let payload = { requests: [], SESSION_ID: this.session_id }
-          for (let index = 0, mask; (mask = region_in_sqe_image[index]); index++) {
-            const maskWKT = svgPolygonToWKT(mask)
+          for (let index = 0, svgMask; (svgMask = region_in_sqe_image[index]); index++) {
+            const maskWKT = svgPolygonToWKT(svgMask)
             payload.requests.push({
               region_in_sqe_image: maskWKT,
               artefact_position_id: artefact_position_id[index],
