@@ -1,6 +1,6 @@
 <template>
     <section class="editor">
-      <column v-for="(column, columnIndex) of columns" :key="columnIndex + column.id" :state="state" :column="column" /></column>
+      <column v-for="(column, columnIndex) of columns" :key="columnIndex + column.id" :state="state" :column="column" @persist-error="refresh" /></column>
     </section>
 </template>
 
@@ -20,6 +20,11 @@ export default {
     },
     state: {
       required: true,
+    },
+  },
+  methods: {
+    refresh() {
+      this.$emit('refresh')
     },
   },
   computed: {

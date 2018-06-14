@@ -290,6 +290,9 @@ export default {
       this.$route.params.scrollVersionID,
       this.$store.getters.sessionID
     )
+    this.persistanceService.on('error', () => {
+      this.$emit('persist-error')
+    })
 
     setTimeout(() => this.persistanceService.engage(), 500)
 

@@ -49,7 +49,6 @@ export default class ColumnPersistanceService extends PersistanceService {
             this._onSuccess(requests, res.data.replies, onDeckChanges)
           }
         })
-        .catch(res => console.error(res))
     } else {
       // there are no things to save ... return a promise that
       // resolves immediately to adhere to the interface
@@ -209,18 +208,21 @@ export default class ColumnPersistanceService extends PersistanceService {
         // since it's now been handles
         delete additions[uuid]
 
-        // create the run going backwards
-        let run = getPreviousFromAdditions(uuid, [])
-
         // add in the sign from the current iteration to the end
         // of the run
-        run.push({
-          sign: sign.toString(),
-          uuid: sign.getUUID(),
-        })
+        let run = [
+          {
+            sign: sign.toString(),
+            uuid: sign.getUUID(),
+          },
+        ]
+
+        // create the run going backwards
+        run = getPreviousFromAdditions(uuid, run)
 
         // add any signs that follow
         run = getNextFromAdditions(uuid, run)
+
         signRuns.push(run)
       }
 

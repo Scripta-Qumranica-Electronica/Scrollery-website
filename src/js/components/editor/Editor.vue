@@ -1,7 +1,7 @@
 <template>
     <div class="text-pane" :class='{fullscreen}'>
         <toolbar :state="state" @fullscreen="toggleFullScreen" />
-        <composition :text="text" :state="state" />
+        <composition :text="text" :state="state" @refresh="refresh" />
     </div>
 </template>
 
@@ -112,6 +112,16 @@ export default {
     },
 
     /**
+     * Refresh the editor from the server
+     */
+    refresh() {
+      const colID = this.$route.params.colID
+      if (colID !== '~' && colID > 0) {
+        this.getText(this.$route.params.scrollVersionID, colID)
+      }
+    },
+
+    /**
      * Show the editor in full screen mode
      */
     toggleFullScreen() {
@@ -121,10 +131,7 @@ export default {
   mounted() {
     // check to see if there's a columnID in the route
     // if so, attempt to load up the text straightaway
-    const colID = this.$route.params.colID
-    if (colID !== '~' && colID > 0) {
-      this.getText(this.$route.params.scrollVersionID, colID)
-    }
+    this.refresh()
   },
   watch: {
     $route(to, from) {

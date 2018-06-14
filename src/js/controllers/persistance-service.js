@@ -102,6 +102,8 @@ export default class PersistanceService extends EventEmitter {
         })
         .catch(res => {
           this.isPersisting = false
+
+          this.emit('error', res)
         })
     }
   }
