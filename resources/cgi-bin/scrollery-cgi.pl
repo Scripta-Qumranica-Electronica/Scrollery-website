@@ -1205,8 +1205,10 @@ sub getTextOfFragment() {
 sub getListOfAttributes() {
 	my ($cgi, $json_post) = @_;
 	my $query = <<'MYSQL';
-	SELECT * FROM attribute
-JOIN attribute_value USING(attribute_id)
+	SELECT attribute.attribute_id, name, type, attribute.description AS attribute_description,
+		attribute_value_id, string_value, attribute_value.description AS attribute_value_description
+	FROM attribute
+	JOIN attribute_value USING(attribute_id)
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($query) or die
 		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
