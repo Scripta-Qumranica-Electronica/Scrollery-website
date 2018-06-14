@@ -115,6 +115,10 @@ export default {
      * Refresh the editor from the server
      */
     refresh() {
+      // reset the UI
+      this.text = new CompositionModel()
+
+      // get the new model from the server
       const colID = this.$route.params.colID
       if (colID !== '~' && colID > 0) {
         this.getText(this.$route.params.scrollVersionID, colID)

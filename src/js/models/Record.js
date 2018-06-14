@@ -49,7 +49,7 @@ function Record(defaults = {}) {
       // the record is persisted if it's not new.
       const privates = {
         __persisted: Boolean(isPersisted || props.__persisted),
-        __uuid: props.__uuid || namespacedUuid(`${props.id || Date.now()}`, BaseRecord.namespace()),
+        __uuid: props.__uuid || namespacedUuid(`${props.id || uuid()}`, BaseRecord.namespace()),
       }
       Object.defineProperties(this, {
         __persisted: {
@@ -199,7 +199,7 @@ function Record(defaults = {}) {
      * @returns {string}  the list class's UUID
      */
     static namespace() {
-      return this.uuid || (this.uuid = uuid())
+      return this.__uuid_namespace__ || (this.__uuid_namespace__ = uuid())
     }
 
     /**
