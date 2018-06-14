@@ -5,6 +5,7 @@ import {
   svgPolygonToWKT,
   svgPolygonToGeoJSON,
   svgPolygonToClipper,
+  clipperToSVGPolygon,
   dbMatrixToSVG,
   svgMatrixToDB,
   matrix6To16,
@@ -263,6 +264,64 @@ describe('VectorFactory.svgPolygonToClipper', () => {
 
   it('should convert a complex unterminated SVG path to a valid Clipper representation', () => {
     expect(svgPolygonToClipper(polygons.svg_unterminated)).to.deep.equal(polygons.clipper)
+  })
+})
+
+describe('VectorFactory.clipperToSVGPolygon', () => {
+  it('should return undefined when unrecognized input passed', () => {
+    expect(clipperToSVGPolygon('INCORRECT')).to.equal(undefined)
+  })
+
+  it('should convert a simple Clipper representation to a SVG path', () => {
+    // Setup the input and result
+    const svg = 'M0 0L10 0L10 10L0 10L0 0M1 1L1 3L3 3L3 1L1 1'
+    const clipper = 
+    [
+      [
+        {"X": 0, "Y": 0},
+        {"X": 10, "Y": 0},
+        {"X": 10, "Y": 10},
+        {"X": 0, "Y": 10},
+        {"X": 0, "Y": 0}
+      ],
+      [
+        {"X": 1, "Y": 1},
+        {"X": 1, "Y": 3},
+        {"X": 3, "Y": 3},
+        {"X": 3, "Y": 1},
+        {"X": 1, "Y": 1}
+      ]
+    ]
+    // assert expected value
+    expect(clipperToSVGPolygon(clipper))
+    .to.equal(svg)
+  })
+
+  it('should convert a simple unterminated Clipper representation to a SVG path', () => {
+    // Setup the input and result
+    const svg = 'M0 0L10 0L10 10L0 10L0 0M1 1L1 3L3 3L3 1L1 1'
+    const clipper = 
+    [
+      [
+        {"X": 0, "Y": 0},
+        {"X": 10, "Y": 0},
+        {"X": 10, "Y": 10},
+        {"X": 0, "Y": 10}
+      ],
+      [
+        {"X": 1, "Y": 1},
+        {"X": 1, "Y": 3},
+        {"X": 3, "Y": 3},
+        {"X": 3, "Y": 1}
+      ]
+    ]
+    // assert expected value
+    expect(clipperToSVGPolygon(clipper))
+    .to.equal(svg)
+  })
+
+  it('should convert a complex valid Clipper representation to a terminated SVG path', () => {
+    expect(clipperToSVGPolygon(polygons.clipper)).to.equal(polygons.svg_terminated)
   })
 })
 

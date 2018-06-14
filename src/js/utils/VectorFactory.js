@@ -215,6 +215,30 @@ export function svgPolygonToClipper(svg) {
   return clipper
 }
 
+export function clipperToSVGPolygon(paths) {
+  let svgPath = undefined
+  if (paths.constructor === Array && paths[0] && paths[0][0]) {
+    svgPath = ''
+    for (let i = 0, lengthI = paths.length; i < lengthI; i++) {
+      const firstPoint = paths[i][0].X + ' ' + paths[i][0].Y
+      svgPath += 'M'
+      let currentPolygonSVG = ''
+      for (let j = 0, lengthJ = paths[i].length; j < lengthJ; j++) {
+        currentPolygonSVG += 'L'
+        currentPolygonSVG += paths[i][j].X + ' ' + paths[i][j].Y
+        if (j === lengthJ - 1) {
+          if (paths[i][j].X + ' ' + paths[i][j].Y !== firstPoint) {
+            currentPolygonSVG += 'L' + firstPoint
+          }
+        }
+      }
+      svgPath += currentPolygonSVG.substring(1)
+    }
+  }
+
+  return svgPath
+}
+
 /* 
  * This function expects the transform matrix 
  * to be in a 2D array: [[a,c,tx],[b,d,ty]].

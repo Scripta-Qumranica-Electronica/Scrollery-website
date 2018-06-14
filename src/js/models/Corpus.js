@@ -9,10 +9,12 @@ import {
   svgMatrixToDB,
   svgPolygonToWKT,
   svgPolygonToGeoJSON,
+  svgPolygonToClipper,
+  wktPolygonToSvg,
   wktParseRect,
 } from '~/utils/VectorFactory.js'
+import ClipperLib from 'js-clipper/clipper'
 import axios from 'axios'
-import { wktPolygonToSvg } from '../utils/VectorFactory.js'
 
 import { polygon } from '@turf/helpers'
 import booleanOverlap from '@turf/boolean-overlap'
@@ -463,8 +465,8 @@ export default class Corpus {
           }
           axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
             if (res.status === 200 && res.data) {
-              for (let index = 0, artefact; (artefact = replies[index]); index++) {
-                currentArtefact = this.artefacts.get(artefact.artefact_id).toJS()
+              for (let index = 0, artefact; (artefact = res.data.replies[index]); index++) {
+                let currentArtefact = this.artefacts.get(artefact.artefact_position_id).toJS()
                 currentArtefact.artefact_shape_id = artefact.artefact_shape_id
                 this.artefacts.set(artefact.artefact_id, new this.artefacts.model(currentArtefact))
               }

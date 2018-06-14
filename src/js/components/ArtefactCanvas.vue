@@ -44,8 +44,14 @@
 </template>
 
 <script>
-import { trace } from '../utils/Potrace.js'
-import { clipCanvas, svgPolygonToGeoJSON, svgPolygonToClipper } from '../utils/VectorFactory'
+import { trace } from '~/utils/Potrace.js'
+import {
+  clipCanvas,
+  wktPolygonToSvg,
+  svgPolygonToGeoJSON,
+  svgPolygonToClipper,
+  clipperToSVGPolygon,
+} from '~/utils/VectorFactory'
 import ClipperLib from 'js-clipper/clipper'
 
 export default {
@@ -68,6 +74,7 @@ export default {
       mouseOver: false,
       drawing: false,
       editingCanvas: document.createElement('canvas'),
+      currentClipperPolygon: [[]],
     }
   },
   methods: {
@@ -142,7 +149,7 @@ export default {
       trace(this.editingCanvas, this.divisor).then(res => {
         const newClipperPolygon = svgPolygonToClipper(res)
         let cpr = new ClipperLib.Clipper()
-        cpr.AddPaths(this.currentTurfPolygon, ClipperLib.PolyType.ptSubject, true)
+        cpr.AddPaths(this.currentClipperPolygon, ClipperLib.PolyType.ptSubject, true)
         cpr.AddPaths(newClipperPolygon, ClipperLib.PolyType.ptClip, true)
         let solution_paths = new ClipperLib.Paths()
         if (this.drawMode === 'erase') {
@@ -164,31 +171,16 @@ export default {
         }
         let ctx = this.editingCanvas.getContext('2d')
         ctx.clearRect(0, 0, this.editingCanvas.width, this.editingCanvas.height)
-        this.$emit('mask', this.paths2string(solution_paths))
+        this.$emit('mask', clipperToSVGPolygon(solution_paths))
       })
-    },
-    paths2string(paths, scale) {
-      var svgpath = '',
-        i,
-        j
-      if (!scale) scale = 1
-      for (i = 0; i < paths.length; i++) {
-        for (j = 0; j < paths[i].length; j++) {
-          if (!j) svgpath += 'M'
-          else svgpath += 'L'
-          svgpath += paths[i][j].X / scale + ' ' + paths[i][j].Y / scale
-        }
-        svgpath += 'Z'
-      }
-      if (svgpath == '') svgpath = 'M0 0'
-      return svgpath
     },
   },
   watch: {
     mask(to, from) {
       if (to && from !== to) {
-        clipCanvas(this.$refs.maskCanvas, this.mask, this.divisor)
-        this.currentTurfPolygon = svgPolygonToClipper(this.mask)
+        const svgMask = wktPolygonToSvg(to)
+        clipCanvas(this.$refs.maskCanvas, svgMask, this.divisor)
+        this.currentClipperPolygon = svgPolygonToClipper(svgMask)
       } else {
         let ctx = this.$refs.maskCanvas.getContext('2d')
         ctx.clearRect(0, 0, this.$refs.maskCanvas.width, this.$refs.maskCanvas.height)

@@ -96,7 +96,7 @@
                         :draw-mode="drawingMode"
                         :brush-size="brushCursorSize"
                         :divisor="imageShrink"
-                        :mask="firstClipMask"
+                        :mask="$route.params.artID === '~' || !corpus.artefacts.get($route.params.artID) ? undefined : corpus.artefacts.get($route.params.artID).mask"
                         :locked="lock"
                         v-on:mask="setClipMask"
                         ref="currentArtCanvas">
