@@ -63,7 +63,8 @@ sub processCGI {
 		removeROI => \&removeROI,
 		getRoiOfCol => \&getRoiOfCol,
 		getRoisOfCombination => \&getRoisOfCombination,
-		getTextOfFragment => \&getTextOfFragment
+		getTextOfFragment => \&getTextOfFragment,
+		getListOfAttributes => \& getListOfAttributes
 	);
 	my $json_post = $cgi->{CGIDATA};
 
@@ -1199,6 +1200,22 @@ sub getTextOfFragment() {
 	print "{";
 	$cgi->get_text_of_fragment($json_post->{col_id}, 'SQE_Format::JSON');
 	print "}";
+}
+
+sub getListOfAttributes() {
+	my ($cgi, $json_post) = @_;
+	my $query = <<'MYSQL';
+	SELECT attribute.attribute_id, name, type, attribute.description AS attribute_description,
+		attribute_value_id, string_value, attribute_value.description AS attribute_value_description
+	FROM attribute
+	JOIN attribute_value USING(attribute_id)
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($query) or die
+		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+	$sql->execute();
+
+	readResults($sql);
+	return;
 }
 
 processCGI();
