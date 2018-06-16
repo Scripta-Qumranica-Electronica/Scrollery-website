@@ -4,10 +4,12 @@
       class="text-col inline text-sbl-hebrew"
       dir="rtl" 
       contenteditable="true"
+      ref="colNode"
       @keydown="onKeydown" 
       @input="onInput"
       @paste="onPaste"
       @copy="onCopy"
+      @cut="onCut"
       v-html="colHtmlString"
     >
     </div><div class="line-number-col inline">
@@ -154,15 +156,74 @@ export default {
     /**
      * @param {KeyboardEvent} e triggered event
      */
+    onCut(e) {
+      this.onCopy(e)
+      document.execCommand('delete', true)
+      this.synchronize(this.$refs.colNode)
+    },
+
+    /**
+     * @param {KeyboardEvent} e triggered event
+     */
     onCopy(e) {
-      // console.log('c', e)
+      // override default copy behavior
+      e.preventDefault()
+
+      // grab the document selection
+      const { focusOffset, anchorOffset, type } = document.getSelection()
+
+      // the user hasn't selected any text. ignore
+      if (type === 'Caret') {
+        return
+      }
+
+      const { line, node } = this.getSelection()
+      let transfer = {
+        text: '',
+        signs: [],
+      }
+      let startOffset = focusOffset < anchorOffset ? focusOffset : anchorOffset
+      let end = focusOffset > anchorOffset ? focusOffset : anchorOffset
+      for (let offset = startOffset; offset < end; offset++) {
+        let sign = line.get(offset)
+        transfer.text = transfer.text + sign.toString()
+        transfer.signs.push(sign)
+      }
+
+      e.clipboardData.setData('text/plain', JSON.stringify(transfer))
     },
 
     /**
      * @param {KeyboardEvent} e triggered event
      */
     onPaste(e) {
-      // console.log('p', e)
+      e.preventDefault()
+
+      let text = e.clipboardData.getData('text/plain')
+
+      // If the string matches this pattern [{ ... }], we most likely have a stringified JSON array,
+      // in which case, the user is copying from another place in the editor
+      if (/^\{/.test(text) && /\}$/.test(text)) {
+        try {
+          const transferData = JSON.parse(text)
+          text = transferData.text
+
+          // TODO for later
+          // transferData.sign contains a stringified copy of the signs that contains
+          // their attributes and chars and whatnot.
+        } catch (err) {
+          this.$emit('warning', {
+            message: 'Paste attempt could not be processed.',
+          })
+        }
+      }
+
+      document.execCommand('insertText', true, text)
+
+      // let sel = document.getSelection()
+      // let range = sel.getRangeAt(0)
+      // range.deleteContents()
+      // range.insertNode(document.createTextNode(text))
     },
 
     /**
@@ -170,24 +231,20 @@ export default {
      */
     onInput(e) {
       switch (e.inputType) {
-        // inserted block/paragraph
-        case 'insertParagraph':
-          this.insertLineAtSelection(e, this.getSelection())
-          break
-
-        // inserted chars
-        case 'insertText':
-          this.signsChanged(e, this.getSelection())
-          break
-
-        // deleted content. Could be line or single char
-        case 'deleteContentBackward':
-          this.signsRemoved(e, this.getSelection())
+        case 'insertParagraph': // inserted block/paragraph
+        case 'deleteContentBackward': // deleted content. Could be line or single char
+        case 'insertText': // inserted chars
+        case 'historyUndo': // ctl-z undo
+        case 'historyRedo': // ctl-y redo
+          this.synchronize(this.$refs.colNode)
           break
 
         // for now, just log out what we're missing
         default:
           console.log('unhandle input event', e)
+          this.$emit('warning', {
+            message: 'An unhandle input event was received.',
+          })
       }
     },
 

@@ -6,8 +6,9 @@
         :state="state"
         :column="column"
         @persist-error="persistError"
-        @persisted="persisted" />
-      </column>
+        @persisted="persisted"
+        @warning="warning"
+      />
       <message-bar ref="messageBar"></message-bar>
     </section>
 </template>
@@ -47,6 +48,11 @@ export default {
     persisted() {
       this.$refs.messageBar.flash('All changes saved!', {
         type: 'success',
+      })
+    },
+    warning(args) {
+      this.$refs.messageBar.flash(args.message, {
+        type: 'warning',
       })
     },
   },
