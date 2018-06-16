@@ -294,7 +294,11 @@ export default {
       this.$emit('persist-error')
     })
 
-    setTimeout(() => this.persistanceService.engage(), 500)
+    this.persistanceService.on('persisted', () => {
+      this.$emit('persisted')
+    })
+
+    setTimeout(() => this.persistanceService.engage(), 200)
 
     this.colHtmlString = this.column.toDOMString()
   },
@@ -305,6 +309,7 @@ export default {
 @import '~sass-vars';
 
 .editor-column {
+  position: relative;
   width: 100%;
   height: 100%;
   overflow-x: hidden;
@@ -319,6 +324,10 @@ export default {
     margin: 0;
     line-height: 1.25;
     height: 37px;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 
