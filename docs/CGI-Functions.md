@@ -741,38 +741,159 @@ Returns artefact data for all artefacts belonging to an image_catalog reference.
 
 ## addSigns
 
+Adds a sign or group of signs into the sign_stream.  There is no limit to the number of signs that can be added in one request, but the first sign must have a previous_sign_id and the last sign must have a next_sign_id.  It is expected that you send a temporary UUID in the POST request, this will be returned in the response as a key with the actual ID from the database write as its value.  That value should replace all occurences of the temporary UUID in the client side data.
+
 **Request**
 
+- Single sign
+
 ```JSON
+{
+  "SESSION_ID": "369EEAB8-7078-11E8-9185-CB47E803D4E5",
+  "transaction": "addSigns",
+  "scroll_version_id":"808",
+  "signs":
+    [
+      {
+        "sign": "א",
+        "previous_sign_id": 7,
+        "uuid": "ui4359867hjksdnbc4567",
+        "next_sign_id": 6
+      }
+    ]
+}
+```
+
+- Multiple signs
+
+```JSON
+{
+  "SESSION_ID": "369EEAB8-7078-11E8-9185-CB47E803D4E5",
+  "transaction": "addSigns",
+  "scroll_version_id":"808",
+  "signs":
+    [
+      {
+        "sign": "א",
+        "previous_sign_id": 7,
+        "uuid": "ui4359867hjksdnbc4567",
+      },
+      {
+        "sign": "ה",
+        "uuid": "ui4359867hjksdnbc4568"
+      },
+      {
+        "sign": "ב",
+        "uuid": "ui4359867hjksdnbc4569",
+        "next_sign_id": 6
+      }
+    ]
+}
 ```
 
 **Response**
 
+- Single sign
+
 ```JSON
+{
+    "replies": {
+      "ui4359867hjksdnbc4567": 1768900
+    }
+    
+}
+```
+
+- Multiple signs
+
+```JSON
+{
+    "replies": {
+      "ui4359867hjksdnbc4567": 1768900,
+      "ui4359867hjksdnbc4568": 1768901,
+      "ui4359867hjksdnbc4569": 1768902
+    }
+}
 ```
 
 ## removeSigns
 
+Removes a sign or group of signs from the sign_stream.  This will return a confirmation that the delete was successfully completed.
+
 **Request**
 
 ```JSON
+{
+  "SESSION_ID": "369EEAB8-7078-11E8-9185-CB47E803D4E5",
+  "transaction": "removeSigns",
+  "scroll_version_id":"808",
+  "sign_id":
+    [
+      998112,
+      998113,
+      ...
+    ]
+}
 ```
 
 **Response**
 
+- Single sign
+
 ```JSON
+{
+    "replies": [
+      {"998112": "deleted"},
+      {"998113": "deleted"},
+      ...
+    ]
+}
 ```
 
 ## addSignAttribute
 
+Adds a sign attribute to an existing sign_char.  Returns **I cant remember now**.
+
 **Request**
 
 ```JSON
+{
+  "SESSION_ID": "8788956A-709F-11E8-9AA3-9ECD5A6463E7",
+  "transaction": "addSignAttribute",
+  "scroll_version_id": 1606,
+  "signs": [
+    {
+      "sign_char_id": 540125,
+      "attributes": [
+        {
+          "attribute_value_id": 21,
+          "attribute_numeric_value": null,
+          "sequence": 1
+        }
+      ]
+    }
+  ]
+}
 ```
 
 **Response**
 
 ```JSON
+{
+  "results": [
+    {
+      540125: [
+        {
+          4503920: {
+            "attribute_value": "21",
+            "numeric_value": null,
+            "sequence": "1)"
+          }
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ## removeSignAttribute
@@ -789,9 +910,19 @@ Returns artefact data for all artefacts belonging to an image_catalog reference.
 
 ## addSignCharVariant
 
+This is currently broken.  Waiting on a fix.
+
 **Request**
 
 ```JSON
+{
+  "SESSION_ID": "369EEAB8-7078-11E8-9185-CB47E803D4E5",
+  "transaction": "addSignCharVariant",
+  "scroll_version_id": 1606,
+  "sign_id": 7867,
+  "character": "ג",
+  "main": 0
+}
 ```
 
 **Response**
@@ -804,6 +935,12 @@ Returns artefact data for all artefacts belonging to an image_catalog reference.
 **Request**
 
 ```JSON
+{
+  "SESSION_ID": "369EEAB8-7078-11E8-9185-CB47E803D4E5",
+  "transaction": "removeSignChar",
+  "scroll_version_id": 1606,
+  "sign_char_id": 7867,
+}
 ```
 
 **Response**
@@ -837,14 +974,28 @@ Returns artefact data for all artefacts belonging to an image_catalog reference.
 
 ## addRoiToScroll
 
+Adds a region of interest to a scroll_version.  Returns the ID of the newly created ROI.  **This transaction is not yet complete, it will eventually return the sign_char_roi_id for the newly created ROI.**
+
 **Request**
 
 ```JSON
+{
+  "path": "Polygon((0 0, 84 0, 84 100, 0 100, 0 0))",
+  "transform_matrix": "{\"matrix\": [[1,0,1010],[0,1,588]]}",
+  "scroll_version_id": 1606,
+  "values_set": 1,
+  "exceptional": 0,
+  "transaction": "addRoiToScroll",
+  "SESSION_ID": "8788956A-709F-11E8-9AA3-9ECD5A6463E7"
+}
 ```
 
 **Response**
 
 ```JSON
+{
+  "sign_char_id": 540122
+}
 ```
 
 ## removeROI
