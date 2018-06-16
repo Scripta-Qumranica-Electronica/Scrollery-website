@@ -21,7 +21,7 @@ describe('EditingDialog', () => {
   })
 
   it('should contain a number of tabbed panes', () => {
-    expect(wrapper.findAll(Tab).length).to.equal(2)
+    expect(wrapper.findAll(Tab).length).to.equal(4)
   })
 
   it('should change signs on click', () => {

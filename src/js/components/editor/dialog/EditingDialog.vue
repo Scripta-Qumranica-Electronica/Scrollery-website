@@ -25,13 +25,13 @@
         </tab>
       </el-tab-pane>
       <el-tab-pane label="ROI" title="Regions of Interest" name="roi">
-        ROI
+          <tab>ROI</tab>
       </el-tab-pane>
       <el-tab-pane label="Parallels" name="parellels">
-        <h2>Parallels</h2>
+          <tab>Parallels</tab>
     </el-tab-pane>
       <el-tab-pane label="Variants" name="variants">
-          <h2>Variants</h2>
+          <tab>Variants</tab>
       </el-tab-pane>
     </el-tabs>
   </el-dialog>

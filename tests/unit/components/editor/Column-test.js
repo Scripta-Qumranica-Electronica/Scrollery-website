@@ -11,7 +11,7 @@ import KEY_CODES from '~/components/editor/key_codes.js'
  *
  * @return {VueTestWrapper} the vue-test-utils wrapper class
  */
-const columnFactory = () =>
+const columnFactory = () => {
   mount(ColumnComponent, {
     attachToDocument: true, // important to ensure selection API works
     propsData: {
@@ -29,12 +29,14 @@ const columnFactory = () =>
       }
     }
   })
+}
 
 describe('ColumnComponent', () => {
   let vm, wrapper
   beforeEach(() => {
     wrapper = columnFactory()
     vm = wrapper.vm
+    vm.state.commit('setLocked', false)
   })
 
   afterEach(() => {
