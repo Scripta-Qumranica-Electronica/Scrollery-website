@@ -998,11 +998,12 @@ sub addSignAttribute() {
 		my $attributeCounter = 1;
 		my $attributeRepeatLength = scalar @{$sign->{attributes}};
 		foreach my $attribute (@{$sign->{attributes}}) {
+      my $attribute_numeric_value = $attribute->{attribute_numeric_value} ? $attribute->{attribute_numeric_value} : "null";
 			my $new_id = $cgi->set_sign_char_attribute(
 				$sign->{sign_char_id}, 
 				$attribute->{attribute_value_id}, 
 				$attribute->{attribute_numeric_value});
-			print "{\"$new_id\": {\"attribute_value\": \"$attribute->{attribute_value_id}\", \"numeric_value\": \"$attribute->{attribute_numeric_value}\", \"sequence\": \"$attribute->{sequence})\"}}";
+			print "{\"$new_id\": {\"attribute_value\": \"$attribute->{attribute_value_id}\", \"numeric_value\": $attribute_numeric_value, \"sequence\": \"$attribute->{sequence})\"}}";
 			if ($attributeCounter != $attributeRepeatLength) {
 				print ",";
 				$attributeCounter++;
