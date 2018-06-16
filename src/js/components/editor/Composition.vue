@@ -34,12 +34,18 @@ export default {
   },
   methods: {
     persistError() {
-      this.$refs.messageBar.flash('An error occurred attempting to save your changes', {
+      this.$refs.messageBar.flash('An error occurred attempting to save your changes.', {
         type: 'error',
+        actionText: 'refresh data? (strongly suggested)',
+        keepOpen: true,
+        actionCallback: () => {
+          this.$emit('refresh')
+          this.$refs.messageBar.close()
+        },
       })
     },
     persisted() {
-      this.$refs.messageBar.flash('changes saved', {
+      this.$refs.messageBar.flash('All changes saved!', {
         type: 'success',
       })
     },
