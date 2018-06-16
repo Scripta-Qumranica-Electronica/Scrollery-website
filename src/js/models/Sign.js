@@ -62,6 +62,33 @@ export default class Sign extends extendModel(defaults) {
   }
 
   /**
+   * @return {AttributeList} the attribute list
+   */
+  attributes() {
+    return this.getMainChar().attributes
+  }
+
+  /**
+   * @public
+   * @instance
+   *
+   * @param {object} attribute  object representation of the attribute to add to the sign
+   */
+  addAttribute(attribute) {
+    this.getMainChar().addAttribute(attribute)
+  }
+
+  /**
+   * @public
+   * @instance
+   *
+   * @param {object} attribute  object representation of the attribute to add to the sign
+   */
+  removeAttribute(attributeId) {
+    this.getMainChar().removeAttribute(attributeId)
+  }
+
+  /**
    * For now, simply return the first char, but plan for needing to return the main
    * char when there are multiple. It will likely be indicated by a flag on the char itself
    *

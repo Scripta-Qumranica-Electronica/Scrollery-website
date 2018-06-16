@@ -77,6 +77,19 @@ export default {
       this.menuLoaded = true
       this.$store.commit('delWorking')
       if (this.$route.params.scrollID && this.$route.params.scrollID !== '~') {
+        if (res && res[0] && res[0].results) {
+          const scrolls = res[0].results
+          this.$store.commit(
+            'setLockedScrolls',
+            scrolls.reduce((hash, scrollVersion) => {
+              if (scrollVersion.locked) {
+                hash[scrollVersion.scroll_version_id] = true
+              }
+              return hash
+            }, {})
+          )
+        }
+
         this.$store.commit('addWorking')
         this.corpus
           .populateColumnsOfCombination(
@@ -125,6 +138,19 @@ export default {
             } else {
               this.resetRouter()
             }
+          })
+
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+          transaction: 'getListOfAttributes',
+        })
+          .then(({ data }) => {
+            const { results: attributes } = data
+            if (attributes && attributes.length) {
+              this.$store.commit('setSignAttributeList', attributes)
+            }
+          })
+          .catch(err => {
+            console.error(err)
           })
       }
     })

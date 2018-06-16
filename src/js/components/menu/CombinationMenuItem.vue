@@ -2,11 +2,13 @@
   <div>
     <span class="clickable-menu-item" @click="selectCombination">{{combination.name}}{{combination.user_id !== 1 ? ` - ${username}` : ' - default'}}</span>
     <i 
-      class="fa" 
+      class="clickable fa" 
       :class="{'fa-lock': combination.locked, 'fa-unlock': !combination.locked}" 
       :style="{color: combination.locked ? 'red' : 'green'}"
-      @click="lockScroll"></i>
-    <i class="fa fa-clone" @click="corpus.cloneScroll(combination.scroll_version_id)"></i>
+      @click="lockScroll"
+      title="lock scroll"
+    ></i>
+    <i class="clickable fa fa-clone" @click="corpus.cloneScroll(combination.scroll_version_id)" title="Clone scroll for editing"></i>
     <!-- Use v-if here so we don't waste space on the DOM -->
     <div class="children" v-if="open">
         <ul>
@@ -19,8 +21,8 @@
               :scroll-i-d="combination.scroll_id"
               :scroll-version-i-d="combination.scroll_version_id"
               :column="corpus.cols.get(column)"
-              :corpus="corpus">
-            </column-menu-item>
+              :corpus="corpus"
+            />
           </li>
           <li><span>images</span></li>
           <li

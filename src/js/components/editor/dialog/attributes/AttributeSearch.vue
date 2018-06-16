@@ -3,12 +3,12 @@
     <el-autocomplete
       class="attribute-input"
       v-model="attribute"
-      placeholder="Enter attribute"
+      placeholder="seach attributes"
+      value-key="name"
       :fetch-suggestions="search"
       :clearable="true"
       @select="handleSelect"
     />
-    <el-button type="default" @click="onAddNew">Add New</el-button>
   </div>
 
 </template>
@@ -23,22 +23,14 @@ export default {
   },
   methods: {
     /**
-     * Fetch all attributes available to the current user.
-     *
-     * @todo this can be async or cached on the client.
-     */
-    loadAll() {
-      return []
-    },
-
-    /**
      * Search the attributes, filtering by the query string.
      *
      * @param {string} queryString the input to search by
      * @param {function} cb        A callback to call with the results
      */
     search(queryString, cb) {
-      cb(this.allAttributes)
+      const re = new RegExp(queryString, 'i')
+      cb(this.allAttributes.filter(({ name }) => re.test(name)))
     },
 
     /**
@@ -46,25 +38,19 @@ export default {
      *
      * @todo implement
      */
-    handleSelect(item) {
-      console.log(item)
-    },
+    handleSelect({ name }) {
+      const attribute = this.$store.getters.attributes[name]
 
-    /**
-     * The user wants to add a new attribute based on the input.
-     *
-     * @todo ensure the attribute doesn't already exist
-     */
-    onAddNew() {
-      // emit event upward
-      this.$emit('new-attribute', this.attribute)
-
-      // reset model to clear out the input
-      this.attribute = ''
+      this.$emit('add-attribute', attribute)
     },
   },
   mounted() {
-    this.allAttributes = this.loadAll()
+    const list = []
+    for (let name in this.$store.getters.attributes) {
+      list.push({ name })
+    }
+
+    this.allAttributes = list
   },
 }
 </script>

@@ -3,7 +3,7 @@
     <div
       class="text-col inline text-sbl-hebrew"
       dir="rtl" 
-      contenteditable="true"
+      :contenteditable="isEditable"
       ref="colNode"
       @keydown="onKeydown" 
       @input="onInput"
@@ -60,6 +60,13 @@ export default {
     },
     state: {
       required: true,
+    },
+    messagebar: null,
+    toolbar: null,
+  },
+  computed: {
+    isEditable() {
+      return !this.state.getters.locked
     },
   },
   methods: {
@@ -212,8 +219,8 @@ export default {
           // transferData.sign contains a stringified copy of the signs that contains
           // their attributes and chars and whatnot.
         } catch (err) {
-          this.$emit('warning', {
-            message: 'Paste attempt could not be processed.',
+          this.messagebar.flash('Paste attempt could not be processed.', {
+            type: 'error',
           })
         }
       }
@@ -340,24 +347,56 @@ export default {
     onDialogChangeSign(sign) {
       this.dialogSign = sign
     },
+
+    wireToolbarEvents() {
+      this.toolbar.$on('open-sign-editor', () => {
+        try {
+          !this.dialogVisible && this.openDialog()
+        } catch (err) {
+          /* swallow */
+        }
+      })
+    },
   },
   mounted() {
+    if (this.toolbar) {
+      this.wireToolbarEvents()
+    }
+
     this.persistanceService = new ColumnPersistanceService(
       this.column,
       this.$route.params.scrollVersionID,
       this.$store.getters.sessionID
     )
     this.persistanceService.on('error', () => {
-      this.$emit('persist-error')
+      this.messageBar.flash('An error occurred attempting to save your changes.', {
+        type: 'error',
+        actionText: 'refresh data? (strongly suggested)',
+        keepOpen: true,
+        actionCallback: () => {
+          this.$emit('refresh')
+          this.messageBar.close()
+        },
+      })
     })
 
     this.persistanceService.on('persisted', () => {
-      this.$emit('persisted')
+      this.messageBar.flash('All changes saved!', {
+        type: 'success',
+      })
     })
 
     setTimeout(() => this.persistanceService.engage(), 200)
 
     this.colHtmlString = this.column.toDOMString()
+  },
+  watch: {
+    toolbar(toolbar) {
+      if (toolbar && (!this._wiredToolbar || toolbar !== this._wiredToolbar)) {
+        this._wiredToolbar = toolbar
+        this.wireToolbarEvents()
+      }
+    },
   },
 }
 </script>

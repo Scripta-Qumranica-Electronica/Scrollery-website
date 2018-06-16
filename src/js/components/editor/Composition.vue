@@ -5,11 +5,10 @@
         :key="columnIndex + column.id"
         :state="state"
         :column="column"
-        @persist-error="persistError"
-        @persisted="persisted"
-        @warning="warning"
+        :toolbar="toolbar"
+        :messageBar="messageBar"
+        @refresh="$emit('refresh')"
       />
-      <message-bar ref="messageBar"></message-bar>
     </section>
 </template>
 
@@ -32,29 +31,8 @@ export default {
     state: {
       required: true,
     },
-  },
-  methods: {
-    persistError() {
-      this.$refs.messageBar.flash('An error occurred attempting to save your changes.', {
-        type: 'error',
-        actionText: 'refresh data? (strongly suggested)',
-        keepOpen: true,
-        actionCallback: () => {
-          this.$emit('refresh')
-          this.$refs.messageBar.close()
-        },
-      })
-    },
-    persisted() {
-      this.$refs.messageBar.flash('All changes saved!', {
-        type: 'success',
-      })
-    },
-    warning(args) {
-      this.$refs.messageBar.flash(args.message, {
-        type: 'warning',
-      })
-    },
+    toolbar: null,
+    messageBar: null,
   },
   computed: {
     columns() {

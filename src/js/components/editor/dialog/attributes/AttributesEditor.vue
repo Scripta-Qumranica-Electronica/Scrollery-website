@@ -1,11 +1,12 @@
 <template>
   <section>
     <attribute-search
-      @new-attribute="addNewAttribute"
+      @add-attribute="addNewAttribute"
     />
     <table class="attributes-table">
       <thead>
         <th>Attribute</th>
+        <th>Attribute Value</th>
         <th>Description</th>
         <th>Comments</th>
         <th>Actions</th>
@@ -14,6 +15,7 @@
         <attribute-row v-for="attribute in attributes"
           :key="attribute.uuid"
           :attribute="attribute"
+          :sign="sign"
           @delete-attribute="deleteAttribute"
         />
       </tbody>
@@ -47,10 +49,13 @@ export default {
   },
   methods: {
     addNewAttribute(attribute) {
-      this.attributes = this.sign.addAttribute({
-        uuid: Date.now(),
-        attribute,
-      })
+      // add it to the table
+      this.attributes.push(attribute)
+
+      // add it to the model.
+      const modelAttribute = { ...attribute }
+      modelAttribute.values = []
+      this.sign.addAttribute(attribute)
     },
     deleteAttribute(attributeID) {
       this.sign.removeAttribute(attributeID)
@@ -59,7 +64,7 @@ export default {
   },
   watch: {
     sign() {
-      this.attributes = this.sign ? this.sign.attributes.items() : []
+      this.attributes = this.sign ? this.sign.attributes().items() : []
     },
   },
 }

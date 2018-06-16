@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="Editor" :visible="dialogVisible" width="70vw" class="editor-dialog" @close="$emit('close')">
+  <el-dialog title="Editor" :visible="dialogVisible" width="90vw" height="90vh" class="editor-dialog" @close="$emit('close')">
 
     <!-- Display the sign in context of the line -->
     <div class="line-subheader">
@@ -7,20 +7,21 @@
         <span v-html="signText"></span>
       </div>
       <div class="line text-sbl-hebrew" dir="rtl">
-          <span v-for="s in signs" class="line-sign" :class='{"edited-sign": (s.getID() === sign.getID())}' @click="changeSign(s)">{{ s.is_whitespace ? ' ' : s.toDOMString() }}</span>
+          <span v-for="s in signs" class="line-sign" :class='{"edited-sign": (s.getID() === sign.getID())}' @click="changeSign(s)">{{ s.isWhitespace() ? ' ' : s.toDOMString() }}</span>
       </div>
     </div>
+
+    <!-- Comments -->
+    <div class="comments-editor">
+        <comments-editor />
+    </div>
+    
 
     <!-- Editor Tabs -->
     <el-tabs v-model="activeName">
       <el-tab-pane label="Sign Attributes" name="attributes">
         <tab>
           <attributes-editor :sign="sign"></attributes-editor>
-        </tab>
-      </el-tab-pane>
-      <el-tab-pane label="Comments" name="comments">
-        <tab>
-          <comments-editor />
         </tab>
       </el-tab-pane>
       <el-tab-pane label="ROI" title="Regions of Interest" name="roi">
@@ -104,6 +105,10 @@ export default {
 
 <style lang="scss">
 .editor-dialog {
+  & .el-dialog {
+    margin-top: 5vh !important;
+  }
+
   & .el-dialog__header {
     padding: 10px;
   }
@@ -142,5 +147,13 @@ export default {
       }
     }
   }
+}
+
+.comments-editor {
+  height: 20vh;
+  min-height: 200px;
+
+  /* needed to clear tabs */
+  margin-bottom: 40px;
 }
 </style>

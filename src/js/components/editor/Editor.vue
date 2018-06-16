@@ -1,7 +1,18 @@
 <template>
     <div class="text-pane" :class='{fullscreen}'>
-        <toolbar :state="state" @fullscreen="toggleFullScreen" />
-        <composition :text="text" :state="state" @refresh="refresh" />
+        <toolbar
+          :state="state"
+          ref="toolbar"
+          @fullscreen="toggleFullScreen"
+        />
+        <composition
+          :text="text"
+          :state="state"
+          :toolbar="$refs.toolbar"
+          @refresh="refresh"
+          :messageBar="$refs.messageBar"
+        />
+        <message-bar ref="messageBar"></message-bar>
     </div>
 </template>
 
@@ -11,6 +22,9 @@ import CompositionModel from '~/models/Composition.js'
 import Line from '~/models/Line.js'
 import Column from '~/models/Column.js'
 import Sign from '~/models/Sign.js'
+
+// components
+import MessageBar from './MessageBar.vue'
 import Composition from './Composition.vue'
 import Toolbar from './Toolbar.vue'
 
@@ -20,6 +34,7 @@ export default {
   components: {
     composition: Composition,
     toolbar: Toolbar,
+    'message-bar': MessageBar,
   },
   computed: {
     colInRouter() {
@@ -53,6 +68,8 @@ export default {
      */
     getText(scrollVersionID, colID) {
       // todo: empty existing columns
+      this.state.commit('setLocked', this.$store.getters.isScrollLocked(scrollVersionID))
+      this.$refs.messageBar.close()
 
       this.$post('resources/cgi-bin/scrollery-cgi.pl', {
         transaction: 'getTextOfFragment',
@@ -103,6 +120,16 @@ export default {
             )
           } else {
             throw new Error('Unable to retrieve text data')
+          }
+
+          // Show a message to the user if the user cannot edit:
+          if (this.state.getters.locked) {
+            this.$refs.messageBar.flash(
+              'Clone this scroll from the menu in order to make changes in your own version.',
+              {
+                keepOpen: true,
+              }
+            )
           }
         })
         .catch(err => {
