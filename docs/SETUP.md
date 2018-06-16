@@ -1,4 +1,24 @@
-# Quick Start
+# Contents
+- [Contents](#contents)
+- [Quick Start Instructions](#quick-start-instructions)
+- [Full Setup Description](#full-setup-description)
+    - [Summary](#summary)
+    - [Server Side](#server-side)
+        - [Build Server Side Code](#build-server-side-code)
+    - [Client](#client)
+        - [Install Dependencies](#install-dependencies)
+            - [Clone the Scrollery-website repository (if not already done)](#clone-the-scrollery-website-repository-if-not-already-done)
+            - [Install website dependencies](#install-website-dependencies)
+            - [Install SQE_API](#install-sqe_api)
+            - [Build the Perl cgi script dependencies](#build-the-perl-cgi-script-dependencies)
+        - [Starting up the server for development or production](#starting-up-the-server-for-development-or-production)
+                - [`npm start`](#npm-start)
+                - [`npm run dev`](#npm-run-dev)
+                - [`npm run prod`](#npm-run-prod)
+        - [Testing in Browser](#testing-in-browser)
+        - [Note](#note)
+
+# Quick Start Instructions
 The Scrollery-website comes with a quick start script.  In order to run it, you must already have installed the following dependencies:
 * [Node 8.9.4](https://nodejs.org/en/download/)
 * Npm 5+ (bundled with node)
