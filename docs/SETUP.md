@@ -49,7 +49,7 @@ npm run bootstrap
 npm start
 ```
 
-If everything runs with no errors, then after executing `npm start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.
+If everything runs with no errors, then after executing `npm start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.  The CGI requests provided in this project are ducumented in [CGI-Functions.md](./CGI-Functions.md).
 
 You may also run `npm run bootstrap` again after pulling down a new version of the Scrollery-website, and it will make any necessary updates to the dependencies and the database <span style="color:red">(Warning!!! this will overwrite your existing SQE_DEV database)</span>.  After running several times, you may find that your Docker runs out of space, I have found the suggestions [here](https://lebkowski.name/docker-volumes/) to be helpful in such circumstances.
 
