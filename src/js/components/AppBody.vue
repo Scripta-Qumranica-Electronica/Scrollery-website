@@ -41,7 +41,8 @@ import SplitPane from 'vue-splitpane'
 import SingleImage from './SingleImage.vue'
 import Editor from './editor/Editor.vue'
 
-import Corpus from '~/models/Corpus.js'
+// import Corpus from '~/models/Corpus.js'
+import Corpus from '~/models-2/Corpus.js'
 
 export default {
   components: {
@@ -69,65 +70,66 @@ export default {
     // from the router.
     this.$store.commit('resetWorking')
     this.$store.commit('addWorking')
-    this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
+    // this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
 
+    this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
     // TODO: find I way to mock the corpus model for unit tests
     /* istanbul ignore next */
-    this.corpus.populateCombinations().then(res => {
-      this.menuLoaded = true
-      this.$store.commit('delWorking')
-      if (this.$route.params.scrollID && this.$route.params.scrollID !== '~') {
-        this.$store.commit('addWorking')
-        this.corpus
-          .populateColumnsOfCombination(
-            this.$route.params.scrollID,
-            this.$route.params.scrollVersionID
-          )
-          .then(res => {
-            if (this.$route.params.colID !== '~') {
-              this.corpus.populateRoiOfCol(
-                this.$route.params.colID,
-                this.$route.params.scrollVersionID
-              )
-            }
-          })
-        this.corpus
-          .populateImageReferencesOfCombination(
-            this.$route.params.scrollID,
-            this.$route.params.scrollVersionID
-          )
-          .then(res1 => {
-            this.$store.commit('delWorking')
-            if (this.$route.params.imageID !== '~') {
-              this.$store.commit('addWorking')
-              this.corpus
-                .populateImagesOfImageReference(
-                  this.$route.params.imageID,
-                  this.$route.params.scrollVersionID
-                )
-                .then(res2 => {
-                  this.$store.commit('delWorking')
-                  if (this.$route.params.artID !== '~') {
-                    this.$store.commit('addWorking')
-                    this.corpus
-                      .populateArtefactsOfImageReference(
-                        this.$route.params.imageID,
-                        this.$route.params.scrollVersionID
-                      )
-                      .then(res3 => {
-                        this.$store.commit('delWorking')
-                        this.resetRouter()
-                      })
-                  } else {
-                    this.resetRouter()
-                  }
-                })
-            } else {
-              this.resetRouter()
-            }
-          })
-      }
-    })
+    // this.corpus.populateCombinations().then(res => {
+    //   this.menuLoaded = true
+    //   this.$store.commit('delWorking')
+    //   if (this.$route.params.scrollID && this.$route.params.scrollID !== '~') {
+    //     this.$store.commit('addWorking')
+    //     this.corpus
+    //       .populateColumnsOfCombination(
+    //         this.$route.params.scrollID,
+    //         this.$route.params.scrollVersionID
+    //       )
+    //       .then(res => {
+    //         if (this.$route.params.colID !== '~') {
+    //           this.corpus.populateRoiOfCol(
+    //             this.$route.params.colID,
+    //             this.$route.params.scrollVersionID
+    //           )
+    //         }
+    //       })
+    //     this.corpus
+    //       .populateImageReferencesOfCombination(
+    //         this.$route.params.scrollID,
+    //         this.$route.params.scrollVersionID
+    //       )
+    //       .then(res1 => {
+    //         this.$store.commit('delWorking')
+    //         if (this.$route.params.imageID !== '~') {
+    //           this.$store.commit('addWorking')
+    //           this.corpus
+    //             .populateImagesOfImageReference(
+    //               this.$route.params.imageID,
+    //               this.$route.params.scrollVersionID
+    //             )
+    //             .then(res2 => {
+    //               this.$store.commit('delWorking')
+    //               if (this.$route.params.artID !== '~') {
+    //                 this.$store.commit('addWorking')
+    //                 this.corpus
+    //                   .populateArtefactsOfImageReference(
+    //                     this.$route.params.imageID,
+    //                     this.$route.params.scrollVersionID
+    //                   )
+    //                   .then(res3 => {
+    //                     this.$store.commit('delWorking')
+    //                     this.resetRouter()
+    //                   })
+    //               } else {
+    //                 this.resetRouter()
+    //               }
+    //             })
+    //         } else {
+    //           this.resetRouter()
+    //         }
+    //       })
+    //   }
+    // })
   },
   methods: {
     resetRouter() {

@@ -1,6 +1,6 @@
 import MapList from './MapList.js'
 import Artefact from './Artefact.js'
-import axios from 'axios'
+import { post } from '~/utils/AxiosPostShim.js'
 import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG } from '~/utils/VectorFactory.js'
 const svgpath = require('svgpath')
 
@@ -12,7 +12,7 @@ export default class Artefacts extends MapList {
     attributes = {},
     standardTransaction = undefined
   ) {
-    idKey = idKey || 'artefact_position_id'
+    idKey = idKey || 'artefact_id'
     standardTransaction = 'getArtOfImage'
     // ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getArtOfImage'}
     super(session_id, idKey, ajaxPayload, Artefact, attributes, standardTransaction)
@@ -24,17 +24,17 @@ export default class Artefacts extends MapList {
 
   // TODO: mocking for axios in unit test
   /* istanbul ignore next */
-  populate(customPayload = {}, scrollVersionID = undefined) {
+  populate(customPayload = {}, scroll_version_id = undefined) {
     let payload = Object.assign(
       {},
       this._ajaxPayload,
       customPayload,
-      scrollVersionID && { scroll_version_id: scrollVersionID }
+      scroll_version_id && { scroll_version_id: scroll_version_id }
     )
 
     return new Promise((resolve, reject) => {
       try {
-        axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
+        post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
           if (res.status === 200 && res.data.replies) {
             // We can store hashes for the returned data
             // in the future, so we can avoid unnecessary
@@ -47,16 +47,20 @@ export default class Artefacts extends MapList {
             // an Object {key1: value1, key2: value2}, then the
             // keys are converted to strings.
             let results = []
-            res.data.replies.forEach(reply => {
+            res.data.replies.forEach((reply, index) => {
               if (reply.error) {
                 return
               }
+              scroll_version_id = res.data.payload.requests[index].scroll_version_id
 
               reply.results.forEach(item => {
                 let record
-                if (this.get(item[this.idKey]) && this.get(item[this.idKey]).toJS() !== item) {
-                  record = this.get(item[this.idKey]).extend(item)
-                } else if (!this.get(item[this.idKey])) {
+                if (
+                  this.get(scroll_version_id + '-' + item[this.idKey]) &&
+                  scroll_version_id + '-' + this.get(item[this.idKey]).toJS() !== item
+                ) {
+                  record = this.get(scroll_version_id + '-' + item[this.idKey]).extend(item)
+                } else if (!this.get(scroll_version_id + '-' + item[this.idKey])) {
                   record = new this.model(item)
                 }
                 if (record) {
@@ -66,7 +70,7 @@ export default class Artefacts extends MapList {
                     .matrix(dbMatrixToSVG(record.transform_matrix))
                     .round()
                     .toString()
-                  results.push([item[this.idKey], record])
+                  results.push([scroll_version_id + '-' + item[this.idKey], record])
                 }
               })
             })

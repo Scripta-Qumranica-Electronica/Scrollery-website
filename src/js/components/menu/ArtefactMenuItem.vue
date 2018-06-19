@@ -1,30 +1,14 @@
 <template>
-  <span class="clickable-menu-item" @click="setRouter">Artefact: {{corpus.artefacts.get(artefactID).name}}</span>
+  <span class="clickable-menu-item" @click="setRouter">Artefact: {{artefact.name}}</span>
 </template>
 
 <script>
 export default {
   props: {
-    artefactID: {
-      required: true,
-      type: Number,
-    },
-    scrollID: {
-      required: true,
-      type: Number,
-    },
-    scrollVersionID: {
-      required: true,
-      type: Number,
-    },
-    imageID: {
-      required: true,
-      type: Number,
-    },
-    corpus: {
-      required: true,
-      type: Object,
-    },
+    artefact: undefined,
+    scrollID: undefined,
+    scrollVersionID: undefined,
+    imageID: undefined,
   },
   methods: {
     setRouter() {
@@ -33,7 +17,7 @@ export default {
         params.scrollID !== this.scrollID ||
         params.scrollVersionID !== this.scrollVersionID ||
         params.imageID !== this.imageID ||
-        params.artID !== this.artefactID
+        params.artID !== this.artefact.artefact_id
       ) {
         this.$router.push({
           name: 'workbenchAddress',
@@ -42,7 +26,7 @@ export default {
             scrollVersionID: this.scrollVersionID,
             colID: params.colID,
             imageID: this.imageID,
-            artID: this.artefactID,
+            artID: this.artefact.artefact_id,
           },
         })
       }

@@ -128,6 +128,7 @@ export default {
   },
   filters: {
     wktToSvg(value) {
+      console.log(wktPolygonToSvg(value))
       return wktPolygonToSvg(value)
     },
   },

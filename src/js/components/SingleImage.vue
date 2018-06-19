@@ -83,7 +83,9 @@
                   :images="filenames"
                   :image-settings="imageSettings"
                   :divisor="imageShrink"
-                  :clipping-mask="$route.params.artID === '~' || !corpus.artefacts.get($route.params.artID) ? undefined : corpus.artefacts.get($route.params.artID).mask"
+                  :clipping-mask="$route.params.artID === '~' || !corpus.artefacts.get($route.params.artID, $route.params.scrollVersionID) ? 
+                                    undefined : 
+                                    corpus.artefacts.get($route.params.artID, $route.params.scrollVersionID).mask"
                   :clip="clippingOn"
                   :corpus="corpus"
                   ref="currentRoiCanvas">
@@ -96,7 +98,9 @@
                         :draw-mode="drawingMode"
                         :brush-size="brushCursorSize"
                         :divisor="imageShrink"
-                        :mask="$route.params.artID === '~' || !corpus.artefacts.get($route.params.artID) ? undefined : corpus.artefacts.get($route.params.artID).mask"
+                        :mask="$route.params.artID === '~' || !corpus.artefacts.get($route.params.artID, $route.params.scrollVersionID) ? 
+                                  undefined :
+                                  corpus.artefacts.get($route.params.artID, $route.params.scrollVersionID).mask"
                         :locked="lock"
                         v-on:mask="setClipMask"
                         ref="currentArtCanvas">
@@ -147,8 +151,11 @@ export default {
   methods: {
     fetchImages(id) {
       this.$store.commit('addWorking')
-      this.corpus
-        .populateImagesOfImageReference(id, this.$route.params.scrollVersionID)
+      this.corpus.images
+        .populate({
+          scroll_version_id: this.$route.params.scrollVersionID,
+          image_catalog_id: id,
+        })
         .then(res => {
           this.$store.commit('delWorking')
           this.filenames = this.corpus.imageReferences.get(id >>> 0).images
@@ -161,8 +168,11 @@ export default {
             }
           })
           this.$store.commit('addWorking')
-          this.corpus
-            .populateArtefactsOfImageReference(id, this.$route.params.scrollVersionID)
+          this.corpus.artefacts
+            .populate({
+              scroll_version_id: this.$route.params.scrollVersionID,
+              image_catalog_id: id,
+            })
             .then(res1 => {
               this.$store.commit('delWorking')
             })
@@ -223,21 +233,9 @@ export default {
         } else {
           this.artefact = to.params.artID >>> 0
           this.scrollVersionID = to.params.scrollVersionID >>> 0
-          // if (this.corpus.artefacts.get(this.artefact).mask === '') {
-          //   // this.$store.commit('addWorking')
-          //   this.corpus.artefacts
-          //     .fetchMask(to.params.scrollVersionID, to.params.artID)
-          //     .then(res => {
-          //       // this.$store.commit('delWorking')
-          //       this.firstClipMask = this.clipMask = wktPolygonToSvg(
-          //         this.corpus.artefacts.get(this.artefact).mask
-          //       )
-          //     })
-          // } else {
           this.firstClipMask = this.clipMask = wktPolygonToSvg(
-            this.corpus.artefacts.get(this.artefact).mask
+            this.corpus.artefacts.get(this.artefact, this.scrollVersionID).mask
           )
-          // }
         }
         this.lock = false
       }

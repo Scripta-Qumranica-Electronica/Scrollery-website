@@ -9,32 +9,37 @@
     <i class="fa fa-clone" @click="corpus.cloneScroll(combination.scroll_version_id)"></i>
     <!-- Use v-if here so we don't waste space on the DOM -->
     <div class="children" v-if="open">
-        <ul>
-          <li><span>columns</span></li>
-          <li
-            v-for="column in combination.cols" 
-            :key="'column-' + column">
-            <column-menu-item 
-              :column-i-d="column"
-              :scroll-i-d="combination.scroll_id"
-              :scroll-version-i-d="combination.scroll_version_id"
-              :column="corpus.cols.get(column)"
-              :corpus="corpus">
-            </column-menu-item>
-          </li>
-          <li><span>images</span></li>
-          <li
-            v-for="image in combination.imageReferences" 
-            :key="'menu-image-' + image">
-            <image-menu-item 
-              :image-i-d="image"
-              :scroll-i-d="combination.scroll_id"
-              :scroll-version-i-d="combination.scroll_version_id"
-              :image="corpus.imageReferences.get(image)"
-              :corpus="corpus">
-            </image-menu-item>
-          </li>
-        </ul>
+      <div @click="toggleColumns">
+        <i class="fa" :class="{'fa-caret-right': !showColumns, 'fa-caret-down': showColumns}"></i>
+        <span>columns</span>
+      </div>
+      <ul v-show="showColumns">
+        <li
+          v-for="col_id in combination.cols" 
+          :key="'menu' + combination.scroll_version_id + '-' + col_id">
+          <column-menu-item 
+            :scroll-i-d="combination.scroll_id"
+            :scroll-version-i-d="combination.scroll_version_id"
+            :column="corpus.cols.get(col_id)">
+          </column-menu-item>
+        </li>
+      </ul>
+      <div @click="toggleImages">
+        <i class="fa" :class="{'fa-caret-right': !showImages, 'fa-caret-down': showImages}"></i>
+        <span>images</span>
+      </div>
+      <ul v-show="showImages">
+        <div
+          v-for="image_catalog_id in combination.imageReferences" 
+          :key="'menu' + combination.scroll_version_id + '-' + image_catalog_id">
+          <image-menu-item 
+            :scroll-i-d="combination.scroll_id"
+            :scroll-version-i-d="combination.scroll_version_id"
+            :image="corpus.imageReferences.get(image_catalog_id)"
+            :corpus="corpus">
+          </image-menu-item>
+        </div>
+      </ul>
     </div>
   </div>
 </template>
@@ -56,6 +61,8 @@ export default {
   data() {
     return {
       open: false,
+      showColumns: false,
+      showImages: false,
     }
   },
   computed: {
@@ -84,22 +91,38 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        this.corpus.populateColumnsOfCombination(
-          this.combination.scroll_id,
-          this.combination.scroll_version_id
-        )
-        this.corpus
-          .populateImageReferencesOfCombination(
-            this.combination.scroll_id,
-            this.combination.scroll_version_id
-          )
-          .then(res => {
-            this.corpus.populateRoisOfCombination(
-              this.combination.scroll_id,
-              this.combination.scroll_version_id
-            )
-          })
+        this.corpus.cols.populate({
+          scroll_version_id: this.combination.scroll_version_id,
+          scroll_id: this.combination.scroll_id,
+        })
+        this.corpus.imageReferences.populate({
+          scroll_version_id: this.combination.scroll_version_id,
+          scroll_id: this.combination.scroll_id,
+        })
+        // this.corpus.populateColumnsOfCombination(
+        //   this.combination.scroll_id,
+        //   this.combination.scroll_version_id
+        // )
+        // this.corpus
+        //   .populateImageReferencesOfCombination(
+        //     this.combination.scroll_id,
+        //     this.combination.scroll_version_id
+        //   )
+        //   .then(res => {
+        //     this.corpus.populateRoisOfCombination(
+        //       this.combination.scroll_id,
+        //       this.combination.scroll_version_id
+        //     )
+        //   })
       }
+    },
+
+    toggleColumns() {
+      this.showColumns = !this.showColumns
+    },
+
+    toggleImages() {
+      this.showImages = !this.showImages
     },
 
     lockScroll() {},
@@ -110,5 +133,8 @@ export default {
 <style lang="scss" scoped>
 .clickable-menu-item {
   cursor: pointer;
+}
+i {
+  width: 10px;
 }
 </style>

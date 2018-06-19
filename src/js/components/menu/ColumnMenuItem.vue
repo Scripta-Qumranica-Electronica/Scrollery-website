@@ -1,17 +1,15 @@
 <template>
   <span class="clickable-menu-item" @click="setRouter">
-    {{column.name}} ({{columnID}})
+    {{column.name}} ({{column.col_id}})
   </span>
 </template>
 
 <script>
 export default {
   props: {
-    columnID: Number,
-    scrollVersionID: Number,
-    scrollID: Number,
+    scrollVersionID: undefined,
+    scrollID: undefined,
     column: {},
-    corpus: {},
   },
   methods: {
     /*
@@ -23,14 +21,14 @@ export default {
       if (
         params.scrollID !== this.scrollID ||
         params.scrollVersionID !== this.scrollVersionID ||
-        params.colID !== this.columnID
+        params.colID !== this.column.col_id
       ) {
         this.$router.push({
           name: 'workbenchAddress',
           params: {
             scrollID: this.scrollID,
             scrollVersionID: this.scrollVersionID,
-            colID: this.columnID,
+            colID: this.column.col_id,
             imageID: params.imageID,
             artID: params.artID,
           },
