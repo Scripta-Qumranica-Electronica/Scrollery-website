@@ -11,7 +11,7 @@ export default class Image {
     this.end = record.end
     this.is_master = record.is_master
     this.suffix = record.suffix
-    this.editionSide = record.editionSide
+    this.editionSide = this.editionSide
   }
 
   /**

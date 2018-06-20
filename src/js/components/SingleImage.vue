@@ -176,6 +176,9 @@ export default {
             .then(res1 => {
               this.$store.commit('delWorking')
             })
+            .catch(err => {
+              console.log(err)
+            })
         })
     },
     setClipMask(svgMask) {

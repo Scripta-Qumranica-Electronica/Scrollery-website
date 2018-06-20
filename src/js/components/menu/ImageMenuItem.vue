@@ -84,10 +84,15 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        this.corpus.artefacts.populate({
-          image_catalog_id: this.image.image_catalog_id,
-          scroll_version_id: this.scrollVersionID,
-        })
+        this.corpus.artefacts
+          .populate({
+            image_catalog_id: this.image.image_catalog_id,
+            scroll_version_id: this.scrollVersionID,
+          })
+          .then(res => {})
+          .catch(err => {
+            console.log(err)
+          })
         // this.corpus
         //   .populateArtefactsOfImageReference(this.image.image_catalog_id, this.scrollVersionID)
         //   .then(res => {

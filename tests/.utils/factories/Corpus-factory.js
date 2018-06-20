@@ -9,21 +9,27 @@ import faker from 'faker'
 
 const generateCorpus = () => {
   let corpus = new Corpus(faker.random.uuid(), faker.random.uuid())
+  let cols = []
+  let imageReferences = []
+  let artefacts = []
+  let rois = []
+  let images = []
+  let artefactRois = []
 
   for(let i = 0; i < 3; i++) {
     const scroll_version_id = faker.random.number(1000000)
-    let cols = []
-    let imageReferences = []
-    let artefacts = []
-    let rois = []
+    cols = []
+    imageReferences = []
+    artefacts = []
+    rois = []
 
     for(let j = 0; j < 5; j++) {
       const col_id = faker.random.number(1000000)
       const image_catalog_id = faker.random.number(1000000)
       const artefact_id = faker.random.number(1000000)
 
-      let images = []
-      let artefactRois = []
+      images = []
+      artefactRois = []
       for(let z = 0; z < 5; z++) {
         const sign_char_roi_id = faker.random.number(1000000)
         const sqe_image_id = faker.random.number(1000000)
@@ -57,13 +63,16 @@ const generateCorpus = () => {
       artefacts.push(artefact_id)
     }
 
-    corpus.combinations._insertItem(new Combination({
-      scroll_version_id: scroll_version_id,
-      cols: cols,
-      artefacts: artefacts,
-      imageReferences: imageReferences,
-      rois: rois
-    }))
+    corpus.combinations._insertItem(
+      new Combination({
+        scroll_version_id: scroll_version_id,
+        cols: cols,
+        imageReferences: imageReferences,
+        artefacts: artefacts,
+        rois: rois
+      })
+    )
+    console.log(corpus.combinations)
   }
 
   return corpus

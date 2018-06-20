@@ -34,7 +34,7 @@ export default class ItemList {
     }
 
     const key = this._formatKey(item[this.idKey], scroll_version_id)
-    if (!this.get(key) || this.get(key) !== item) {
+    if (!(key in this._items) || this.get(key) !== item) {
       this._items = Object.assign({}, this._items, { [key]: item })
       this._itemOrder.splice(position, 0, key)
     }
@@ -51,7 +51,7 @@ export default class ItemList {
 
   alterItemAtKey(key, newData, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
-    if (this.get(key)) {
+    if (key in this._items) {
       const updatedItem = Object.assign({}, this.get(key), newData)
       this._items = Object.assign({}, this._items, { [key]: updatedItem })
     } else {
@@ -61,15 +61,15 @@ export default class ItemList {
 
   addToItemSublist(key, sublistName, newData, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
-    if (this.get(key)) {
-      const updatedItem = this.get(key)
-      newData = Array.isArray(newData) ? newData : [newData]
+    newData = Array.isArray(newData) ? newData : [newData]
+    if (key in this._items) {
+      const updateItem = this.get(key)
       for (let i = 0, newDatum; (newDatum = newData[i]); i++) {
-        if (updatedItem[sublistName].indexOf(newDatum) === -1) {
-          updatedItem[sublistName].push(newDatum)
+        if (updateItem[sublistName].indexOf(newDatum) === -1) {
+          updateItem[sublistName].push(newDatum)
         }
       }
-      this._items = Object.assign({}, this._items, { [key]: updatedItem })
+      this.alterItemAtKey(key, updateItem)
     } else {
       throw new TypeError(`Item ${key} not found.`)
     }
@@ -84,7 +84,7 @@ export default class ItemList {
       throw new TypeError(`Key ${key} does not exist in itemOrder Array.`)
     }
 
-    if (this.get(key)) {
+    if (key in this._items) {
       delete this._items[key]
     } else {
       throw new TypeError(`Key ${key} does not exist in items Object.`)
@@ -125,7 +125,11 @@ export default class ItemList {
               this.propagateAddData(recordKey, res.data.payload, scroll_version_id)
             }
             this._items = Object.assign({}, this._items, temporaryList)
-            this._itemOrder = [...temporaryOrder, ...this._itemOrder]
+            for (let i = 0, newItem; (newItem = temporaryOrder[i]); i++) {
+              if (this._itemOrder.indexOf(newItem) === -1) {
+                this._itemOrder.push(newItem)
+              }
+            }
             resolve(res)
           } else {
             reject(res)
@@ -142,16 +146,10 @@ export default class ItemList {
    * populate to the proper entries in other lists.
    */
   propagateAddData(data, payload) {
-    for (let i = 0, addList; (addList = this.connectedLists[i]); i++) {
-      const key = payload[addList.idKey]
-      const scroll_version_id = addList.relativeToScrollVersion
-        ? payload.scroll_version_id
-        : undefined
-      if (this.relativeToScrollVersion) {
-        addList.addToItemSublist(key, this.listType, data, scroll_version_id)
-      } else {
-        addList.addToItemSublist(key, this.listType, data, scroll_version_id)
-      }
+    for (let i = 0, list; (list = this.connectedLists[i]); i++) {
+      const key = payload[list.idKey]
+      const scroll_version_id = list.relativeToScrollVersion ? payload.scroll_version_id : undefined
+      list.addToItemSublist(key, this.listType, data, scroll_version_id)
     }
   }
 
