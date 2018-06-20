@@ -884,38 +884,13 @@ sub nameCombination {
 }
 
 sub changeArtefactPoly {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	$cgi->dbh->set_scrollversion($json_post->{scroll_version_id});
-	my $artefact_shape_id_query = <<'MYSQL';
-	SELECT artefact_shape.artefact_shape_id
-	FROM artefact_shape
-		JOIN artefact_shape_owner USING(artefact_shape_id)
-		JOIN artefact_position USING(artefact_id)
-		JOIN artefact_position_owner USING(artefact_position_id)
-	WHERE artefact_position.artefact_position_id = ?
-		AND artefact_position_owner.scroll_version_id = ?
-		AND artefact_shape_owner.scroll_version_id = ?
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($artefact_shape_id_query)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{artefact_position_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
-	my $artefact_shape_id = $sql->fetchrow_arrayref()->[0];
+	my ($cgi, $json_post) = @_;
 
-	# my ($new_art_shape_id, $new_art_error) = $cgi->dbh->change_value("artefact_shape", $artefact_shape_id, "region_in_sqe_image", ['ST_GEOMFROMTEXT', $json_post->{region_in_sqe_image}]);
-	# if ($new_art_error) {
-	# 	handleDBError ($new_art_shape_id, $new_art_error);
-	# }
+  $cgi->set_scrollversion($json_post->{scroll_version_id});
+  $cgi->change_artefact_shape($json_post->{artefact_position_id}, $json_post->{image_catalog_id}, $json_post->{region_in_sqe_image});
 
-	my $changeArtefactMaskQuery = <<'MYSQL';
-	UPDATE artefact_shape
-	SET region_in_sqe_image = ST_GEOMFROMTEXT(?)
-	WHERE artefact_shape_id = ?
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($changeArtefactMaskQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{region_in_sqe_image}, $artefact_shape_id);
-
-	print '{"artefact_shape_id":' . $artefact_shape_id . ', "artefact_position_id":' . $json_post->{artefact_position_id} . '}';
+  # TODO: collect the new artefact (using the API) and send it back.
+  print '{"change_artefact_shape":"success"}';
 
 	return;
 }

@@ -41,8 +41,7 @@ import SplitPane from 'vue-splitpane'
 import SingleImage from './SingleImage.vue'
 import Editor from './editor/Editor.vue'
 
-// import Corpus from '~/models/Corpus.js'
-import Corpus from '~/models-2/Corpus.js'
+import Corpus from '~/models/Corpus.js'
 
 export default {
   components: {
@@ -73,6 +72,7 @@ export default {
     // this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
 
     this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
+    this.corpus.combinations.populate()
     // TODO: find I way to mock the corpus model for unit tests
     /* istanbul ignore next */
     // this.corpus.populateCombinations().then(res => {

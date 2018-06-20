@@ -239,6 +239,41 @@ export function clipperToSVGPolygon(paths) {
   return svgPath
 }
 
+/*
+ * This function receives an GeoJSON polygon and 
+ * converts it to a WKT Polygon.
+ */
+export function geoJSONPolygonToWKT(geoJSON) {
+  let wkt = undefined
+  if (typeof geoJSON === 'string' && geoJSON.substring(0, 1) === '{') {
+    geoJSON = JSON.parse(geoJSON.trim())
+  }
+  if (geoJSON.coordinates) {
+    wkt = 'POLYGON('
+    for (let i = 0, poly; (poly = geoJSON.coordinates[i]); i++) {
+      if (wkt === 'POLYGON(') {
+        wkt += '('
+      } else {
+        wkt += '),('
+      }
+      const firstPoint = poly[0][0] + ' ' + poly[0][1]
+      const lastElement = poly.length - 1
+      for (let i = 0, point; (point = poly[i]); i++) {
+        wkt += point[0] + ' ' + point[1]
+        if (i === lastElement) {
+          if (point[0] + ' ' + point[1] !== firstPoint) {
+            wkt += ',' + firstPoint
+          }
+        } else {
+          wkt += ','
+        }
+      }
+    }
+    wkt += '))'
+  }
+  return wkt
+}
+
 /* 
  * This function expects the transform matrix 
  * to be in a 2D array: [[a,c,tx],[b,d,ty]].

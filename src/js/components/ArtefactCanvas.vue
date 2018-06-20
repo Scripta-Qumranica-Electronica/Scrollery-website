@@ -150,7 +150,6 @@ export default {
         cpr.AddPaths(newClipperPolygon, ClipperLib.PolyType.ptClip, true)
         let solution_paths = new ClipperLib.Paths()
         if (this.drawMode === 'erase') {
-          console.log('erase')
           let succeeded = cpr.Execute(
             ClipperLib.ClipType.ctDifference,
             solution_paths,
@@ -158,7 +157,6 @@ export default {
             ClipperLib.PolyFillType.pftNonZero
           )
         } else {
-          console.log('draw')
           let succeeded = cpr.Execute(
             ClipperLib.ClipType.ctUnion,
             solution_paths,

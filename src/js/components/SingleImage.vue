@@ -179,10 +179,10 @@ export default {
         })
     },
     setClipMask(svgMask) {
-      this.corpus.changeArtefactMask(
-        svgMask,
-        this.corpus.artefacts.get(this.$route.params.artID).artefact_position_id,
-        this.$route.params.scrollVersionID
+      this.corpus.artefacts.updateArtefactShape(
+        this.$route.params.artID,
+        this.$route.params.scrollVersionID,
+        svgMask
       )
     },
     toggleMask() {

@@ -33,14 +33,14 @@ export default class ItemList {
       throw new TypeError(`Requested position exceeds length of array: ${this._itemOrder.length}.`)
     }
 
-    const key = this._formatKey(key, scroll_version_id)
-    if (!this._items.get(item[this.idKey]) || this._items.get(item[this.idKey]) !== item) {
+    const key = this._formatKey(item[this.idKey], scroll_version_id)
+    if (!this.get(key) || this.get(key) !== item) {
       this._items = Object.assign({}, this._items, { [key]: item })
-      this._itemOrder = this._itemOrder.splice(position, 0, key)
+      this._itemOrder.splice(position, 0, key)
     }
   }
 
-  _updateItem(item, scroll_version_id = undefined) {
+  _replaceItem(item, scroll_version_id = undefined) {
     //This check is probably a waste of time
     if (!(item instanceof this.recordModel)) {
       throw new TypeError(`Expected item to be an instance of ${this.recordModel.name}.`)
