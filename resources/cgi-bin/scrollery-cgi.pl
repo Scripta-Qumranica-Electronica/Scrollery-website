@@ -13,10 +13,6 @@ use Data::Dumper;
 
 sub processCGI {
 	my ($cgi, $error) = SQE_CGI->new;
-  print $cgi->header(
-  -type    => 'application/json; charset=utf-8',
-  -charset => 'utf-8',
-);
 	if (defined $error)
 	{
 		print('{"error":"'.@{$error}[1].'"}');
@@ -43,6 +39,11 @@ sub processCGI {
 		newCombination => \&newCombination,
 		copyCombination => \&copyCombination,
 		nameCombination => \&nameCombination,
+    addArtefact => \&addArtefact,
+    removeArtefact => \&removeArtefact,
+    changeArtefactShape => \&changeArtefactShape,
+    changeArtefactPosition => \&changeArtefactPosition,
+    changeArtefactData => \&changeArtefactData,
 		changeArtefactPoly => \&changeArtefactPoly,
 		setArtPosition => \&setArtPosition,
 		setArtRotation => \&setArtRotation,
@@ -499,125 +500,6 @@ MYSQL
 	return;
 }
 
-# First I copy the artefect to a new artefact owner with the currect scroll_version_id
-# Then I change the scroll_id of the artefact to match the current scroll_id
-# TODO update for new DB structure.
-# sub addArtToComb {
-# 	my ($cgi, $json_post, $key, $lastItem) = @_;
-# 	my $scroll_version_id =  $json_post->{version_id};
-# 	$cgi->dbh->set_scrollversion($scroll_version_id);
-# 	my $addArtToCombQuery = <<'MYSQL';
-# 		INSERT IGNORE INTO artefact_owner (artefact_id, scroll_version_id)
-# 		VALUES(?,?)
-# MYSQL
-# 	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
-# 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-#     $sql->execute($json_post->{art_id}, $scroll_version_id);
-#     $sql->finish;
-
-# 	my ($new_scroll_data_id, $error) = $cgi->dbh->add_value("artefact", $json_post->{art_id}, "scroll_id", $json_post->{scroll_id});
-# 	handleDBError ($new_scroll_data_id, $error);
-# }
-
-# I should create an artefact, link an artefact_data,
-# then create the necessary owner tables by using the SQE API.
-# TODO update for new DB structure.
-sub newArtefact {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $scroll_version_id =  $json_post->{version_id};
-	$cgi->dbh->set_scrollversion($scroll_version_id);
-
-	# Get the sqe_image_id for our image
-	my $getSQEImageIdQuery = <<'MYSQL';
-SELECT sqe_image_id
-FROM SQE_image
-WHERE image_catalog_id = ?
-      AND is_master = 1
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getSQEImageIdQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{image_id});
-	my $sqe_image_id = $sql->fetchrow_arrayref()->[0];
-
-	# Create new artefact
-	my $addArtToImageQuery = <<'MYSQL';
-INSERT INTO artefact (id_of_sqe_image, region_in_master_image)
-VALUES(?, ST_GEOMFROMTEXT(?))
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($addArtToImageQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($sqe_image_id, $json_post->{region_in_master_image});
-	my $artefact_id = $sql->{mysql_insertid};
-
-	# create artefact owner table
-# 	my $addArtOwnerQuery = <<'MYSQL';
-# INSERT INTO artefact_owner (artefact_id, scroll_version_id)
-# VALUES(?, ?)
-# MYSQL
-# 	$sql = $cgi->dbh->prepare_cached($addArtOwnerQuery)
-# 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-# 	$sql->execute($artefact_id, $scroll_version_id);
-
-# 	Run add value so that undo tracking system follows along
-# 	my ($new_artefact_id, $art_error) = $cgi->dbh->add_value("artefact", $artefact_id, "sqe_image_id", $json_post->{sqe_image_id});
-# 	if ($artefact_id ne $new_artefact_id) {
-# 		handleDBError ($new_artefact_id, $art_error);
-# 	}
-
-	# create artefact_data
-	my $addArtDataQuery = <<'MYSQL';
-INSERT INTO artefact_data (artefact_id, name)
-VALUES(?, ?)
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($addArtDataQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($artefact_id, $json_post->{name});
-	my $artefact_data_id = $sql->{mysql_insertid};
-
-	#create artefact_data_owner table
-	my $addArtDataOwnerQuery = <<'MYSQL';
-INSERT INTO artefact_data_owner (artefact_data_id, scroll_version_id)
-VALUES(?, ?)
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($addArtDataOwnerQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($artefact_data_id, $scroll_version_id);
-
-	# Run add value so that undo tracking system follows along
-#	my ($new_artefact_data_id, $art_data_error) = $cgi->dbh->add_value("artefact_data", $artefact_data_id, "name", $json_post->{name});
-#	if ($artefact_data_id ne $new_artefact_data_id) {
-#		handleDBError ($new_artefact_data_id, $art_data_error);
-#	}
-
-	# create artefact_position
-	my $addArtPositionQuery = <<'MYSQL';
-INSERT INTO artefact_position (artefact_id, scroll_id, transform_matrix)
-VALUES(?, ?, ?)
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($addArtPositionQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($artefact_id, $json_post->{scroll_id}, '{"matrix": [[1,0,0],[0,1,0]]}');
-	my $artefact_position_id = $sql->{mysql_insertid};
-
-	#create artefact_data_owner table
-	my $addArtPositionOwnerQuery = <<'MYSQL';
-INSERT INTO artefact_position_owner (artefact_position_id, scroll_version_id)
-VALUES(?, ?)
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($addArtPositionOwnerQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($artefact_position_id, $scroll_version_id);
-
-	# Run add value so that undo tracking system follows along
-#	my ($new_artefact_position_id, $art_pos_error) = $cgi->dbh->add_value("artefact_position", $artefact_position_id, "scroll_id", $json_post->{scroll_id});
-#	if ($artefact_position_id ne $new_artefact_position_id) {
-#		handleDBError ($new_artefact_position_id, $art_pos_error);
-#	} else {
-#		handleDBError ($artefact_id, $art_error);
-#	}
-	handleDBError ($artefact_id);
-}
-
 sub getArtefactMask {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $addArtToCombQuery = <<'MYSQL';
@@ -658,6 +540,7 @@ SELECT DISTINCT artefact_position.artefact_position_id AS artefact_position_id,
         artefact_data.name AS name,
         artefact_data.artefact_data_id,
 				SQE_image.image_catalog_id,
+        SQE_image.sqe_image_id,
         artefact_shape_owner.scroll_version_id AS scroll_version_id
 FROM artefact_position_owner
 	JOIN artefact_position USING(artefact_position_id)
@@ -681,49 +564,49 @@ MYSQL
 	return;
 }
 
-sub newCombination {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $user_id = $cgi->dbh->user_id;
-	my $name = $json_post->{name}; 
+# sub newCombination {
+# 	my ($cgi, $json_post, $key, $lastItem) = @_;
+# 	my $user_id = $cgi->dbh->user_id;
+# 	my $name = $json_post->{name}; 
 
-	my $newScroll = <<'MYSQL';
-		INSERT INTO scroll ()
-		VALUES()
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($newScroll)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute();
-	my $scroll_id = $cgi->dbh->last_insert_id(undef, undef, undef, undef);
+# 	my $newScroll = <<'MYSQL';
+# 		INSERT INTO scroll ()
+# 		VALUES()
+# MYSQL
+# 	my $sql = $cgi->dbh->prepare_cached($newScroll)
+# 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+# 	$sql->execute();
+# 	my $scroll_id = $cgi->dbh->last_insert_id(undef, undef, undef, undef);
 
-	my $newScrollVersion = <<'MYSQL';
-		INSERT INTO scroll_version (user_id, scroll_id, version)
-		VALUES(?, ?, 0)
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($newScrollVersion)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($user_id, $scroll_id);
-	my $scroll_version_id = $cgi->dbh->last_insert_id(undef, undef, undef, undef);
+# 	my $newScrollVersion = <<'MYSQL';
+# 		INSERT INTO scroll_version (user_id, scroll_id, version)
+# 		VALUES(?, ?, 0)
+# MYSQL
+# 	$sql = $cgi->dbh->prepare_cached($newScrollVersion)
+# 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+# 	$sql->execute($user_id, $scroll_id);
+# 	my $scroll_version_id = $cgi->dbh->last_insert_id(undef, undef, undef, undef);
 
-	my $newScrollData = <<'MYSQL';
-		INSERT INTO scroll_data (name, scroll_id)
-		VALUES(?, ?)
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($newScrollData)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($name, $scroll_id);
-	my $scroll_data_id = $cgi->dbh->last_insert_id(undef, undef, undef, undef);
+# 	my $newScrollData = <<'MYSQL';
+# 		INSERT INTO scroll_data (name, scroll_id)
+# 		VALUES(?, ?)
+# MYSQL
+# 	$sql = $cgi->dbh->prepare_cached($newScrollData)
+# 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+# 	$sql->execute($name, $scroll_id);
+# 	my $scroll_data_id = $cgi->dbh->last_insert_id(undef, undef, undef, undef);
 
-	my $newScrollDataOwner = <<'MYSQL';
-		INSERT INTO scroll_data_owner (scroll_data_id, scroll_version_id)
-		VALUES(?, ?)
-MYSQL
-	$sql = $cgi->dbh->prepare_cached($newScrollDataOwner)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($scroll_data_id, $scroll_version_id);
+# 	my $newScrollDataOwner = <<'MYSQL';
+# 		INSERT INTO scroll_data_owner (scroll_data_id, scroll_version_id)
+# 		VALUES(?, ?)
+# MYSQL
+# 	$sql = $cgi->dbh->prepare_cached($newScrollDataOwner)
+# 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+# 	$sql->execute($scroll_data_id, $scroll_version_id);
 
-	print '{"created": {"scroll_data": ' . $scroll_data_id . ', "scroll_version":' . $scroll_version_id . '}}';
-	return;
-}
+# 	print '{"created": {"scroll_data": ' . $scroll_data_id . ', "scroll_version":' . $scroll_version_id . '}}';
+# 	return;
+# }
 
 sub copyCombination {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
@@ -767,34 +650,66 @@ sub nameCombination {
 	return;
 }
 
-sub changeArtefactPoly {
-	my ($cgi, $json_post) = @_;
-
+sub addArtefact {
+  my ($cgi, $json_post) = @_;
   $cgi->set_scrollversion($json_post->{scroll_version_id});
-  $cgi->change_artefact_shape($json_post->{artefact_position_id}, $json_post->{image_catalog_id}, $json_post->{region_in_sqe_image});
-
-  # TODO: collect the new artefact (using the API) and send it back.
-  print '{"change_artefact_shape":"success"}';
-
-	return;
+  my ($artefact_id, $error) = $cgi->add_artefact($json_post->{sqe_image_id}, $json_post->{region_in_master_image});
+  handleDBError ($artefact_id, $error);
+  print '{"artefact_id":"' . $artefact_id . '"}';
 }
 
-sub setArtPosition {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	$cgi->dbh->set_scrollversion($json_post->{version_id});
-	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $json_post->{art_id}, "transform_matrix", $json_post->{matrix});
-	handleDBError ($new_id, $error);
-	return;
+sub removeArtefact {
+  my ($cgi, $json_post) = @_;
+  $cgi->set_scrollversion($json_post->{scroll_version_id});
+  $cgi->remove_artefact($json_post->{artefact_id});
+  print '{"deleted":"' . $json_post->{artefact_id} . '"}';
 }
 
-sub setArtRotation {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $user_id = $cgi->dbh->user_id;
-	$cgi->dbh->set_scrollversion($json_post->{version_id});
-	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $json_post->{art_id}, "rotation", $json_post->{rotation});
-	handleDBError ($new_id, $error);
-	return;
+sub changeArtefactShape{
+  my ($cgi, $json_post) = @_;
+  $cgi->set_scrollversion($json_post->{scroll_version_id});
+  $cgi->change_artefact_shape($json_post->{artefact_id}, $json_post->{sqe_image_id}, $json_post->{region_in_master_image});
 }
+sub changeArtefactPosition{
+  my ($cgi, $json_post) = @_;
+  $cgi->set_scrollversion($json_post->{scroll_version_id});
+  $cgi->change_artefact_position($json_post->{artefact_id}, $json_post->{transform_matrix}, $json_post->{z_index});
+}
+
+sub changeArtefactData{
+  my ($cgi, $json_post) = @_;
+  $cgi->set_scrollversion($json_post->{scroll_version_id});
+  $cgi->change_artefact_data($json_post->{artefact_id}, $json_post->{name});
+}
+
+# sub changeArtefactPoly {
+# 	my ($cgi, $json_post) = @_;
+
+#   $cgi->set_scrollversion($json_post->{scroll_version_id});
+#   $cgi->change_artefact_shape($json_post->{artefact_position_id}, $json_post->{image_catalog_id}, $json_post->{region_in_sqe_image});
+
+#   # TODO: collect the new artefact (using the API) and send it back.
+#   print '{"change_artefact_shape":"success"}';
+
+# 	return;
+# }
+
+# sub setArtPosition {
+# 	my ($cgi, $json_post, $key, $lastItem) = @_;
+# 	$cgi->dbh->set_scrollversion($json_post->{version_id});
+# 	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $json_post->{art_id}, "transform_matrix", $json_post->{matrix});
+# 	handleDBError ($new_id, $error);
+# 	return;
+# }
+
+# sub setArtRotation {
+# 	my ($cgi, $json_post, $key, $lastItem) = @_;
+# 	my $user_id = $cgi->dbh->user_id;
+# 	$cgi->dbh->set_scrollversion($json_post->{version_id});
+# 	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $json_post->{art_id}, "rotation", $json_post->{rotation});
+# 	handleDBError ($new_id, $error);
+# 	return;
+# }
 
 sub addSigns() {
 	my ($cgi, $json_post, $key, $lastItem) = @_;

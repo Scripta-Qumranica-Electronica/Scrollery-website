@@ -187,6 +187,7 @@ describe('get menu data', () => {
         } catch (err) {
           console.log(res.body)
           console.log(err.message)
+          console.log(`The failed scroll_version_id is: ${scroll_version_id}`)
           assert(false)
         }
 
@@ -222,6 +223,7 @@ describe('get menu data', () => {
         } catch (err) {
           console.log(res.body)
           console.log(err.message)
+          console.log(`The failed scroll_version_id is: ${scroll_version_id}`)
           assert(false)
         }
 
@@ -261,6 +263,8 @@ describe('get menu data', () => {
         } catch (err) {
           console.log(res.body)
           console.log(err.message)
+          console.log(`The failed scroll_version_id is: ${image.scroll_version_id}`)
+          console.log(`The failed image_catalog_id is: ${image.image_catalog_id}`)
           assert(false)
         }
 
