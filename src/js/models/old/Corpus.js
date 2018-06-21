@@ -199,13 +199,12 @@ export default class Corpus {
   */
 
   /* istanbul ignore next */
-  populateArtefactsOfCombination(scrollID, scrollVersionID) {
+  populateArtefactsOfCombination(scrollVersionID) {
     return new Promise((resolve, reject) => {
       this.artefacts
         .populate(
           {
             transaction: 'getScrollArtefacts',
-            scroll_id: scrollID,
           },
           scrollVersionID
         )

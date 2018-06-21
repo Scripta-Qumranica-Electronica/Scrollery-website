@@ -13,6 +13,10 @@ use Data::Dumper;
 
 sub processCGI {
 	my ($cgi, $error) = SQE_CGI->new;
+  print $cgi->header(
+  -type    => 'application/json; charset=utf-8',
+  -charset => 'utf-8',
+);
 	if (defined $error)
 	{
 		print('{"error":"'.@{$error}[1].'"}');
@@ -26,18 +30,9 @@ sub processCGI {
 		getArtOfImage => \&getArtOfImage,
 		getImgOfComb => \&getImgOfComb,
 		getColOfComb => \&getColOfComb,
-		getFragsOfCol => \&getFragsOfCol,
-		getColOfScrollID => \&getColOfScrollID,
 		getSignStreamOfColumn => \&getSignStreamOfColumn,
 		getSignStreamOfFrag => \&getSignStreamOfFrag,
 		getImagesOfFragment => \&getImagesOfFragment,
-		getIAAEdID => \&getIAAEdID,
-		getCanonicalCompositions => \&getCanonicalCompositions,
-		getCanonicalID1 => \&getCanonicalID1,
-		getCanonicalID2 => \&getCanonicalID2,
-		getInstitutions => \&getInstitutions,
-		getInstitutionPlates => \&getInstitutionPlates,
-		getInstitutionFragments => \&getInstitutionFragments,
 		imagesOfInstFragments => \&imagesOfInstFragments,
 		getInstitutionArtefacts => \&getInstitutionArtefacts,
 		getScrollWidth => \&getScrollWidth,
@@ -176,7 +171,7 @@ ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{user});
+	$sql->execute($json_post->{user_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -185,15 +180,17 @@ MYSQL
 sub getArtOfComb {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
-SELECT DISTINCT artefact_position.artefact_id AS id
-FROM artefact_position
-	JOIN artefact_position_owner USING(artefact_position_id)
-WHERE artefact_position.scroll_id = ?
-      AND artefact_position_owner.scroll_version_id = ?
+SELECT DISTINCT artefact.artefact_id AS artefact_id,
+  artefact_data.name,
+  artefact_data_owner.scroll_version_id
+FROM artefact
+	JOIN artefact_data USING(artefact_id)
+  JOIN artefact_data_owner USING(artefact_data_id)
+WHERE artefact_data_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{combID}, $json_post->{version_id});
+	$sql->execute($json_post->{scroll_version_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -202,7 +199,7 @@ MYSQL
 sub getArtOfImage {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getArtOfImageQuery = <<'MYSQL';
-SELECT DISTINCT	artefact_position.artefact_position_id,
+SELECT DISTINCT	artefact_position.artefact_position_id AS artefact_position_id,
 				artefact_shape.artefact_shape_id AS artefact_shape_id,
 				artefact_position.artefact_id AS artefact_id,
 				artefact_data.name, 
@@ -210,7 +207,8 @@ SELECT DISTINCT	artefact_position.artefact_position_id,
 				ST_AsText(artefact_shape.region_in_sqe_image) as mask,
 				artefact_position.transform_matrix,
 				ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
-				SQE_image.image_catalog_id
+				SQE_image.image_catalog_id,
+        artefact_data_owner.scroll_version_id
 FROM artefact_shape
 	JOIN artefact_shape_owner USING(artefact_shape_id)
 	JOIN artefact_position USING(artefact_id)
@@ -239,18 +237,21 @@ SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
 		image_catalog.catalog_number_2 AS lvl2,
 		image_catalog.catalog_side AS side,
 		image_catalog.institution,
-		image_catalog.image_catalog_id AS image_catalog_id
+		image_catalog.image_catalog_id AS image_catalog_id,
+    scroll_version.scroll_version_id AS scroll_version_id
 FROM image_catalog
 	JOIN image_to_edition_catalog USING (image_catalog_id)
 	JOIN edition_catalog USING (edition_catalog_id)
 	JOIN SQE_image USING(image_catalog_id)
-WHERE edition_catalog.scroll_id = ?
+  JOIN scroll_version_group USING(scroll_id)
+  JOIN scroll_version USING(scroll_version_group_id)
+WHERE scroll_version.scroll_version_id = ?
 	AND SQE_image.is_master = 1
 ORDER BY lvl1, lvl2, side
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{scroll_id});
+	$sql->execute($json_post->{scroll_version_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -260,57 +261,16 @@ sub getColOfComb {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
 		SELECT DISTINCT col_data.name AS name,
-						col_data.col_id AS col_id
+      col_data.col_id AS col_id,
+      col_data_owner.scroll_version_id
 		FROM col_data
 			JOIN col_data_owner USING(col_data_id)
 			JOIN scroll_to_col USING(col_id)
 		WHERE col_data_owner.scroll_version_id = ?
-			AND scroll_to_col.scroll_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{scroll_version_id}, $json_post->{scroll_id});
-
-	readResults($sql, $key, $lastItem);
-	return;
-}
-
-sub getFragsOfCol {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getFragsOfColQuery = <<'MYSQL';
-		SELECT discrete_canonical_reference.discrete_canonical_reference_id,
-			discrete_canonical_reference.column_name,
-			discrete_canonical_reference.fragment_name,
-			discrete_canonical_reference.sub_fragment_name,
-			discrete_canonical_reference.fragment_column,
-			discrete_canonical_reference.side,
-			discrete_canonical_reference.column_of_scroll_id
-		FROM discrete_canonical_reference
-		WHERE discrete_canonical_reference.column_of_scroll_id = ?
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getFragsOfColQuery) or die
-			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{colID});
-
-	readResults($sql, $key, $lastItem);
-	return;
-}
-
-sub getColOfScrollID {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getColOfScrollIDQuery = <<'MYSQL';
-		SELECT scroll.name AS scroll_name,
-			   column_of_scroll.name as col_name
-		FROM discrete_canonical_reference
-			INNER JOIN scroll
-				ON scroll.scroll_id = discrete_canonical_reference.discrete_canonical_name_id
-			INNER JOIN column_of_scroll
-				ON column_of_scroll.column_of_scroll_id = discrete_canonical_reference.column_of_scroll_id
-		WHERE discrete_canonical_reference.discrete_canonical_reference_id = ?
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getColOfScrollIDQuery) or die
-			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{discCanRef});
+	$sql->execute($json_post->{scroll_version_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -388,160 +348,41 @@ sub getSignStreamOfFrag {
 	return;
 }
 
+# This is not well tested, and it will fail often.
+# This is skipped in the server unit tests.
 sub getImagesOfFragment {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $sql;
 	my $idType = $json_post->{idType};
-	my $getImagesOfFragmentQuery;
+	my $getImagesOfFragmentQuery = <<'MYSQL';
+SELECT * 
+FROM image_to_edition_catalog
+  JOIN edition_catalog USING(edition_catalog_id)
+  JOIN scroll_to_col USING(scroll_id)
+  JOIN col_data USING(col_id)
+  JOIN col_data_owner USING(col_data_id)
+WHERE (
+  scroll_version_id = ? 
+  AND col_id = ?
+) AND
+(
+  REPLACE(name, 'frg. ', '') = edition_location_2 
+  OR  CONCAT(
+        CAST(
+          fromRoman(
+            REGEXP_REPLACE(edition_location_1 COLLATE utf8_bin,'[^A-Z]','')
+          ) 
+          AS CHAR(20)
+        ), 
+        edition_location_2
+      ) 
+      LIKE REPLACE(name, 'col. ', '') 
+)
+MYSQL
 
-	if ($idType eq 'composition') {
-		$getImagesOfFragmentQuery = <<'MYSQL';
-SELECT 	SQE_image.filename AS filename,
-		  SQE_image.wavelength_start AS start,
-		  SQE_image.wavelength_end AS end,
-		  SQE_image.is_master,
-		  SQE_image.native_width AS width,
-		  SQE_image.native_height AS height,
-		  image_urls.url AS url,
-		  image_urls.suffix AS suffix
-FROM SQE_image
-	JOIN image_urls USING(image_urls_id)
-	JOIN edition_catalog USING(edition_catalog_id)
-	JOIN edition_catalog_to_discrete_reference USING(edition_catalog_id)
-	JOIN discrete_canonical_reference USING(discrete_canonical_reference_id)
-WHERE edition_catalog.edition_side=0
-      AND discrete_canonical_reference.column_of_scroll_id = ?
-	  ORDER BY SQE_image.is_master DESC
-MYSQL
-	} elsif ($idType eq 'institution') {
-		$getImagesOfFragmentQuery = <<'MYSQL';
-			SELECT *
-			FROM SQE_image
-			WHERE image_catalog_id = ?
-MYSQL
-	}
 	$sql = $cgi->dbh->prepare_cached($getImagesOfFragmentQuery)
 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{id});
-
-	readResults($sql, $key, $lastItem);
-	return;
-}
-
-sub getIAAEdID {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getIAAEdIDQuery = <<'MYSQL';
-		SELECT edition_catalog_to_discrete_reference.edition_id
-		FROM edition_catalog_to_discrete_reference
-			INNER JOIN edition_catalog
-				USING(edition_catalog_id)
-		WHERE edition_catalog.edition_side=0
-			  AND edition_catalog_to_discrete_reference.disc_can_ref_id = ?
-MYSQL
-        my $sql = $cgi->dbh->prepare_cached($getIAAEdIDQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-        $sql->execute($json_post->{discCanRef});
-
-		readResults($sql, $key, $lastItem);
-        return;
-}
-
-sub getCanonicalCompositions {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getCanonicalCompositionsQuery = <<'MYSQL';
-		SELECT DISTINCT composition
-		FROM edition_catalog
-		ORDER BY BIN(composition) ASC,
-			composition ASC
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getCanonicalCompositionsQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute();
-
-	readResults($sql, $key, $lastItem);
-	return;
-}
-
-sub getCanonicalID1 {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getCanonicalID1Query = <<'MYSQL';
-		SELECT DISTINCT composition,
-			edition_location_1
-		FROM edition_catalog
-		WHERE composition = ?
-		ORDER BY BIN(edition_location_1) ASC,
-			edition_location_1 ASC
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getCanonicalID1Query)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{composition});
-
-	readResults($sql, $key, $lastItem);
-	return;
-}
-
-sub getCanonicalID2 {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getCanonicalID2Query = <<'MYSQL';
-		SELECT edition_location_2, edition_catalog_id
-		FROM edition_catalog
-		WHERE composition = ?
-			  AND edition_location_1 = ?
-			  AND edition_side = 0
-		ORDER BY CAST(edition_location_2 AS UNSIGNED)
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getCanonicalID2Query)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{composition}, $json_post->{edition_location_1});
- 	readResults($sql, $key, $lastItem);
-	return;
-}
-
-sub getInstitutions {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getInstitutionsQuery = <<'MYSQL';
-		SELECT DISTINCT institution
-		FROM image_catalog
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getInstitutionsQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute();
-
-	readResults($sql, $key, $lastItem);
-	return;
-}
-
-sub getInstitutionPlates {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getInstitutionPlates = <<'MYSQL';
-		SELECT DISTINCT institution,
-			catalog_number_1 AS catalog_plate
-		FROM image_catalog
-		WHERE institution = ?
-		ORDER BY CAST(catalog_number_1 AS UNSIGNED)
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getInstitutionPlates)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{institution});
-
-	readResults($sql, $key, $lastItem);
-	return;
-}
-
-sub getInstitutionFragments {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getInstitutionFragmentsQuery = <<'MYSQL';
-		SELECT catalog_number_2 AS catalog_fragment,
-			image_catalog_id
-		FROM image_catalog
-		WHERE institution = ?
-			  AND catalog_number_1 = ?
-			  AND catalog_side = 0
-		ORDER BY CAST(catalog_number_2 AS UNSIGNED)
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getInstitutionFragmentsQuery)
-		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{institution}, $json_post->{catalog_number_1});
+	$sql->execute($json_post->{scroll_version_id}, $json_post->{col_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -583,14 +424,14 @@ sub getInstitutionArtefacts {
 			user_id
 		FROM artefact_shape
 			JOIN SQE_image ON SQE_image.sqe_image_id = artefact_shape.id_of_sqe_image
-			JOIN artefact_shape_owner USING(artefact_shape)
+			JOIN artefact_shape_owner USING(artefact_shape_id)
 			JOIN scroll_version USING(scroll_version_id)
 		WHERE SQE_image.image_catalog_id = ?
 			  AND user_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getInstitutionArtefactsQuery)
 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{catalog_id}, $json_post->{user_id});
+	$sql->execute($json_post->{image_catalog_id}, $json_post->{user_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -599,11 +440,29 @@ MYSQL
 sub getScrollWidth {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getScrollWidthQuery = <<'MYSQL';
-		CALL getScrollWidth(?,?)
+	SELECT  artefact_id, 
+          MAX(
+            JSON_EXTRACT(transform_matrix, '$.matrix[0][2]') 
+            + (
+              (ST_X(ST_PointN(ST_ExteriorRing(ST_ENVELOPE(region_in_sqe_image)), 2)) 
+              - ST_X(ST_PointN(ST_ExteriorRing(ST_ENVELOPE(region_in_sqe_image)), 1))
+            ) 
+            * (1215 / SQE_image.dpi))
+          ) 
+          AS max_x 
+  FROM artefact_position 
+    JOIN artefact_position_owner USING(artefact_position_id) 
+    JOIN artefact_shape USING(artefact_id) 
+    JOIN artefact_shape_owner USING(artefact_shape_id) 
+    JOIN SQE_image ON SQE_image.sqe_image_id = artefact_shape.id_of_sqe_image
+    JOIN image_catalog USING(image_catalog_id) 
+  WHERE artefact_position_owner.scroll_version_id = ? 
+    AND artefact_shape_owner.scroll_version_id = ? 
+    AND image_catalog.catalog_side=0
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollWidthQuery)
 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id});
+	$sql->execute($json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -612,11 +471,29 @@ MYSQL
 sub getScrollHeight {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getScrollHeightQuery = <<'MYSQL';
-		CALL getScrollHeight(?,?)
+	SELECT  artefact_id, 
+          MAX(
+            JSON_EXTRACT(transform_matrix, '$.matrix[1][2]') 
+            + (
+              (ST_Y(ST_PointN(ST_ExteriorRing(ST_ENVELOPE(region_in_sqe_image)), 3)) 
+              - ST_Y(ST_PointN(ST_ExteriorRing(ST_ENVELOPE(region_in_sqe_image)), 1))
+            ) 
+            * (1215 / SQE_image.dpi))
+          ) 
+          AS max_y 
+  FROM artefact_position 
+    JOIN artefact_position_owner USING(artefact_position_id) 
+    JOIN artefact_shape USING(artefact_id) 
+    JOIN artefact_shape_owner USING(artefact_shape_id) 
+    JOIN SQE_image ON SQE_image.sqe_image_id = artefact_shape.id_of_sqe_image
+    JOIN image_catalog USING(image_catalog_id) 
+  WHERE artefact_position_owner.scroll_version_id = ? 
+    AND artefact_shape_owner.scroll_version_id = ? 
+    AND image_catalog.catalog_side=0
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollHeightQuery)
 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id});
+	$sql->execute($json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -744,8 +621,9 @@ MYSQL
 sub getArtefactMask {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $addArtToCombQuery = <<'MYSQL';
-SELECT ST_AsText(region_in_sqe_image) as mask,
+SELECT ST_AsText(region_in_sqe_image) AS mask,
 	transform_matrix,
+  artefact_shape_owner.scroll_version_id AS scroll_version_id,
 	ST_AsText(ST_Envelope(region_in_sqe_image)) AS rect
 	FROM artefact_shape
 	JOIN artefact_shape_owner USING(artefact_shape_id)
@@ -757,7 +635,7 @@ SELECT ST_AsText(region_in_sqe_image) as mask,
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($addArtToCombQuery)
 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{artID}, $json_post->{scrollVersion}, $json_post->{scrollVersion});
+	$sql->execute($json_post->{artefact_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -776,22 +654,28 @@ SELECT DISTINCT artefact_position.artefact_position_id AS artefact_position_id,
                 image_urls.suffix AS suffix,
                 SQE_image.filename AS filename,
                 SQE_image.dpi AS dpi,
-				SQE_image.image_catalog_id
+                image_catalog.catalog_side AS side,
+        artefact_data.name AS name,
+        artefact_data.artefact_data_id,
+				SQE_image.image_catalog_id,
+        artefact_shape_owner.scroll_version_id AS scroll_version_id
 FROM artefact_position_owner
 	JOIN artefact_position USING(artefact_position_id)
 	JOIN artefact_shape USING(artefact_id)
 	JOIN artefact_shape_owner USING(artefact_shape_id)
-	INNER JOIN SQE_image ON SQE_image.sqe_image_id = artefact_shape.id_of_sqe_artefact
+	JOIN artefact_data USING(artefact_id)
+	JOIN artefact_data_owner USING(artefact_data_id)
+	INNER JOIN SQE_image ON SQE_image.sqe_image_id = artefact_shape.id_of_sqe_image
 	INNER JOIN image_urls USING(image_urls_id)
 	INNER JOIN image_catalog USING(image_catalog_id)
-WHERE artefact_position.scroll_id=?
-      AND artefact_position_owner.scroll_version_id=?
+WHERE artefact_position_owner.scroll_version_id=?
 	  AND artefact_shape_owner.scroll_version_id=?
+	  AND artefact_data_owner.scroll_version_id=?
       AND image_catalog.catalog_side=0
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getScrollArtefactsQuery)
 		or die "{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{scroll_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
+	$sql->execute($json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
