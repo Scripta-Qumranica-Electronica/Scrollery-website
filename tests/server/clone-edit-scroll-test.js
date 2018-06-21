@@ -53,7 +53,7 @@
 //         return done(err)
 //       }
 
-//       assert(res.body.set_scroll_version && 
+//       assert(res.body.set_scroll_version &&
 //         typeof res.body.set_scroll_version.returned_info === 'number')
 //       assert(res.body.new_scroll_id &&
 //         typeof res.body.new_scroll_id === 'number')
