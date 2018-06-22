@@ -7,6 +7,7 @@
       :style="{color: combination.locked ? 'red' : 'green'}"
       @click="lockScroll"></i>
     <i class="fa fa-clone" @click="corpus.combinations.cloneScroll(combination.scroll_version_id)"></i>
+    <i v-if="!combination.locked" class="fa fa-trash-o" @click="corpus.combinations.removeItem(combination.scroll_version_id)"></i>
     <!-- Use v-if here so we don't waste space on the DOM -->
     <div class="children" v-if="open">
       <div @click="toggleColumns">

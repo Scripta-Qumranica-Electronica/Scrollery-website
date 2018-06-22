@@ -10,4 +10,12 @@ export default class Cols extends ItemList {
     defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getColOfComb' }
     super(corpus, idKey, Col, listType, connectedLists, relativeToScrollVersion, defaultPostData)
   }
+
+  removeItem(key, scroll_version_id = undefined) {
+    /**
+     * Add axios command to remove from database.
+     * run super on successful completion.
+     */
+    super.removeItem(key, scroll_version_id)
+  }
 }

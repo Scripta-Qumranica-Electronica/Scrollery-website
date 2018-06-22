@@ -135,7 +135,7 @@ export default class ItemList {
     key = this._formatKey(key, scroll_version_id)
     const arrayIndex = this._itemOrder.indexOf(key)
     if (arrayIndex !== -1) {
-      this._itemOrder = this._itemOrder.splice(arrayIndex, 1)
+      this._itemOrder.splice(arrayIndex, 1)
     } else {
       throw new TypeError(`Key ${key} does not exist in itemOrder Array.`)
     }
@@ -162,7 +162,7 @@ export default class ItemList {
       const listKey = this.get(key)[list.idKey]
       list.removeItemFromSublist(listKey, this.listType, key)
     }
-    this._removeItem(key, scroll_version_id)
+    this._removeItem(key)
   }
 
   get(key, scroll_version_id = undefined) {

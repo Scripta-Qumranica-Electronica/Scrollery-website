@@ -1,7 +1,7 @@
 export default class Image {
   constructor(record = {}) {
     this.sqe_image_id = record.sqe_image_id
-    this.image_catalog_id = record.image.image_catalog_id
+    this.image_catalog_id = record.image_catalog_id
     this.url = record.url
     this.filename = record.filename
     this.width = record.width
