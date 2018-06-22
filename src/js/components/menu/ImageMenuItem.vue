@@ -14,7 +14,8 @@
               :artefact="corpus.artefacts.get(artefact_id)" 
               :scroll-i-d="scrollID"
               :scroll-version-i-d="scrollVersionID"
-              :image-i-d="image.image_catalog_id">
+              :image-i-d="image.image_catalog_id"
+              :corpus="corpus">
             </artefact-menu-item>
           </li>
         </ul>

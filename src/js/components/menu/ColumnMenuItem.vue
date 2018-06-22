@@ -1,7 +1,7 @@
 <template>
   <span class="clickable-menu-item" @click="setRouter">
     <span>{{column.name}} ({{column.col_id}})</span>
-    <i class="fa fa-trash-o" @click="corpus.cols.removeItem(column.col_id, scrollVersionID)"></i>
+    <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="corpus.cols.removeItem(column.col_id, scrollVersionID)"></i>
   </span>
 </template>
 
