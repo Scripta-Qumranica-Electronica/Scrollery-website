@@ -49,6 +49,13 @@ export default class ItemList {
     this.alterItemAtKey(item[this.idKey], item, scroll_version_id)
   }
 
+  /**
+   *
+   * @param {Number/String} key of the record to be altered
+   * @param {Object} newData to be inserted
+   * @param {Number} scroll_version_id of the key, if present
+   *                 the key will be automatically updated.
+   */
   alterItemAtKey(key, newData, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
     if (key in this._items) {
@@ -59,14 +66,63 @@ export default class ItemList {
     }
   }
 
+  /**
+   *
+   * Some ItemList objects will have items containing id's for linked
+   * data.  This function will add the id for one or more of those
+   * relational links to the item specified as the "key".
+   *
+   * @param {Number/String}       key           key of the record to be altered
+   * @param {String}              sublistName   name of the list to be altered
+   *                                            within the specified item.
+   * @param {Array/String/Number} newData       the id(s) for the linked data
+   *                                            to be inserted into the sublist.
+   *                                            This is automatically converted to
+   *                                            an Array if it isn't one already.
+   * @param {Number}              scroll_version_id of the key, if present the key will be automatically updated.
+   */
   addToItemSublist(key, sublistName, newData, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
+    // Wrap newData in an array if it isn't already
     newData = Array.isArray(newData) ? newData : [newData]
     if (key in this._items) {
       const updateItem = this.get(key)
       for (let i = 0, newDatum; (newDatum = newData[i]); i++) {
         if (updateItem[sublistName].indexOf(newDatum) === -1) {
           updateItem[sublistName].push(newDatum)
+        }
+      }
+      this.alterItemAtKey(key, updateItem)
+    } else {
+      throw new TypeError(`Item ${key} not found.`)
+    }
+  }
+
+  /**
+   *
+   * Some ItemList objects will have items containing id's for linked
+   * data.  This function will remove the id for one or more of those
+   * relational links from the item specified as the "key".
+   *
+   * @param {Number/String}       key           key of the record to be altered
+   * @param {String}              sublistName   name of the list to be altered
+   *                                            within the specified item.
+   * @param {Array/String/Number} newData       the id(s) for the linked data
+   *                                            to be inserted into the sublist.
+   *                                            This is automatically converted to
+   *                                            an Array if it isn't one already.
+   * @param {Number}              scroll_version_id of the key, if present the key will be automatically updated.
+   */
+  removeItemFromSublist(key, sublistName, newData, scroll_version_id = undefined) {
+    key = this._formatKey(key, scroll_version_id)
+    // Wrap newData in an array if it isn't already
+    newData = Array.isArray(newData) ? newData : [newData]
+    if (key in this._items) {
+      const updateItem = this.get(key)
+      for (let i = 0, newDatum; (newDatum = newData[i]); i++) {
+        let index = updateItem[sublistName].indexOf(newDatum)
+        if (index !== -1) {
+          updateItem[sublistName].splice(index, 1)
         }
       }
       this.alterItemAtKey(key, updateItem)
@@ -89,6 +145,24 @@ export default class ItemList {
     } else {
       throw new TypeError(`Key ${key} does not exist in items Object.`)
     }
+  }
+
+  /**
+   *
+   * This is the public access to the private function.
+   * It may be overridden by the classes that
+   * inherit this class.
+   *
+   * @param {String or Number} key of the item to be deleted.
+   * @param {Number} scroll_version_id that the item belongs to/
+   */
+  removeItem(key, scroll_version_id = undefined) {
+    key = this._formatKey(key, scroll_version_id)
+    for (let i = 0, list; (list = this.connectedLists[i]); i++) {
+      const listKey = this.get(key)[list.idKey]
+      list.removeItemFromSublist(listKey, this.listType, key)
+    }
+    this._removeItem(key, scroll_version_id)
   }
 
   get(key, scroll_version_id = undefined) {

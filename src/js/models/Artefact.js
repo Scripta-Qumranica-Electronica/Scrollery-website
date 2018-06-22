@@ -1,25 +1,12 @@
 import SvgPath from 'svgpath'
 import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG } from '~/utils/VectorFactory.js'
 
-const defaults = {
-  artefact_position_id: 0,
-  artefact_id: 0,
-  artefact_shape_id: 0,
-  name: '',
-  side: '',
-  mask: '',
-  svgInCombination: '',
-  transform_matrix: '',
-  rect: '',
-  mage_catalog_id: 0,
-  rois: [],
-}
-
 export default class Artefact {
   constructor(record = {}) {
     this.artefact_position_id = record.artefact_position_id
     this.artefact_id = record.artefact_id
     this.artefact_shape_id = record.artefact_shape_id
+    this.scroll_version_id = record.scroll_version_id
     this.name = record.name
     this.side = record.side
     this.mask = record.mask

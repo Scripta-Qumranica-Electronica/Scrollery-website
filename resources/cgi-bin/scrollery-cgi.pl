@@ -403,7 +403,8 @@ SELECT DISTINCT	SQE_image.sqe_image_id,
 				SQE_image.type AS type,
 				image_urls.url AS url,
 				image_urls.suffix AS suffix,
-				edition_catalog.edition_side
+				edition_catalog.edition_side,
+        image_catalog_id
 FROM SQE_image
 	JOIN image_urls USING(image_urls_id)
 	LEFT JOIN SQE_image_to_edition_catalog USING(sqe_image_id)

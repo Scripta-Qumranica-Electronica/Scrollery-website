@@ -64,6 +64,7 @@ describe('get image data', () => {
           assert(res.body.results && Array.isArray(res.body.results))
           for (let i = 0, item; (item = res.body.results[i]); i++) {
             assert(typeof item.sqe_image_id === 'number')
+            assert(item.image_catalog_id === image.image_catalog_id)
             assert(item.dpi > 399 && item.dpi < 8001)
             assert(item.start > 100 && item.start < 1050)
             assert(item.end > 100 && item.end < 1050)

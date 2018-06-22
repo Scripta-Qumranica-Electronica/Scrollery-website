@@ -5,6 +5,7 @@ export default class ImageReference {
     this.lvl2 = record.lvl2
     this.side = record.side
     this.image_catalog_id = record.image_catalog_id
+    this.scroll_version_id = record.scroll_version_id
     this.images = []
     this.artefacts = []
     this.rois = []

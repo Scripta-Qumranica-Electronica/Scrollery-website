@@ -1,6 +1,7 @@
 <template>
   <span class="clickable-menu-item" @click="setRouter">
-    {{column.name}} ({{column.col_id}})
+    <span>{{column.name}} ({{column.col_id}})</span>
+    <i class="fa fa-trash-o" @click="corpus.cols.removeItem(column.col_id, scrollVersionID)"></i>
   </span>
 </template>
 
@@ -10,6 +11,7 @@ export default {
     scrollVersionID: undefined,
     scrollID: undefined,
     column: {},
+    corpus: {},
   },
   methods: {
     /*

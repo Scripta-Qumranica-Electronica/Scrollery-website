@@ -5,6 +5,7 @@ export default class ROIs extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
     idKey = idKey || 'sign_char_roi_id'
     const listType = 'rois'
+    // TODO: we will have to calculate these relationships to some extent.
     const connectedLists = [corpus.combinations, corpus.artefacts, corpus.cols]
     const relativeToScrollVersion = true
     defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getRoiOfCol' }

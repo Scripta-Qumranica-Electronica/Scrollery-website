@@ -1,6 +1,6 @@
 {
     "_comment" : "This file maintains the specific version of SQE_DB_API and Data-files necessary for the current Scrollery-website version.",
-    "version": "0.1.5",
+    "version": "0.2.0-cgi_update",
     "status": "development",
     "dependencies": {
       "SQE_DB_API": "0.2.1",
