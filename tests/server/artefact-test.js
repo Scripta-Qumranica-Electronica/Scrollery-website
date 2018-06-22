@@ -165,7 +165,9 @@ describe('get artefact data', () => {
       done()
     })
   })
+})
 
+describe('manipulate artefact data', () => {
   it('should clone a scroll', done => {
     request(app)
     .post('/resources/cgi-bin/scrollery-cgi.pl')
@@ -219,7 +221,7 @@ describe('get artefact data', () => {
       try {
         assert(res.body.results && Array.isArray(res.body.results))
         for (let i = 0, item; (item = res.body.results[i]); i++) {
-          assert(item.scroll_version_id === image.scroll_version_id)
+          assert(item.scroll_version_id === scroll_version_id)
           assert(typeof item.artefact_id === 'number')
           artefact_id = item.artefact_id
         }
@@ -228,6 +230,122 @@ describe('get artefact data', () => {
         console.log(err.message)
         console.log(`The failed scroll_version_id is: ${scroll_version_id}`)
         console.log(`The failed sqe_image_id is: ${sqe_image_id}`)
+        assert(false)
+      }
+
+      done()
+    })
+  })
+
+  it('should be able to change the shape of an artefact', done => {
+    const region_in_master_image = 'POLYGON((0 0,0 60,60 60,60 0,0 0),(5 5,5 20,20 20,20 5,5 5))'
+    request(app)
+    .post('/resources/cgi-bin/scrollery-cgi.pl')
+    .send({
+      SESSION_ID: session_id,
+      scroll_version_id: scroll_version_id,
+      artefact_id: artefact_id,
+      sqe_image_id: sqe_image_id,
+      region_in_master_image: region_in_master_image,
+      transaction: 'changeArtefactShape',
+    })
+    .expect('Content-Type', /json/)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        return done(err)
+      }
+
+      try {
+        assert(res.body.results && Array.isArray(res.body.results))
+        for (let i = 0, item; (item = res.body.results[i]); i++) {
+          assert(item.scroll_version_id === scroll_version_id)
+          assert(item.artefact_id === artefact_id)
+          assert(item.region_in_master_image === region_in_master_image)
+        }
+      } catch (err) {
+        console.log(res.body)
+        console.log(err.message)
+        console.log(`The failed scroll_version_id is: ${scroll_version_id}`)
+        console.log(`The failed sqe_image_id is: ${sqe_image_id}`)
+        console.log(`The failed artefact_id is: ${artefact_id}`)
+        assert(false)
+      }
+
+      done()
+    })
+  })
+
+  it('should be able to change the position of an artefact', done => {
+    const transform_matrix = '{"matrix":[[1,0,20],[0,1,34]]}'
+    const z_index = 0
+    request(app)
+    .post('/resources/cgi-bin/scrollery-cgi.pl')
+    .send({
+      SESSION_ID: session_id,
+      scroll_version_id: scroll_version_id,
+      artefact_id: artefact_id,
+      transform_matrix: transform_matrix,
+      z_index: z_index,
+      transaction: 'changeArtefactPosition',
+    })
+    .expect('Content-Type', /json/)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        return done(err)
+      }
+
+      try {
+        assert(res.body.results && Array.isArray(res.body.results))
+        for (let i = 0, item; (item = res.body.results[i]); i++) {
+          assert(item.scroll_version_id === scroll_version_id)
+          assert(item.artefact_id === artefact_id)
+          assert(item.transform_matrix === transform_matrix)
+          assert(item.z_index === z_index)
+        }
+      } catch (err) {
+        console.log(res.body)
+        console.log(err.message)
+        console.log(`The failed scroll_version_id is: ${scroll_version_id}`)
+        console.log(`The failed artefact_id is: ${artefact_id}`)
+        assert(false)
+      }
+
+      done()
+    })
+  })
+
+  it('should be able to change the name of an artefact', done => {
+    const name = 'heavily altered artefact'
+    request(app)
+    .post('/resources/cgi-bin/scrollery-cgi.pl')
+    .send({
+      SESSION_ID: session_id,
+      scroll_version_id: scroll_version_id,
+      artefact_id: artefact_id,
+      name: name,
+      transaction: 'changeArtefactData',
+    })
+    .expect('Content-Type', /json/)
+    .expect(200)
+    .end(function(err, res) {
+      if (err) {
+        return done(err)
+      }
+
+      try {
+        assert(res.body.results && Array.isArray(res.body.results))
+        for (let i = 0, item; (item = res.body.results[i]); i++) {
+          assert(item.scroll_version_id === scroll_version_id)
+          assert(item.artefact_id === artefact_id)
+          assert(item.name === name)
+        }
+      } catch (err) {
+        console.log(res.body)
+        console.log(err.message)
+        console.log(`The failed scroll_version_id is: ${scroll_version_id}`)
+        console.log(`The failed artefact_id is: ${artefact_id}`)
         assert(false)
       }
 

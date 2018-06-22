@@ -662,24 +662,33 @@ sub removeArtefact {
   my ($cgi, $json_post) = @_;
   $cgi->set_scrollversion($json_post->{scroll_version_id});
   $cgi->remove_artefact($json_post->{artefact_id});
-  print '{"deleted":"' . $json_post->{artefact_id} . '"}';
+  print '{"' . $json_post->{artefact_id} . '":"deleted","scroll_version_id":"' . $json_post->{scroll_version_id} . '"}';
 }
 
 sub changeArtefactShape{
   my ($cgi, $json_post) = @_;
   $cgi->set_scrollversion($json_post->{scroll_version_id});
   $cgi->change_artefact_shape($json_post->{artefact_id}, $json_post->{sqe_image_id}, $json_post->{region_in_master_image});
+  print '{"' . $json_post->{artefact_id} . '":"changed shape","region_in_master_image":"' . 
+    $json_post->{region_in_master_image} . '","scroll_version_id":"' . 
+    $json_post->{scroll_version_id} . '"}';
 }
 sub changeArtefactPosition{
   my ($cgi, $json_post) = @_;
   $cgi->set_scrollversion($json_post->{scroll_version_id});
   $cgi->change_artefact_position($json_post->{artefact_id}, $json_post->{transform_matrix}, $json_post->{z_index});
+  print '{"' . $json_post->{artefact_id} . '":"changed position","position":"' . 
+    $json_post->{transform_matrix} . '","scroll_version_id":"' . 
+    $json_post->{scroll_version_id} . '"}';
 }
 
 sub changeArtefactData{
   my ($cgi, $json_post) = @_;
   $cgi->set_scrollversion($json_post->{scroll_version_id});
   $cgi->change_artefact_data($json_post->{artefact_id}, $json_post->{name});
+  print '{"' . $json_post->{artefact_id} . '":"changed name","name":"' . 
+    $json_post->{name} . '","scroll_version_id":"' . 
+    $json_post->{scroll_version_id} . '"}';
 }
 
 # sub changeArtefactPoly {
