@@ -73,7 +73,7 @@ let scroll_version_id = scrollData[getRandomArbitrary(0, scrollData.length)]
 //         console.log(`The failed scroll_version_id is: ${image.scroll_version_id}`)
 //         assert(false)
 //       }
-      
+
 //       done()
 //     })
 //   })
