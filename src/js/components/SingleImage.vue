@@ -190,8 +190,8 @@ export default {
     },
     toggleMask() {
       if (
-        this.corpus.artefacts.get(this.$route.params.artID) &&
-        this.corpus.artefacts.get(this.$route.params.artID).mask
+        this.corpus.artefacts.get(this.$route.params.artID, this.$route.params.scrollVersionID) &&
+        this.corpus.artefacts.get(this.$route.params.artID, this.$route.params.scrollVersionID).mask
       ) {
         this.clippingOn = !this.clippingOn
       }

@@ -137,6 +137,6 @@ export default {
   cursor: pointer;
 }
 i {
-  width: 10px;
+  padding: 2px;
 }
 </style>
