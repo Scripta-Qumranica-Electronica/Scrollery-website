@@ -39,6 +39,7 @@ sub processCGI {
 		newCombination => \&newCombination,
 		copyCombination => \&copyCombination,
 		nameCombination => \&nameCombination,
+    removeCombination => \&removeCombination,
     addArtefact => \&addArtefact,
     removeArtefact => \&removeArtefact,
     changeArtefactShape => \&changeArtefactShape,
@@ -639,7 +640,7 @@ MYSQL
 }
 
 sub nameCombination {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my ($cgi, $json_post) = @_;
 	my $scroll_id = $json_post->{scroll_id};
 	my $scroll_data_id = $json_post->{scroll_data_id};
 	my $version_id = $json_post->{version_id};
@@ -649,6 +650,12 @@ sub nameCombination {
 	my ($new_scroll_data_id, $error) = $cgi->dbh->change_value("scroll_data", $scroll_data_id, "name", $scroll_name);
 	handleDBError ($new_scroll_data_id, $error);
 	return;
+}
+
+sub removeCombination {
+  my ($cgi, $json_post) = @_;
+  $cgi->delete_scrollversion($json_post->{scroll_version_id});
+  print '{"' . $json_post->{scroll_version_id} . '": "deleted"}'
 }
 
 sub addArtefact {

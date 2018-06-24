@@ -27,7 +27,7 @@ export default class ItemList {
       throw new TypeError(`Expected item to be an instance of ${this.recordModel.name}.`)
     }
 
-    if (!position) {
+    if (position === undefined) {
       position = this._itemOrder.length
     } else if (position > this._itemOrder.length) {
       throw new TypeError(`Requested position exceeds length of array: ${this._itemOrder.length}.`)

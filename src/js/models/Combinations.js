@@ -45,30 +45,50 @@ export default class Combinations extends ItemList {
   }
 
   removeItem(key, scroll_version_id = undefined) {
-    /**
-     * Add axios command to remove from database.
-     * run super and all these other edits on successful
-     * completion.
-     */
-    for (let i = 0, col; (col = this.get(key).cols[i]); i++) {
-      this.corpus.cols._removeItem(col)
-    }
-    for (let i = 0, artefact; (artefact = this.get(key).artefacts[i]); i++) {
-      this.corpus.artefacts._removeItem(artefact)
-    }
-    for (let i = 0, imageReference; (imageReference = this.get(key).imageReferences[i]); i++) {
-      for (
-        let j = 0, image;
-        (image = this.corpus.imageReferences.get(imageReference).images[j]);
-        j++
-      ) {
-        this.corpus.images._removeItem(image)
+    return new Promise((resolve, reject) => {
+      const postData = {
+        transaction: 'removeCombination',
+        scroll_version_id: key,
       }
-      this.corpus.imageReferences._removeItem(imageReference)
-    }
-    for (let i = 0, roi; (roi = this.get(key).rois[i]); i++) {
-      this.corpus.rois._removeItem(roi)
-    }
-    super.removeItem(key, scroll_version_id)
+      try {
+        this.axios.post('resources/cgi-bin/scrollery-cgi.pl', postData).then(res => {
+          if (res.data && res.data[key] === 'deleted') {
+            // Delete all linked cols from corpus model.
+            for (let i = 0, col; (col = this.get(key).cols[i]); i++) {
+              this.corpus.cols._removeItem(col)
+            }
+            // Delete all linked artefacts from corpus model.
+            for (let i = 0, artefact; (artefact = this.get(key).artefacts[i]); i++) {
+              this.corpus.artefacts._removeItem(artefact)
+            }
+            // Delete all linked image references from corpus model.
+            for (
+              let i = 0, imageReference;
+              (imageReference = this.get(key).imageReferences[i]);
+              i++
+            ) {
+              // Delete all linked images from corpus model.
+              for (
+                let j = 0, image;
+                (image = this.corpus.imageReferences.get(imageReference).images[j]);
+                j++
+              ) {
+                this.corpus.images._removeItem(image)
+              }
+              this.corpus.imageReferences._removeItem(imageReference)
+            }
+            // Delete all linked ROI's from corpus model
+            for (let i = 0, roi; (roi = this.get(key).rois[i]); i++) {
+              this.corpus.rois._removeItem(roi)
+            }
+            super.removeItem(key, scroll_version_id)
+          } else {
+            reject(res)
+          }
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
   }
 }
