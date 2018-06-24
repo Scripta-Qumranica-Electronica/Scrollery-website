@@ -93,14 +93,18 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        this.corpus.cols.populate({
-          scroll_version_id: this.combination.scroll_version_id,
-          scroll_id: this.combination.scroll_id,
-        })
-        this.corpus.imageReferences.populate({
-          scroll_version_id: this.combination.scroll_version_id,
-          scroll_id: this.combination.scroll_id,
-        })
+        this.corpus.cols
+          .populate({
+            scroll_version_id: this.combination.scroll_version_id,
+            scroll_id: this.combination.scroll_id,
+          })
+          .catch(res => console.log(res))
+        this.corpus.imageReferences
+          .populate({
+            scroll_version_id: this.combination.scroll_version_id,
+            scroll_id: this.combination.scroll_id,
+          })
+          .catch(res => console.log(res))
         // this.corpus.populateColumnsOfCombination(
         //   this.combination.scroll_id,
         //   this.combination.scroll_version_id
