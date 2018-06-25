@@ -18,4 +18,12 @@ export default class ImageReferences extends ItemList {
       defaultPostData
     )
   }
+
+  populate(postData) {
+    postData = Object.assign({}, this.defaultPostData, postData)
+    if (postData.scroll_version_id === undefined) {
+      postData = Object.assign({}, postData, { transaction: 'getImages' })
+    }
+    return super.populate(postData)
+  }
 }

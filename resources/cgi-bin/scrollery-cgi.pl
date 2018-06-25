@@ -22,6 +22,7 @@ sub processCGI {
 	my %actions = (
 		validateSession => \&validateSession,
 		getCombs => \&getCombs,
+    getImages => \&getImages,
 		getArtOfComb => \&getArtOfComb,
 		getArtOfImage => \&getArtOfImage,
 		getImgOfComb => \&getImgOfComb,
@@ -179,6 +180,28 @@ MYSQL
 	return;
 }
 
+sub getImages {
+	my ($cgi, $json_post) = @_;
+	my $getImagesQuery = <<'MYSQL';
+ SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
+		image_catalog.catalog_number_2 AS lvl2,
+		image_catalog.catalog_side AS side,
+		image_catalog.institution,
+		image_catalog.image_catalog_id AS image_catalog_id,
+		SQE_image.sqe_image_id AS master_sqe_image_id
+  FROM image_catalog
+  LEFT JOIN SQE_image USING(image_catalog_id)
+  WHERE SQE_image.is_master = 1 OR SQE_image.is_master IS NULL
+  ORDER BY lvl1, lvl2, side
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getImagesQuery) or die
+			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+	$sql->execute();
+
+	readResults($sql);
+	return;
+}
+
 sub getArtOfComb {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
@@ -199,7 +222,7 @@ MYSQL
 }
 
 sub getArtOfImage {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my ($cgi, $json_post) = @_;
 	my $getArtOfImageQuery = <<'MYSQL';
 SELECT DISTINCT	artefact_position.artefact_position_id AS artefact_position_id,
 				artefact_shape.artefact_shape_id AS artefact_shape_id,
@@ -228,7 +251,7 @@ MYSQL
 		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
 	$sql->execute($json_post->{image_catalog_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 
-	readResults($sql, $key, $lastItem);
+	readResults($sql);
 	return;
 }
 
@@ -236,19 +259,20 @@ sub getImgOfComb {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
-		image_catalog.catalog_number_2 AS lvl2,
-		image_catalog.catalog_side AS side,
-		image_catalog.institution,
-		image_catalog.image_catalog_id AS image_catalog_id,
-    scroll_version.scroll_version_id AS scroll_version_id
+    image_catalog.catalog_number_2 AS lvl2,
+    image_catalog.catalog_side AS side,
+    image_catalog.institution,
+    image_catalog.image_catalog_id AS image_catalog_id,
+    scroll_version.scroll_version_id AS scroll_version_id,
+    SQE_image.sqe_image_id AS master_sqe_image_id
 FROM image_catalog
-	JOIN image_to_edition_catalog USING (image_catalog_id)
-	JOIN edition_catalog USING (edition_catalog_id)
-	JOIN SQE_image USING(image_catalog_id)
+  JOIN image_to_edition_catalog USING (image_catalog_id)
+  JOIN edition_catalog USING (edition_catalog_id)
   JOIN scroll_version_group USING(scroll_id)
   JOIN scroll_version USING(scroll_version_group_id)
+  LEFT JOIN SQE_image USING(image_catalog_id)
 WHERE scroll_version.scroll_version_id = ?
-	AND SQE_image.is_master = 1
+  AND (SQE_image.is_master = 1 OR SQE_image.is_master IS NULL)
 ORDER BY lvl1, lvl2, side
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die

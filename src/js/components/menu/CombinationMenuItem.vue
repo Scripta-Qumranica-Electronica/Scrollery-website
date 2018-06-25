@@ -13,6 +13,11 @@
       <div @click="toggleColumns">
         <i class="fa" :class="{'fa-caret-right': !showColumns, 'fa-caret-down': showColumns}"></i>
         <span>columns</span>
+        <i 
+          v-if="loadingColumns" 
+          class="fa fa-spinner fa-spin fa-fw" 
+          aria-hidden="true"
+          style="color: black"></i>
       </div>
       <ul v-show="showColumns">
         <li
@@ -29,6 +34,11 @@
       <div @click="toggleImages">
         <i class="fa" :class="{'fa-caret-right': !showImages, 'fa-caret-down': showImages}"></i>
         <span>images</span>
+        <i 
+          v-if="loadingImages" 
+          class="fa fa-spinner fa-spin fa-fw" 
+          aria-hidden="true"
+          style="color: black"></i>
       </div>
       <ul v-show="showImages">
         <div
@@ -63,7 +73,9 @@ export default {
   data() {
     return {
       open: false,
+      loadingColumns: false,
       showColumns: false,
+      loadingImages: false,
       showImages: false,
     }
   },
@@ -93,33 +105,28 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
+        this.loadingColumns = true
         this.corpus.cols
           .populate({
             scroll_version_id: this.combination.scroll_version_id,
             scroll_id: this.combination.scroll_id,
           })
-          .catch(res => console.log(res))
+          .then(res => (this.loadingColumns = false))
+          .catch(res => {
+            this.loadingColumns = false
+            console.log(res)
+          })
+        this.loadingImages = true
         this.corpus.imageReferences
           .populate({
             scroll_version_id: this.combination.scroll_version_id,
             scroll_id: this.combination.scroll_id,
           })
-          .catch(res => console.log(res))
-        // this.corpus.populateColumnsOfCombination(
-        //   this.combination.scroll_id,
-        //   this.combination.scroll_version_id
-        // )
-        // this.corpus
-        //   .populateImageReferencesOfCombination(
-        //     this.combination.scroll_id,
-        //     this.combination.scroll_version_id
-        //   )
-        //   .then(res => {
-        //     this.corpus.populateRoisOfCombination(
-        //       this.combination.scroll_id,
-        //       this.combination.scroll_version_id
-        //     )
-        //   })
+          .then(res => (this.loadingImages = false))
+          .catch(res => {
+            this.loadingImages = false
+            console.log(res)
+          })
       }
     },
 

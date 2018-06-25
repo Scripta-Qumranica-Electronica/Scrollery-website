@@ -10,10 +10,14 @@ export default class Artefact {
     this.name = record.name
     this.side = record.side
     this.mask = record.mask
-    this.svgInCombination = SvgPath(wktPolygonToSvg(record.mask, wktParseRect(record.rect)))
-      .matrix(dbMatrixToSVG(record.transform_matrix))
-      .round()
-      .toString()
+    this.svgInCombination =
+      record.mask &&
+      record.rect &&
+      record.transform_matrix &&
+      SvgPath(wktPolygonToSvg(record.mask, wktParseRect(record.rect)))
+        .matrix(dbMatrixToSVG(record.transform_matrix))
+        .round()
+        .toString()
     this.transform_matrix = record.transform_matrix
     this.rect = record.rect
     this.image_catalog_id = record.image_catalog_id

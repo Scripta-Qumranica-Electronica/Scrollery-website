@@ -190,9 +190,10 @@ export default class ItemList {
             const temporaryOrder = []
             const scroll_version_id = res.data.payload.scroll_version_id
             for (let i = 0, record; (record = res.data.results[i]); i++) {
-              const recordKey = this.relativeToScrollVersion
-                ? scroll_version_id + '-' + record[this.idKey]
-                : record[this.idKey]
+              const recordKey =
+                this.relativeToScrollVersion && scroll_version_id !== undefined
+                  ? scroll_version_id + '-' + record[this.idKey]
+                  : record[this.idKey]
               record = new this.recordModel(record)
               temporaryList[recordKey] = record
               temporaryOrder.push(recordKey)
@@ -223,7 +224,7 @@ export default class ItemList {
     for (let i = 0, list; (list = this.connectedLists[i]); i++) {
       const key = payload[list.idKey]
       const scroll_version_id = list.relativeToScrollVersion ? payload.scroll_version_id : undefined
-      list.addToItemSublist(key, this.listType, data, scroll_version_id)
+      if (key !== undefined) list.addToItemSublist(key, this.listType, data, scroll_version_id)
     }
   }
 

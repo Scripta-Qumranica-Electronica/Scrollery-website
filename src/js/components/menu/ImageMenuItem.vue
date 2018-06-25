@@ -5,6 +5,11 @@
       <span>
         {{image.institution}}: {{image.lvl1}}, {{image.lvl2}} {{image.side === 0 ? 'recto' : 'verso'}}
       </span>
+      <i 
+          v-if="loadingArtefacts" 
+          class="fa fa-spinner fa-spin fa-fw" 
+          aria-hidden="true"
+          style="color: black"></i>
     </div>
     <div class="children" v-show="open">
         <ul>
@@ -25,24 +30,22 @@
       title="Add Artefact"
       :visible.sync="dialogVisible"
       width="80vw"
-      height="80vh"
+      height="60vh"
       >
       <add-new-dialog
         :add-type="'artefacts'"
-        :initial-combination="scrollVersionID"
-        :initial-image="image.image_catalog_id"
         :corpus="corpus"></add-new-dialog>
-      <!-- <span slot="footer" class="dialog-footer">
+      <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">Cancel</el-button>
         <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
-      </span> -->
+      </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import ArtefactMenuItem from './ArtefactMenuItem.vue'
-import AddNewDialog from '~/components/AddNewDialog.vue'
+import AddNewDialog from '~/components/AddNewDialog/AddNewDialog.vue'
 
 export default {
   props: {
@@ -59,6 +62,7 @@ export default {
     return {
       open: false,
       dialogVisible: false,
+      loadingArtefacts: false,
     }
   },
   methods: {
@@ -85,20 +89,17 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
+        this.loadingArtefacts = true
         this.corpus.artefacts
           .populate({
             image_catalog_id: this.image.image_catalog_id,
             scroll_version_id: this.scrollVersionID,
           })
-          .then(res => {})
+          .then(res => (this.loadingArtefacts = false))
           .catch(err => {
+            this.loadingArtefacts = false
             console.log(err)
           })
-        // this.corpus
-        //   .populateArtefactsOfImageReference(this.image.image_catalog_id, this.scrollVersionID)
-        //   .then(res => {
-        //     this.corpus.mapRoisAndArtefactsInCombination(this.scrollVersionID)
-        //   })
       }
     },
 
