@@ -4,7 +4,10 @@
         <span>Artefacts ({{artefactReferences.length}}): {{selectedArtefact ? corpus.artefacts.get(selectedArtefact).name : ''}}</span>
     </div>
     <ul>
-      <li @click="setArtefact(-1)">None</li>
+      <li @click="createNewArtefact()">
+        <span>Create New</span>
+        <i class="fa fa-plus"></i>
+      </li>
       <li 
         v-if="selectedCombination !== undefined"
         v-for="artefact in artefactReferences"
@@ -32,6 +35,9 @@ export default {
     setArtefact(artefact) {
       this.selectedArtefact = artefact
       this.$emit('setArtefact', artefact)
+    },
+    createNewArtefact() {
+      this.$emit('createNewArtefact')
     },
   },
   computed: {

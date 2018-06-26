@@ -1,80 +1,22 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <!-- TODO move menu into its own component -->
-    <el-row class="single-image-pane-menu" :gutter="4" type="flex" justify="space-around">
-      <el-col :span="8">
-        <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple size="mini">
-          <el-option
-            v-for="image of filenames"
-            :key="'selector-' + corpus.images.get(image).filename"
-            :label="corpus.images.get(image).type | formatImageType"
-            :value="image">
-            <el-row>
-              <el-col :span="2">
-                <span class="drag-handle image-select-entry" style="float: left">☰</span>
-              </el-col>
-              <el-col :span="8">
-                <span class="image-select-entry">
-                  &nbsp;{{corpus.images.get(image).type | formatImageType}}
-                </span>
-              </el-col>
-              <el-col :span="10">
-                  <input
-                  class="image-select-entry"
-                  type="range"
-                  min="0"
-                  max="1.0"
-                  step="0.01"
-                  @input="setOpacity(image, $event.target.value)" />
-              </el-col>
-              <el-col :span="4">
-                <i class="fa fa-eye image-select-entry"
-                  :style="{color: imageSettings[image].visible ? 'green' : 'red'}"
-                  @click="toggleVisible(image)">
-                </i>
-              </el-col>
-            </el-row>
-          </el-option>
-        </el-select>
-      </el-col>
-      <el-col :span="2">
-        <el-slider
-          v-model="zoom"
-          :min="0.1"
-          :step="0.01"
-          :max="1.0"
-          :format-tooltip="formatTooltip">
-        </el-slider>
-      </el-col>
-      <el-col v-show="artefact && artefact !== 'new'"  :span="5">
-        <el-radio-group v-model="viewMode" size="mini">
-          <el-radio-button label="ROI">{{$i18n.str('ROI')}}</el-radio-button>
-          <el-radio-button label="ART">{{$i18n.str('ART')}}</el-radio-button>
-        </el-radio-group>
-      </el-col>
-      <el-col v-show="artefact || artefact === 'new'"  :span="3">
-        <el-button @click="toggleMask" size="mini">Mask</el-button>
-      </el-col>
-      <el-col v-show="viewMode === 'ROI' && artefact" :span="3">
-        <el-button @click="delSelectedRoi" size="mini">Del ROI</el-button>
-      </el-col>
-      <el-col v-show="viewMode === 'ART' && (artefact || artefact === 'new')" :span="3">
-        <el-button
-                @click="toggleDrawingMode"
-                :type="drawingMode === 'draw' ? 'primary' : 'warning'"
-                size="mini">
-          {{drawingMode === 'draw' ? 'Draw' : 'Erase'}}
-        </el-button>
-      </el-col>
-      <el-col v-show="viewMode === 'ART' && (artefact || artefact === 'new')" :span="3">
-        <el-slider
-          v-model="brushCursorSize"
-          :min="0"
-          :max="200"
-          :step="1">
-        </el-slider>
-      </el-col>
-    </el-row>
+    <image-menu
+      :corpus="corpus"
+      :images="filenames"
+      :imageSettings="imageSettings"
+      :artefact="artefact"
+      :zoom="zoom"
+      :viewMode="viewMode"
+      :brushCursorSize="brushCursorSize"
+      v-on:opacity="setOpacity"
+      v-on:changeBrushSize="changeBrushSize"
+      v-on:visible="toggleVisible"
+      v-on:drawingMode="toggleDrawingMode"
+      v-on:toggleMask="toggleMask"
+      v-on:delSelectedRoi="delSelectedRoi"
+      v-on:changeViewMode="changeViewMode"
+      v-on:changeZoom="changeZoom">
+    </image-menu>
     <div style="{width: 100%; height: calc(100% - 30px); overflow: auto; position: relative;}">
       <roi-canvas class="overlay-image"
                   :width="masterImage.width ? masterImage.width : 0"
@@ -110,6 +52,7 @@
 </template>
 
 <script>
+import ImageMenu from './ImageMenu.vue'
 import RoiCanvas from './RoiCanvas.vue'
 import ArtefactCanvas from './ArtefactCanvas.vue'
 import { wktPolygonToSvg, svgPolygonToWKT } from '../utils/VectorFactory'
@@ -122,6 +65,7 @@ export default {
     },
   },
   components: {
+    'image-menu': ImageMenu,
     'roi-canvas': RoiCanvas,
     'artefact-canvas': ArtefactCanvas,
   },
@@ -180,6 +124,9 @@ export default {
               console.log(err)
             })
         })
+        .catch(err => {
+          console.log(err)
+        })
     },
     setClipMask(svgMask) {
       this.corpus.artefacts.updateArtefactShape(
@@ -210,6 +157,15 @@ export default {
     },
     toggleDrawingMode() {
       this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
+    },
+    changeBrushSize(value) {
+      this.brushCursorSize = value
+    },
+    changeViewMode(value) {
+      this.viewMode = value
+    },
+    changeZoom(value) {
+      this.zoom = value
     },
   },
   watch: {
@@ -264,32 +220,14 @@ export default {
       return formattedString
     },
   },
+  created() {
+    this.brushCursorSize = 20
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 @import '~sass-vars';
-
-.single-image-pane-menu {
-  width: 100%;
-  height: 32px; // Should be 30px, but 32px looks better
-  max-height: 32px; // Should be 30px, but 32px looks better
-  background: #dedede;
-  margin-left: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
-  margin-right: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
-}
-.fileSelector {
-  border-radius: 15px;
-  background: #e1e1d0;
-  padding: 10px;
-  z-index: 10;
-}
-.image-select-box > .image-select-entry {
-  padding: 5px;
-}
-.image-select-entry {
-  width: 100%;
-}
 .overlay-image {
   position: absolute;
   top: 0;

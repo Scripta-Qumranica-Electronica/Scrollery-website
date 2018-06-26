@@ -17,7 +17,8 @@
             :selected-combination="selectedCombination"
             :selected-image-reference="selectedImageReference"
             :corpus="corpus"
-            v-on:setArtefact="setArtefact"/>
+            v-on:setArtefact="setArtefact"
+            v-on:createNewArtefact="createNewArtefact"/>
         </div>
         <div class="add-dialog-menu-listings">
             <!-- <ul>
@@ -35,9 +36,12 @@
     </div>
     <!-- TODO add code to display the selected data -->
     <div class="add-new-display">
-        <div>
-
-        </div>
+        <add-new-dialog-image
+          v-if="selectedArtefact || selectedImageReference"
+          :image-reference="selectedImageReference"
+          :artefact="selectedArtefact"
+          :corpus="corpus"
+        />
         <!-- <svg v-if="images || artefacts">
 
         </svg> -->
@@ -46,11 +50,13 @@
 </template>
 
 <script>
+import AddNewDialogImage from './AddNewDialogImage.vue'
 import AddNewCombinationMenu from './AddNewCombinationMenu.vue'
 import AddNewImageReferenceMenu from './AddNewImageReferenceMenu.vue'
 import AddNewArtefactMenu from './AddNewArtefactMenu.vue'
 export default {
   components: {
+    addNewDialogImage: AddNewDialogImage,
     addNewCombinationMenu: AddNewCombinationMenu,
     addNewImageReferenceMenu: AddNewImageReferenceMenu,
     addNewArtefactMenu: AddNewArtefactMenu,
@@ -63,6 +69,7 @@ export default {
     return {
       selectedCombination: undefined,
       selectedImageReference: undefined,
+      selectedArtefact: undefined,
     }
   },
   methods: {
@@ -71,52 +78,51 @@ export default {
       this.selectedImageReference = undefined
       const payload =
         this.selectedCombination >= 0 ? { scroll_version_id: this.selectedCombination } : {}
-      this.corpus.imageReferences.populate(payload)
-      this.corpus.artefacts.populate({
-        transaction: 'getArtOfComb',
-        scroll_version_id: this.selectedCombination,
+      this.corpus.imageReferences.populate(payload).catch(err => {
+        console.log(err)
       })
+      this.corpus.artefacts
+        .populate({
+          transaction: 'getArtOfComb',
+          scroll_version_id: this.selectedCombination,
+        })
+        .catch(err => {
+          console.log(err)
+        })
     },
     setImageReference(imageReference) {
-      this.selectedImageReference = imageReference
-      if (this.selectedCombination) {
-        this.corpus.artefacts.populate({
-          scroll_version_id: this.selectedCombination,
-          image_catalog_id: this.selectedImageReference,
-        })
+      if (imageReference && this.selectedCombination) {
+        this.corpus.images
+          .populate({
+            scroll_version_id: this.selectedCombination,
+            image_catalog_id: imageReference,
+          })
+          .then(res => {
+            this.selectedImageReference = imageReference
+          })
+          .catch(err => {
+            console.log(err)
+          })
+        this.corpus.artefacts
+          .populate({
+            scroll_version_id: this.selectedCombination,
+            image_catalog_id: this.selectedImageReference,
+          })
+          .catch(err => {
+            console.log(err)
+          })
       }
     },
     setArtefact(artefact) {
-      console.log(artefact)
+      this.selectedArtefact = artefact
     },
+    createNewArtefact() {},
   },
-  // watch: {
-  //   selectedCombination(to, from) {
-  //     if (to !== from) {
-  //       const postData = to === -1 ? {} : {scroll_version_id: to}
-  //       this.corpus.imageReferences.populate(postData)
-  //         // .then(res => {
-  //         //   this.selectedImage = this.corpus.combinations.get(to).images[0] || undefined
-  //         // })
-  //       // this.corpus.artefacts.
-  //     }
-  //   },
-  //   selectedImage(to, from) {
-  //     if (to !== from) {
-  //       this.corpus.artefacts.populate({scroll_version_id: this.selectedCombination, image_catalog_id: to})
-  //     }
-  //   },
-  // },
 }
 </script>
 
 <style lang="scss" scoped>
 @import '~sass-vars';
-.add-new-dialog {
-  height: 70vh;
-  min-height: 70vh;
-  max-height: 70vh;
-}
 .add-new-menu {
   width: 20%;
   min-width: 20%;
@@ -140,6 +146,7 @@ export default {
   min-height: 65vh;
   background: gray;
   margin-left: 20%;
+  overflow: auto;
 }
 
 .add-new-menu-select-item {

@@ -2,13 +2,13 @@
   <div>
     <div @click="show = !show">
         <i class="fa" :class="{'fa-caret-right': !show, 'fa-caret-down': show}"></i>
-        <span>Images:</span>
+        <span>Images ({{imageReferences.length}}): {{corpus.imageReferences.get(selectedImageReference) | label}}</span>
     </div>
     <ul v-show="show">
-      <li @click="setImageReference(-1)" >None</li>
+      <!-- <li @click="setImageReference(-1)" >None</li> -->
       <li 
         v-if="selectedCombination !== undefined"
-        v-for="imageReference in selectedCombination >= 0 ? corpus.combinations.get(selectedCombination).imageReferences : corpus.imageReferences.keys()" 
+        v-for="imageReference in imageReferences" 
         :key="'add-new-menu-image-' + imageReference"
         @click="setImageReference(imageReference)">
         {{corpus.imageReferences.get(imageReference) | label}}
@@ -32,18 +32,29 @@ export default {
     return {
       show: false,
       queryString: '',
+      selectedImageReference: undefined,
     }
   },
   methods: {
     setImageReference(imageReference) {
+      this.selectedImageReference = imageReference
       this.$emit('setImageReference', imageReference)
+    },
+  },
+  computed: {
+    imageReferences() {
+      return this.selectedCombination >= 0
+        ? this.corpus.combinations.get(this.selectedCombination).imageReferences
+        : this.corpus.imageReferences.keys()
     },
   },
   filters: {
     label(imageReference) {
-      return `${imageReference.institution}: ${imageReference.lvl1}/${imageReference.lvl2} ${
-        imageReference.side === 0 ? 'R' : 'V'
-      }`
+      return imageReference
+        ? `${imageReference.institution}: ${imageReference.lvl1}/${imageReference.lvl2} ${
+            imageReference.side === 0 ? 'R' : 'V'
+          }`
+        : ''
     },
   },
 }
