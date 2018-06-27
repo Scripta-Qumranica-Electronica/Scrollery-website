@@ -16,16 +16,6 @@
         <span slot="icon"><i class="fa fa-hashtag"></i></span>
         <div slot="body">
           <div>
-            <!-- These two buttons switch the listing mode to display either QWB -->
-            <!-- cataloguing according to the DJD text editions, or the institutional -->
-            <!-- cataloguing of the images.  Is there better terminology than -->
-            <!-- Text/Image that would make this referencing distinction more clear? -->
-            <!-- <el-radio-group v-model="menuDisplay" size="mini">
-              <el-radio-button label="image">{{$i18n.str('Image')}}</el-radio-button>
-              <el-radio-button label="text">{{$i18n.str('Text')}}</el-radio-button>
-            </el-radio-group> -->
-          </div>
-          <div>
             <el-input class="searchBox" autosize placeholder="Enter search string" v-model="queryString"></el-input>
           </div>
           <div>
@@ -102,6 +92,7 @@
   min-height: 70vh;
   overflow: auto;
   text-align: left;
+  user-select: none;
 }
 
 #side-menu,

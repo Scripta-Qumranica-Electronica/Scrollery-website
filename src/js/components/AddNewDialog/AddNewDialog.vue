@@ -174,6 +174,7 @@ export default {
 }
 .add-dialog-select {
   height: 60px;
+  user-select: none;
 }
 .add-dialog-menu-listings {
   overflow: auto;
