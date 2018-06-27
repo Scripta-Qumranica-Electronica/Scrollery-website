@@ -20,28 +20,34 @@
             v-on:setArtefact="setArtefact"
             v-on:createNewArtefact="createNewArtefact"/>
         </div>
-        <div class="add-dialog-menu-listings">
-            <!-- <ul>
-                <li 
-                    v-if="addType === 'artefacts' && selectedImage >= 0" 
-                    v-for="artefact in selectedImage ? corpus.imageReferences.get(selectedImage).artefacts : corpus.combinations.get(selectedCombination).artefacts"
-                    :key="'addmenu-artefact-' + selectedCombination + '-' + artefact">{{corpus.artefacts.get(artefact).name}}</li>
-                <li 
-                    v-if="addType === 'columns' && selectedCombination >= 0"
-                    v-for="column in columns"
-                    :key="column.id">{{column.name}}
-                </li>
-            </ul> -->
-        </div>
     </div>
-    <!-- TODO add code to display the selected data -->
+    <!-- TODO add more code to display the selected data -->
     <div class="add-new-display">
-        <add-new-dialog-image
-          v-if="selectedArtefact || selectedImageReference"
-          :image-reference="selectedImageReference"
-          :artefact="selectedArtefact"
-          :corpus="corpus"
-        />
+      <image-menu
+        :corpus="corpus"
+        :images="filenames"
+        :imageSettings="imageSettings"
+        :artefact="artefact"
+        :zoom="zoom"
+        :viewMode="viewMode"
+        :artefact-editable="false"
+        :roi-editable="false"
+        :brushCursorSize="brushCursorSize"
+        v-on:opacity="setOpacity"
+        v-on:changeBrushSize="changeBrushSize"
+        v-on:visible="toggleVisible"
+        v-on:drawingMode="toggleDrawingMode"
+        v-on:toggleMask="toggleMask"
+        v-on:delSelectedRoi="delSelectedRoi"
+        v-on:changeViewMode="changeViewMode"
+        v-on:changeZoom="changeZoom">
+      </image-menu>
+      <add-new-dialog-image
+        v-if="selectedArtefact || selectedImageReference"
+        :image-reference="selectedImageReference"
+        :artefact="selectedArtefact"
+        :corpus="corpus">
+      </add-new-dialog-image>
         <!-- <svg v-if="images || artefacts">
 
         </svg> -->
@@ -54,12 +60,14 @@ import AddNewDialogImage from './AddNewDialogImage.vue'
 import AddNewCombinationMenu from './AddNewCombinationMenu.vue'
 import AddNewImageReferenceMenu from './AddNewImageReferenceMenu.vue'
 import AddNewArtefactMenu from './AddNewArtefactMenu.vue'
+import ImageMenu from '~/components/ImageMenu.vue'
 export default {
   components: {
     addNewDialogImage: AddNewDialogImage,
     addNewCombinationMenu: AddNewCombinationMenu,
     addNewImageReferenceMenu: AddNewImageReferenceMenu,
     addNewArtefactMenu: AddNewArtefactMenu,
+    imageMenu: ImageMenu,
   },
   props: {
     addType: undefined,

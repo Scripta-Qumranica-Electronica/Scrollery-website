@@ -1,7 +1,7 @@
 'use strict'
 
 import { mount } from '@test'
-import AddNewDialog from '~/components/AddNewDialog.vue'
+import AddNewDialog from '~/components/AddNewDialog/AddNewDialog.vue'
 
 describe('AddNewDialog', function() {
   let wrapper, vm

@@ -7,6 +7,8 @@
       :artefact="artefact"
       :zoom="zoom"
       :viewMode="viewMode"
+      :artefact-editable="true"
+      :roi-editable="false"
       :brushCursorSize="brushCursorSize"
       v-on:opacity="setOpacity"
       v-on:changeBrushSize="changeBrushSize"

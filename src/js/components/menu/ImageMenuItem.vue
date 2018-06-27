@@ -5,11 +5,16 @@
       <span>
         {{image.institution}}: {{image.lvl1}}, {{image.lvl2}} {{image.side === 0 ? 'recto' : 'verso'}}
       </span>
+      <i class="fa" 
+        :class="{
+          'fa-check-circle-o': image.master_sqe_image_id !== undefined, 
+          'fa-exclamation-circle': image.master_sqe_image_id === undefined
+          }"></i>
       <i 
-          v-if="loadingArtefacts" 
-          class="fa fa-spinner fa-spin fa-fw" 
-          aria-hidden="true"
-          style="color: black"></i>
+        v-if="loadingArtefacts" 
+        class="fa fa-spinner fa-spin fa-fw" 
+        aria-hidden="true"
+        style="color: black"></i>
     </div>
     <div class="children" v-show="open">
         <ul>
