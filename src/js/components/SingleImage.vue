@@ -154,9 +154,6 @@ export default {
     toggleVisible(idx) {
       this.$set(this.imageSettings[idx], 'visible', !this.imageSettings[idx].visible)
     },
-    formatTooltip() {
-      return (this.zoom * 100).toFixed(2) + '%'
-    },
     toggleDrawingMode() {
       this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
     },

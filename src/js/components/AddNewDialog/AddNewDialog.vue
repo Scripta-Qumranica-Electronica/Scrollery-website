@@ -23,29 +23,11 @@
     </div>
     <!-- TODO add more code to display the selected data -->
     <div class="add-new-display">
-      <image-menu
-        :corpus="corpus"
-        :images="filenames"
-        :imageSettings="imageSettings"
-        :artefact="artefact"
-        :zoom="zoom"
-        :viewMode="viewMode"
-        :artefact-editable="false"
-        :roi-editable="false"
-        :brushCursorSize="brushCursorSize"
-        v-on:opacity="setOpacity"
-        v-on:changeBrushSize="changeBrushSize"
-        v-on:visible="toggleVisible"
-        v-on:drawingMode="toggleDrawingMode"
-        v-on:toggleMask="toggleMask"
-        v-on:delSelectedRoi="delSelectedRoi"
-        v-on:changeViewMode="changeViewMode"
-        v-on:changeZoom="changeZoom">
-      </image-menu>
       <add-new-dialog-image
         v-if="selectedArtefact || selectedImageReference"
         :image-reference="selectedImageReference"
         :artefact="selectedArtefact"
+        :scrollVersionId="selectedCombination"
         :corpus="corpus">
       </add-new-dialog-image>
         <!-- <svg v-if="images || artefacts">
@@ -60,14 +42,12 @@ import AddNewDialogImage from './AddNewDialogImage.vue'
 import AddNewCombinationMenu from './AddNewCombinationMenu.vue'
 import AddNewImageReferenceMenu from './AddNewImageReferenceMenu.vue'
 import AddNewArtefactMenu from './AddNewArtefactMenu.vue'
-import ImageMenu from '~/components/ImageMenu.vue'
 export default {
   components: {
     addNewDialogImage: AddNewDialogImage,
     addNewCombinationMenu: AddNewCombinationMenu,
     addNewImageReferenceMenu: AddNewImageReferenceMenu,
     addNewArtefactMenu: AddNewArtefactMenu,
-    imageMenu: ImageMenu,
   },
   props: {
     addType: undefined,
