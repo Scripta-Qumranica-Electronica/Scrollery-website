@@ -13,7 +13,7 @@
       <clipPath id="Full-clipping-outline">
         <use stroke="none" fill="black" fill-rule="evenodd" href="#Full-clip-path"></use>
       </clipPath>
-      <path id="Clip-path" v-if="clippingMask" :d="clippingMask | wktToSvg" :transform="`scale(${scale})`"></path>
+      <path id="Clip-path" v-if="clippingMask" :d="svgMask" :transform="`scale(${scale})`"></path>
       <clipPath id="Clipping-outline">
         <use stroke="none" fill="black" fill-rule="evenodd" href="#Clip-path"></use>
       </clipPath>
@@ -125,10 +125,8 @@ export default {
     fullImageMask() {
       return `M0 0L${this.width} 0L${this.width} ${this.height}L0 ${this.height}`
     },
-  },
-  filters: {
-    wktToSvg(value) {
-      return wktPolygonToSvg(value)
+    svgMask() {
+      return wktPolygonToSvg(this.clippingMask)
     },
   },
   methods: {

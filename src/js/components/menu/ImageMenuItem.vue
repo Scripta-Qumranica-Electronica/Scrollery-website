@@ -32,7 +32,7 @@
     </div>
 
     <el-dialog
-      title="Add Artefact"
+      :title="`Add Artefact`"
       :visible.sync="dialogVisible"
       width="80vw"
       height="60vh"

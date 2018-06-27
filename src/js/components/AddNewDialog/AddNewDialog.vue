@@ -21,7 +21,7 @@
             v-on:createNewArtefact="createNewArtefact"/>
         </div>
     </div>
-    <!-- TODO add more code to display the selected data -->
+    <!-- TODO add code to display selected columns -->
     <div class="add-new-display">
       <add-new-dialog-image
         v-if="selectedArtefact || selectedImageReference"
@@ -30,9 +30,6 @@
         :scrollVersionId="selectedCombination"
         :corpus="corpus">
       </add-new-dialog-image>
-        <!-- <svg v-if="images || artefacts">
-
-        </svg> -->
     </div>
   </div>
 </template>
@@ -66,43 +63,97 @@ export default {
       this.selectedImageReference = undefined
       const payload =
         this.selectedCombination >= 0 ? { scroll_version_id: this.selectedCombination } : {}
-      this.corpus.imageReferences.populate(payload).catch(err => {
-        console.log(err)
-      })
+      this.$store.commit('addWorking')
+      this.corpus.imageReferences
+        .populate(payload)
+        .then(res => {
+          this.$store.commit('delWorking')
+        })
+        .catch(err => {
+          this.$store.commit('delWorking')
+          console.log(err)
+        })
+
+      this.$store.commit('addWorking')
       this.corpus.artefacts
         .populate({
           transaction: 'getArtOfComb',
           scroll_version_id: this.selectedCombination,
         })
+        .then(res => {
+          this.$store.commit('delWorking')
+        })
         .catch(err => {
+          this.$store.commit('delWorking')
           console.log(err)
         })
     },
     setImageReference(imageReference) {
+      this.selectedArtefact = undefined
+      this.$store.commit('addWorking')
       if (imageReference && this.selectedCombination) {
+        this.corpus.artefacts
+          .populate({
+            scroll_version_id: this.selectedCombination,
+            image_catalog_id: this.selectedImageReference,
+          })
+          .then(res => {
+            this.$store.commit('delWorking')
+            this.selectedImageReference = undefined
+            this.selectedImageReference = imageReference
+          })
+          .catch(err => {
+            this.$store.commit('delWorking')
+            console.log(err)
+          })
+
+        this.$store.commit('addWorking')
         this.corpus.images
           .populate({
             scroll_version_id: this.selectedCombination,
             image_catalog_id: imageReference,
           })
           .then(res => {
+            this.$store.commit('delWorking')
+            this.selectedImageReference = undefined
             this.selectedImageReference = imageReference
           })
           .catch(err => {
-            console.log(err)
-          })
-        this.corpus.artefacts
-          .populate({
-            scroll_version_id: this.selectedCombination,
-            image_catalog_id: this.selectedImageReference,
-          })
-          .catch(err => {
+            this.$store.commit('delWorking')
             console.log(err)
           })
       }
     },
     setArtefact(artefact) {
-      this.selectedArtefact = artefact
+      const newImageReference = this.corpus.artefacts.get(artefact).image_catalog_id
+      this.$store.commit('addWorking')
+      this.corpus.images
+        .populate({
+          image_catalog_id: newImageReference,
+        })
+        .then(res => {
+          this.$store.commit('delWorking')
+          this.selectedImageReference = newImageReference
+        })
+        .catch(err => {
+          this.$store.commit('delWorking')
+          console.log(err)
+        })
+
+      this.$store.commit('addWorking')
+      this.corpus.artefacts
+        .populate({
+          scroll_version_id: this.selectedCombination,
+          image_catalog_id: newImageReference,
+        })
+        .then(res => {
+          this.$store.commit('delWorking')
+          this.selectedArtefact = artefact
+        })
+        .catch(err => {
+          this.$store.commit('delWorking')
+          console.log(err)
+        })
     },
     createNewArtefact() {},
   },

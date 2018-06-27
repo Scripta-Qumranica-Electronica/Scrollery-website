@@ -5,7 +5,6 @@
         <span>Images ({{imageReferences.length}}): {{corpus.imageReferences.get(selectedImageReference) | label}}</span>
     </div>
     <ul v-show="show">
-      <!-- <li @click="setImageReference(-1)" >None</li> -->
       <li 
         v-if="selectedCombination !== undefined"
         v-for="imageReference in imageReferences" 

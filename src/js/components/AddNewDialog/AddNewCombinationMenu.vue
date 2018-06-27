@@ -3,6 +3,11 @@
     <div @click="show = !show">
         <i class="fa" :class="{'fa-caret-right': !show, 'fa-caret-down': show}"></i>
         <span>Combinations:</span>
+        <i 
+          v-show="working > 0" 
+          class="fa fa-spinner fa-spin fa-fw" 
+          aria-hidden="true"
+          style="color: white"></i>
     </div>
     <div v-show="show">
       <el-input size="mini" class="searchBox" autosize placeholder="Enter search string" v-model="queryString"/>
@@ -22,6 +27,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   props: {
     corpus: undefined,
@@ -31,6 +37,9 @@ export default {
       show: true,
       queryString: '',
     }
+  },
+  computed: {
+    ...mapGetters(['working']),
   },
   methods: {
     setCombination(combination) {

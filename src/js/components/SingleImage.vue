@@ -123,10 +123,12 @@ export default {
               this.$store.commit('delWorking')
             })
             .catch(err => {
+              this.$store.commit('delWorking')
               console.log(err)
             })
         })
         .catch(err => {
+          this.$store.commit('delWorking')
           console.log(err)
         })
     },

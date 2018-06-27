@@ -207,10 +207,16 @@ sub getArtOfComb {
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT artefact.artefact_id AS artefact_id,
   artefact_data.name,
-  artefact_data_owner.scroll_version_id
+  artefact_data_owner.scroll_version_id,
+  SQE_image.image_catalog_id AS image_catalog_id,
+  image_catalog.catalog_side AS catalog_side
 FROM artefact
 	JOIN artefact_data USING(artefact_id)
   JOIN artefact_data_owner USING(artefact_data_id)
+  JOIN artefact_shape USING(artefact_id)
+  JOIN artefact_shape_owner USING(artefact_shape_id)
+  JOIN SQE_image ON SQE_image.sqe_image_id = artefact_shape.id_of_sqe_image
+  JOIN image_catalog USING(image_catalog_id)
 WHERE artefact_data_owner.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die

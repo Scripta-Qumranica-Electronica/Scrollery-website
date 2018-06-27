@@ -4,7 +4,9 @@
         <span>Artefacts ({{artefactReferences.length}}): {{selectedArtefact ? corpus.artefacts.get(selectedArtefact).name : ''}}</span>
     </div>
     <ul>
-      <li @click="createNewArtefact()">
+      <li 
+        v-show="selectedCombination !== undefined && selectedImageReference !== undefined" 
+        @click="createNewArtefact()">
         <span>Create New</span>
         <i class="fa fa-plus"></i>
       </li>
@@ -13,7 +15,7 @@
         v-for="artefact in artefactReferences"
         :key="'add-new-menu-artefact-' + artefact"
         @click="setArtefact(artefact)">
-        {{corpus.artefacts.get(artefact).name}}
+        {{corpus.artefacts.get(artefact) | label}}
       </li>
     </ul>
   </div>
@@ -47,6 +49,11 @@ export default {
         : this.selectedCombination >= 0
           ? this.corpus.combinations.get(this.selectedCombination).artefacts
           : []
+    },
+  },
+  filters: {
+    label(artefact) {
+      return artefact ? `${artefact.name} - ${artefact.catalog_side ? 'V' : 'R'}` : ''
     },
   },
 }

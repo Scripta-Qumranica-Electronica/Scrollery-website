@@ -3,7 +3,6 @@
     class="single-image-pane-menu" 
     :gutter="1" 
     type="flex" 
-    justify="space-around"
     align="middle">
     <el-col :span="5">
       <el-select 
@@ -36,7 +35,7 @@
               type="range"
               min="0"
               max="1.0"
-              step="0.01"
+              step="0.001"
               @input="setOpacity(image, $event.target.value)"/>
             </el-col>
             <el-col :span="4">
@@ -56,6 +55,7 @@
     </el-col>
     <el-col :span="4">
       <el-slider
+        class="image-zoom"
         v-model="changeZoom"
         :min="0.1"
         :step="0.01"
@@ -208,6 +208,10 @@ export default {
 }
 .label {
   font-size: small;
+}
+.image-zoom {
+  padding-left: 20px;
+  padding-right: 20px;
 }
 i {
   padding-left: 6px;
