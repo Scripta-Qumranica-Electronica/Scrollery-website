@@ -4,16 +4,18 @@
         <div class="add-dialog-select">
           <add-new-combination-menu
             class="add-new-menu-select-item"
+            :selectedCombination="selectedCombination"
             :corpus="corpus"
             v-on:setCombination="setCombination"/>
           <add-new-image-reference-menu
             class="add-new-menu-select-item"
             :selected-combination="selectedCombination"
+            :selectedImageReference="selectedImageReference"
             :corpus="corpus"
             v-on:setImageReference="setImageReference"/>
           <add-new-artefact-menu
             v-if="addType === 'artefacts' && (selectedCombination || selectedImageReference)"
-            class="add-new-menu-select-item"
+            class="add-new-artefact-menu-select-item"
             :selected-combination="selectedCombination"
             :selected-image-reference="selectedImageReference"
             :corpus="corpus"
@@ -187,8 +189,10 @@ export default {
   margin-left: 20%;
   overflow: auto;
 }
-
 .add-new-menu-select-item {
   height: 20vh;
+}
+.add-new-artefact-menu-select-item {
+  height: 25vh;
 }
 </style>

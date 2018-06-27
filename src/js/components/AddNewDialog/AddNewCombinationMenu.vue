@@ -19,7 +19,8 @@
                   .toLowerCase().indexOf(queryString.toLowerCase()) !== -1"
         v-for="combination in corpus.combinations.keys()" 
         :key="'add-new-menu-combination-' + combination"
-        @click="setCombination(combination)">
+        @click="setCombination(combination)"
+        :style="{background: selectedCombination === combination ? 'lightblue' : '#222f5b'}">
         {{label(combination)}}
       </li>
     </ul>
@@ -30,6 +31,7 @@
 import { mapGetters } from 'vuex'
 export default {
   props: {
+    selectedCombination: undefined,
     corpus: undefined,
   },
   data() {
@@ -56,7 +58,7 @@ export default {
 
 <style lang="scss" scoped>
 ul {
-  max-height: 60%;
+  max-height: 12vh;
   overflow-y: auto;
   overflow-x: hidden;
 }

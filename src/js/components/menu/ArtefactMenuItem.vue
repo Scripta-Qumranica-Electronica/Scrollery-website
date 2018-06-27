@@ -1,8 +1,10 @@
 <template>
-  <span class="clickable-menu-item" @click="setRouter">
-    <span>Artefact: {{artefact.name}}</span>
-    <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="corpus.artefacts.removeItem(artefact.artefact_id, scrollVersionID)"></i>
-  </span>
+  <div>
+    <span class="clickable-menu-item" @click="setRouter" :style="{background: $route.params.artID === artefact.artefact_id ? 'lightblue' : '#dedede'}">
+      <span>Artefact: {{artefact.name}}</span>
+      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="corpus.artefacts.removeItem(artefact.artefact_id, scrollVersionID)"></i>
+    </span>
+  </div>
 </template>
 
 <script>

@@ -1,15 +1,18 @@
 <template>
   <div>
-    <span class="clickable-menu-item" @click="selectCombination">{{combination.name}}{{combination.user_id !== 1 ? ` - ${username}` : ' - default'}}</span>
-    <i 
-      class="fa" 
-      :class="{'fa-lock': combination.locked, 'fa-unlock': !combination.locked}" 
-      :style="{color: combination.locked ? 'red' : 'green'}"
-      @click="lockScroll"></i>
-    <i class="fa fa-clone" @click="corpus.combinations.cloneScroll(combination.scroll_version_id)"></i>
-    <i v-if="!combination.locked" class="fa fa-trash-o" @click="corpus.combinations.removeItem(combination.scroll_version_id)"></i>
+    <div :style="{background: $route.params.scrollVersionID === combination.scroll_version_id ? 'lightblue' : '#dedede'}">
+      <span class="clickable-menu-item" @click="selectCombination">{{combination.name}}{{combination.user_id !== 1 ? ` - ${username}` : ' - default'}}</span>
+      <i 
+        class="fa" 
+        :class="{'fa-lock': combination.locked, 'fa-unlock': !combination.locked}" 
+        :style="{color: combination.locked ? 'red' : 'green'}"
+        @click="lockScroll"></i>
+      <i class="fa fa-clone" @click="corpus.combinations.cloneScroll(combination.scroll_version_id)"></i>
+      <i v-if="!combination.locked" class="fa fa-trash-o" @click="corpus.combinations.removeItem(combination.scroll_version_id)"></i>
+    </div>
     <!-- Use v-if here so we don't waste space on the DOM -->
     <div class="children" v-if="open">
+      <li v-if="combination.locked === 0" @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
       <div @click="toggleColumns">
         <i class="fa" :class="{'fa-caret-right': !showColumns, 'fa-caret-down': showColumns}"></i>
         <span>columns</span>
@@ -53,6 +56,20 @@
         </div>
       </ul>
     </div>
+
+    <el-dialog
+      :title="addType"
+      :visible.sync="dialogVisible"
+      width="80vw"
+      height="60vh"
+      >
+      <add-new-dialog
+        :add-type="'artefacts'"
+        :corpus="corpus"></add-new-dialog>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">Done</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -60,6 +77,7 @@
 import { mapGetters } from 'vuex'
 import ColumnMenuItem from './ColumnMenuItem.vue'
 import ImageMenuItem from './ImageMenuItem.vue'
+import AddNewDialog from '~/components/AddNewDialog/AddNewDialog.vue'
 
 export default {
   props: {
@@ -67,6 +85,7 @@ export default {
     corpus: {},
   },
   components: {
+    'add-new-dialog': AddNewDialog,
     'column-menu-item': ColumnMenuItem,
     'image-menu-item': ImageMenuItem,
   },
@@ -77,6 +96,8 @@ export default {
       showColumns: false,
       loadingImages: false,
       showImages: false,
+      addType: '',
+      dialogVisible: false,
     }
   },
   computed: {
@@ -139,6 +160,13 @@ export default {
     },
 
     lockScroll() {},
+
+    addArtefact() {
+      this.addType = `Add new artefact to combination: ${this.combination.name} (v. ${
+        this.combination.scroll_version_id
+      })`
+      this.dialogVisible = true
+    },
   },
 }
 </script>

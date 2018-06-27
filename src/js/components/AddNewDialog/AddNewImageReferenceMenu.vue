@@ -9,7 +9,8 @@
         v-if="selectedCombination !== undefined"
         v-for="imageReference in imageReferences" 
         :key="'add-new-menu-image-' + imageReference"
-        @click="setImageReference(imageReference)">
+        @click="setImageReference(imageReference)"
+        :style="{background: selectedImageReference === imageReference ? 'lightblue' : '#222f5b'}">
         {{corpus.imageReferences.get(imageReference) | label}}
         <i class="fa" 
           :class="{
@@ -25,18 +26,17 @@
 export default {
   props: {
     selectedCombination: undefined,
+    selectedImageReference: undefined,
     corpus: undefined,
   },
   data() {
     return {
-      show: false,
+      show: true,
       queryString: '',
-      selectedImageReference: undefined,
     }
   },
   methods: {
     setImageReference(imageReference) {
-      this.selectedImageReference = imageReference
       this.$emit('setImageReference', imageReference)
     },
   },
@@ -61,8 +61,14 @@ export default {
 
 <style lang="scss" scoped>
 ul {
-  max-height: 60%;
+  max-height: 12vh;
   overflow-y: auto;
   overflow-x: hidden;
+}
+.fa-check-circle-o {
+  color: green;
+}
+.fa-exclamation-circle {
+  color: red;
 }
 </style>

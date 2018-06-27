@@ -15,7 +15,9 @@
       v-on:changeZoom="changeZoom">
     </image-menu>
     <div class="add-dialog-image-container">
-      <roi-canvas class="overlay-image"
+      <roi-canvas 
+                  v-if="masterImage"
+                  class="overlay-image"
                   :width="masterImage.width ? masterImage.width : 0"
                   :height="masterImage.height ? masterImage.height : 0"
                   :zoom-level="zoom"

@@ -1,6 +1,6 @@
 <template>
   <div class="clickable-menu-item">
-    <div @click="selectImage">
+    <div @click="selectImage" :style="{background: $route.params.imageID === image.image_catalog_id ? 'lightblue' : '#dedede'}">
       <i class="fa" :class="{'fa-caret-right': !open, 'fa-caret-down': open}"></i>
       <span>
         {{image.institution}}: {{image.lvl1}}, {{image.lvl2}} {{image.side === 0 ? 'recto' : 'verso'}}
@@ -18,7 +18,6 @@
     </div>
     <div class="children" v-show="open">
         <ul>
-          <li @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
           <li v-if="image.artefacts" v-for="artefact_id in image.artefacts" :key="'menu-' + scrollVersionID + '-' + artefact_id">
             <artefact-menu-item 
               :artefact="corpus.artefacts.get(artefact_id)" 
@@ -30,21 +29,6 @@
           </li>
         </ul>
     </div>
-
-    <el-dialog
-      :title="`Add Artefact`"
-      :visible.sync="dialogVisible"
-      width="80vw"
-      height="60vh"
-      >
-      <add-new-dialog
-        :add-type="'artefacts'"
-        :corpus="corpus"></add-new-dialog>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogVisible = false">Confirm</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -66,7 +50,6 @@ export default {
   data() {
     return {
       open: false,
-      dialogVisible: false,
       loadingArtefacts: false,
     }
   },
@@ -107,10 +90,15 @@ export default {
           })
       }
     },
-
-    addArtefact() {
-      this.dialogVisible = true
-    },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.fa-check-circle-o {
+  color: green;
+}
+.fa-exclamation-circle {
+  color: red;
+}
+</style>

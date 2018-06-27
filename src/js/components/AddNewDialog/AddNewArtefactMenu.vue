@@ -14,7 +14,8 @@
         v-if="selectedCombination !== undefined"
         v-for="artefact in artefactReferences"
         :key="'add-new-menu-artefact-' + artefact"
-        @click="setArtefact(artefact)">
+        @click="setArtefact(artefact)"
+        :style="{background: selectedArtefact === artefact ? 'lightblue' : '#222f5b'}">
         {{corpus.artefacts.get(artefact) | label}}
       </li>
     </ul>
