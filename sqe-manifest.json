@@ -3,7 +3,7 @@
   "version": "0.2.0-cgi_update",
   "status": "development",
   "dependencies": {
-    "SQE_DB_API": "0.3.0",
+    "SQE_DB_API": "0.3.1",
     "Data-files": "0.2.5"
   }
 }

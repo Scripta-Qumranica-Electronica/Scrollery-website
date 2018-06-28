@@ -652,16 +652,16 @@ sub copyCombination {
 
 	my $getCombsQuery = <<'MYSQL';
 SELECT DISTINCT 
-       scroll_data.scroll_id as scroll_id,
-       scroll_data.name AS name,
-       scroll_version.scroll_version_id AS scroll_version_id,
-       scroll_data.scroll_data_id AS scroll_data_id,
-       scroll_version_group.locked,
-			scroll_version.user_id
+  scroll_data.scroll_id AS scroll_id,
+  scroll_data.name AS name,
+  scroll_version.scroll_version_id AS scroll_version_id,
+  scroll_data.scroll_data_id AS scroll_data_id,
+  scroll_version_group.locked,
+  scroll_version.user_id
 FROM scroll_version
-	JOIN scroll_version_group USING(scroll_version_group_id)
-	JOIN scroll_data using(scroll_id)
-	JOIN scroll_data_owner using(scroll_data_id)
+  JOIN scroll_version_group USING(scroll_version_group_id)
+  JOIN scroll_data_owner USING(scroll_version_id)
+  JOIN scroll_data using(scroll_data_id)
 WHERE scroll_version.scroll_version_id = ?
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
