@@ -1,6 +1,6 @@
 <template>
-  <div class="clickable-menu-item">
-    <div @click="selectImage" :style="{background: $route.params.imageID === image.image_catalog_id ? 'lightblue' : '#dedede'}">
+  <div>
+    <div class="clickable-menu-item" @click="selectImage" :style="{background: $route.params.imageID === image.image_catalog_id ? 'lightblue' : '#dedede'}">
       <i class="fa" :class="{'fa-caret-right': !open, 'fa-caret-down': open}"></i>
       <span>
         {{image.institution}}: {{image.lvl1}}, {{image.lvl2}} {{image.side === 0 ? 'recto' : 'verso'}}

@@ -44,7 +44,8 @@ const generateCorpus = () => {
 
       corpus.cols._insertItem(new Col({
         col_id: col_id,
-        rois: artefactRois
+        rois: artefactRois,
+        scroll_version_id: scroll_version_id
       }), scroll_version_id)
       cols.push(col_id)
 
@@ -58,7 +59,8 @@ const generateCorpus = () => {
 
       corpus.artefacts._insertItem(new Artefact({
         artefact_id: artefact_id,
-        rois: artefactRois
+        rois: artefactRois,
+        scroll_version_id: scroll_version_id
       }), scroll_version_id)
       artefacts.push(artefact_id)
     }

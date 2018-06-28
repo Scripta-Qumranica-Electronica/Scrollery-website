@@ -19,4 +19,4 @@ const plain = props =>
 
 const model = props => new Combination(plain(props))
 
-export default { plain, model }
+export default model
