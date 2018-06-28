@@ -41,6 +41,7 @@ import AddNewDialogImage from './AddNewDialogImage.vue'
 import AddNewCombinationMenu from './AddNewCombinationMenu.vue'
 import AddNewImageReferenceMenu from './AddNewImageReferenceMenu.vue'
 import AddNewArtefactMenu from './AddNewArtefactMenu.vue'
+
 export default {
   components: {
     addNewDialogImage: AddNewDialogImage,

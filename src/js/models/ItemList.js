@@ -56,6 +56,7 @@ export default class ItemList {
    * @param {Number} scroll_version_id of the key, if present
    *                 the key will be automatically updated.
    */
+  /* istanbul ignore next */
   alterItemAtKey(key, newData, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
     if (key in this._items) {
@@ -81,6 +82,7 @@ export default class ItemList {
    *                                            an Array if it isn't one already.
    * @param {Number}              scroll_version_id of the key, if present the key will be automatically updated.
    */
+  /* istanbul ignore next */
   addToItemSublist(key, sublistName, newData, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
     // Wrap newData in an array if it isn't already
@@ -113,6 +115,7 @@ export default class ItemList {
    *                                            an Array if it isn't one already.
    * @param {Number}              scroll_version_id of the key, if present the key will be automatically updated.
    */
+  /* istanbul ignore next */
   removeItemFromSublist(key, sublistName, newData, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
     // Wrap newData in an array if it isn't already
@@ -131,6 +134,7 @@ export default class ItemList {
     }
   }
 
+  /* istanbul ignore next */
   _removeItem(key, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
     const arrayIndex = this._itemOrder.indexOf(key)
@@ -156,6 +160,7 @@ export default class ItemList {
    * @param {String or Number} key of the item to be deleted.
    * @param {Number} scroll_version_id that the item belongs to/
    */
+  /* istanbul ignore next */
   removeItem(key, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
     for (let i = 0, list; (list = this.connectedLists[i]); i++) {
@@ -170,6 +175,7 @@ export default class ItemList {
     return this._items[key] ? this._items[key] : undefined
   }
 
+  /* istanbul ignore next */
   getIndexOfKey(key, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
     return this._itemOrder.indexOf(key) !== -1 ? this._itemOrder.indexOf(key) : undefined
@@ -179,6 +185,7 @@ export default class ItemList {
     return this._itemOrder
   }
 
+  /* istanbul ignore next */
   populate(postData) {
     postData = Object.assign({}, this.defaultPostData, postData)
     if (!postData) throw new TypeError(`No payload for POST request is available.`)
@@ -220,6 +227,7 @@ export default class ItemList {
    * This function will propagate the relational from
    * populate to the proper entries in other lists.
    */
+  /* istanbul ignore next */
   propagateAddData(data, payload) {
     for (let i = 0, list; (list = this.connectedLists[i]); i++) {
       const key = payload[list.idKey]

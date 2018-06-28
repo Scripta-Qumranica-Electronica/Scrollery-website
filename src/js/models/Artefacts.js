@@ -21,6 +21,7 @@ export default class Artefacts extends ItemList {
     )
   }
 
+  /* istanbul ignore next */
   updateArtefactShape(artefact_id, scroll_version_id, shape) {
     shape = Array.isArray(shape) ? shape : [shape]
     artefact_id = Array.isArray(artefact_id) ? artefact_id : [artefact_id]

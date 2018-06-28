@@ -21,6 +21,7 @@ export default class Combinations extends ItemList {
     )
   }
 
+  /* istanbul ignore next */
   cloneScroll(scroll_version_id) {
     const payload = {
       scroll_version_id: scroll_version_id,
@@ -44,6 +45,7 @@ export default class Combinations extends ItemList {
       })
   }
 
+  /* istanbul ignore next */
   removeItem(key, scroll_version_id = undefined) {
     return new Promise((resolve, reject) => {
       const postData = {

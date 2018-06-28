@@ -36,6 +36,7 @@
 <script>
 import ImageMenu from '~/components/ImageMenu.vue'
 import RoiCanvas from '~/components/RoiCanvas.vue'
+
 export default {
   components: {
     imageMenu: ImageMenu,
