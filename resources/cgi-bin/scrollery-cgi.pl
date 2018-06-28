@@ -574,7 +574,7 @@ SELECT DISTINCT artefact_position.artefact_position_id AS artefact_position_id,
         artefact_data.name AS name,
         artefact_data.artefact_data_id,
 				SQE_image.image_catalog_id,
-        SQE_image.sqe_image_id,
+        SQE_image.sqe_image_id AS id_of_sqe_image,
         artefact_shape_owner.scroll_version_id AS scroll_version_id
 FROM artefact_position_owner
 	JOIN artefact_position USING(artefact_position_id)
@@ -693,9 +693,9 @@ sub removeCombination {
 sub addArtefact {
   my ($cgi, $json_post) = @_;
   $cgi->set_scrollversion($json_post->{scroll_version_id});
-  my ($artefact_id, $error) = $cgi->add_artefact($json_post->{sqe_image_id}, $json_post->{region_in_master_image});
+  my ($artefact_id, $error) = $cgi->add_artefact($json_post->{id_of_sqe_image}, $json_post->{region_in_master_image});
   handleDBError ($artefact_id, $error);
-  print '{"artefact_id":"' . $artefact_id . '"}';
+  # print '{"artefact_id":"' . $artefact_id . '"}';
 }
 
 sub removeArtefact {
@@ -715,8 +715,7 @@ sub changeArtefactPosition{
   my ($cgi, $json_post) = @_;
   $cgi->set_scrollversion($json_post->{scroll_version_id});
   $cgi->change_artefact_position($json_post->{artefact_id}, $json_post->{transform_matrix}, $json_post->{z_index});
-  print '{"' . $json_post->{artefact_id} . '":"changed position","position":"' . 
-    $json_post->{transform_matrix} . '","scroll_version_id":"' . 
+  print '{"' . $json_post->{artefact_id} . '":"changed position","scroll_version_id":"' . 
     $json_post->{scroll_version_id} . '"}';
 }
 
