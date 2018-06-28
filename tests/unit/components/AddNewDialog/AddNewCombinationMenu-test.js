@@ -26,6 +26,7 @@ describe("AddNewCombinationMenu", function() {
 
       // assertions 
       expect(vm.selectedCombination).to.equal(vm.corpus.combinations.keys()[0])
+      expect(wrapper.emitted().setCombination[0][0]).to.equal(vm.corpus.combinations.keys()[0])
     })
 
     it('hides/shows combinations', () => {

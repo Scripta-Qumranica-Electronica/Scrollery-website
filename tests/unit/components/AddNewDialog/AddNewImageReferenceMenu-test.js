@@ -12,7 +12,7 @@ describe("AddNewImageReferenceMenu", function() {
   const push = sinon.spy()
   beforeEach(() => push.reset())
   
-  describe('display of images', () => {
+  describe('display of images with image reference', () => {
     beforeEach(() => {
       wrapper = mount(AddNewImageReferenceMenu, {
         propsData: {
@@ -23,14 +23,33 @@ describe("AddNewImageReferenceMenu", function() {
       })
       vm = wrapper.vm
     })
-    it('selects a combination', () => {
+    it('selects an image', () => {
       vm.setImageReference(vm.imageReferences[0])
 
       // assertions 
       expect(vm.selectedImageReference).to.equal(vm.imageReferences[0])
+      expect(wrapper.emitted().setImageReference[0][0]).to.equal(vm.imageReferences[0])
     })
 
-    it('hides/shows combinations', () => {
+    it('hides/shows images', () => {
+      wrapper.find('div.hide-show-images').trigger('click')
+      expect(vm.show).to.equal(false)
+    })
+  })
+
+  describe('display of images without selected combination', () => {
+    beforeEach(() => {
+      wrapper = mount(AddNewImageReferenceMenu, {
+        propsData: {
+          selectedCombination: undefined,
+          selectedImageReference: undefined,
+          corpus: corpus,
+        },
+      })
+      vm = wrapper.vm
+    })
+
+    it('hides/shows images', () => {
       wrapper.find('div.hide-show-images').trigger('click')
       expect(vm.show).to.equal(false)
     })

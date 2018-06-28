@@ -49,6 +49,12 @@ describe("AddNewArtefactMenu", function() {
 
       // assertions 
       expect(vm.selectedArtefact).to.equal(vm.artefactReferences[0])
+      expect(wrapper.emitted().setArtefact[0][0]).to.equal(vm.artefactReferences[0])
+    })
+
+    it('adds a new artefact', () => {
+      wrapper.find('li.add-new-artefact-in-dialog').trigger('click')
+      expect(wrapper.emitted().createNewArtefact[0]).to.deep.equal([])
     })
   })
 

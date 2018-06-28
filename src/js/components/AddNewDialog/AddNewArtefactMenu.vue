@@ -5,6 +5,7 @@
     </div>
     <ul>
       <li 
+        class="add-new-artefact-in-dialog"
         v-show="selectedCombination !== undefined && selectedImageReference !== undefined" 
         @click="createNewArtefact()">
         <span>Create New</span>
