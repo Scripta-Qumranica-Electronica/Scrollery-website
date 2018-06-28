@@ -182,7 +182,6 @@ describe('manipulate artefact data', () => {
         scroll_version_id: image.scroll_version_id,
         transaction: 'copyCombination',
       })
-      .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
         if (err) {
