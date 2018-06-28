@@ -12,7 +12,7 @@ if [ -d "../resources/perl-libs/.git" ];
 then
     echo "Fetching changes."
     cd ../resources/perl-libs
-    git fetch
+    git fetch --all --tags --prune
 else
     echo "Cloning repository."
     git clone https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API.git ../resources/perl-libs
