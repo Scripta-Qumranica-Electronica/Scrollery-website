@@ -209,6 +209,7 @@ SELECT DISTINCT artefact.artefact_id AS artefact_id,
   artefact_data.name,
   artefact_data_owner.scroll_version_id,
   SQE_image.image_catalog_id AS image_catalog_id,
+  SQE_image.sqe_image_id AS id_of_sqe_image,
   image_catalog.catalog_side AS catalog_side
 FROM artefact
 	JOIN artefact_data USING(artefact_id)
@@ -239,6 +240,7 @@ SELECT DISTINCT	artefact_position.artefact_position_id AS artefact_position_id,
 				artefact_position.transform_matrix,
 				ST_AsText(ST_Envelope(artefact_shape.region_in_sqe_image)) AS rect,
 				SQE_image.image_catalog_id,
+        SQE_image.sqe_image_id AS id_of_sqe_image,
         artefact_data_owner.scroll_version_id
 FROM artefact_shape
 	JOIN artefact_shape_owner USING(artefact_shape_id)
@@ -706,10 +708,8 @@ sub removeArtefact {
 sub changeArtefactShape{
   my ($cgi, $json_post) = @_;
   $cgi->set_scrollversion($json_post->{scroll_version_id});
-  $cgi->change_artefact_shape($json_post->{artefact_id}, $json_post->{sqe_image_id}, $json_post->{region_in_master_image});
-  print '{"' . $json_post->{artefact_id} . '":"changed shape","region_in_master_image":"' . 
-    $json_post->{region_in_master_image} . '","scroll_version_id":"' . 
-    $json_post->{scroll_version_id} . '"}';
+  $cgi->change_artefact_shape($json_post->{artefact_id}, $json_post->{id_of_sqe_image}, $json_post->{region_in_master_image});
+  print '{"' . $json_post->{artefact_id} . '":"changed shape","region_in_master_image":"' . $json_post->{region_in_master_image} . '","scroll_version_id":"' . $json_post->{scroll_version_id} . '"}';
 }
 sub changeArtefactPosition{
   my ($cgi, $json_post) = @_;
@@ -728,35 +728,6 @@ sub changeArtefactData{
     $json_post->{name} . '","scroll_version_id":"' . 
     $json_post->{scroll_version_id} . '"}';
 }
-
-# sub changeArtefactPoly {
-# 	my ($cgi, $json_post) = @_;
-
-#   $cgi->set_scrollversion($json_post->{scroll_version_id});
-#   $cgi->change_artefact_shape($json_post->{artefact_position_id}, $json_post->{image_catalog_id}, $json_post->{region_in_sqe_image});
-
-#   # TODO: collect the new artefact (using the API) and send it back.
-#   print '{"change_artefact_shape":"success"}';
-
-# 	return;
-# }
-
-# sub setArtPosition {
-# 	my ($cgi, $json_post, $key, $lastItem) = @_;
-# 	$cgi->dbh->set_scrollversion($json_post->{version_id});
-# 	my ($new_id, $error) = $cgi->dbh->change_value("artefact_position", $json_post->{art_id}, "transform_matrix", $json_post->{matrix});
-# 	handleDBError ($new_id, $error);
-# 	return;
-# }
-
-# sub setArtRotation {
-# 	my ($cgi, $json_post, $key, $lastItem) = @_;
-# 	my $user_id = $cgi->dbh->user_id;
-# 	$cgi->dbh->set_scrollversion($json_post->{version_id});
-# 	my ($new_id, $error) = $cgi->dbh->change_value("artefact", $json_post->{art_id}, "rotation", $json_post->{rotation});
-# 	handleDBError ($new_id, $error);
-# 	return;
-# }
 
 sub addSigns() {
 	my ($cgi, $json_post, $key, $lastItem) = @_;

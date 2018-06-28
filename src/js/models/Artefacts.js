@@ -51,11 +51,12 @@ export default class Artefacts extends ItemList {
               break
           }
           payload.requests.push({
-            region_in_sqe_image: maskWKT,
+            region_in_master_image: maskWKT,
             artefact_id: currentArtefactID,
             scroll_version_id: currentScrollVersionID,
             image_catalog_id: this.get(currentArtefactID, currentScrollVersionID).image_catalog_id,
-            transaction: 'changeArtefactPoly',
+            id_of_sqe_image: this.get(currentArtefactID, currentScrollVersionID).id_of_sqe_image,
+            transaction: 'changeArtefactShape',
           })
           this.alterItemAtKey(currentArtefactID, { mask: maskWKT }, currentScrollVersionID)
         }

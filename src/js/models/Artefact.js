@@ -21,6 +21,7 @@ export default class Artefact {
     this.transform_matrix = record.transform_matrix
     this.rect = record.rect
     this.image_catalog_id = record.image_catalog_id
+    this.id_of_sqe_image = record.id_of_sqe_image
     this.catalog_side = record.catalog_side
     this.rois = record.rois || []
   }
