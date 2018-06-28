@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div @click="show = !show">
+    <div class="hide-show-combinations" @click="show = !show">
         <i class="fa" :class="{'fa-caret-right': !show, 'fa-caret-down': show}"></i>
         <span>Combinations:</span>
         <i 

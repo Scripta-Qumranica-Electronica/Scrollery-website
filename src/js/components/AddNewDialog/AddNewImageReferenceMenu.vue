@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div @click="show = !show">
+    <div class="hide-show-images" @click="show = !show">
         <i class="fa" :class="{'fa-caret-right': !show, 'fa-caret-down': show}"></i>
         <span>Images ({{imageReferences.length}}): {{corpus.imageReferences.get(selectedImageReference) | label}}</span>
     </div>
