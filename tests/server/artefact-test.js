@@ -168,7 +168,7 @@ describe('get artefact data', () => {
 })
 
 /**
- * TODO I need to check some of the returned data here a 
+ * TODO I need to check some of the returned data here a
  * bit better.  Tests do work, but should validate a bit
  * more cleanly.
  */
