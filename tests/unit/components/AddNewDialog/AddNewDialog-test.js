@@ -29,6 +29,7 @@ describe('AddNewDialog', function() {
   it('has a proper initial state', () => {
     expect(vm.corpus).to.deep.equal(corpus)
     expect(vm.addType).to.equal('artefacts')
+    expect(vm.currentScrollVersionID).to.equal(combination.scroll_version_id)
   })
 
   it('can set a combination', () => {
@@ -57,5 +58,21 @@ describe('AddNewDialog', function() {
     // expect(vm.selectedCombination).to.equal(combination.scroll_version_id)
     // expect(vm.selectedImageReference).to.equal(image.image_catalog_id)
     // expect(vm.selectedArtefact).to.equal(undefined)
+  })
+
+  it('can prepare to create a new artefact', () => {
+    vm.createNewArtefact()
+    // expect(vm.selectedCombination).to.equal(combination.scroll_version_id)
+    // expect(vm.selectedImageReference).to.equal(image.image_catalog_id)
+    expect(vm.selectedArtefact).to.equal(undefined)
+  })
+
+  it('can commit a new artefact', () => {
+    vm.selectedArtefact = artefact[0]
+    vm.commitNewArtefact()
+    vm.selectedArtefact = undefined
+    vm.commitNewArtefact()
+    // expect(vm.selectedCombination).to.equal(combination.scroll_version_id)
+    // expect(vm.selectedImageReference).to.equal(image.image_catalog_id)
   })
 })
