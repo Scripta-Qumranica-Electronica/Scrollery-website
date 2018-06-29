@@ -266,8 +266,8 @@ describe('Login', function() {
       vm.$i18n.load = $i18nLoadStub
       vm.$router = {
         push: route => {
-          // ensure route is workbench
-          expect(route.name).to.equal('workbench')
+          // ensure route is workbenchAddress
+          expect(route.name).to.equal('workbenchAddress')
         },
       }
 

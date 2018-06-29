@@ -143,7 +143,16 @@ export default {
             .load()
             .then(() => {
               // success!
-              this.$router.push({ name: 'workbench' })
+              this.$router.push({
+                name: 'workbenchAddress',
+                params: {
+                  scrollID: '~',
+                  scrollVersionID: '~',
+                  imageID: '~',
+                  colID: '~',
+                  artID: '~',
+                },
+              })
               resolve()
             })
             .catch(() => {

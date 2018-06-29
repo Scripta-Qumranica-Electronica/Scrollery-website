@@ -1,30 +1,20 @@
 <template>
-  <span class="clickable-menu-item" @click="setRouter">Artefact: {{corpus.artefacts.get(artefactID).name}}</span>
+  <div>
+    <span class="clickable-menu-item" @click="setRouter" :style="{background: $route.params.artID === artefact.artefact_id ? 'lightblue' : '#dedede'}">
+      <span>Artefact: {{artefact.name}}</span>
+      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="corpus.artefacts.removeItem(artefact.artefact_id, scrollVersionID)"></i>
+    </span>
+  </div>
 </template>
 
 <script>
 export default {
   props: {
-    artefactID: {
-      required: true,
-      type: Number,
-    },
-    scrollID: {
-      required: true,
-      type: Number,
-    },
-    scrollVersionID: {
-      required: true,
-      type: Number,
-    },
-    imageID: {
-      required: true,
-      type: Number,
-    },
-    corpus: {
-      required: true,
-      type: Object,
-    },
+    artefact: undefined,
+    scrollID: undefined,
+    scrollVersionID: undefined,
+    imageID: undefined,
+    corpus: undefined,
   },
   methods: {
     setRouter() {
@@ -33,7 +23,7 @@ export default {
         params.scrollID !== this.scrollID ||
         params.scrollVersionID !== this.scrollVersionID ||
         params.imageID !== this.imageID ||
-        params.artID !== this.artefactID
+        params.artID !== this.artefact.artefact_id
       ) {
         this.$router.push({
           name: 'workbenchAddress',
@@ -42,7 +32,7 @@ export default {
             scrollVersionID: this.scrollVersionID,
             colID: params.colID,
             imageID: this.imageID,
-            artID: this.artefactID,
+            artID: this.artefact.artefact_id,
           },
         })
       }

@@ -1,126 +1,81 @@
-import MapList from './MapList.js'
+import ItemList from './ItemList.js'
 import Artefact from './Artefact.js'
-import axios from 'axios'
-import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG } from '~/utils/VectorFactory.js'
-const svgpath = require('svgpath')
+import { pathIdentifier } from '~/utils/PathIdentifier.js'
+import { svgPolygonToWKT, geoJSONPolygonToWKT } from '~/utils/VectorFactory.js'
 
-export default class Artefacts extends MapList {
-  constructor(
-    session_id,
-    idKey,
-    ajaxPayload = undefined,
-    attributes = {},
-    standardTransaction = undefined
-  ) {
-    idKey = idKey || 'artefact_position_id'
-    standardTransaction = 'getArtOfImage'
-    // ajaxPayload = ajaxPayload ? ajaxPayload : {transaction: 'getArtOfImage'}
-    super(session_id, idKey, ajaxPayload, Artefact, attributes, standardTransaction)
+export default class Artefacts extends ItemList {
+  constructor(corpus, idKey, defaultPostData = undefined) {
+    idKey = idKey || 'artefact_id'
+    const listType = 'artefacts'
+    const connectedLists = [corpus.combinations, corpus.imageReferences]
+    const relativeToScrollVersion = true
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getArtOfImage' }
+    super(
+      corpus,
+      idKey,
+      Artefact,
+      listType,
+      connectedLists,
+      relativeToScrollVersion,
+      defaultPostData
+    )
   }
 
-  // We should eventually have a hash associated with each mask,
-  // and should be prepared to recieve a message back from the server
-  // saying "nothing changed" and then we can leave the artefact alone.
-
-  // TODO: mocking for axios in unit test
   /* istanbul ignore next */
-  populate(customPayload = {}, scrollVersionID = undefined) {
-    let payload = Object.assign(
-      {},
-      this._ajaxPayload,
-      customPayload,
-      scrollVersionID && { scroll_version_id: scrollVersionID }
-    )
-
+  updateArtefactShape(artefact_id, scroll_version_id, shape) {
+    shape = Array.isArray(shape) ? shape : [shape]
+    artefact_id = Array.isArray(artefact_id) ? artefact_id : [artefact_id]
+    scroll_version_id = Array.isArray(scroll_version_id) ? scroll_version_id : [scroll_version_id]
     return new Promise((resolve, reject) => {
-      try {
-        axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
-          if (res.status === 200 && res.data.replies) {
-            // We can store hashes for the returned data
-            // in the future, so we can avoid unnecessary
-            // data transmission.
-            this._hash = res.data.hash
-
-            // Note to self: if you load the data into a 2d array:
-            // [[key1, value1],[key2,[value2]] the keys can be
-            // loaded into an OrderedMap as integers.  If you use
-            // an Object {key1: value1, key2: value2}, then the
-            // keys are converted to strings.
-            let results = []
-            res.data.replies.forEach(reply => {
-              if (reply.error) {
-                return
-              }
-
-              reply.results.forEach(item => {
-                let record
-                if (this.get(item[this.idKey]) && this.get(item[this.idKey]).toJS() !== item) {
-                  record = this.get(item[this.idKey]).extend(item)
-                } else if (!this.get(item[this.idKey])) {
-                  record = new this.model(item)
-                }
-                if (record) {
-                  record.svgInCombination = svgpath(
-                    wktPolygonToSvg(record.mask, wktParseRect(record.rect))
-                  )
-                    .matrix(dbMatrixToSVG(record.transform_matrix))
-                    .round()
-                    .toString()
-                  results.push([item[this.idKey], record])
-                }
-              })
-            })
-
-            this.merge(results)
-            resolve(res.data.replies)
+      if (shape.length === artefact_id.length && shape.length === scroll_version_id.length) {
+        let payload = { requests: [], SESSION_ID: this.session_id }
+        for (
+          let index = 0, svgMask, currentArtefactID, currentScrollVersionID;
+          (svgMask = shape[index]) &&
+          (currentArtefactID = artefact_id[index]) &&
+          (currentScrollVersionID = scroll_version_id[index]);
+          index++
+        ) {
+          let maskWKT = undefined
+          switch (pathIdentifier(svgMask)) {
+            case 'SVG':
+              maskWKT = svgPolygonToWKT(svgMask)
+              break
+            case 'WKT':
+              maskWKT = svgMask
+              break
+            case 'GeoJSON':
+              maskWKT = geoJSONPolygonToWKT(svgMask)
+              break
+            case 'GeoJSON String':
+              maskWKT = geoJSONPolygonToWKT(svgMask)
+              break
           }
-        })
-      } catch (err) {
-        reject(err)
+          payload.requests.push({
+            region_in_master_image: maskWKT,
+            artefact_id: currentArtefactID,
+            scroll_version_id: currentScrollVersionID,
+            image_catalog_id: this.get(currentArtefactID, currentScrollVersionID).image_catalog_id,
+            id_of_sqe_image: this.get(currentArtefactID, currentScrollVersionID).id_of_sqe_image,
+            transaction: 'changeArtefactShape',
+          })
+          this.alterItemAtKey(currentArtefactID, { mask: maskWKT }, currentScrollVersionID)
+        }
+        this.axios
+          .post('resources/cgi-bin/scrollery-cgi.pl', payload)
+          .then(res => {
+            if (res.status === 200 && res.data) {
+              resolve(res.data)
+            }
+          })
+          .catch(err => {
+            console.error(err)
+          })
+      } else {
+        reject(
+          'The mask, artefact_shape_id, and scroll_version_id inputs were of different lengths.'
+        )
       }
     })
   }
-
-  // TODO: mocking for axios in unit test
-  /* istanbul ignore next */
-
-  // TODO I think this should be deprecated, it is wrong to some extent
-  // anway.  We always grab the mask when first initializing the artefact
-  // record.
-
-  // fetchMask(scrollVersionID, artefactID) {
-  //   console.log('Fetched mask:', artefactID)
-  //   scrollVersionID = scrollVersionID >>> 0
-  //   artefactID = artefactID >>> 0
-  //   let payload = {
-  //     transaction: 'getArtefactMask',
-  //     SESSION_ID: this.sessionID,
-  //     scrollVersion: scrollVersionID,
-  //     artID: artefactID,
-  //   }
-
-  //   return new Promise((resolve, reject) => {
-  //     try {
-  //       axios.post('resources/cgi-bin/scrollery-cgi.pl', payload).then(res => {
-  //         if (res.status === 200 && res.data.results) {
-  //           // We can store hashes for the returned data
-  //           // in the future, so we can avoid unnecessary
-  //           // data transmission.
-  //           this.set(this._items[artefactID], 'hash', res.data.results[0].hash)
-
-  //           let newArtefact = this.get(artefactID).toJS()
-  //           newArtefact.mask = wktPolygonToSvg(res.data.results[0].poly)
-  //           newArtefact.transform_matrix = dbMatrixToSVG(
-  //             JSON.parse(res.data.results[0].transform_matrix).matrix
-  //           )
-  //           newArtefact.rect = wktPolygonToSvg(res.data.results[0].rect)
-  //           this._items.set(artefactID, new this.model(newArtefact))
-  //           resolve(res.data.results)
-  //         }
-  //       })
-  //     } catch (err) {
-  //       reject(err)
-  //     }
-  //   })
-  // }
 }

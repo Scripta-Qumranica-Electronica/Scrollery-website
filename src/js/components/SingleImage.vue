@@ -1,80 +1,24 @@
 <template>
   <div style="{width: 100%; height: 100%;}">
-    <!-- TODO move menu into its own component -->
-    <el-row class="single-image-pane-menu" :gutter="4" type="flex" justify="space-around">
-      <el-col :span="8">
-        <el-select class="image-select-entry" v-model="selectedImage" placeholder="Select" multiple size="mini">
-          <el-option
-            v-for="image of filenames"
-            :key="'selector-' + corpus.images.get(image).filename"
-            :label="corpus.images.get(image).type | formatImageType"
-            :value="image">
-            <el-row>
-              <el-col :span="2">
-                <span class="drag-handle image-select-entry" style="float: left">☰</span>
-              </el-col>
-              <el-col :span="8">
-                <span class="image-select-entry">
-                  &nbsp;{{corpus.images.get(image).type | formatImageType}}
-                </span>
-              </el-col>
-              <el-col :span="10">
-                  <input
-                  class="image-select-entry"
-                  type="range"
-                  min="0"
-                  max="1.0"
-                  step="0.01"
-                  @input="setOpacity(image, $event.target.value)" />
-              </el-col>
-              <el-col :span="4">
-                <i class="fa fa-eye image-select-entry"
-                  :style="{color: imageSettings[image].visible ? 'green' : 'red'}"
-                  @click="toggleVisible(image)">
-                </i>
-              </el-col>
-            </el-row>
-          </el-option>
-        </el-select>
-      </el-col>
-      <el-col :span="2">
-        <el-slider
-          v-model="zoom"
-          :min="0.1"
-          :step="0.01"
-          :max="1.0"
-          :format-tooltip="formatTooltip">
-        </el-slider>
-      </el-col>
-      <el-col v-show="artefact && artefact !== 'new'"  :span="5">
-        <el-radio-group v-model="viewMode" size="mini">
-          <el-radio-button label="ROI">{{$i18n.str('ROI')}}</el-radio-button>
-          <el-radio-button label="ART">{{$i18n.str('ART')}}</el-radio-button>
-        </el-radio-group>
-      </el-col>
-      <el-col v-show="artefact || artefact === 'new'"  :span="3">
-        <el-button @click="toggleMask" size="mini">Mask</el-button>
-      </el-col>
-      <el-col v-show="viewMode === 'ROI' && artefact" :span="3">
-        <el-button @click="delSelectedRoi" size="mini">Del ROI</el-button>
-      </el-col>
-      <el-col v-show="viewMode === 'ART' && (artefact || artefact === 'new')" :span="3">
-        <el-button
-                @click="toggleDrawingMode"
-                :type="drawingMode === 'draw' ? 'primary' : 'warning'"
-                size="mini">
-          {{drawingMode === 'draw' ? 'Draw' : 'Erase'}}
-        </el-button>
-      </el-col>
-      <el-col v-show="viewMode === 'ART' && (artefact || artefact === 'new')" :span="3">
-        <el-slider
-          v-model="brushCursorSize"
-          :min="0"
-          :max="200"
-          :step="1">
-        </el-slider>
-      </el-col>
-    </el-row>
+    <image-menu
+      :corpus="corpus"
+      :images="filenames"
+      :imageSettings="imageSettings"
+      :artefact="artefact"
+      :zoom="zoom"
+      :viewMode="viewMode"
+      :artefact-editable="true"
+      :roi-editable="false"
+      :brushCursorSize="brushCursorSize"
+      v-on:opacity="setOpacity"
+      v-on:changeBrushSize="changeBrushSize"
+      v-on:visible="toggleVisible"
+      v-on:drawingMode="toggleDrawingMode"
+      v-on:toggleMask="toggleMask"
+      v-on:delSelectedRoi="delSelectedRoi"
+      v-on:changeViewMode="changeViewMode"
+      v-on:changeZoom="changeZoom">
+    </image-menu>
     <div style="{width: 100%; height: calc(100% - 30px); overflow: auto; position: relative;}">
       <roi-canvas class="overlay-image"
                   :width="masterImage.width ? masterImage.width : 0"
@@ -83,7 +27,9 @@
                   :images="filenames"
                   :image-settings="imageSettings"
                   :divisor="imageShrink"
-                  :clipping-mask="clipMask"
+                  :clipping-mask="$route.params.artID === '~' || !corpus.artefacts.get($route.params.artID, $route.params.scrollVersionID) ? 
+                                    undefined : 
+                                    corpus.artefacts.get($route.params.artID, $route.params.scrollVersionID).mask"
                   :clip="clippingOn"
                   :corpus="corpus"
                   ref="currentRoiCanvas">
@@ -96,7 +42,9 @@
                         :draw-mode="drawingMode"
                         :brush-size="brushCursorSize"
                         :divisor="imageShrink"
-                        :mask="firstClipMask"
+                        :mask="$route.params.artID === '~' || !corpus.artefacts.get($route.params.artID, $route.params.scrollVersionID) ? 
+                                  undefined :
+                                  corpus.artefacts.get($route.params.artID, $route.params.scrollVersionID).mask"
                         :locked="lock"
                         v-on:mask="setClipMask"
                         ref="currentArtCanvas">
@@ -106,6 +54,7 @@
 </template>
 
 <script>
+import ImageMenu from './ImageMenu.vue'
 import RoiCanvas from './RoiCanvas.vue'
 import ArtefactCanvas from './ArtefactCanvas.vue'
 import { wktPolygonToSvg, svgPolygonToWKT } from '../utils/VectorFactory'
@@ -118,6 +67,7 @@ export default {
     },
   },
   components: {
+    'image-menu': ImageMenu,
     'roi-canvas': RoiCanvas,
     'artefact-canvas': ArtefactCanvas,
   },
@@ -147,8 +97,11 @@ export default {
   methods: {
     fetchImages(id) {
       this.$store.commit('addWorking')
-      this.corpus
-        .populateImagesOfImageReference(id, this.$route.params.scrollVersionID)
+      this.corpus.images
+        .populate({
+          scroll_version_id: this.$route.params.scrollVersionID,
+          image_catalog_id: id,
+        })
         .then(res => {
           this.$store.commit('delWorking')
           this.filenames = this.corpus.imageReferences.get(id >>> 0).images
@@ -161,65 +114,38 @@ export default {
             }
           })
           this.$store.commit('addWorking')
-          this.corpus
-            .populateArtefactsOfImageReference(id, this.$route.params.scrollVersionID)
+          this.corpus.artefacts
+            .populate({
+              scroll_version_id: this.$route.params.scrollVersionID,
+              image_catalog_id: id,
+            })
             .then(res1 => {
               this.$store.commit('delWorking')
             })
+            .catch(err => {
+              this.$store.commit('delWorking')
+              console.error(err)
+            })
+        })
+        .catch(err => {
+          this.$store.commit('delWorking')
+          console.error(err)
         })
     },
-    // TODO move the logic for this into the data model.
-    setClipMask(mask) {
-      // this.lock = true
-      this.clipMask = mask
-      // if (this.artefact === 'new') {
-      //   this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-      //     transaction: 'newArtefact',
-      //     image_id: this.$route.params.imageID,
-      //     region_in_master_image: svgPolygonToWKT(mask),
-      //     name: this.artName,
-      //     scroll_id: this.$route.params.scrollID,
-      //     version_id: this.$route.params.scrollVersionID,
-      //   }).then(res => {
-      //     if (res.status === 200 && res.data.returned_info) {
-      //       this.$router.push({
-      //         name: 'workbenchAddress',
-      //         params: {
-      //           scrollID: this.$route.params.scrollID,
-      //           scrollVersionID: this.$route.params.scrollVersionID,
-      //           colID: this.$route.params.colID ? this.$route.params.colID : '~',
-      //           imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-      //           artID: res.data.returned_info,
-      //         },
-      //       })
-      //       this.lock = false
-      //     }
-      //   })
-      // } else {
-      //   this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-      //     transaction: 'changeArtefactPoly',
-      //     region_in_sqe_image: svgPolygonToWKT(mask),
-      //     artefact_id: this.$route.params.artID,
-      //     version_id: this.$route.params.scrollVersionID,
-      //   }).then(res => {
-      //     if (res.status === 200 && res.data.artefact_id) {
-      //       this.$router.push({
-      //         name: 'workbenchAddress',
-      //         params: {
-      //           scrollID: this.$route.params.scrollID,
-      //           scrollVersionID: this.$route.params.scrollVersionID,
-      //           colID: this.$route.params.colID ? this.$route.params.colID : '~',
-      //           imageID: this.$route.params.imageID ? this.$route.params.imageID : '~',
-      //           artID: res.data.artefact_id,
-      //         },
-      //       })
-      //       this.lock = false
-      //     }
-      //   })
-      // }
+    setClipMask(svgMask) {
+      this.corpus.artefacts.updateArtefactShape(
+        this.$route.params.artID,
+        this.$route.params.scrollVersionID,
+        svgMask
+      )
     },
     toggleMask() {
-      this.clippingOn = !this.clippingOn
+      if (
+        this.corpus.artefacts.get(this.$route.params.artID, this.$route.params.scrollVersionID) &&
+        this.corpus.artefacts.get(this.$route.params.artID, this.$route.params.scrollVersionID).mask
+      ) {
+        this.clippingOn = !this.clippingOn
+      }
     },
     delSelectedRoi() {
       this.$refs.currentRoiCanvas.deleteSelectedRoi()
@@ -230,11 +156,17 @@ export default {
     toggleVisible(idx) {
       this.$set(this.imageSettings[idx], 'visible', !this.imageSettings[idx].visible)
     },
-    formatTooltip() {
-      return (this.zoom * 100).toFixed(2) + '%'
-    },
     toggleDrawingMode() {
       this.drawingMode = this.drawingMode === 'draw' ? 'erase' : 'draw'
+    },
+    changeBrushSize(value) {
+      this.brushCursorSize = value
+    },
+    changeViewMode(value) {
+      this.viewMode = value
+    },
+    changeZoom(value) {
+      this.zoom = value
     },
   },
   watch: {
@@ -247,6 +179,9 @@ export default {
         this.fetchImages(this.$route.params.imageID)
         this.artefact = undefined
         this.firstClipMask = this.clipMask = undefined
+        if (to.params.artID === '~') {
+          this.clippingOn = false
+        }
       }
 
       // Load new artefact ID if there is one
@@ -258,21 +193,9 @@ export default {
         } else {
           this.artefact = to.params.artID >>> 0
           this.scrollVersionID = to.params.scrollVersionID >>> 0
-          // if (this.corpus.artefacts.get(this.artefact).mask === '') {
-          //   // this.$store.commit('addWorking')
-          //   this.corpus.artefacts
-          //     .fetchMask(to.params.scrollVersionID, to.params.artID)
-          //     .then(res => {
-          //       // this.$store.commit('delWorking')
-          //       this.firstClipMask = this.clipMask = wktPolygonToSvg(
-          //         this.corpus.artefacts.get(this.artefact).mask
-          //       )
-          //     })
-          // } else {
           this.firstClipMask = this.clipMask = wktPolygonToSvg(
-            this.corpus.artefacts.get(this.artefact).mask
+            this.corpus.artefacts.get(this.artefact, this.scrollVersionID).mask
           )
-          // }
         }
         this.lock = false
       }
@@ -298,32 +221,14 @@ export default {
       return formattedString
     },
   },
+  created() {
+    this.brushCursorSize = 20
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 @import '~sass-vars';
-
-.single-image-pane-menu {
-  width: 100%;
-  height: 32px; // Should be 30px, but 32px looks better
-  max-height: 32px; // Should be 30px, but 32px looks better
-  background: #dedede;
-  margin-left: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
-  margin-right: 0px !important; // Not sure why I have to do this, there is bleed through somewhere.
-}
-.fileSelector {
-  border-radius: 15px;
-  background: #e1e1d0;
-  padding: 10px;
-  z-index: 10;
-}
-.image-select-box > .image-select-entry {
-  padding: 5px;
-}
-.image-select-entry {
-  width: 100%;
-}
 .overlay-image {
   position: absolute;
   top: 0;
