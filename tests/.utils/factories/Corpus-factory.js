@@ -37,7 +37,10 @@ const generateCorpus = () => {
         corpus.rois._insertItem(new ROI({sign_char_roi_id: sign_char_roi_id}), scroll_version_id)
         rois.push(sign_char_roi_id)
         artefactRois.push(sign_char_roi_id)
-        corpus.images._insertItem(new Image({sqe_image_id: sqe_image_id}))
+        corpus.images._insertItem(new Image({
+          sqe_image_id: sqe_image_id,
+          type: z % 4,
+        }))
         images.push(sqe_image_id)
       }
 
@@ -53,7 +56,8 @@ const generateCorpus = () => {
         image_catalog_id: image_catalog_id,
         artefacts: [artefact_id],
         rois: artefactRois,
-        images: images
+        images: images,
+        side: j % 2
       }))
       imageReferences.push(image_catalog_id)
 
