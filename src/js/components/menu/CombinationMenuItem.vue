@@ -65,10 +65,9 @@
       >
       <add-new-dialog
         :add-type="'artefacts'"
-        :corpus="corpus"></add-new-dialog>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">Done</el-button>
-      </span>
+        :corpus="corpus"
+        :currentScrollVersionID="combination.scroll_version_id">
+      </add-new-dialog>
     </el-dialog>
   </div>
 </template>

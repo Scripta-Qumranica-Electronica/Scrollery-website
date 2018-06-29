@@ -6,6 +6,7 @@
     <ul>
       <li 
         class="add-new-artefact-in-dialog"
+        :style="{background: !selectedArtefact ? 'lightblue' : '#222f5b'}"
         v-show="selectedCombination !== undefined && selectedImageReference !== undefined" 
         @click="createNewArtefact()">
         <span>Create New</span>
@@ -41,6 +42,7 @@ export default {
       this.$emit('setArtefact', artefact)
     },
     createNewArtefact() {
+      this.selectedArtefact = undefined
       this.$emit('createNewArtefact')
     },
   },

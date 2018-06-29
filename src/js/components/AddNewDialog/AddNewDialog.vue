@@ -33,6 +33,12 @@
         :corpus="corpus">
       </add-new-dialog-image>
     </div>
+    <div class="add-new-dialog-footer">
+      <el-button 
+        type="primary" 
+        class="commit-button" 
+        @click="commitNewArtefact()">Commit</el-button>
+    </div>
   </div>
 </template>
 
@@ -52,6 +58,7 @@ export default {
   props: {
     addType: undefined,
     corpus: undefined,
+    currentScrollVersionID: undefined,
   },
   data() {
     return {
@@ -182,7 +189,16 @@ export default {
           console.error(err)
         })
     },
-    createNewArtefact() {},
+    createNewArtefact() {
+      this.selectedArtefact = undefined
+    },
+    commitNewArtefact() {
+      if (this.selectedArtefact) {
+        console.log(this.selectedArtefact, this.currentScrollVersionID)
+      } else {
+        console.log(this.selectedImageReference, this.currentScrollVersionID)
+      }
+    },
   },
 }
 </script>
@@ -220,5 +236,13 @@ export default {
 }
 .add-new-artefact-menu-select-item {
   height: 25vh;
+}
+.add-new-dialog-footer {
+  width: 100%;
+  height: 5vh;
+}
+.commit-button {
+  float: right;
+  margin-top: 10px;
 }
 </style>

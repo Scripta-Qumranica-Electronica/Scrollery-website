@@ -20,6 +20,7 @@ describe('AddNewDialog', function() {
       propsData: {
         corpus: corpus,
         addType: 'artefacts',
+        currentScrollVersionID: combination.scroll_version_id,
       },
     })
     vm = wrapper.vm
