@@ -74,7 +74,7 @@ export default {
         })
         .catch(err => {
           this.$store.commit('delWorking')
-          console.log(err)
+          console.error(err)
         })
 
       this.$store.commit('addWorking')
@@ -88,7 +88,7 @@ export default {
         })
         .catch(err => {
           this.$store.commit('delWorking')
-          console.log(err)
+          console.error(err)
         })
     },
     setImageReference(imageReference) {
@@ -107,7 +107,7 @@ export default {
           })
           .catch(err => {
             this.$store.commit('delWorking')
-            console.log(err)
+            console.error(err)
           })
 
         this.$store.commit('addWorking')
@@ -123,7 +123,7 @@ export default {
           })
           .catch(err => {
             this.$store.commit('delWorking')
-            console.log(err)
+            console.error(err)
           })
       }
     },
@@ -140,7 +140,7 @@ export default {
         })
         .catch(err => {
           this.$store.commit('delWorking')
-          console.log(err)
+          console.error(err)
         })
 
       this.$store.commit('addWorking')
@@ -155,7 +155,7 @@ export default {
         })
         .catch(err => {
           this.$store.commit('delWorking')
-          console.log(err)
+          console.error(err)
         })
     },
     createNewArtefact() {},

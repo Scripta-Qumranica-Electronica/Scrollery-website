@@ -109,7 +109,7 @@ export default {
       })
       .catch(err => {
         this.$store.commit('delWorking')
-        console.log(err)
+        console.error(err)
       })
   },
   methods: {

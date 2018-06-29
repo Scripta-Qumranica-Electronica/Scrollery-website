@@ -68,8 +68,8 @@ export default class Artefacts extends ItemList {
               resolve(res.data)
             }
           })
-          .catch(error => {
-            console.log(error.response)
+          .catch(err => {
+            console.error(err)
           })
       } else {
         reject(

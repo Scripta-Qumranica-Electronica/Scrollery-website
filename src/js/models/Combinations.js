@@ -40,8 +40,8 @@ export default class Combinations extends ItemList {
           this._insertItem(new this.recordModel(scroll_data), undefined, 0)
         }
       })
-      .catch(error => {
-        console.log(error)
+      .catch(err => {
+        console.error(err)
       })
   }
 

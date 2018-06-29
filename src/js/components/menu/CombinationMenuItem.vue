@@ -133,9 +133,9 @@ export default {
             scroll_id: this.combination.scroll_id,
           })
           .then(res => (this.loadingColumns = false))
-          .catch(res => {
+          .catch(err => {
             this.loadingColumns = false
-            console.log(res)
+            console.error(err)
           })
         this.loadingImages = true
         this.corpus.imageReferences
@@ -144,9 +144,9 @@ export default {
             scroll_id: this.combination.scroll_id,
           })
           .then(res => (this.loadingImages = false))
-          .catch(res => {
+          .catch(err => {
             this.loadingImages = false
-            console.log(res)
+            console.error(err)
           })
       }
     },

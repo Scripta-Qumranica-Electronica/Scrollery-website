@@ -86,7 +86,7 @@ export default {
           .then(res => (this.loadingArtefacts = false))
           .catch(err => {
             this.loadingArtefacts = false
-            console.log(err)
+            console.error(err)
           })
       }
     },
