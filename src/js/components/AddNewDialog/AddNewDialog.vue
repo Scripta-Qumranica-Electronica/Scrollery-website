@@ -70,10 +70,13 @@ export default {
       this.corpus.imageReferences
         .populate(payload)
         .then(res => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
         })
         .catch(err => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           console.error(err)
         })
 
@@ -84,10 +87,13 @@ export default {
           scroll_version_id: this.selectedCombination,
         })
         .then(res => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
         })
         .catch(err => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           console.error(err)
         })
     },
@@ -101,12 +107,17 @@ export default {
             image_catalog_id: this.selectedImageReference,
           })
           .then(res => {
+            /* istanbul ignore next */
             this.$store.commit('delWorking')
+            /* istanbul ignore next */
             this.selectedImageReference = undefined
+            /* istanbul ignore next */
             this.selectedImageReference = imageReference
           })
           .catch(err => {
+            /* istanbul ignore next */
             this.$store.commit('delWorking')
+            /* istanbul ignore next */
             console.error(err)
           })
 
@@ -117,12 +128,17 @@ export default {
             image_catalog_id: imageReference,
           })
           .then(res => {
+            /* istanbul ignore next */
             this.$store.commit('delWorking')
+            /* istanbul ignore next */
             this.selectedImageReference = undefined
+            /* istanbul ignore next */
             this.selectedImageReference = imageReference
           })
           .catch(err => {
+            /* istanbul ignore next */
             this.$store.commit('delWorking')
+            /* istanbul ignore next */
             console.error(err)
           })
       }
@@ -135,11 +151,15 @@ export default {
           image_catalog_id: newImageReference,
         })
         .then(res => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           this.selectedImageReference = newImageReference
         })
         .catch(err => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           console.error(err)
         })
 
@@ -150,11 +170,15 @@ export default {
           image_catalog_id: newImageReference,
         })
         .then(res => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           this.selectedArtefact = artefact
         })
         .catch(err => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           console.error(err)
         })
     },

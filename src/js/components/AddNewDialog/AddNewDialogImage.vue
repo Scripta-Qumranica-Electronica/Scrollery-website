@@ -80,11 +80,13 @@ export default {
       return this.corpus.imageReferences.get(this.imageReference).images
     },
     mask() {
-      return this.artefact ? this.corpus.artefacts.get(this.artefact).mask : undefined
+      return this.artefact
+        ? this.corpus.artefacts.get(this.artefact, this.scroll_version_id).mask
+        : undefined
     },
     masterImage() {
       const reference = this.artefact
-        ? this.corpus.artefacts.get(this.artefact).image_catalog_id
+        ? this.corpus.artefacts.get(this.artefact, this.scroll_version_id).image_catalog_id
         : this.imageReference
       let master = undefined
       for (let i = 0, image; (image = this.corpus.imageReferences.get(reference).images[i]); i++) {

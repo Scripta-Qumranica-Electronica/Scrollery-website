@@ -64,7 +64,8 @@ const generateCorpus = () => {
       corpus.artefacts._insertItem(new Artefact({
         artefact_id: artefact_id,
         rois: artefactRois,
-        scroll_version_id: scroll_version_id
+        scroll_version_id: scroll_version_id,
+        image_catalog_id: image_catalog_id,
       }), scroll_version_id)
       artefacts.push(artefact_id)
     }
