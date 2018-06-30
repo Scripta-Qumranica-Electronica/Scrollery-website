@@ -7,7 +7,7 @@
         :class="{'fa-lock': combination.locked, 'fa-unlock': !combination.locked}" 
         :style="{color: combination.locked ? 'red' : 'green'}"
         @click="lockScroll"></i>
-      <i class="fa fa-clone" @click="corpus.combinations.cloneScroll(combination.scroll_version_id)"></i>
+      <i class="fa fa-clone" @click="cloneCombination"></i>
       <i v-if="!combination.locked" class="fa fa-trash-o" @click="corpus.combinations.removeItem(combination.scroll_version_id)"></i>
     </div>
     <!-- Use v-if here so we don't waste space on the DOM -->
@@ -148,6 +148,19 @@ export default {
             console.error(err)
           })
       }
+    },
+
+    cloneCombination() {
+      this.$store.commit('addWorking')
+      this.corpus.combinations
+        .cloneScroll(this.combination.scroll_version_id)
+        .then(res => {
+          this.$store.commit('delWorking')
+        })
+        .catch(err => {
+          this.$store.commit('delWorking')
+          console.error(err)
+        })
     },
 
     toggleColumns() {
