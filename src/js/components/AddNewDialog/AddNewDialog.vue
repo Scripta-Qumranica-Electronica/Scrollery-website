@@ -206,12 +206,28 @@ export default {
       const region_in_master_image = this.selectedArtefact
         ? this.corpus.artefacts.get(this.selectedArtefact).mask
         : 'POLYGON((0 0,0 0,0 0,0 0))'
-      this.corpus.artefacts.addNewArtefact(
-        this.currentScrollVersionID,
-        id_of_sqe_image,
-        image_catalog_id,
-        region_in_master_image
-      )
+      this.corpus.artefacts
+        .addNewArtefact(
+          this.currentScrollVersionID,
+          id_of_sqe_image,
+          image_catalog_id,
+          region_in_master_image
+        )
+        .then(res => {
+          const h = this.$createElement
+          this.$notify({
+            title: 'Add artefact',
+            message: h('i', { style: 'color: teal' }, 'The artefact was succesfully created'),
+          })
+        })
+        .catch(err => {
+          console.error(err)
+          const h = this.$createElement
+          this.$notify({
+            title: 'Add artefact',
+            message: h('i', { style: 'color: red' }, 'There was an error creating the artefact.'),
+          })
+        })
     },
   },
 }
