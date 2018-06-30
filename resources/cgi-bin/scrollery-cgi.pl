@@ -279,13 +279,16 @@ FROM image_catalog
   JOIN scroll_version_group USING(scroll_id)
   JOIN scroll_version USING(scroll_version_group_id)
   LEFT JOIN SQE_image USING(image_catalog_id)
-WHERE scroll_version.scroll_version_id = ?
-  AND (SQE_image.is_master = 1 OR SQE_image.is_master IS NULL)
+  LEFT JOIN artefact_shape ON artefact_shape.id_of_sqe_image = SQE_image.sqe_image_id
+  JOIN artefact_shape_owner USING(artefact_shape_id)
+WHERE (scroll_version.scroll_version_id = ?
+  AND (SQE_image.is_master = 1 OR SQE_image.is_master IS NULL)) 
+  OR artefact_shape_owner.scroll_version_id = ?
 ORDER BY lvl1, lvl2, side
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{scroll_version_id});
+	$sql->execute($json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 
 	readResults($sql, $key, $lastItem);
 	return;
@@ -873,7 +876,8 @@ sub removeSignChar() {
 sub addSignCharCommentary() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
-	$cgi->set_sign_char_commentary($json_post->{sign_char_id}, $json_post->{attribute_id}, $json_post->{commentary});
+	my $new_sign_char_commentary_id = $cgi->set_sign_char_commentary($json_post->{sign_char_id}, $json_post->{attribute_id}, $json_post->{commentary});
+  print '{"new_sign_char_commentary_id":' . "$new_sign_char_commentary_id}";
 }
 
 #Give a sign_char_commentary_id.

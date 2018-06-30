@@ -1,5 +1,6 @@
 import ItemList from './ItemList.js'
 import Artefact from './Artefact.js'
+import uuid from 'uuid/v1'
 import { pathIdentifier } from '~/utils/PathIdentifier.js'
 import { svgPolygonToWKT, geoJSONPolygonToWKT } from '~/utils/VectorFactory.js'
 
@@ -76,6 +77,55 @@ export default class Artefacts extends ItemList {
           'The mask, artefact_shape_id, and scroll_version_id inputs were of different lengths.'
         )
       }
+    })
+  }
+
+  /* istanbul ignore next */
+  addNewArtefact(scroll_version_id, id_of_sqe_image, image_catalog_id, region_in_master_image) {
+    const payload = {
+      scroll_version_id: scroll_version_id,
+      id_of_sqe_image: id_of_sqe_image,
+      image_catalog_id: image_catalog_id,
+      region_in_master_image: region_in_master_image,
+      transaction: 'addArtefact',
+    }
+    return new Promise((resolve, reject) => {
+      this.axios
+        .post('resources/cgi-bin/scrollery-cgi.pl', payload)
+        .then(res => {
+          if (res.status === 200 && res.data) {
+            this.axios
+              .post('resources/cgi-bin/scrollery-cgi.pl', {
+                transaction: 'changeArtefactPosition',
+                scroll_version_id: res.data.payload.scroll_version_id,
+                artefact_id: res.data.returned_info,
+                transform_matrix: '{"matrix":[[1,0,0],[0,1,0]]}',
+                image_catalog_id: res.data.payload.image_catalog_id,
+                z_index: 0,
+              })
+              .then(res => {
+                this.axios
+                  .post('resources/cgi-bin/scrollery-cgi.pl', {
+                    transaction: 'changeArtefactData',
+                    scroll_version_id: res.data.payload.scroll_version_id,
+                    artefact_id: res.data.payload.artefact_id,
+                    image_catalog_id: res.data.payload.image_catalog_id,
+                    name: uuid(),
+                  })
+                  .then(res => {
+                    resolve(
+                      this.populate({
+                        image_catalog_id: res.data.payload.image_catalog_id,
+                        scroll_version_id: res.data.payload.scroll_version_id,
+                      })
+                    )
+                  })
+              })
+          }
+        })
+        .catch(err => {
+          reject(err)
+        })
     })
   }
 }

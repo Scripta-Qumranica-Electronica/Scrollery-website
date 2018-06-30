@@ -192,12 +192,26 @@ export default {
     createNewArtefact() {
       this.selectedArtefact = undefined
     },
+
+    /**
+     * TODO: finish this when you life becomes more bearable...
+     */
     commitNewArtefact() {
-      if (this.selectedArtefact) {
-        console.log(this.selectedArtefact, this.currentScrollVersionID)
-      } else {
-        console.log(this.selectedImageReference, this.currentScrollVersionID)
-      }
+      const image_catalog_id = this.selectedArtefact
+        ? this.corpus.artefacts.get(this.selectedArtefact).image_catalog_id
+        : this.corpus.imageReferences.get(this.selectedImageReference).image_catalog_id
+      const id_of_sqe_image = this.selectedArtefact
+        ? this.corpus.artefacts.get(this.selectedArtefact).id_of_sqe_image
+        : this.corpus.imageReferences.get(this.selectedImageReference).master_sqe_image_id
+      const region_in_master_image = this.selectedArtefact
+        ? this.corpus.artefacts.get(this.selectedArtefact).mask
+        : 'POLYGON((0 0,0 0,0 0,0 0))'
+      this.corpus.artefacts.addNewArtefact(
+        this.currentScrollVersionID,
+        id_of_sqe_image,
+        image_catalog_id,
+        region_in_master_image
+      )
     },
   },
 }
