@@ -25,7 +25,7 @@ else
     git clone https://github.com/Scripta-Qumranica-Electronica/Data-files.git ../resources/data-files
     # cd into the directory
     cd ../resources/data-files
-    git fetch --tags
+    git fetch --all --tags --prune
 fi
 
 echo "Checking for desired version"

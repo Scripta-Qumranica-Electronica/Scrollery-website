@@ -4,19 +4,23 @@ import {
   wktParseRect,
   svgPolygonToWKT,
   svgPolygonToGeoJSON,
+  svgPolygonToClipper,
+  clipperToSVGPolygon,
+  geoJSONPolygonToWKT,
   dbMatrixToSVG,
   svgMatrixToDB,
   matrix6To16,
   matrix16To6,
   clipCanvas,
 } from '~/utils/VectorFactory.js'
+import * as polygons from '../../.utils/testing-data/polygons.js'
 
 describe('VectorFactory.wktPolygonToSvg', () => {
   it('should return undefined when unrecognized input passed', () => {
     expect(wktPolygonToSvg('INCORRECT')).to.equal(undefined)
   })
 
-  it('should convert a GeoJSON Polygon to a valid svg path String', () => {
+  it('should convert a simple terminated WKT Polygon to a valid svg path String', () => {
     // setup initial state
     const point1 = {
       x: 1,
@@ -30,9 +34,7 @@ describe('VectorFactory.wktPolygonToSvg', () => {
       x: 1,
       y: 5,
     }
-    const geoJsonPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${
-      point3.y
-    },${point1.x} ${point1.y}))`
+    const wktPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${point3.y},${point1.x} ${point1.y}))`
     const boundingRect = {
       x: point1.x - point1.x,
       y: point1.y - point1.y,
@@ -45,10 +47,10 @@ describe('VectorFactory.wktPolygonToSvg', () => {
     }L${point1.x} ${point1.y}`
 
     // assert expected value
-    expect(wktPolygonToSvg(geoJsonPolygon, boundingRect)).to.equal(expectedSvgPolygon)
+    expect(wktPolygonToSvg(wktPolygon, boundingRect)).to.equal(expectedSvgPolygon)
   })
 
-  it('should convert a GeoJSON Polygon to a valid svg path String', () => {
+  it('should convert a simple unterminated WKT Polygon to a valid svg path String', () => {
     // setup initial state
     const point1 = {
       x: 1,
@@ -62,16 +64,28 @@ describe('VectorFactory.wktPolygonToSvg', () => {
       x: 1,
       y: 5,
     }
-    const geoJsonPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${
-      point3.y
-    },${point1.x} ${point1.y}))`
+    const wktPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${point3.y}))`
+    const boundingRect = {
+      x: point1.x - point1.x,
+      y: point1.y - point1.y,
+      width: point2.x - point1.x,
+      height: point3.y - point1.y,
+    }
     //define expected result
     const expectedSvgPolygon = `M${point1.x} ${point1.y}L${point2.x} ${point2.y}L${point3.x} ${
       point3.y
     }L${point1.x} ${point1.y}`
 
     // assert expected value
-    expect(wktPolygonToSvg(geoJsonPolygon)).to.equal(expectedSvgPolygon)
+    expect(wktPolygonToSvg(wktPolygon, boundingRect)).to.equal(expectedSvgPolygon)
+  })
+
+  it('should convert a complex WKT Polygon to a valid svg path String', () => {
+    expect(wktPolygonToSvg(polygons.wkt_terminated)).to.equal(polygons.svg_terminated)
+  })
+
+  it('should convert a complex unterminated WKT Polygon to a valid svg path String', () => {
+    expect(wktPolygonToSvg(polygons.wkt_unterminated)).to.equal(polygons.svg_terminated)
   })
 })
 
@@ -126,7 +140,7 @@ describe('VectorFactory.svgPolygonToWKT', () => {
     expect(svgPolygonToWKT('INCORRECT')).to.equal(undefined)
   })
 
-  it('should convert an SVG path to a WKT string', () => {
+  it('should convert a simple SVG path to a WKT string', () => {
     // Setup the input and result
     let svg = 'M'
     let wkt = 'POLYGON(('
@@ -162,6 +176,14 @@ describe('VectorFactory.svgPolygonToWKT', () => {
     // assert expected value
     expect(svgPolygonToWKT(svg)).to.equal(wkt)
   })
+
+  it('should convert a complex terminated SVG path to a valid WKT polygon String', () => {
+    expect(svgPolygonToWKT(polygons.svg_terminated)).to.equal(polygons.wkt_terminated)
+  })
+
+  it('should convert a complex unterminated SVG path to a valid WKT polygon String', () => {
+    expect(svgPolygonToWKT(polygons.svg_unterminated)).to.equal(polygons.wkt_terminated)
+  })
 })
 
 describe('VectorFactory.svgPolygonToGeoJSON', () => {
@@ -169,7 +191,7 @@ describe('VectorFactory.svgPolygonToGeoJSON', () => {
     expect(svgPolygonToGeoJSON('INCORRECT')).to.equal(undefined)
   })
 
-  it('should convert an SVG path to a GeoJSON representation', () => {
+  it('should convert a simple SVG path to a GeoJSON representation', () => {
     // Setup the input and result
     const svg = 'M0 0 10 0 10 10 0 10M1 1 1 3 3 3 3 1'
     const geoJSON = 
@@ -197,6 +219,161 @@ describe('VectorFactory.svgPolygonToGeoJSON', () => {
     expect(JSON.stringify(svgPolygonToGeoJSON(svg)))
     .to.equal(JSON.stringify(geoJSON))
   })
+
+  it('should convert a complex terminated SVG path to a valid GeoJSON representation', () => {
+    expect(svgPolygonToGeoJSON(polygons.svg_terminated)).to.deep.equal(polygons.geoJSON)
+  })
+
+  it('should convert a complex unterminated SVG path to a valid GeoJSON representation', () => {
+    expect(svgPolygonToGeoJSON(polygons.svg_unterminated)).to.deep.equal(polygons.geoJSON)
+  })
+})
+
+describe('VectorFactory.svgPolygonToClipper', () => {
+  it('should return undefined when unrecognized input passed', () => {
+    expect(svgPolygonToClipper('INCORRECT')).to.equal(undefined)
+  })
+
+  it('should convert a simple SVG path to a Clipper representation', () => {
+    // Setup the input and result
+    const svg = 'M0 0 10 0 10 10 0 10M1 1 1 3 3 3 3 1'
+    const clipper = 
+    [
+      [
+        {"X": 0, "Y": 0},
+        {"X": 10, "Y": 0},
+        {"X": 10, "Y": 10},
+        {"X": 0, "Y": 10},
+        {"X": 0, "Y": 0}
+      ],
+      [
+        {"X": 1, "Y": 1},
+        {"X": 1, "Y": 3},
+        {"X": 3, "Y": 3},
+        {"X": 3, "Y": 1},
+        {"X": 1, "Y": 1}
+      ]
+    ]
+    // assert expected value
+    expect(svgPolygonToClipper(svg))
+    .to.deep.equal(clipper)
+  })
+
+  it('should convert a complex terminated SVG path to a valid Clipper representation', () => {
+    expect(svgPolygonToClipper(polygons.svg_terminated)).to.deep.equal(polygons.clipper)
+  })
+
+  it('should convert a complex unterminated SVG path to a valid Clipper representation', () => {
+    expect(svgPolygonToClipper(polygons.svg_unterminated)).to.deep.equal(polygons.clipper)
+  })
+})
+
+describe('VectorFactory.clipperToSVGPolygon', () => {
+  it('should return undefined when unrecognized input passed', () => {
+    expect(clipperToSVGPolygon('INCORRECT')).to.equal(undefined)
+  })
+
+  it('should convert a simple Clipper representation to a SVG path', () => {
+    // Setup the input and result
+    const svg = 'M0 0L10 0L10 10L0 10L0 0M1 1L1 3L3 3L3 1L1 1'
+    const clipper = 
+    [
+      [
+        {"X": 0, "Y": 0},
+        {"X": 10, "Y": 0},
+        {"X": 10, "Y": 10},
+        {"X": 0, "Y": 10},
+        {"X": 0, "Y": 0}
+      ],
+      [
+        {"X": 1, "Y": 1},
+        {"X": 1, "Y": 3},
+        {"X": 3, "Y": 3},
+        {"X": 3, "Y": 1},
+        {"X": 1, "Y": 1}
+      ]
+    ]
+    // assert expected value
+    expect(clipperToSVGPolygon(clipper))
+    .to.equal(svg)
+  })
+
+  it('should convert a simple unterminated Clipper representation to a SVG path', () => {
+    // Setup the input and result
+    const svg = 'M0 0L10 0L10 10L0 10L0 0M1 1L1 3L3 3L3 1L1 1'
+    const clipper = 
+    [
+      [
+        {"X": 0, "Y": 0},
+        {"X": 10, "Y": 0},
+        {"X": 10, "Y": 10},
+        {"X": 0, "Y": 10}
+      ],
+      [
+        {"X": 1, "Y": 1},
+        {"X": 1, "Y": 3},
+        {"X": 3, "Y": 3},
+        {"X": 3, "Y": 1}
+      ]
+    ]
+    // assert expected value
+    expect(clipperToSVGPolygon(clipper))
+    .to.equal(svg)
+  })
+
+  it('should convert a complex valid Clipper representation to a terminated SVG path', () => {
+    expect(clipperToSVGPolygon(polygons.clipper)).to.equal(polygons.svg_terminated)
+  })
+})
+
+describe('VectorFactory.geoJSONPolygonToWKT', () => {
+  it('should return undefined when unrecognized input passed', () => {
+    expect(geoJSONPolygonToWKT('INCORRECT')).to.equal(undefined)
+  })
+
+  it('should convert a GeoJSON representation to a WKT representation', () => {
+    // Setup the input and result
+    const geoJSON = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [0,0],
+          [0,1],
+          [1,1],
+          [1,0],
+          [0,0]
+        ]
+      ]
+    }
+    const wkt = 'POLYGON((0 0,0 1,1 1,1 0,0 0))'
+    // assert expected value
+    expect(geoJSONPolygonToWKT(geoJSON)).to.equal(wkt)
+    expect(geoJSONPolygonToWKT(JSON.stringify(geoJSON))).to.equal(wkt)
+  })
+
+  it('should convert a simple unterminated GeoJSON representation to a WKT representation', () => {
+    // Setup the input and result
+    const geoJSON = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [0,0],
+          [0,1],
+          [1,1],
+          [1,0]
+        ]
+      ]
+    }
+    const wkt = 'POLYGON((0 0,0 1,1 1,1 0,0 0))'
+    // assert expected value
+    expect(geoJSONPolygonToWKT(geoJSON)).to.equal(wkt)
+    expect(geoJSONPolygonToWKT(JSON.stringify(geoJSON))).to.equal(wkt)
+  })
+
+  it('should convert a complex valid GeoJSON representation to a valid WKT representation', () => {
+    expect(geoJSONPolygonToWKT(polygons.geoJSON)).to.equal(polygons.wkt_terminated)
+    expect(geoJSONPolygonToWKT(JSON.stringify(polygons.geoJSON))).to.equal(polygons.wkt_terminated)
+  })
 })
 
 describe('VectorFactory.dbMatrixToSVG', () => {
@@ -213,6 +390,17 @@ describe('VectorFactory.dbMatrixToSVG', () => {
 
     // assert expected value
     expect(dbMatrixToSVG(dbMatrix)).to.deep.equal(svgMatrix)
+  })
+
+  it('should convert string representation of a 2D DB matrix to 1D SVG matrix', () => {
+    // setup initial input
+    const dbMatrix = {matrix: [[1, 3, 5], [2, 4, 6]]}
+
+    //define expected result
+    const svgMatrix = [1, 2, 3, 4, 5, 6]
+
+    // assert expected value
+    expect(dbMatrixToSVG(JSON.stringify(dbMatrix))).to.deep.equal(svgMatrix)
   })
 })
 

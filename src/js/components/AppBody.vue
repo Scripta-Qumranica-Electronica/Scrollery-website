@@ -69,103 +69,68 @@ export default {
     // from the router.
     this.$store.commit('resetWorking')
     this.$store.commit('addWorking')
+
     this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
-
-    // TODO: find I way to mock the corpus model for unit tests
-    /* istanbul ignore next */
-    this.corpus.populateCombinations().then(res => {
-      this.menuLoaded = true
-      this.$store.commit('delWorking')
-      if (this.$route.params.scrollID && this.$route.params.scrollID !== '~') {
-        if (res && res[0] && res[0].results) {
-          const scrolls = res[0].results
-          this.$store.commit(
-            'setLockedScrolls',
-            scrolls.reduce((hash, scrollVersion) => {
-              if (scrollVersion.locked) {
-                hash[scrollVersion.scroll_version_id] = true
-              }
-              return hash
-            }, {})
-          )
-        }
-
+    this.corpus.combinations
+      .populate()
+      .then(res => {
+        this.$store.commit('delWorking')
         this.$store.commit('addWorking')
-        this.corpus
-          .populateColumnsOfCombination(
-            this.$route.params.scrollID,
-            this.$route.params.scrollVersionID
-          )
-          .then(res => {
-            if (this.$route.params.colID !== '~') {
-              this.corpus.populateRoiOfCol(
-                this.$route.params.colID,
-                this.$route.params.scrollVersionID
-              )
-            }
-          })
-        this.corpus
-          .populateImageReferencesOfCombination(
-            this.$route.params.scrollID,
-            this.$route.params.scrollVersionID
-          )
-          .then(res1 => {
-            this.$store.commit('delWorking')
-            if (this.$route.params.imageID !== '~') {
-              this.$store.commit('addWorking')
-              this.corpus
-                .populateImagesOfImageReference(
-                  this.$route.params.imageID,
-                  this.$route.params.scrollVersionID
-                )
-                .then(res2 => {
-                  this.$store.commit('delWorking')
-                  if (this.$route.params.artID !== '~') {
-                    this.$store.commit('addWorking')
-                    this.corpus
-                      .populateArtefactsOfImageReference(
-                        this.$route.params.imageID,
-                        this.$route.params.scrollVersionID
-                      )
-                      .then(res3 => {
-                        this.$store.commit('delWorking')
-                        this.resetRouter()
-                      })
-                  } else {
-                    this.resetRouter()
-                  }
-                })
-            } else {
-              this.resetRouter()
-            }
-          })
-
-        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-          transaction: 'getListOfAttributes',
-        })
-          .then(({ data }) => {
-            const { results: attributes } = data
-            if (attributes && attributes.length) {
-              this.$store.commit('setSignAttributeList', attributes)
-            }
-          })
-          .catch(err => {
-            console.error(err)
-          })
-      }
-    })
+        return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
+          ? this.corpus.cols.populate({
+              scroll_version_id: this.$route.params.scrollVersionID,
+              scroll_id: this.$route.params.scrollID,
+            })
+          : undefined
+      })
+      .then(res => {
+        this.$store.commit('delWorking')
+        this.$store.commit('addWorking')
+        return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
+          ? this.corpus.imageReferences.populate({
+              scroll_version_id: this.$route.params.scrollVersionID,
+              scroll_id: this.$route.params.scrollID,
+            })
+          : undefined
+      })
+      .then(res => {
+        this.$store.commit('delWorking')
+        this.$store.commit('addWorking')
+        return this.$route.params.imageID && this.$route.params.imageID !== '~'
+          ? this.corpus.artefacts.populate({
+              image_catalog_id: this.$route.params.imageID,
+              scroll_version_id: this.$route.params.scrollVersionID,
+            })
+          : undefined
+      })
+      .then(res => {
+        this.$store.commit('delWorking')
+        this.resetRouter()
+      })
+      .catch(err => {
+        this.$store.commit('delWorking')
+        console.error(err)
+      })
   },
   methods: {
+    /**
+     * This function triggers a router change, though it copies all
+     * data from the old router to the new one.  This way we do not
+     * need to write special mount() functions in our Vue components,
+     * they will catch any necessary changes via watch() functions that
+     * listen to router changes, so loading the website with a full
+     * address in the router behaves the same way as navigating to
+     * the router address while the webist is already running.
+     */
     resetRouter() {
-      // Trigger a router change here, so we don't need extra mount()
-      // functions in all of our vue components.  Is there a more
-      // elegant way to achieve this?
+      // Save the initial router address.
       const scrollID = this.$route.params.scrollID
       const scrollVersionID = this.$route.params.scrollVersionID
       const colID = this.$route.params.colID
       const imageID = this.$route.params.imageID
       const artID = this.$route.params.artID
 
+      // Navigate to an empty router address.
       this.$router.push(
         {
           name: 'workbenchAddress',
@@ -179,7 +144,7 @@ export default {
         },
         () => {
           this.$nextTick(() => {
-            // Load back the initial values
+            // Navigate back to the initial values on the next tick.
             this.$router.push({
               name: 'workbenchAddress',
               params: {

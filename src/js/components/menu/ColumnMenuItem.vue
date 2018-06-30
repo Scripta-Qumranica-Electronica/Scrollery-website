@@ -1,15 +1,17 @@
 <template>
-  <span class="clickable-menu-item" @click="setRouter">
-    {{column.name}} ({{columnID}})
-  </span>
+  <div :style="{background: $route.params.colID === column.col_id ? 'lightblue' : '#dedede'}">
+    <span class="clickable-menu-item" @click="setRouter">
+      <span>{{column.name}} ({{column.col_id}})</span>
+      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="corpus.cols.removeItem(column.col_id, scrollVersionID)"></i>
+    </span>
+  </div>
 </template>
 
 <script>
 export default {
   props: {
-    columnID: Number,
-    scrollVersionID: Number,
-    scrollID: Number,
+    scrollVersionID: undefined,
+    scrollID: undefined,
     column: {},
     corpus: {},
   },
@@ -23,14 +25,14 @@ export default {
       if (
         params.scrollID !== this.scrollID ||
         params.scrollVersionID !== this.scrollVersionID ||
-        params.colID !== this.columnID
+        params.colID !== this.column.col_id
       ) {
         this.$router.push({
           name: 'workbenchAddress',
           params: {
             scrollID: this.scrollID,
             scrollVersionID: this.scrollVersionID,
-            colID: this.columnID,
+            colID: this.column.col_id,
             imageID: params.imageID,
             artID: params.artID,
           },

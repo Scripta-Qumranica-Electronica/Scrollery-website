@@ -1,4 +1,24 @@
-# Quick Start
+# Contents
+- [Contents](#contents)
+- [Quick Start Instructions](#quick-start-instructions)
+- [Full Setup Description](#full-setup-description)
+    - [Summary](#summary)
+    - [Server Side](#server-side)
+        - [Build Server Side Code](#build-server-side-code)
+    - [Client](#client)
+        - [Install Dependencies](#install-dependencies)
+            - [Clone the Scrollery-website repository (if not already done)](#clone-the-scrollery-website-repository-if-not-already-done)
+            - [Install website dependencies](#install-website-dependencies)
+            - [Install SQE_API](#install-sqe_api)
+            - [Build the Perl cgi script dependencies](#build-the-perl-cgi-script-dependencies)
+        - [Starting up the server for development or production](#starting-up-the-server-for-development-or-production)
+                - [`npm start`](#npm-start)
+                - [`npm run dev`](#npm-run-dev)
+                - [`npm run prod`](#npm-run-prod)
+        - [Testing in Browser](#testing-in-browser)
+        - [Note](#note)
+
+# Quick Start Instructions
 The Scrollery-website comes with a quick start script.  In order to run it, you must already have installed the following dependencies:
 * [Node 8.9.4](https://nodejs.org/en/download/)
 * Npm 5+ (bundled with node)
@@ -29,7 +49,7 @@ npm run bootstrap
 npm start
 ```
 
-If everything runs with no errors, then after executing `npm start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.
+If everything runs with no errors, then after executing `npm start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.  The CGI requests provided in this project are ducumented in [CGI-Functions.md](./CGI-Functions.md).  Documentation for the database structure can be found in the [Data-files project documentation](https://github.com/Scripta-Qumranica-Electronica/Data-files/blob/master/docs/Database-structure.md).
 
 You may also run `npm run bootstrap` again after pulling down a new version of the Scrollery-website, and it will make any necessary updates to the dependencies and the database <span style="color:red">(Warning!!! this will overwrite your existing SQE_DEV database)</span>.  After running several times, you may find that your Docker runs out of space, I have found the suggestions [here](https://lebkowski.name/docker-volumes/) to be helpful in such circumstances.
 

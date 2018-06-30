@@ -19,6 +19,7 @@ try {
   // This dummy suite only runs if Webpack encounters a hard error attempting
   // to build the test context. If it does, then this catches it and gives 
   // something intelligible.
+  /* istanbul ignore next */
   describe('test compilation', () => {
     it('should not throw an error', () => {
       expect(e).to.equal(null);
