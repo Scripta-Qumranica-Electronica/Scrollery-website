@@ -282,8 +282,8 @@ FROM image_catalog
   LEFT JOIN artefact_shape ON artefact_shape.id_of_sqe_image = SQE_image.sqe_image_id
   JOIN artefact_shape_owner USING(artefact_shape_id)
 WHERE (scroll_version.scroll_version_id = ?
-  AND (SQE_image.is_master = 1 OR SQE_image.is_master IS NULL)) 
-  OR artefact_shape_owner.scroll_version_id = ?
+  OR artefact_shape_owner.scroll_version_id = ?)
+  AND (SQE_image.is_master = 1 OR SQE_image.is_master IS NULL) 
 ORDER BY lvl1, lvl2, side
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
