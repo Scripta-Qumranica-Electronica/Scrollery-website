@@ -873,7 +873,8 @@ sub removeSignChar() {
 sub addSignCharCommentary() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
-	$cgi->set_sign_char_commentary($json_post->{sign_char_id}, $json_post->{attribute_id}, $json_post->{commentary});
+	my $new_sign_char_commentary_id = $cgi->set_sign_char_commentary($json_post->{sign_char_id}, $json_post->{attribute_id}, $json_post->{commentary});
+  print '{"new_sign_char_commentary_id":' . "$new_sign_char_commentary_id}";
 }
 
 #Give a sign_char_commentary_id.
