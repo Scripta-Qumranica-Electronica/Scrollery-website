@@ -69,8 +69,19 @@ describe('AddNewDialog', function() {
 
   it('can commit a new artefact', () => {
     vm.selectedArtefact = artefact[0]
+    vm.selectedImageReference = combination.imageReferences[0]
     vm.commitNewArtefact()
+
+    vm.selectedArtefact = artefact[0]
+    vm.selectedImageReference = undefined
+    vm.commitNewArtefact()
+
     vm.selectedArtefact = undefined
+    vm.selectedImageReference = combination.imageReferences[0]
+    vm.commitNewArtefact()
+    
+    vm.selectedArtefact = undefined
+    vm.selectedImageReference = undefined
     vm.commitNewArtefact()
     // expect(vm.selectedCombination).to.equal(combination.scroll_version_id)
     // expect(vm.selectedImageReference).to.equal(image.image_catalog_id)
