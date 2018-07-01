@@ -92,8 +92,8 @@ export default class ColumnPersistanceService extends PersistanceService {
           } else if (typeof singleAction[signIdenfifier] === 'number') {
             let signRequested = transaction.signs[i]
             persistedMap.additions[signIdenfifier] = {
-              next_sign_id: signRequested.next_sign_id || -1,
-              sign_id: singleAction[signIdenfifier],
+              next_sign_id: ~~signRequested.next_sign_id || -1,
+              sign_id: ~~singleAction[signIdenfifier],
             }
           }
           // need case for updates...

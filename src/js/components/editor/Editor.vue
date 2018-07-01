@@ -98,7 +98,7 @@ export default {
               lines.push(
                 new Line(
                   {
-                    id: line.line_id,
+                    id: ~~line.line_id,
                     name: line.line_name,
                   },
                   signs,
@@ -111,7 +111,7 @@ export default {
             this.text.insert(
               new Column(
                 {
-                  id: column.fragment_id,
+                  id: ~~column.fragment_id,
                   name: column.fragment_name,
                 },
                 lines,
