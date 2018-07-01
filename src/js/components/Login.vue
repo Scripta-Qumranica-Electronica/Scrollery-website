@@ -141,7 +141,7 @@ export default {
         } else if (res.data && res.data.SESSION_ID && res.data.USER_ID) {
           // Set store state
           this.setSessionID(res.data.SESSION_ID)
-          this.setUserID(res.data.USER_ID)
+          this.setUserID(~~res.data.USER_ID)
           this.setUsername(this.user.trim())
           this.setLanguage(this.language)
           // Load language files
