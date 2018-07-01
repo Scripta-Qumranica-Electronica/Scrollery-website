@@ -492,4 +492,20 @@ export default {
     padding-bottom: 20px;
   }
 }
+
+/* here are all the CSS directives for sign attributes */
+.is_reconstructed_TRUE {
+  color: white;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.is_reconstructed_FALSE + .is_reconstructed_TRUE:before {
+  content: '[';
+  color: initial;
+  text-shadow: initial;
+}
+
+.is_reconstructed_TRUE + .is_reconstructed_FALSE:before {
+  content: ']';
+}
 </style>
