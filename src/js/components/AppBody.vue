@@ -74,8 +74,20 @@ export default {
     this.corpus.combinations
       .populate()
       .then(res => {
-        this.$store.commit('delWorking')
-        this.$store.commit('addWorking')
+        // determine the locked scrolls
+        if (res && res.data && res.data.results) {
+          const scrolls = res.data.results
+          this.$store.commit(
+            'setLockedScrolls',
+            scrolls.reduce((hash, scrollVersion) => {
+              if (scrollVersion.locked) {
+                hash[scrollVersion.scroll_version_id] = true
+              }
+              return hash
+            }, {})
+          )
+        }
+
         return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
           ? this.corpus.cols.populate({
               scroll_version_id: this.$route.params.scrollVersionID,
@@ -84,8 +96,6 @@ export default {
           : undefined
       })
       .then(res => {
-        this.$store.commit('delWorking')
-        this.$store.commit('addWorking')
         return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
           ? this.corpus.imageReferences.populate({
               scroll_version_id: this.$route.params.scrollVersionID,
@@ -94,8 +104,6 @@ export default {
           : undefined
       })
       .then(res => {
-        this.$store.commit('delWorking')
-        this.$store.commit('addWorking')
         return this.$route.params.imageID && this.$route.params.imageID !== '~'
           ? this.corpus.artefacts.populate({
               image_catalog_id: this.$route.params.imageID,
@@ -106,6 +114,23 @@ export default {
       .then(res => {
         this.$store.commit('delWorking')
         this.resetRouter()
+      })
+      .catch(err => {
+        this.$store.commit('delWorking')
+        console.error(err)
+      })
+
+    this.$store.commit('addWorking')
+    this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+      transaction: 'getListOfAttributes',
+    })
+      .then(({ data }) => {
+        this.$store.commit('delWorking')
+
+        const { results: attributes } = data
+        if (attributes && attributes.length) {
+          this.$store.commit('setSignAttributeList', attributes)
+        }
       })
       .catch(err => {
         this.$store.commit('delWorking')

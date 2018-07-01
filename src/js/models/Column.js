@@ -61,36 +61,6 @@ class Column extends List {
    * @public
    * @instance
    *
-   * @param {object|Sign} sign sign to insert
-   */
-  insertSign(sign, isPersisted) {
-    if (!(sign instanceof Sign)) {
-      sign = new Sign(sign, isPersisted)
-    }
-
-    let line = this.find(line => line.id === sign.line_id)
-
-    // Lazy create the line model from the sign.
-    if (!line) {
-      line = new Line(
-        {
-          id: sign.line_id,
-          name: sign.line_name,
-          col_id: this.id,
-          col_name: this.name,
-        },
-        [],
-        isPersisted
-      )
-      this.insert(line)
-    }
-    line.insert(sign)
-  }
-
-  /**
-   * @public
-   * @instance
-   *
    * @param {number|Line} line        A line instance, or index for that line.
    * @param {number}      splitIndex  The location to split the line at
    *

@@ -43,13 +43,23 @@ class List extends EventEmitter {
     }
 
     this.on(['insert', 'push', 'splice'], ({ item, index }) => {
+      if (item.isPersisted()) {
+        return
+      }
+
       item.on('change', this._itemChanged.bind(this, item))
 
       if (item instanceof List) {
         item.on('delete', ({ item, index }) => this.emit('delete'))
+        item.on('addition', ({ item, index }) => this.emit('addition'))
       }
 
       this.emit('addition', { item, index })
+      this.emit('change', {
+        type: 'addition',
+        item,
+        index,
+      })
     })
 
     // insert each item in turn
@@ -116,7 +126,9 @@ class List extends EventEmitter {
     }
 
     // TODO: updates
-    this.forEach(item => item.persisted(persistedMap))
+    this.forEach(item => {
+      item.persisted(persistedMap)
+    })
   }
 
   /**
@@ -186,6 +198,16 @@ class List extends EventEmitter {
   }
 
   /**
+   * @public
+   * @instance
+   *
+   * @return {boolean}       proxies to hasChanges
+   */
+  isPersisted() {
+    return this.hasChanges()
+  }
+
+  /**
    * The List has changes if it has any unpersisted sub-items with changes
    * or itself has additions/deletions
    *
@@ -249,7 +271,7 @@ class List extends EventEmitter {
       throw new TypeError(`Expect an instance of ${this.constructor.getModel().name} in push`)
     }
 
-    if (item.hasChanges()) {
+    if (!item.isPersisted()) {
       this.__changes.additions[item.getUUID()] = item
     }
 
@@ -373,7 +395,7 @@ class List extends EventEmitter {
    * @public
    * @instance
    *
-   * @param {Record|id|function} criteria  Criteria by which to find an item
+   * @param {Record|id|uuid|function} criteria  Criteria by which to find an item
    */
   findIndex(criteria) {
     if (typeof criteria === 'function') {
@@ -382,7 +404,9 @@ class List extends EventEmitter {
       return this._items.findIndex(item => {
         return criteria instanceof this.constructor.getModel()
           ? item === criteria // this is an instance of model
-          : item.getID() === criteria // criteria is a string, which is assumed to be the id
+          : typeof criteria === 'string' // it's a UUID
+            ? item.getUUID() === criteria
+            : item.getID() === criteria // criteria is a number, which is assumed to be the id
       })
     }
   }

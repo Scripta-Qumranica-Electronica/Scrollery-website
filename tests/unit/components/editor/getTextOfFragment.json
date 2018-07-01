@@ -1,0 +1,1443 @@
+{
+  "text": [
+    {
+      "scroll_id": 808,
+      "scroll_name": "1Q7",
+      "fragments": [
+        {
+          "fragment_id": 9111,
+          "fragment_name": "col. 1",
+          "lines": [
+            {
+              "line_id": 38834,
+              "line_name": "1",
+              "signs": [
+                {
+                  "sign_id": 998006,
+                  "next_sign_ids": 998007,
+                  "chars": {
+                    "sign_char_id": 998006,
+                    "sign_char": "",
+                    "attributes": [
+                      {
+                        "attribute_id": 1,
+                        "attribute_name": "sign_type",
+                        "values": {
+                          "attribute_value_id": 9,
+                          "attribute_value": "BREAK"
+                        }
+                      },
+                      {
+                        "attribute_id": 2,
+                        "attribute_name": "break_type",
+                        "values": [
+                          {
+                            "attribute_value_id": 10,
+                            "attribute_value": "LINE_START"
+                          },
+                          {
+                            "attribute_value_id": 12,
+                            "attribute_value": "COLUMN_START"
+                          },
+                          {
+                            "attribute_value_id": 14,
+                            "attribute_value": "SCROLL_START"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "sign_id": 998007,
+                  "next_sign_ids": 998008,
+                  "chars": {
+                    "sign_char_id": 998007,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998008,
+                  "next_sign_ids": 998009,
+                  "chars": {
+                    "sign_char_id": 998008,
+                    "sign_char": "ך"
+                  }
+                },
+                {
+                  "sign_id": 998009,
+                  "next_sign_ids": 998010,
+                  "chars": {
+                    "sign_char_id": 998009,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998010,
+                  "next_sign_ids": 998011,
+                  "chars": {
+                    "sign_char_id": 998010,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998011,
+                  "next_sign_ids": 998012,
+                  "chars": {
+                    "sign_char_id": 998011,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998012,
+                  "next_sign_ids": 998013,
+                  "chars": {
+                    "sign_char_id": 998012,
+                    "sign_char": "ש"
+                  }
+                },
+                {
+                  "sign_id": 998013,
+                  "next_sign_ids": 998014,
+                  "chars": {
+                    "sign_char_id": 998013,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998014,
+                  "next_sign_ids": 998015,
+                  "chars": {
+                    "sign_char_id": 998014,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998015,
+                  "next_sign_ids": 998016,
+                  "chars": {
+                    "sign_char_id": 998015,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998016,
+                  "next_sign_ids": 998017,
+                  "chars": {
+                    "sign_char_id": 998016,
+                    "sign_char": "ך"
+                  }
+                },
+                {
+                  "sign_id": 998017,
+                  "next_sign_ids": 998018,
+                  "chars": {
+                    "sign_char_id": 998017,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998018,
+                  "next_sign_ids": 998019,
+                  "chars": {
+                    "sign_char_id": 998018,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998019,
+                  "next_sign_ids": 998020,
+                  "chars": {
+                    "sign_char_id": 998019,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998020,
+                  "next_sign_ids": 998021,
+                  "chars": {
+                    "sign_char_id": 998020,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998021,
+                  "next_sign_ids": 998022,
+                  "chars": {
+                    "sign_char_id": 998021,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998022,
+                  "next_sign_ids": 998023,
+                  "chars": {
+                    "sign_char_id": 998022,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998023,
+                  "next_sign_ids": 998024,
+                  "chars": {
+                    "sign_char_id": 998023,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998024,
+                  "next_sign_ids": 998025,
+                  "chars": {
+                    "sign_char_id": 998024,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998025,
+                  "next_sign_ids": 998026,
+                  "chars": {
+                    "sign_char_id": 998025,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998026,
+                  "next_sign_ids": 998027,
+                  "chars": {
+                    "sign_char_id": 998026,
+                    "sign_char": "ב"
+                  }
+                },
+                {
+                  "sign_id": 998027,
+                  "next_sign_ids": 998028,
+                  "chars": {
+                    "sign_char_id": 998027,
+                    "sign_char": "ן"
+                  }
+                },
+                {
+                  "sign_id": 998028,
+                  "next_sign_ids": 998029,
+                  "chars": {
+                    "sign_char_id": 998028,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998029,
+                  "next_sign_ids": 998030,
+                  "chars": {
+                    "sign_char_id": 998029,
+                    "sign_char": "ח"
+                  }
+                },
+                {
+                  "sign_id": 998030,
+                  "next_sign_ids": 998031,
+                  "chars": {
+                    "sign_char_id": 998030,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998031,
+                  "next_sign_ids": 998032,
+                  "chars": {
+                    "sign_char_id": 998031,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998032,
+                  "next_sign_ids": 998033,
+                  "chars": {
+                    "sign_char_id": 998032,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998033,
+                  "next_sign_ids": 998034,
+                  "chars": {
+                    "sign_char_id": 998033,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998034,
+                  "next_sign_ids": 998035,
+                  "chars": {
+                    "sign_char_id": 998034,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998035,
+                  "next_sign_ids": 998036,
+                  "chars": {
+                    "sign_char_id": 998035,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998036,
+                  "next_sign_ids": 998037,
+                  "chars": {
+                    "sign_char_id": 998036,
+                    "sign_char": "ח"
+                  }
+                },
+                {
+                  "sign_id": 998037,
+                  "next_sign_ids": 998038,
+                  "chars": {
+                    "sign_char_id": 998037,
+                    "sign_char": "ם"
+                  }
+                },
+                {
+                  "sign_id": 998038,
+                  "next_sign_ids": 998039,
+                  "chars": {
+                    "sign_char_id": 998038,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998039,
+                  "next_sign_ids": 998040,
+                  "chars": {
+                    "sign_char_id": 998039,
+                    "sign_char": "מ"
+                  }
+                },
+                {
+                  "sign_id": 998040,
+                  "next_sign_ids": 998041,
+                  "chars": {
+                    "sign_char_id": 998040,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998041,
+                  "next_sign_ids": 998042,
+                  "chars": {
+                    "sign_char_id": 998041,
+                    "sign_char": "ח"
+                  }
+                },
+                {
+                  "sign_id": 998042,
+                  "next_sign_ids": 998043,
+                  "chars": {
+                    "sign_char_id": 998042,
+                    "sign_char": "מ"
+                  }
+                },
+                {
+                  "sign_id": 998043,
+                  "next_sign_ids": 998044,
+                  "chars": {
+                    "sign_char_id": 998043,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998044,
+                  "next_sign_ids": 998045,
+                  "chars": {
+                    "sign_char_id": 998044,
+                    "sign_char": "ת"
+                  }
+                },
+                {
+                  "sign_id": 998045,
+                  "next_sign_ids": 998046,
+                  "chars": {
+                    "sign_char_id": 998045,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998046,
+                  "next_sign_ids": 998047,
+                  "chars": {
+                    "sign_char_id": 998046,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998047,
+                  "next_sign_ids": 998048,
+                  "chars": {
+                    "sign_char_id": 998047,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998048,
+                  "next_sign_ids": 998049,
+                  "chars": {
+                    "sign_char_id": 998048,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998049,
+                  "next_sign_ids": 998050,
+                  "chars": {
+                    "sign_char_id": 998049,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998050,
+                  "next_sign_ids": 998051,
+                  "chars": {
+                    "sign_char_id": 998050,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998051,
+                  "next_sign_ids": 998052,
+                  "chars": {
+                    "sign_char_id": 998051,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998052,
+                  "next_sign_ids": 998053,
+                  "chars": {
+                    "sign_char_id": 998052,
+                    "sign_char": "ש"
+                  }
+                },
+                {
+                  "sign_id": 998053,
+                  "next_sign_ids": 998054,
+                  "chars": {
+                    "sign_char_id": 998053,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998054,
+                  "next_sign_ids": 998055,
+                  "chars": {
+                    "sign_char_id": 998054,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998055,
+                  "next_sign_ids": 998056,
+                  "chars": {
+                    "sign_char_id": 998055,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998056,
+                  "next_sign_ids": 998057,
+                  "chars": {
+                    "sign_char_id": 998056,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998057,
+                  "next_sign_ids": 998058,
+                  "chars": {
+                    "sign_char_id": 998057,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998058,
+                  "next_sign_ids": 998059,
+                  "chars": {
+                    "sign_char_id": 998058,
+                    "sign_char": "מ"
+                  }
+                },
+                {
+                  "sign_id": 998059,
+                  "next_sign_ids": 998060,
+                  "chars": {
+                    "sign_char_id": 998059,
+                    "sign_char": "ר"
+                  }
+                },
+                {
+                  "sign_id": 998060,
+                  "next_sign_ids": 998061,
+                  "chars": {
+                    "sign_char_id": 998060,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998061,
+                  "next_sign_ids": 998062,
+                  "chars": {
+                    "sign_char_id": 998061,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998062,
+                  "next_sign_ids": 998063,
+                  "chars": {
+                    "sign_char_id": 998062,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998063,
+                  "next_sign_ids": 998064,
+                  "chars": {
+                    "sign_char_id": 998063,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998064,
+                  "next_sign_ids": 998065,
+                  "chars": {
+                    "sign_char_id": 998064,
+                    "sign_char": "ת"
+                  }
+                },
+                {
+                  "sign_id": 998065,
+                  "next_sign_ids": 998066,
+                  "chars": {
+                    "sign_char_id": 998065,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998066,
+                  "next_sign_ids": 998067,
+                  "chars": {
+                    "sign_char_id": 998066,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998067,
+                  "next_sign_ids": 998068,
+                  "chars": {
+                    "sign_char_id": 998067,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998068,
+                  "next_sign_ids": 998069,
+                  "chars": {
+                    "sign_char_id": 998068,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998069,
+                  "next_sign_ids": 998070,
+                  "chars": {
+                    "sign_char_id": 998069,
+                    "sign_char": "ד"
+                  }
+                },
+                {
+                  "sign_id": 998070,
+                  "next_sign_ids": 998071,
+                  "chars": {
+                    "sign_char_id": 998070,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998071,
+                  "next_sign_ids": 998072,
+                  "chars": {
+                    "sign_char_id": 998071,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998072,
+                  "next_sign_ids": 998073,
+                  "chars": {
+                    "sign_char_id": 998072,
+                    "sign_char": "ב"
+                  }
+                },
+                {
+                  "sign_id": 998073,
+                  "next_sign_ids": 998074,
+                  "chars": {
+                    "sign_char_id": 998073,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998074,
+                  "next_sign_ids": 998075,
+                  "chars": {
+                    "sign_char_id": 998074,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998075,
+                  "next_sign_ids": 998076,
+                  "chars": {
+                    "sign_char_id": 998075,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998076,
+                  "next_sign_ids": 998077,
+                  "chars": {
+                    "sign_char_id": 998076,
+                    "sign_char": "ת"
+                  }
+                },
+                {
+                  "sign_id": 998077,
+                  "next_sign_ids": 998078,
+                  "chars": {
+                    "sign_char_id": 998077,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998078,
+                  "next_sign_ids": 998079,
+                  "chars": {
+                    "sign_char_id": 998078,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998079,
+                  "next_sign_ids": 998080,
+                  "chars": {
+                    "sign_char_id": 998079,
+                    "sign_char": "",
+                    "attributes": [
+                      {
+                        "attribute_id": 1,
+                        "attribute_name": "sign_type",
+                        "values": {
+                          "attribute_value_id": 9,
+                          "attribute_value": "BREAK"
+                        }
+                      },
+                      {
+                        "attribute_id": 2,
+                        "attribute_name": "break_type",
+                        "values": {
+                          "attribute_value_id": 11,
+                          "attribute_value": "LINE_END"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "line_id": 38835,
+              "line_name": "2",
+              "signs": [
+                {
+                  "sign_id": 998080,
+                  "next_sign_ids": 998081,
+                  "chars": {
+                    "sign_char_id": 998080,
+                    "sign_char": "",
+                    "attributes": [
+                      {
+                        "attribute_id": 1,
+                        "attribute_name": "sign_type",
+                        "values": {
+                          "attribute_value_id": 9,
+                          "attribute_value": "BREAK"
+                        }
+                      },
+                      {
+                        "attribute_id": 2,
+                        "attribute_name": "break_type",
+                        "values": {
+                          "attribute_value_id": 10,
+                          "attribute_value": "LINE_START"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "sign_id": 998081,
+                  "next_sign_ids": 998082,
+                  "chars": {
+                    "sign_char_id": 998081,
+                    "sign_char": "ב"
+                  }
+                },
+                {
+                  "sign_id": 998082,
+                  "next_sign_ids": 998083,
+                  "chars": {
+                    "sign_char_id": 998082,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998083,
+                  "next_sign_ids": 998084,
+                  "chars": {
+                    "sign_char_id": 998083,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998084,
+                  "next_sign_ids": 998085,
+                  "chars": {
+                    "sign_char_id": 998084,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998085,
+                  "next_sign_ids": 998086,
+                  "chars": {
+                    "sign_char_id": 998085,
+                    "sign_char": "ד"
+                  }
+                },
+                {
+                  "sign_id": 998086,
+                  "next_sign_ids": 998087,
+                  "chars": {
+                    "sign_char_id": 998086,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998087,
+                  "next_sign_ids": 998088,
+                  "chars": {
+                    "sign_char_id": 998087,
+                    "sign_char": "פ"
+                  }
+                },
+                {
+                  "sign_id": 998088,
+                  "next_sign_ids": 998089,
+                  "chars": {
+                    "sign_char_id": 998088,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998089,
+                  "next_sign_ids": 998090,
+                  "chars": {
+                    "sign_char_id": 998089,
+                    "sign_char": "ש"
+                  }
+                },
+                {
+                  "sign_id": 998090,
+                  "next_sign_ids": 998091,
+                  "chars": {
+                    "sign_char_id": 998090,
+                    "sign_char": "ת"
+                  }
+                },
+                {
+                  "sign_id": 998091,
+                  "next_sign_ids": 998092,
+                  "chars": {
+                    "sign_char_id": 998091,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998092,
+                  "next_sign_ids": 998093,
+                  "chars": {
+                    "sign_char_id": 998092,
+                    "sign_char": "ם"
+                  }
+                },
+                {
+                  "sign_id": 998093,
+                  "next_sign_ids": 998104,
+                  "chars": {
+                    "sign_char_id": 998093,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998104,
+                  "next_sign_ids": 998105,
+                  "chars": {
+                    "sign_char_id": 998104,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998105,
+                  "next_sign_ids": 998106,
+                  "chars": {
+                    "sign_char_id": 998105,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998106,
+                  "next_sign_ids": 998107,
+                  "chars": {
+                    "sign_char_id": 998106,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998107,
+                  "next_sign_ids": 998108,
+                  "chars": {
+                    "sign_char_id": 998107,
+                    "sign_char": "ש"
+                  }
+                },
+                {
+                  "sign_id": 998108,
+                  "next_sign_ids": 998109,
+                  "chars": {
+                    "sign_char_id": 998108,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998109,
+                  "next_sign_ids": 998110,
+                  "chars": {
+                    "sign_char_id": 998109,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998110,
+                  "next_sign_ids": 998111,
+                  "chars": {
+                    "sign_char_id": 998110,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998111,
+                  "next_sign_ids": 998112,
+                  "chars": {
+                    "sign_char_id": 998111,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998112,
+                  "next_sign_ids": 998113,
+                  "chars": {
+                    "sign_char_id": 998112,
+                    "sign_char": "מ"
+                  }
+                },
+                {
+                  "sign_id": 998113,
+                  "next_sign_ids": 998114,
+                  "chars": {
+                    "sign_char_id": 998113,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998114,
+                  "next_sign_ids": 998115,
+                  "chars": {
+                    "sign_char_id": 998114,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998115,
+                  "next_sign_ids": 998116,
+                  "chars": {
+                    "sign_char_id": 998115,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998116,
+                  "next_sign_ids": 998117,
+                  "chars": {
+                    "sign_char_id": 998116,
+                    "sign_char": "נ"
+                  }
+                },
+                {
+                  "sign_id": 998117,
+                  "next_sign_ids": 998118,
+                  "chars": {
+                    "sign_char_id": 998117,
+                    "sign_char": "כ"
+                  }
+                },
+                {
+                  "sign_id": 998118,
+                  "next_sign_ids": 998119,
+                  "chars": {
+                    "sign_char_id": 998118,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998119,
+                  "next_sign_ids": 998120,
+                  "chars": {
+                    "sign_char_id": 998119,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998120,
+                  "next_sign_ids": 998121,
+                  "chars": {
+                    "sign_char_id": 998120,
+                    "sign_char": "ו"
+                  }
+                },
+                {
+                  "sign_id": 998121,
+                  "next_sign_ids": 998122,
+                  "chars": {
+                    "sign_char_id": 998121,
+                    "sign_char": "מ"
+                  }
+                },
+                {
+                  "sign_id": 998122,
+                  "next_sign_ids": 998123,
+                  "chars": {
+                    "sign_char_id": 998122,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998123,
+                  "next_sign_ids": 998124,
+                  "chars": {
+                    "sign_char_id": 998123,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998124,
+                  "next_sign_ids": 998125,
+                  "chars": {
+                    "sign_char_id": 998124,
+                    "sign_char": "ח"
+                  }
+                },
+                {
+                  "sign_id": 998125,
+                  "next_sign_ids": 998126,
+                  "chars": {
+                    "sign_char_id": 998125,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998126,
+                  "next_sign_ids": 998127,
+                  "chars": {
+                    "sign_char_id": 998126,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998127,
+                  "next_sign_ids": 998128,
+                  "chars": {
+                    "sign_char_id": 998127,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998128,
+                  "next_sign_ids": 998129,
+                  "chars": {
+                    "sign_char_id": 998128,
+                    "sign_char": "מ"
+                  }
+                },
+                {
+                  "sign_id": 998129,
+                  "next_sign_ids": 998130,
+                  "chars": {
+                    "sign_char_id": 998129,
+                    "sign_char": "ש"
+                  }
+                },
+                {
+                  "sign_id": 998130,
+                  "next_sign_ids": 998131,
+                  "chars": {
+                    "sign_char_id": 998130,
+                    "sign_char": "פ"
+                  }
+                },
+                {
+                  "sign_id": 998131,
+                  "next_sign_ids": 998132,
+                  "chars": {
+                    "sign_char_id": 998131,
+                    "sign_char": "ח"
+                  }
+                },
+                {
+                  "sign_id": 998132,
+                  "next_sign_ids": 998133,
+                  "chars": {
+                    "sign_char_id": 998132,
+                    "sign_char": "ת"
+                  }
+                },
+                {
+                  "sign_id": 998133,
+                  "next_sign_ids": 998134,
+                  "chars": {
+                    "sign_char_id": 998133,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998134,
+                  "next_sign_ids": 998135,
+                  "chars": {
+                    "sign_char_id": 998134,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998135,
+                  "next_sign_ids": 998136,
+                  "chars": {
+                    "sign_char_id": 998135,
+                    "sign_char": "ב"
+                  }
+                },
+                {
+                  "sign_id": 998136,
+                  "next_sign_ids": 998137,
+                  "chars": {
+                    "sign_char_id": 998136,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998137,
+                  "next_sign_ids": 998138,
+                  "chars": {
+                    "sign_char_id": 998137,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998138,
+                  "next_sign_ids": 998139,
+                  "chars": {
+                    "sign_char_id": 998138,
+                    "sign_char": "ב"
+                  }
+                },
+                {
+                  "sign_id": 998139,
+                  "next_sign_ids": 998140,
+                  "chars": {
+                    "sign_char_id": 998139,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998140,
+                  "next_sign_ids": 998141,
+                  "chars": {
+                    "sign_char_id": 998140,
+                    "sign_char": "ש"
+                  }
+                },
+                {
+                  "sign_id": 998141,
+                  "next_sign_ids": 998142,
+                  "chars": {
+                    "sign_char_id": 998141,
+                    "sign_char": "ר"
+                  }
+                },
+                {
+                  "sign_id": 998142,
+                  "next_sign_ids": 998143,
+                  "chars": {
+                    "sign_char_id": 998142,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998143,
+                  "next_sign_ids": 998144,
+                  "chars": {
+                    "sign_char_id": 998143,
+                    "sign_char": "ל"
+                  }
+                },
+                {
+                  "sign_id": 998144,
+                  "next_sign_ids": 998145,
+                  "chars": {
+                    "sign_char_id": 998144,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998145,
+                  "next_sign_ids": 998146,
+                  "chars": {
+                    "sign_char_id": 998145,
+                    "sign_char": "כ"
+                  }
+                },
+                {
+                  "sign_id": 998146,
+                  "next_sign_ids": 998147,
+                  "chars": {
+                    "sign_char_id": 998146,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998147,
+                  "next_sign_ids": 998148,
+                  "chars": {
+                    "sign_char_id": 998147,
+                    "sign_char": "",
+                    "attributes": {
+                      "attribute_id": 1,
+                      "attribute_name": "sign_type",
+                      "values": {
+                        "attribute_value_id": 2,
+                        "attribute_value": "SPACE"
+                      }
+                    }
+                  }
+                },
+                {
+                  "sign_id": 998148,
+                  "next_sign_ids": 998149,
+                  "chars": {
+                    "sign_char_id": 998148,
+                    "sign_char": "א"
+                  }
+                },
+                {
+                  "sign_id": 998149,
+                  "next_sign_ids": 998150,
+                  "chars": {
+                    "sign_char_id": 998149,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998150,
+                  "next_sign_ids": 998151,
+                  "chars": {
+                    "sign_char_id": 998150,
+                    "sign_char": "י"
+                  }
+                },
+                {
+                  "sign_id": 998151,
+                  "next_sign_ids": 998152,
+                  "chars": {
+                    "sign_char_id": 998151,
+                    "sign_char": "ה"
+                  }
+                },
+                {
+                  "sign_id": 998152,
+                  "chars": {
+                    "sign_char_id": 998152,
+                    "sign_char": "",
+                    "attributes": [
+                      {
+                        "attribute_id": 1,
+                        "attribute_name": "sign_type",
+                        "values": {
+                          "attribute_value_id": 9,
+                          "attribute_value": "BREAK"
+                        }
+                      },
+                      {
+                        "attribute_id": 2,
+                        "attribute_name": "break_type",
+                        "values": [
+                          {
+                            "attribute_value_id": 11,
+                            "attribute_value": "LINE_END"
+                          },
+                          {
+                            "attribute_value_id": 13,
+                            "attribute_value": "COLUMN_END"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

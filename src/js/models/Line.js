@@ -15,44 +15,14 @@ class Line extends List {
   }
 
   /**
-   * @public
-   * @instance
-   *
-   * @param {Sign}      sign    A sign to insert
-   * @param {number=-1} index   The index at which to insert the column, defaults to the end
-   */
-  insert(sign, index = -1) {
-    if (!(sign instanceof Sign)) {
-      throw new TypeError('Line.prototype.insertSign(sign, index) expect a sign of type Sign')
-    }
-
-    index === -1 ? this.push(sign) : super.insert(this._setAttributes(sign), index)
-  }
-
-  /**
-   * @public
-   * @instance
-   *
-   * @param {Sign} sign A sign to insert
-   */
-  push(sign) {
-    if (!(sign instanceof Sign)) {
-      throw new TypeError('Line.prototype.pushSign(sign) expect a sign of type Sign')
-    }
-
-    super.push(this._setAttributes(sign))
-  }
-
-  /**
-
    * Diff the line-model against the provided string (usually from the DOM representation
    * of this line). Therefore, inserts/deletes to the data will be to bring it into
    * alignment with the given string
-   * 
+   *
    * @public
    * @instance
-   * 
-   * @param {string} str a string to synchronize this line to 
+   *
+   * @param {string} str a string to synchronize this line to
    */
   synchronizeTo(str) {
     // TODO: handle whitespace chars more consistently.
@@ -74,8 +44,17 @@ class Line extends List {
 
         // there's been (a) sign(s) inserted
         case diff.INSERT:
-          d[1].split('').forEach(sign => {
-            this.insert(new Sign({ sign }), diffIndex)
+          d[1].split('').forEach(char => {
+            this.insert(
+              new Sign({
+                chars: [
+                  {
+                    sign_char: char,
+                  },
+                ],
+              }),
+              diffIndex
+            )
             diffIndex++
           })
           break
@@ -106,21 +85,6 @@ class Line extends List {
       str += sign.toString()
     }, this)
     return str
-  }
-
-  /**
-   * @private
-   * @instance
-   *
-   * @param {Sign} sign A sign to insert
-   */
-  _setAttributes(sign) {
-    return sign.extend({
-      line_name: this.name,
-      line_id: this.id,
-      col_name: this.col_name,
-      col_id: this.col_id,
-    })
   }
 }
 

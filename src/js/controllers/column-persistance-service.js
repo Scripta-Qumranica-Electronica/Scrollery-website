@@ -11,8 +11,18 @@ export default class ColumnPersistanceService extends PersistanceService {
     this.session_id = session_id
 
     this.column = column
+  }
 
-    this.column.on(['change', 'addition', 'delete'], this.onChange.bind(this))
+  engage() {
+    this.__handler = this.onChange.bind(this)
+    this.column.on(['change', 'addition', 'delete'], this.__handler)
+  }
+
+  disengage() {
+    if (this.__handler) {
+      this.column.off(['change', 'addition', 'delete'], this.__handler)
+      delete this.__handler
+    }
   }
 
   /**
@@ -39,11 +49,8 @@ export default class ColumnPersistanceService extends PersistanceService {
         })
         .then(res => {
           if (res.status === 200 && res.data) {
-            this.onSuccess(requests, res.data.replies)
+            this._onSuccess(requests, res.data.replies, onDeckChanges)
           }
-        })
-        .catch(res => {
-          res
         })
     } else {
       // there are no things to save ... return a promise that
@@ -56,7 +63,14 @@ export default class ColumnPersistanceService extends PersistanceService {
    * @private
    * @instance
    */
-  _onSuccess(transactions, replies) {
+  _onSuccess(transactions, replies, persistedChangeSet) {
+    // Deletions come back keyed to their ID rather than their UUID on the client side.
+    // Create a map that enables looking up of ID > UUID.
+    const deletedIdToUuidMap = Object.keys(persistedChangeSet.deletions).reduce((map, uuid) => {
+      map[persistedChangeSet.deletions[uuid].getID()] = uuid
+      return map
+    }, {})
+
     const persistedMap = {
       additions: {},
       deletions: {},
@@ -65,18 +79,21 @@ export default class ColumnPersistanceService extends PersistanceService {
     for (let id in replies) {
       const transaction = transactions[id]
       replies[id].forEach((singleAction, i) => {
-        for (let signUuid in singleAction) {
+        for (let signIdenfifier in singleAction) {
           // the value is the keyword 'deleted', then the corresponding
           // sign has been removed.
-          if (singleAction[signUuid] === 'deleted') {
-            persistedMap.deletions[signUuid] = true
+          // In the case of deletions, the signIdentifier is it's ID.
+          // Convert from the ID to the UUID in the persisted map to inform
+          // the model of which models have been deleted.
+          if (singleAction[signIdenfifier] === 'deleted') {
+            persistedMap.deletions[deletedIdToUuidMap[signIdenfifier]] = true
 
             // if the value is a number, it's the sign's id after being persisted.
-          } else if (typeof singleAction[signUuid] === 'number') {
+          } else if (typeof singleAction[signIdenfifier] === 'number') {
             let signRequested = transaction.signs[i]
-            persistedMap.additions[signUuid] = {
+            persistedMap.additions[signIdenfifier] = {
               next_sign_id: signRequested.next_sign_id || -1,
-              id: singleAction[signUuid],
+              sign_id: singleAction[signIdenfifier],
             }
           }
           // need case for updates...
@@ -94,6 +111,10 @@ export default class ColumnPersistanceService extends PersistanceService {
   _gatherTransactions({ additions, deletions, updates }) {
     const transactions = []
 
+    // create a new object so that the additions
+    // aren't modified by reference
+    additions = { ...additions }
+
     // Gather all deletions into a single transaction
     const deletedKeys = Object.keys(deletions)
     if (deletedKeys.length) {
@@ -110,26 +131,113 @@ export default class ColumnPersistanceService extends PersistanceService {
     if (Object.keys(additions).length) {
       const signStream = this.column.flattenToSignStream()
 
-      let signs = []
-      for (let key in additions) {
-        let sign = additions[key]
+      // the additions are an object keys by UUID, which provide no
+      // guarantee of set order ... additionally, there are potentially
+      // multiple runs of sequential signs to gath. Essentially, we have
+      // to contend with multiple linked lists that are not ordered in any way
+      let signRuns = []
 
-        // we need to grab the next and subsequent sign, if any.
-        let prev = signStream[signStream.map[sign.getUUID()] - 1]
-        let next = signStream[signStream.map[sign.getUUID()] + 1]
+      // a recursive function to create a run
+      const getPreviousFromAdditions = (uuid, run) => {
+        let prev = signStream[signStream.map[uuid] - 1]
 
-        signs.push({
-          sign: sign.sign,
-          uuid: sign.getUUID(),
-          previous_sign_id: prev ? prev.getID() || prev.getUUID() : '',
-          next_sign_id: next ? next.getID() || next.getUUID() : '',
-        })
+        // there's a previous sign
+        if (prev) {
+          // check to see if it's also an addition
+          let prevUuid = prev.getUUID()
+          if (additions[prevUuid]) {
+            // remove it from the additions once handled
+            delete additions[prevUuid]
+
+            // if so, we add it in to the run and ...
+            run.unshift({
+              sign: prev.toString(),
+              uuid: prevUuid,
+            })
+            // .. recurse backwards
+            return getPreviousFromAdditions(prevUuid, run)
+
+            // otherwise, if the run has items in it, we can
+            // se the prev_sign_id to the item.
+          } else if (run.length) {
+            run[0].previous_sign_id = prev.getID()
+          }
+        }
+
+        // break out of recursion
+        return run
       }
 
-      transactions.push({
-        transaction: 'addSigns',
-        scroll_version_id: this.scroll_version_id,
-        signs,
+      const getNextFromAdditions = (uuid, run) => {
+        let next = signStream[signStream.map[uuid] + 1]
+
+        // there's a next sign
+        if (next) {
+          // check to see if it's also an addition
+          let nextUuid = next.getUUID()
+          if (additions[nextUuid]) {
+            // remove it from the additions once handled
+            delete additions[nextUuid]
+
+            // if so, we push it onto to the run and ...
+            run.push({
+              sign: next.toString(),
+              uuid: nextUuid,
+            })
+            // .. recurse forwards
+            return getNextFromAdditions(nextUuid, run)
+
+            // otherwise, if the run has items in it, we can
+            // set the next_sign_id to the next item.
+          } else if (run.length) {
+            run[run.length - 1].next_sign_id = next.getID()
+          }
+        }
+
+        // break out of recursion
+        return run
+      }
+
+      // for loop calculates the keys in the additions object on every
+      // pass through the loop. The
+      for (
+        let i = 0, uuids = Object.keys(additions), uuid;
+        uuids.length > 0;
+        uuids = Object.keys(additions)
+      ) {
+        let sign = additions[(uuid = uuids.pop())]
+
+        // delete the addition from the additions
+        // since it's now been handles
+        delete additions[uuid]
+
+        // add in the sign from the current iteration to the end
+        // of the run
+        let run = [
+          {
+            sign: sign.toString(),
+            uuid: sign.getUUID(),
+          },
+        ]
+
+        // create the run going backwards
+        run = getPreviousFromAdditions(uuid, run)
+
+        // add any signs that follow
+        run = getNextFromAdditions(uuid, run)
+
+        signRuns.push(run)
+      }
+
+      // each sign run becomes it's own transaction
+      // which should start/end with the appropriate
+      // prev/next sign id
+      signRuns.forEach(run => {
+        transactions.push({
+          transaction: 'addSigns',
+          scroll_version_id: this.scroll_version_id,
+          signs: run,
+        })
       })
     }
 

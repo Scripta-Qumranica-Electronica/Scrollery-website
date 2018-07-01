@@ -6,29 +6,15 @@ const plain = props =>
     {
       sign_id: faker.random.number(),
       id: faker.random.number(),
-      sign: faker.random.word()[0],
-
-      // characteristics
-      readability: faker.random.word(),
-      break_type: faker.random.word(),
-      is_reconstructed: faker.random.boolean(),
-      is_variant: faker.random.uuid(),
-      is_retraced: faker.random.uuid(),
-      is_whitespace: faker.random.uuid(),
-
-      // position in stream info
-
-      // > peers
-      prev_sign_id: faker.random.number(),
-      next_sign_id: faker.random.number(),
-
-      // > col
-      col_name: faker.random.word(),
-      col_id: faker.random.number(),
-
-      // > line
-      line_name: faker.random.word(),
-      line_id: faker.random.number(),
+      chars: [
+        {
+          sign_char: faker.random.word()[0],
+          attributs: []
+        }
+      ],
+      next_sign_ids: [
+        faker.random.number()
+      ],
     },
     props
   )

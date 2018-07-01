@@ -11,8 +11,8 @@ import KEY_CODES from '~/components/editor/key_codes.js'
  *
  * @return {VueTestWrapper} the vue-test-utils wrapper class
  */
-const columnFactory = () =>
-  mount(ColumnComponent, {
+const columnFactory = () => {
+  return mount(ColumnComponent, {
     attachToDocument: true, // important to ensure selection API works
     propsData: {
       state: editorStore({
@@ -29,12 +29,14 @@ const columnFactory = () =>
       }
     }
   })
+}
 
 describe('ColumnComponent', () => {
   let vm, wrapper
   beforeEach(() => {
     wrapper = columnFactory()
     vm = wrapper.vm
+    vm.state.commit('setLocked', false)
   })
 
   afterEach(() => {
@@ -43,7 +45,7 @@ describe('ColumnComponent', () => {
   })
 
   it('should contain a div with the column text', () => {
-    expect(wrapper.contains('.text-col[contenteditable="true"]')).to.equal(true)
+    expect(wrapper.contains('.text-col[contenteditable]')).to.equal(true)
   })
 
   describe('keyboard events', () => {

@@ -18,7 +18,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       if (!vm.sessionID.length || vm.userID === -1) {
-        vm.$router.replace('login')
+        vm.$router.replace({ name: 'login' })
       }
     })
   },

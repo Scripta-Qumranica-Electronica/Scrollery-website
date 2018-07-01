@@ -1,20 +1,22 @@
 <template>
   <section>
     <attribute-search
-      @new-attribute="addNewAttribute"
+      @add-attribute="addNewAttribute"
     />
     <table class="attributes-table">
       <thead>
         <th>Attribute</th>
+        <th>Attribute Value</th>
         <th>Description</th>
-        <th>Comments</th>
+        <!-- <th>Comments</th> -->
         <th>Actions</th>
       </thead>
       <tbody>
         <attribute-row v-for="attribute in attributes"
-          :key="attribute.uuid"
+          :key="attribute.getUUID()"
           :attribute="attribute"
-          @delete-attribute="deleteAttribute"
+          :sign="sign"
+          @delete-attribute="deleteAttribute(attribute.getUUID())"
         />
       </tbody>
     </table>
@@ -41,26 +43,37 @@ export default {
   },
   data() {
     return {
-      attributeName: '',
       attributes: [],
+      attributeName: '',
     }
   },
   methods: {
+    /**
+     * @param {object} attribute  the canonical attribute that has all values
+     */
     addNewAttribute(attribute) {
-      this.attributes = this.sign.addAttribute({
-        uuid: Date.now(),
-        attribute,
-      })
+      // prepare the model attribute
+      const modelAttribute = { ...attribute }
+
+      // remove values from the canonical attribute
+      // so the user can select what values they want.
+      modelAttribute.values = []
+      this.attributes = this.sign.addAttribute(modelAttribute)
     },
     deleteAttribute(attributeID) {
       this.sign.removeAttribute(attributeID)
-      this.attributes = this.sign.attributes.items()
+      this.attributes = this.sign.getMainChar().attributes.items()
     },
   },
   watch: {
     sign() {
-      this.attributes = this.sign ? this.sign.attributes.items() : []
+      this.attributes = this.sign ? this.sign.getMainChar().attributes.items() : []
     },
+  },
+  mounted() {
+    if (this.sign) {
+      this.attributes = this.sign.getMainChar().attributes.items()
+    }
   },
 }
 </script>
@@ -68,5 +81,18 @@ export default {
 <style lang="scss">
 .attributes-table {
   width: 100%;
+  border-collapse: collapse;
+  margin-top: 5px;
+  border: 1px solid #eee;
+  border-radius: 3px;
+
+  tr {
+    padding: 0px 3px;
+    border-bottom: 1px solid #eee;
+  }
+}
+
+thead {
+  background-color: #eee;
 }
 </style>

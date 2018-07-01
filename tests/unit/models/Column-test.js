@@ -31,7 +31,6 @@ describe('ColumnModel', () => {
     })
 
     it('should insert lines on the fly for inserted signs', () => {
-      // rely on the column factory which uses "insertSign"
       expect(col.toString().replace(/[\s\n]+/g, '').length).to.equal(30)
     })
 
