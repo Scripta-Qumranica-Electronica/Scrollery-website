@@ -63,7 +63,7 @@ describe('QueueAction', () => {
   })
 
   describe('undo', () => {
-    it('should throw an error if attempting to do before undoing', () => {
+    it('should throw an error if attempting to undo before doing', () => {
       let action = new QueueAction(() => {}, () => {})
       expect(action.undo).to.throw(Error)
     })

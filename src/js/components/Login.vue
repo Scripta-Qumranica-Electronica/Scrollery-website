@@ -95,7 +95,7 @@ export default {
           if (res.data && res.data.error) {
             // blow away localStorage on session error
             this.errMsg = ''
-            storage.removeItem('sqe')
+            storage.removeItem('sqe-session')
           } else if (res.data) {
             return this.validateLogin(res)
           }
@@ -107,7 +107,8 @@ export default {
           // The Session is invalid, so clear out local Vuex storage but
           // no error message required.
           this.errMsg = ''
-          storage && storage.removeItem('sqe')
+          storage && storage.removeItem('sqe-session')
+          this.visible = true
         })
     },
     attemptLogin() {
@@ -118,16 +119,21 @@ export default {
         SCROLLVERSION: 1,
       })
         .then(res => this.validateLogin(res))
-        .catch(({ response }) => {
-          this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
-        })
+        .catch(
+          function({ response }) {
+            this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
+          }.bind(this)
+        )
     },
     validateLogin(res) {
       return new Promise((resolve, reject) => {
         // Safeguard to ensure data given
         if (!res) {
           reject(new Error('Login.validateLogin requires a server response'))
+          return
         }
+
+        // got a successful response
         if (res.data && res.data.error) {
           this.errMsg = res.data.error
           console.error(res.data)

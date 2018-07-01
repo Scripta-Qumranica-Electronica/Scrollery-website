@@ -68,7 +68,7 @@ export default class EventEmitter {
    * @param {function} handler    The event handler to remove
    */
   off(names, handler) {
-    if (!name || typeof handler !== 'function') {
+    if (!names || typeof handler !== 'function') {
       throw new TypeError(
         'EventEmitter.prototype.off requires a name (String) and handler (Function)'
       )

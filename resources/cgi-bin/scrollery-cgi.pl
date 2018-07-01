@@ -55,13 +55,14 @@ sub processCGI {
 		removeSignAttribute => \&removeSignAttribute,
 		addSignCharVariant => \&addSignCharVariant,
 		removeSignChar => \&removeSignChar,
-		addSignCharCommentary => \&addSignCharCommentary,
+		addSignCharAttributeCommentary => \&addSignCharAttributeCommentary,
 		removeSignCharCommentary => \&removeSignCharCommentary,
 		addRoiToScroll => \&addRoiToScroll,
 		removeROI => \&removeROI,
 		getRoiOfCol => \&getRoiOfCol,
 		getRoisOfCombination => \&getRoisOfCombination,
-		getTextOfFragment => \&getTextOfFragment
+		getTextOfFragment => \&getTextOfFragment,
+		getListOfAttributes => \& getListOfAttributes
 	);
 	my $json_post = $cgi->{CGIDATA};
 
@@ -736,11 +737,12 @@ sub addSigns() {
 	print "[{";
 
 	my $prev_sign_id = 0;
+	my $next_sign_id = $json_post->{signs}->[-1]->{next_sign_id};
 	foreach my $sign (@{$json_post->{signs}}) {
 		if ($counter == 1) {
 			$prev_sign_id = $sign->{previous_sign_id};
 		}
-		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $sign->{next_sign_id});
+		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $next_sign_id);
 		print "\"$sign->{uuid}\":$prev_sign_id";
 		if ($counter != $repeatLength) {
 			print "},{";
@@ -788,11 +790,12 @@ sub addSignAttribute() {
 		my $attributeCounter = 1;
 		my $attributeRepeatLength = scalar @{$sign->{attributes}};
 		foreach my $attribute (@{$sign->{attributes}}) {
+      my $attribute_numeric_value = $attribute->{attribute_numeric_value} ? $attribute->{attribute_numeric_value} : "null";
 			my $new_id = $cgi->set_sign_char_attribute(
 				$sign->{sign_char_id}, 
 				$attribute->{attribute_value_id}, 
 				$attribute->{attribute_numeric_value});
-			print "{\"$new_id\": {\"attribute_value\": \"$attribute->{attribute_value_id}\", \"numeric_value\": \"$attribute->{attribute_numeric_value}\", \"sequence\": \"$attribute->{sequence})\"}}";
+			print "{\"$new_id\": {\"attribute_value\": \"$attribute->{attribute_value_id}\", \"numeric_value\": $attribute_numeric_value, \"sequence\": \"$attribute->{sequence})\"}}";
 			if ($attributeCounter != $attributeRepeatLength) {
 				print ",";
 				$attributeCounter++;
@@ -870,7 +873,7 @@ sub removeSignChar() {
 
 #Give a sign_char_id, an attribute_id, and a comment.
 #I don't know yet what it returns.
-sub addSignCharCommentary() {
+sub addSignCharAttributeCommentary() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
 	my $new_sign_char_commentary_id = $cgi->set_sign_char_commentary($json_post->{sign_char_id}, $json_post->{attribute_id}, $json_post->{commentary});
@@ -991,6 +994,22 @@ sub getTextOfFragment() {
 	print "{";
 	$cgi->get_text_of_fragment($json_post->{col_id}, 'SQE_Format::JSON');
 	print "}";
+}
+
+sub getListOfAttributes() {
+	my ($cgi, $json_post) = @_;
+	my $query = <<'MYSQL';
+	SELECT attribute.attribute_id, name, type, attribute.description AS attribute_description,
+		attribute_value_id, string_value, attribute_value.description AS attribute_value_description
+	FROM attribute
+	JOIN attribute_value USING(attribute_id)
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($query) or die
+		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+	$sql->execute();
+
+	readResults($sql);
+	return;
 }
 
 processCGI();

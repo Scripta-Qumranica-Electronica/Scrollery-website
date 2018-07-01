@@ -3,14 +3,17 @@
     <div
       class="text-col inline text-sbl-hebrew"
       dir="rtl" 
-      contenteditable="true"
+      :contenteditable="isEditable"
+      ref="colNode"
+      @scroll="handleColScroll"
       @keydown="onKeydown" 
       @input="onInput"
       @paste="onPaste"
       @copy="onCopy"
+      @cut="onCut"
       v-html="colHtmlString"
     >
-    </div><div class="line-number-col inline">
+    </div><div class="line-number-col inline" ref="lineNode" :style="lineNodeStyle">
         <p class="line-number" v-for="(line, lineIndex) of column.items()" :key="line.id">{{ lineIndex + 1 }}</p>
     </div>
     <editing-dialog
@@ -24,6 +27,7 @@
 </template>
 
 <script>
+import throttle from 'lodash/throttle'
 import KEYS from './key_codes.js'
 
 // components
@@ -49,6 +53,18 @@ export default {
       dialogSign: null,
       dialogLine: null,
       dialogVisible: false,
+
+      // handles column scrolling
+      // to keep the lineNode and colNode in sync
+      handleColScroll: () => {
+        if (!this.scrollHandled) {
+          this.scrollHandled = true
+          requestAnimationFrame(() => {
+            this.$refs.lineNode.scrollTop = this.$refs.colNode.scrollTop
+            this.scrollHandled = false
+          })
+        }
+      },
     }
   },
   props: {
@@ -58,6 +74,18 @@ export default {
     },
     state: {
       required: true,
+    },
+    messageBar: null,
+    toolbar: null,
+  },
+  computed: {
+    isEditable() {
+      return !this.state.getters.locked
+    },
+    lineNodeStyle() {
+      return {
+        height: this.$refs.colNode ? this.$refs.colNode.scrollHeight : '100%',
+      }
     },
   },
   methods: {
@@ -154,15 +182,74 @@ export default {
     /**
      * @param {KeyboardEvent} e triggered event
      */
+    onCut(e) {
+      this.onCopy(e)
+      document.execCommand('delete', true)
+      this.synchronize(this.$refs.colNode)
+    },
+
+    /**
+     * @param {KeyboardEvent} e triggered event
+     */
     onCopy(e) {
-      // console.log('c', e)
+      // override default copy behavior
+      e.preventDefault()
+
+      // grab the document selection
+      const { focusOffset, anchorOffset, type } = document.getSelection()
+
+      // the user hasn't selected any text. ignore
+      if (type === 'Caret') {
+        return
+      }
+
+      const { line, node } = this.getSelection()
+      let transfer = {
+        text: '',
+        signs: [],
+      }
+      let startOffset = focusOffset < anchorOffset ? focusOffset : anchorOffset
+      let end = focusOffset > anchorOffset ? focusOffset : anchorOffset
+      for (let offset = startOffset; offset < end; offset++) {
+        let sign = line.get(offset)
+        transfer.text = transfer.text + sign.toString()
+        transfer.signs.push(sign)
+      }
+
+      e.clipboardData.setData('text/plain', JSON.stringify(transfer))
     },
 
     /**
      * @param {KeyboardEvent} e triggered event
      */
     onPaste(e) {
-      // console.log('p', e)
+      e.preventDefault()
+
+      let text = e.clipboardData.getData('text/plain')
+
+      // If the string matches this pattern [{ ... }], we most likely have a stringified JSON array,
+      // in which case, the user is copying from another place in the editor
+      if (/^\{/.test(text) && /\}$/.test(text)) {
+        try {
+          const transferData = JSON.parse(text)
+          text = transferData.text
+
+          // TODO for later
+          // transferData.sign contains a stringified copy of the signs that contains
+          // their attributes and chars and whatnot.
+        } catch (err) {
+          this.messageBar.flash('Paste attempt could not be processed.', {
+            type: 'error',
+          })
+        }
+      }
+
+      document.execCommand('insertText', true, text)
+
+      // let sel = document.getSelection()
+      // let range = sel.getRangeAt(0)
+      // range.deleteContents()
+      // range.insertNode(document.createTextNode(text))
     },
 
     /**
@@ -170,24 +257,20 @@ export default {
      */
     onInput(e) {
       switch (e.inputType) {
-        // inserted block/paragraph
-        case 'insertParagraph':
-          this.insertLineAtSelection(e, this.getSelection())
-          break
-
-        // inserted chars
-        case 'insertText':
-          this.signsChanged(e, this.getSelection())
-          break
-
-        // deleted content. Could be line or single char
-        case 'deleteContentBackward':
-          this.signsRemoved(e, this.getSelection())
+        case 'insertParagraph': // inserted block/paragraph
+        case 'deleteContentBackward': // deleted content. Could be line or single char
+        case 'insertText': // inserted chars
+        case 'historyUndo': // ctl-z undo
+        case 'historyRedo': // ctl-y redo
+          this.synchronize(this.$refs.colNode)
           break
 
         // for now, just log out what we're missing
         default:
           console.log('unhandle input event', e)
+          this.$emit('warning', {
+            message: 'An unhandle input event was received.',
+          })
       }
     },
 
@@ -260,6 +343,10 @@ export default {
       this.dialogLine = line
       this.dialogSign = sign
       this.dialogVisible = true
+
+      // disengage the persistance service so the dialog can handle
+      // all changes to signs
+      this.persistanceService.disengage()
     },
 
     /**
@@ -272,6 +359,9 @@ export default {
       this.dialogSign = null
       this.dialogVisible = false
 
+      // re-engage the persistance service so the dialog can handle
+      this.persistanceService.engage()
+
       // TODO: reset selection to previous point
     },
 
@@ -283,15 +373,56 @@ export default {
     onDialogChangeSign(sign) {
       this.dialogSign = sign
     },
+
+    wireToolbarEvents() {
+      this.toolbar.$on('open-sign-editor', () => {
+        try {
+          !this.dialogVisible && this.openDialog()
+        } catch (err) {
+          /* swallow */
+        }
+      })
+    },
   },
   mounted() {
+    if (this.toolbar) {
+      this.wireToolbarEvents()
+    }
+
     this.persistanceService = new ColumnPersistanceService(
       this.column,
       this.$route.params.scrollVersionID,
       this.$store.getters.sessionID
     )
+    this.persistanceService.on('error', () => {
+      this.messageBar.flash('An error occurred attempting to save your changes.', {
+        type: 'error',
+        actionText: 'refresh data? (strongly suggested)',
+        keepOpen: true,
+        actionCallback: () => {
+          this.$emit('refresh')
+          this.messageBar.close()
+        },
+      })
+    })
+
+    this.persistanceService.on('persisted', () => {
+      this.messageBar.flash('All changes saved!', {
+        type: 'success',
+      })
+    })
+
+    setTimeout(() => this.persistanceService.engage(), 200)
 
     this.colHtmlString = this.column.toDOMString()
+  },
+  watch: {
+    toolbar(toolbar) {
+      if (toolbar && (!this._wiredToolbar || toolbar !== this._wiredToolbar)) {
+        this._wiredToolbar = toolbar
+        this.wireToolbarEvents()
+      }
+    },
   },
 }
 </script>
@@ -300,6 +431,7 @@ export default {
 @import '~sass-vars';
 
 .editor-column {
+  position: relative;
   width: 100%;
   height: 100%;
   overflow-x: hidden;
@@ -314,6 +446,10 @@ export default {
     margin: 0;
     line-height: 1.25;
     height: 37px;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -349,6 +485,11 @@ export default {
 
   & .line-number {
     padding: 0 5px;
+  }
+
+  /* account for the scrollbar in the colNode */
+  & .line-number:last-of-type {
+    padding-bottom: 20px;
   }
 }
 </style>

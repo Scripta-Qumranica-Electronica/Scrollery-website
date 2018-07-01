@@ -10,7 +10,7 @@ import namespacedUuid from 'uuid/v3'
  *
  * @return {BaseRecord}       A unique base record class with the defaults accessible
  */
-function Record(defaults = {}) {
+function Record(defaults = {}, settings = {}) {
   function mergeDefaults(props) {
     return {
       ...cloneDeep(defaults),
@@ -49,7 +49,7 @@ function Record(defaults = {}) {
       // the record is persisted if it's not new.
       const privates = {
         __persisted: Boolean(isPersisted || props.__persisted),
-        __uuid: props.__uuid || namespacedUuid(`${props.id || Date.now()}`, BaseRecord.namespace()),
+        __uuid: props.__uuid || namespacedUuid(`${props.id || uuid()}`, BaseRecord.namespace()),
       }
       Object.defineProperties(this, {
         __persisted: {
@@ -127,6 +127,16 @@ function Record(defaults = {}) {
 
             // reset persisted
             this.__persisted = true
+
+            // iterate through properties to find others that
+            // have persisted methods, and pass them down.
+            for (let k in this) {
+              ;(function(key, property) {
+                if (propUpdates[key] && property && typeof property.persisted === 'function') {
+                  property.persisted(propUpdates[key])
+                }
+              }.call(this, k, this[k]))
+            }
           },
         },
       })
@@ -191,6 +201,23 @@ function Record(defaults = {}) {
 
       // disallow new properties, deleting properties, etc.
       // Object.freeze(this)
+
+      if (settings.propogate !== false) {
+        for (let k in this) {
+          ;(function(key, property) {
+            if (property instanceof EventEmitter) {
+              // emit upwards
+              property.on('change', args => {
+                this.__persisted = property.isPersisted()
+                this.emit('change', {
+                  propertyName: key,
+                  ...args,
+                })
+              })
+            }
+          }.call(this, k, this[k]))
+        }
+      }
     }
 
     /**
@@ -199,7 +226,7 @@ function Record(defaults = {}) {
      * @returns {string}  the list class's UUID
      */
     static namespace() {
-      return this.uuid || (this.uuid = uuid())
+      return this.__uuid_namespace__ || (this.__uuid_namespace__ = uuid())
     }
 
     /**
@@ -216,6 +243,16 @@ function Record(defaults = {}) {
      */
     getUUID() {
       return this.__uuid
+    }
+
+    /**
+     * @public
+     * @instance
+     *
+     * @returns {boolean}  whether or not the record has unpersisted changes
+     */
+    isPersisted() {
+      return this.__persisted
     }
 
     /**

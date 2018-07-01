@@ -905,7 +905,7 @@ Removes a sign attribute from an existing sign_char.  Returns **I cant remember 
 ```JSON
 {
   "SESSION_ID": "8788956A-709F-11E8-9AA3-9ECD5A6463E7",
-  "removeSignAttribute": "addSignAttribute",
+  "removeSignAttribute": "removeSignAttribute",
   "scroll_version_id": 1606,
   "signs": [
     {

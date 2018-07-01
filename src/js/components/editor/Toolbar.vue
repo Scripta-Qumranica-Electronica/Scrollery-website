@@ -1,20 +1,32 @@
 <template>
   <div class="toolbar">
-    <el-dropdown :hide-on-click="true" trigger="click" @command="onFontChange">
-      <span class="el-dropdown-link">
-        {{ font.name }} <i class="el-icon-arrow-down el-icon--right"></i>
-      </span>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item v-for="(font, key) in fonts" :key="key" :command="key">
-          <span>{{ font.label }}</span> <span :class="font.class" dir="rtl">אבגד</span>
-        </el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
-    <button class="toolbar-item" @click="toggleReconstructedText" v-bind:title="$i18n.str('Editor.ToggleReconstructedText')">
-        <i v-show="state.getters.showReconstructedText" class="fa fa-eye" aria-hidden="true"></i>
-        <i v-show="!state.getters.showReconstructedText" class="fa fa-eye-slash" aria-hidden="true"></i>
-    </button>
-    <button id="editor-fullscreen" class="toolbar-item" @click="$emit('fullscreen')" v-bind:title="$i18n.str('Editor.Fullscreen')">
+    <div class="toolbar-item float-left">
+      <i 
+        class="fa locked-icon" 
+        :class="{'fa-lock': state.getters.locked, 'fa-unlock': !state.getters.locked}" 
+        :style="{color: state.getters.locked ? 'red' : 'green'}"
+      ></i>
+    </div>
+    <div class="inline toolbar-right" v-show="!state.getters.locked">
+      <button id="editor-fullscreen" class="inline toolbar-item" @click="$emit('open-sign-editor')">
+          Open Sign Editor
+      </button>
+      <el-dropdown :hide-on-click="true" trigger="click" @command="onFontChange">
+        <span class="el-dropdown-link">
+          {{ font.name }} <i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item v-for="(font, key) in fonts" :key="key" :command="key">
+            <span>{{ font.label }}</span> <span :class="font.class" dir="rtl">אבגד</span>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <button class="toolbar-item" @click="toggleReconstructedText" v-bind:title="$i18n.str('Editor.ToggleReconstructedText')">
+          <i v-show="state.getters.showReconstructedText" class="fa fa-eye" aria-hidden="true"></i>
+          <i v-show="!state.getters.showReconstructedText" class="fa fa-eye-slash" aria-hidden="true"></i>
+      </button>
+    </div>
+    <button id="editor-fullscreen" class="inline toolbar-item" @click="$emit('fullscreen')" v-bind:title="$i18n.str('Editor.Fullscreen')">
         <i class="fa fa-arrows-alt" aria-hidden="true"></i>
     </button>
   </div>
@@ -75,5 +87,9 @@ export default {
 
 .toolbar-item {
   font-size: 20px;
+}
+
+.locked-icon {
+  padding: 5px 0;
 }
 </style>

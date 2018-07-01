@@ -1,6 +1,6 @@
 import extendModel from './extendModel.js'
-import Attribute from './Attribute.js'
-import AttributeList from './AttributeList.js'
+import Char from './Char.js'
+import CharList from './CharList.js'
 
 /**
  * Default values for a new sign object
@@ -11,32 +11,13 @@ import AttributeList from './AttributeList.js'
 const defaults = {
   sign_id: 0,
   id: 0,
-  sign: '',
 
-  // characteristics
-  readability: '',
-  break_type: '',
-  is_reconstructed: 0,
-  is_variant: 0,
-  is_retraced: 0,
-  is_whitespace: 0,
+  chars: new CharList(),
 
   // position in stream info
 
   // > peers
-  prev_sign_id: 0,
-  next_sign_id: 0,
-
-  // > col
-  col_name: '',
-  col_id: 0,
-
-  // > line
-  line_name: '',
-  line_id: 0,
-
-  // > attributes
-  attributes: new AttributeList(),
+  next_sign_ids: [],
 }
 
 /**
@@ -47,87 +28,109 @@ const defaults = {
  * @class
  * @extends Record
  */
-export default class Sign extends extendModel(defaults) {
+export default class Sign extends extendModel(defaults, { propogate: false }) {
   constructor(attrs, isPersisted) {
-    attrs.id = attrs.sign_id
-    attrs.is_whitespace =
-      !attrs.sign ||
-      attrs.sign === '' ||
-      attrs.sign === ' ' ||
-      attrs.sign === '&nbsp;' ||
-      attrs.sign === '·'
-
-    // coerce attributes to the a List
-    if (attrs.attributes && !(attrs.attributes instanceof AttributeList)) {
-      attrs.attributes = new AttributeList(
-        {
-          sign_id: attrs.sign_id,
-        },
-        attrs.attributes
-      )
+    // When sign streams split, next_sign_ids is an array of all next signs
+    // For consistency, we make this a single one
+    attrs.next_sign_ids = attrs.next_sign_ids || []
+    if (!Array.isArray(attrs.next_sign_ids)) {
+      attrs.next_sign_ids = [attrs.next_sign_ids]
     }
+
+    // A sign can have multiple characters. If there isn't an array,
+    // coerace it to an array.
+    attrs.chars = attrs.chars || []
+    if (!Array.isArray(attrs.chars)) {
+      attrs.chars = [attrs.chars]
+    }
+    attrs.chars = new CharList(
+      {},
+      attrs.chars.map(char => new Char(char, isPersisted)) || [],
+      isPersisted
+    )
 
     super(attrs, isPersisted)
   }
 
   /**
-   * Add an attribute to the AttributeList
-   *
-   * @param {Attribute|object} attribute  The attribute to add
+   * @return {number} the sign id
    */
-  addAttribute(attribute) {
-    this.attributes.push(attribute instanceof Attribute ? attribute : new Attribute(attribute))
-    return this.attributes.items()
-  }
-
-  /**
-   * Remove an attribute from the Sign
-   *
-   * @param {string} attributeID  The attribute ID to remove from the AttributeList
-   */
-  removeAttribute(attributeID) {
-    // safeguard
-    if (attributeID == null) {
-      return
-    }
-
-    // determine the index of the item to remove
-    let i = this.attributes.findIndex(attributeID)
-    return i >= 0 ? this.attributes.delete(i) : null
-  }
-
-  /**
-   * @return {boolean} whether or not this sign is preceded by another sign
-   */
-  hasPrevious() {
-    return Boolean(this.prev_sign_id)
+  getID() {
+    return this.sign_id
   }
 
   /**
    * @return {boolean} whether or not this sign is followed by another sign
    */
   hasNext() {
-    return Boolean(this.next_sign_id)
+    return this.next_sign_ids.length > 0
   }
 
   /**
-   * @returns {boolean} whether or not this sign is reconstructed
+   * @return {AttributeList} the attribute list
    */
-  reconstructed() {
-    return this.is_reconstructed
+  attributes() {
+    return this.getMainChar().attributes
   }
 
   /**
+   * @public
+   * @instance
+   *
+   * @param {object} attribute  object representation of the attribute to add to the sign
+   */
+  addAttribute(attribute) {
+    return this.getMainChar().addAttribute(attribute)
+  }
+
+  /**
+   * @public
+   * @instance
+   *
+   * @param {object} attribute  object representation of the attribute to add to the sign
+   */
+  removeAttribute(attributeId) {
+    this.getMainChar().removeAttribute(attributeId)
+  }
+
+  /**
+   * For now, simply return the first char, but plan for needing to return the main
+   * char when there are multiple. It will likely be indicated by a flag on the char itself
+   *
+   * @public
+   * @return {Char} the char object
+   */
+  getMainChar() {
+    return this.chars.get(0)
+  }
+
+  /**
+   * @public
+   * @instance
+   *
+   * @return {boolean} whether or not the sign is a whitespace
+   */
+  isWhitespace() {
+    return this.getMainChar().is_whitespace
+  }
+
+  /**
+   * @public
+   * @instance
+   *
    * @returns {string}
    */
   toString() {
-    return this.is_whitespace ? ' ' : this.sign
+    return this.getMainChar().toString()
   }
 
   /**
+   * @public
+   * @instance
+   *
    * @returns {string}
    */
   toDOMString() {
-    return this.is_whitespace ? '&nbsp;' : this.sign
+    return this.getMainChar().toDOMString()
   }
 }
