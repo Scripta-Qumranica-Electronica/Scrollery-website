@@ -12,10 +12,9 @@
     </div>
 
     <!-- Comments -->
-    <div class="comments-editor">
+    <!-- <div class="comments-editor">
         <comments-editor />
-    </div>
-    
+    </div> -->
 
     <!-- Editor Tabs -->
     <el-tabs v-model="activeName">

@@ -1,5 +1,6 @@
 import extendModel from './extendModel.js'
 import Char from './Char.js'
+import CharList from './CharList.js'
 
 /**
  * Default values for a new sign object
@@ -11,7 +12,7 @@ const defaults = {
   sign_id: 0,
   id: 0,
 
-  chars: [],
+  chars: new CharList(),
 
   // position in stream info
 
@@ -27,7 +28,7 @@ const defaults = {
  * @class
  * @extends Record
  */
-export default class Sign extends extendModel(defaults) {
+export default class Sign extends extendModel(defaults, { propogate: false }) {
   constructor(attrs, isPersisted) {
     // When sign streams split, next_sign_ids is an array of all next signs
     // For consistency, we make this a single one
@@ -42,7 +43,11 @@ export default class Sign extends extendModel(defaults) {
     if (!Array.isArray(attrs.chars)) {
       attrs.chars = [attrs.chars]
     }
-    attrs.chars = attrs.chars.map(char => new Char(char))
+    attrs.chars = new CharList(
+      {},
+      attrs.chars.map(char => new Char(char, isPersisted)) || [],
+      isPersisted
+    )
 
     super(attrs, isPersisted)
   }
@@ -75,7 +80,7 @@ export default class Sign extends extendModel(defaults) {
    * @param {object} attribute  object representation of the attribute to add to the sign
    */
   addAttribute(attribute) {
-    this.getMainChar().addAttribute(attribute)
+    return this.getMainChar().addAttribute(attribute)
   }
 
   /**
@@ -96,7 +101,7 @@ export default class Sign extends extendModel(defaults) {
    * @return {Char} the char object
    */
   getMainChar() {
-    return this.chars[0]
+    return this.chars.get(0)
   }
 
   /**

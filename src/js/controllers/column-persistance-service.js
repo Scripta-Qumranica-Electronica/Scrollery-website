@@ -19,7 +19,10 @@ export default class ColumnPersistanceService extends PersistanceService {
   }
 
   disengage() {
-    this.column.off(['change', 'addition', 'delete'], this.__handler)
+    if (this.__handler) {
+      this.column.off(['change', 'addition', 'delete'], this.__handler)
+      delete this.__handler
+    }
   }
 
   /**

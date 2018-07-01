@@ -12,7 +12,7 @@ import KEY_CODES from '~/components/editor/key_codes.js'
  * @return {VueTestWrapper} the vue-test-utils wrapper class
  */
 const columnFactory = () => {
-  mount(ColumnComponent, {
+  return mount(ColumnComponent, {
     attachToDocument: true, // important to ensure selection API works
     propsData: {
       state: editorStore({
@@ -45,7 +45,7 @@ describe('ColumnComponent', () => {
   })
 
   it('should contain a div with the column text', () => {
-    expect(wrapper.contains('.text-col[contenteditable="true"]')).to.equal(true)
+    expect(wrapper.contains('.text-col[contenteditable]')).to.equal(true)
   })
 
   describe('keyboard events', () => {

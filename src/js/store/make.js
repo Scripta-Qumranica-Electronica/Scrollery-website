@@ -1,7 +1,7 @@
-export default function(Vuex, plugins) {
+export default function(Vuex, sessionID = '') {
   return new Vuex.Store({
     state: {
-      sessionID: '',
+      sessionID,
       userID: -1,
       username: '',
       language: 'en',
@@ -21,6 +21,7 @@ export default function(Vuex, plugins) {
         return Boolean(state.lockedScrolls[scroll_version_id])
       },
       attributes: state => state.signAttributeList,
+      cannonicalAttribute: state => name => state.signAttributeList[name],
     },
     mutations: {
       logout(state) {
@@ -29,6 +30,7 @@ export default function(Vuex, plugins) {
         state.username = ''
       },
       setSessionID(state, sessionID) {
+        window.localStorage.setItem('sqe-session', sessionID)
         state.sessionID = sessionID
       },
       setUserID(state, userID) {
@@ -65,15 +67,19 @@ export default function(Vuex, plugins) {
               values: [],
             }
           }
-          state.signAttributeList[attr.name].values.push({
-            attribute_value_id: attr.attribute_value_id,
-            attribute_value_description: attr.attribute_value_description,
-            string_value: attr.string_value,
-            type: attr.type,
-          })
+          const values = state.signAttributeList[attr.name].values
+
+          // ensure no duplicate attribute_value_ids sneak by
+          if (!values.find(val => attr.attribute_value_id === val.attribute_value_id)) {
+            values.push({
+              attribute_value_id: attr.attribute_value_id,
+              attribute_value_description: attr.attribute_value_description,
+              string_value: attr.string_value,
+              type: attr.type,
+            })
+          }
         })
       },
     },
-    plugins,
   })
 }

@@ -166,7 +166,10 @@ export default {
   },
   watch: {
     $route(to, from) {
-      if (to.params.colID !== from.params.colID) {
+      if (
+        to.params.colID !== from.params.colID ||
+        to.params.scrollVersionID !== from.params.scrollVersionID
+      ) {
         if (to.params.colID !== '~' && to.params.colID > 0) {
           this.getText(to.params.scrollVersionID, to.params.colID)
         } else {

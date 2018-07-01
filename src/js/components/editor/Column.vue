@@ -5,6 +5,7 @@
       dir="rtl" 
       :contenteditable="isEditable"
       ref="colNode"
+      @scroll="handleColScroll"
       @keydown="onKeydown" 
       @input="onInput"
       @paste="onPaste"
@@ -12,7 +13,7 @@
       @cut="onCut"
       v-html="colHtmlString"
     >
-    </div><div class="line-number-col inline">
+    </div><div class="line-number-col inline" ref="lineNode" :style="lineNodeStyle">
         <p class="line-number" v-for="(line, lineIndex) of column.items()" :key="line.id">{{ lineIndex + 1 }}</p>
     </div>
     <editing-dialog
@@ -26,6 +27,7 @@
 </template>
 
 <script>
+import throttle from 'lodash/throttle'
 import KEYS from './key_codes.js'
 
 // components
@@ -51,6 +53,18 @@ export default {
       dialogSign: null,
       dialogLine: null,
       dialogVisible: false,
+
+      // handles column scrolling
+      // to keep the lineNode and colNode in sync
+      handleColScroll: () => {
+        if (!this.scrollHandled) {
+          this.scrollHandled = true
+          requestAnimationFrame(() => {
+            this.$refs.lineNode.scrollTop = this.$refs.colNode.scrollTop
+            this.scrollHandled = false
+          })
+        }
+      },
     }
   },
   props: {
@@ -61,12 +75,17 @@ export default {
     state: {
       required: true,
     },
-    messagebar: null,
+    messageBar: null,
     toolbar: null,
   },
   computed: {
     isEditable() {
       return !this.state.getters.locked
+    },
+    lineNodeStyle() {
+      return {
+        height: this.$refs.colNode ? this.$refs.colNode.scrollHeight : '100%',
+      }
     },
   },
   methods: {
@@ -219,7 +238,7 @@ export default {
           // transferData.sign contains a stringified copy of the signs that contains
           // their attributes and chars and whatnot.
         } catch (err) {
-          this.messagebar.flash('Paste attempt could not be processed.', {
+          this.messageBar.flash('Paste attempt could not be processed.', {
             type: 'error',
           })
         }
@@ -324,6 +343,10 @@ export default {
       this.dialogLine = line
       this.dialogSign = sign
       this.dialogVisible = true
+
+      // disengage the persistance service so the dialog can handle
+      // all changes to signs
+      this.persistanceService.disengage()
     },
 
     /**
@@ -335,6 +358,9 @@ export default {
       this.dialogLine = null
       this.dialogSign = null
       this.dialogVisible = false
+
+      // re-engage the persistance service so the dialog can handle
+      this.persistanceService.engage()
 
       // TODO: reset selection to previous point
     },
@@ -459,6 +485,11 @@ export default {
 
   & .line-number {
     padding: 0 5px;
+  }
+
+  /* account for the scrollbar in the colNode */
+  & .line-number:last-of-type {
+    padding-bottom: 20px;
   }
 }
 </style>
