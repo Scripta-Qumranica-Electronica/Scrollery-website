@@ -61,7 +61,7 @@ export default function(Vuex, sessionID = '') {
         rawList.forEach(attr => {
           if (!state.signAttributeList[attr.name]) {
             state.signAttributeList[attr.name] = {
-              name: attr.name,
+              attribute_name: attr.name,
               attribute_id: attr.attribute_id,
               attribute_description: attr.attribute_description || '',
               values: [],

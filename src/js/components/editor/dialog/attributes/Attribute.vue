@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td class="attribute-name">
-      {{ attribute.name }}
+      {{ attribute.attribute_name }}
     </td>
     <td class="attribute-value-selection">
         <attribute-value-selector
@@ -250,7 +250,9 @@ export default {
     //   },
     // })
 
-    const canonicalAttribute = this.$store.getters.cannonicalAttribute(this.attribute.name)
+    const canonicalAttribute = this.$store.getters.cannonicalAttribute(
+      this.attribute.attribute_name
+    )
     this.canonicalValues = canonicalAttribute ? canonicalAttribute.values : []
   },
 }
