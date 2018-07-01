@@ -280,13 +280,16 @@ FROM image_catalog
   JOIN scroll_version_group USING(scroll_id)
   JOIN scroll_version USING(scroll_version_group_id)
   LEFT JOIN SQE_image USING(image_catalog_id)
-WHERE scroll_version.scroll_version_id = ?
-  AND (SQE_image.is_master = 1 OR SQE_image.is_master IS NULL)
+  LEFT JOIN artefact_shape ON artefact_shape.id_of_sqe_image = SQE_image.sqe_image_id
+  JOIN artefact_shape_owner USING(artefact_shape_id)
+WHERE (scroll_version.scroll_version_id = ?
+  OR artefact_shape_owner.scroll_version_id = ?)
+  AND (SQE_image.is_master = 1 OR SQE_image.is_master IS NULL) 
 ORDER BY lvl1, lvl2, side
 MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
 		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{scroll_version_id});
+	$sql->execute($json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 
 	readResults($sql, $key, $lastItem);
 	return;

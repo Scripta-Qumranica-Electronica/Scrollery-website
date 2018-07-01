@@ -33,6 +33,12 @@
         :corpus="corpus">
       </add-new-dialog-image>
     </div>
+    <div class="add-new-dialog-footer">
+      <el-button 
+        type="primary" 
+        class="commit-button" 
+        @click="commitNewArtefact()">Commit</el-button>
+    </div>
   </div>
 </template>
 
@@ -52,6 +58,7 @@ export default {
   props: {
     addType: undefined,
     corpus: undefined,
+    currentScrollVersionID: undefined,
   },
   data() {
     return {
@@ -182,7 +189,48 @@ export default {
           console.error(err)
         })
     },
-    createNewArtefact() {},
+    createNewArtefact() {
+      this.selectedArtefact = undefined
+    },
+
+    /**
+     * TODO: finish this when you life becomes more bearable...
+     */
+    commitNewArtefact() {
+      if (this.selectedArtefact || this.selectedImageReference) {
+        const image_catalog_id = this.selectedArtefact
+          ? this.corpus.artefacts.get(this.selectedArtefact).image_catalog_id
+          : this.corpus.imageReferences.get(this.selectedImageReference).image_catalog_id
+        const id_of_sqe_image = this.selectedArtefact
+          ? this.corpus.artefacts.get(this.selectedArtefact).id_of_sqe_image
+          : this.corpus.imageReferences.get(this.selectedImageReference).master_sqe_image_id
+        const region_in_master_image = this.selectedArtefact
+          ? this.corpus.artefacts.get(this.selectedArtefact).mask
+          : 'POLYGON((0 0,0 0,0 0,0 0))'
+        this.corpus.artefacts
+          .addNewArtefact(
+            this.currentScrollVersionID,
+            id_of_sqe_image,
+            image_catalog_id,
+            region_in_master_image
+          )
+          .then(res => {
+            const h = this.$createElement
+            this.$notify({
+              title: 'Add artefact',
+              message: h('i', { style: 'color: teal' }, 'The artefact was succesfully created'),
+            })
+          })
+          .catch(err => {
+            console.error(err)
+            const h = this.$createElement
+            this.$notify({
+              title: 'Add artefact',
+              message: h('i', { style: 'color: red' }, 'There was an error creating the artefact.'),
+            })
+          })
+      }
+    },
   },
 }
 </script>
@@ -220,5 +268,13 @@ export default {
 }
 .add-new-artefact-menu-select-item {
   height: 25vh;
+}
+.add-new-dialog-footer {
+  width: 100%;
+  height: 5vh;
+}
+.commit-button {
+  float: right;
+  margin-top: 10px;
 }
 </style>

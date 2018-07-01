@@ -185,18 +185,16 @@ export default {
       }
 
       // Load new artefact ID if there is one
-      if (to.params.artID !== '~' && to.params.artID !== from.params.artID) {
+      if (
+        (to.params.artID !== '~' && to.params.artID !== from.params.artID) ||
+        to.params.scrollVersionID !== from.params.scrollVersionID
+      ) {
         this.viewMode = 'ART'
-        if (to.params.artID.toString().indexOf('name') !== -1) {
-          this.artefact = 'new'
-          this.artName = to.params.artID.split('name-')[1]
-        } else {
-          this.artefact = to.params.artID >>> 0
-          this.scrollVersionID = to.params.scrollVersionID >>> 0
-          this.firstClipMask = this.clipMask = wktPolygonToSvg(
-            this.corpus.artefacts.get(this.artefact, this.scrollVersionID).mask
-          )
-        }
+        this.artefact = to.params.artID >>> 0
+        this.scrollVersionID = to.params.scrollVersionID >>> 0
+        this.firstClipMask = this.clipMask = wktPolygonToSvg(
+          this.corpus.artefacts.get(this.artefact, this.scrollVersionID).mask
+        )
         this.lock = false
       }
     },

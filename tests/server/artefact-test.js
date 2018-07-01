@@ -224,20 +224,17 @@ describe('manipulate artefact data', () => {
           return done(err)
         }
 
-        // try {
-        //   assert(res.body.results && Array.isArray(res.body.results))
-        //   for (let i = 0, item; (item = res.body.results[i]); i++) {
-        //     assert(item.scroll_version_id === scroll_version_id)
-        //     assert(typeof item.artefact_id === 'number')
-        //     artefact_id = item.artefact_id
-        //   }
-        // } catch (err) {
-        //   console.log(res.body)
-        //   console.log(err.message)
-        //   console.log(`The failed scroll_version_id is: ${scroll_version_id}`)
-        //   console.log(`The failed sqe_image_id is: ${sqe_image_id}`)
-        //   assert(false)
-        // }
+        try {
+          assert(res.body.returned_info)
+          assert(typeof res.body.returned_info === 'number')
+          artefact_id = res.body.returned_info
+        } catch (err) {
+          console.log(res.body)
+          console.log(err.message)
+          console.log(`The failed scroll_version_id is: ${scroll_version_id}`)
+          console.log(`The failed sqe_image_id is: ${sqe_image_id}`)
+          assert(false)
+        }
 
         done()
       })
