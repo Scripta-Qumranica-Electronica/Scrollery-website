@@ -166,8 +166,8 @@ SELECT DISTINCT
 			scroll_version.user_id
 FROM scroll_version
 	JOIN scroll_version_group USING(scroll_version_group_id)
-	JOIN scroll_data using(scroll_id)
-	JOIN scroll_data_owner using(scroll_data_id)
+	JOIN scroll_data_owner using(scroll_version_id)
+	JOIN scroll_data using(scroll_data_id)
 WHERE scroll_version.user_id = ?
 	OR scroll_version.user_id = 1
 ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
