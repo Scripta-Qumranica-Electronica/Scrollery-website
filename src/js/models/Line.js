@@ -70,7 +70,16 @@ class Line extends List {
   toDOMString() {
     let str = ''
     this.forEach(sign => {
-      str += sign.toDOMString()
+      let classes = ''
+      const attrs = sign.attributes()
+      attrs.forEach(attribute => {
+        const name = attribute.attribute_name === '' ? '' : attribute.attribute_name + '_'
+        attribute.values.forEach(value => {
+          classes += value.attribute_value === '' ? '' : name + value.attribute_value + ' '
+        })
+      })
+      classes += classes.indexOf('is_reconstructed_TRUE') === -1 ? 'is_reconstructed_FALSE' : ''
+      str += `<span class="${classes}">${sign.toDOMString()}</span>`
     }, this)
 
     return `<p data-line-id="${this.getID()}">${str}</p>`

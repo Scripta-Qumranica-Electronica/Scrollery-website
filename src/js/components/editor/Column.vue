@@ -1,7 +1,11 @@
 <template>
   <div class="editor-column">
     <div
-      class="text-col inline text-sbl-hebrew"
+      class="text-col inline"
+      :class="[
+        state.getters.font ? state.getters.font.class : `text-sbl-hebrew`,
+        state.getters.showReconstructedText ? '' : 'hide-reconstructed-text'
+      ]"
       dir="rtl" 
       :contenteditable="isEditable"
       ref="colNode"
@@ -491,5 +495,40 @@ export default {
   & .line-number:last-of-type {
     padding-bottom: 20px;
   }
+}
+
+/* here are all the CSS directives for sign attributes */
+.is_reconstructed_TRUE {
+  color: grey;
+  /* cursor does not show properly when using outline font */
+  // text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  // padding-left: 2px;
+  // padding-right: 2px;
+}
+
+/* using :before selectors causes UI problems with contenteditable */
+/* need more time to find a fix */
+// .is_reconstructed_FALSE + .is_reconstructed_TRUE:before {
+//   content: '[';
+//   color: black;
+//   // text-shadow: initial;
+// }
+
+// .is_reconstructed_TRUE + .is_reconstructed_FALSE:before {
+//   content: ']';
+//   color: black;
+// }
+
+.readability_INCOMPLETE_AND_NOT_CLEAR {
+  color: blue;
+}
+
+.readability_INCOMPLETE_AND_NOT_CLEAR:after {
+  content: '֯';
+  color: blue;
+}
+
+div.hide-reconstructed-text p span.is_reconstructed_TRUE {
+  opacity: 0;
 }
 </style>

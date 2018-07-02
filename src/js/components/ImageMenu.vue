@@ -55,7 +55,7 @@
     </el-col>
     <el-col :span="4">
       <el-slider
-        class="image-zoom"
+        class="image-slider"
         v-model="changeZoom"
         :min="0.1"
         :step="0.01"
@@ -85,11 +85,21 @@
     </el-col>
     <el-col v-if="artefactEditable" v-show="viewMode === 'ART' && (artefact || artefact === 'new')" :span="4">
       <el-slider
+        class="image-slider"
         v-model="changeBrushSize"
         :min="0"
         :max="200"
         :step="1">
       </el-slider>
+    </el-col>
+    <el-col :span="1">
+      <el-button 
+        id="single-image-fullscreen" 
+        @click="toggleFullscreen" 
+        v-bind:title="$i18n.str('Editor.Fullscreen')"
+        size="mini">
+        <i class="fa fa-arrows-alt" aria-hidden="true"></i>
+      </el-button>
     </el-col>
   </el-row>
 </template>
@@ -168,6 +178,9 @@ export default {
     delSelectedRoi() {
       this.$emit('delSelectedRoi')
     },
+    toggleFullscreen() {
+      this.$emit('fullscreen')
+    },
   },
   filters: {
     formatImageType(value) {
@@ -209,11 +222,11 @@ export default {
 .label {
   font-size: small;
 }
-.image-zoom {
+.image-slider {
   padding-left: 20px;
   padding-right: 20px;
 }
-i {
+i.image-select-entry {
   padding-left: 6px;
 }
 </style>

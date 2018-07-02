@@ -92,5 +92,10 @@ describe('ImageMenu', () => {
       vm.delSelectedRoi()
       expect(wrapper.emitted().delSelectedRoi[0]).to.deep.equal([])
     })
+
+    it('should toggle fullscreen mode', () => {
+      vm.toggleFullscreen()
+      expect(wrapper.emitted().fullscreen[0]).to.deep.equal([])
+    })
   })
 })

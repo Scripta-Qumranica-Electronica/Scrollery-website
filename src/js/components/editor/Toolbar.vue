@@ -8,7 +8,7 @@
       ></i>
     </div>
     <div class="inline toolbar-right" v-show="!state.getters.locked">
-      <button id="editor-fullscreen" class="inline toolbar-item" @click="$emit('open-sign-editor')">
+      <button id="editor-fullscreen" class="inline toolbar-item toolbar-button" @click="$emit('open-sign-editor')">
           Open Sign Editor
       </button>
       <el-dropdown :hide-on-click="true" trigger="click" @command="onFontChange">
@@ -87,6 +87,13 @@ export default {
 
 .toolbar-item {
   font-size: 20px;
+  margin-left: 4px;
+  margin-right: 4px;
+  margin-top: 1px;
+}
+
+.toolbar-button {
+  font-size: initial;
 }
 
 .locked-icon {
