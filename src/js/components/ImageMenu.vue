@@ -95,7 +95,7 @@
     <el-col :span="1">
       <el-button 
         id="single-image-fullscreen" 
-        @click="$emit('fullscreen')" 
+        @click="toggleFullscreen" 
         v-bind:title="$i18n.str('Editor.Fullscreen')"
         size="mini">
         <i class="fa fa-arrows-alt" aria-hidden="true"></i>
@@ -177,6 +177,9 @@ export default {
     },
     delSelectedRoi() {
       this.$emit('delSelectedRoi')
+    },
+    toggleFullscreen() {
+      this.$emit('fullscreen')
     },
   },
   filters: {
