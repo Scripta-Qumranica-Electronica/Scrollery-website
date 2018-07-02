@@ -1,5 +1,8 @@
 <template>
-  <div style="{width: 100%; height: 100%;}">
+  <div 
+    class="single-image-pane" 
+    :class='{fullscreen}'
+    style="{width: 100%; height: 100%;}">
     <image-menu
       :corpus="corpus"
       :images="filenames"
@@ -17,7 +20,8 @@
       v-on:toggleMask="toggleMask"
       v-on:delSelectedRoi="delSelectedRoi"
       v-on:changeViewMode="changeViewMode"
-      v-on:changeZoom="changeZoom">
+      v-on:changeZoom="changeZoom"
+      v-on:fullscreen="toggleFullScreen">
     </image-menu>
     <div style="{width: 100%; height: calc(100% - 30px); overflow: auto; position: relative;}">
       <roi-canvas class="overlay-image"
@@ -92,6 +96,7 @@ export default {
       clippingOn: false,
       lock: true,
       imageSettings: {},
+      fullscreen: false,
     }
   },
   methods: {
@@ -168,6 +173,12 @@ export default {
     changeZoom(value) {
       this.zoom = value
     },
+    /**
+     * Show the editor in full screen mode
+     */
+    toggleFullScreen() {
+      this.fullscreen = !this.fullscreen
+    },
   },
   watch: {
     $route(to, from) {
@@ -238,5 +249,14 @@ export default {
   top: 0;
   left: 0;
   transform-origin: top left;
+}
+.single-image-pane.fullscreen {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
+  background: #fff;
 }
 </style>
