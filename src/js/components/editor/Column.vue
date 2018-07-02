@@ -2,7 +2,10 @@
   <div class="editor-column">
     <div
       class="text-col inline"
-      :class="state.getters.font ? state.getters.font.class : `text-sbl-hebrew`"
+      :class="[
+        state.getters.font ? state.getters.font.class : `text-sbl-hebrew`,
+        state.getters.showReconstructedText ? '' : 'hide-reconstructed-text'
+      ]"
       dir="rtl" 
       :contenteditable="isEditable"
       ref="colNode"
@@ -523,5 +526,9 @@ export default {
 .readability_INCOMPLETE_AND_NOT_CLEAR:after {
   content: '֯';
   color: blue;
+}
+
+div.hide-reconstructed-text p span.is_reconstructed_TRUE {
+  opacity: 0;
 }
 </style>
