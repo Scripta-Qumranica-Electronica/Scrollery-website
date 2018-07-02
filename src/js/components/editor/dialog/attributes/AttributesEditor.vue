@@ -16,7 +16,9 @@
           :key="attribute.getUUID()"
           :attribute="attribute"
           :sign="sign"
+          :class="selectedAttribute === attribute.sign_char_attribute_id ? 'selected-char-attribute' : ''"
           @delete-attribute="deleteAttribute(attribute.getUUID())"
+          @selectAttribute="selectAttribute"
         />
       </tbody>
     </table>
@@ -45,6 +47,7 @@ export default {
     return {
       attributes: [],
       attributeName: '',
+      selectedAttribute: undefined,
     }
   },
   methods: {
@@ -63,6 +66,10 @@ export default {
     deleteAttribute(attributeID) {
       this.sign.removeAttribute(attributeID)
       this.attributes = this.sign.getMainChar().attributes.items()
+    },
+    selectAttribute(attribute) {
+      this.selectedAttribute = attribute
+      this.$emit('selectAttribute', attribute)
     },
   },
   watch: {
@@ -94,5 +101,9 @@ export default {
 
 thead {
   background-color: #eee;
+}
+
+.selected-char-attribute {
+  background: lightblue;
 }
 </style>

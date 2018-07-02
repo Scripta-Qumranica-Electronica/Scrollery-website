@@ -56,7 +56,7 @@ sub processCGI {
 		addSignCharVariant => \&addSignCharVariant,
 		removeSignChar => \&removeSignChar,
 		addSignCharAttributeCommentary => \&addSignCharAttributeCommentary,
-		removeSignCharCommentary => \&removeSignCharCommentary,
+		removeSignCharAttributeCommentary => \&removeSignCharAttributeCommentary,
 		addRoiToScroll => \&addRoiToScroll,
 		removeROI => \&removeROI,
 		getRoiOfCol => \&getRoiOfCol,
@@ -885,7 +885,7 @@ sub addSignCharAttributeCommentary() {
 
 #Give a sign_char_commentary_id.
 #I don't know yet what it returns.
-sub removeSignCharCommentary() {
+sub removeSignCharAttributeCommentary() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
 	$cgi->remove_sign_char_commentary($json_post->{sign_char_commentary_id});

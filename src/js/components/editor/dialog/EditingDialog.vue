@@ -12,15 +12,22 @@
     </div>
 
     <!-- Comments -->
-    <div class="comments-editor">
-        <comments-editor />
+    <div 
+      v-show="selectAttribute && selectedSignChar" 
+      class="comments-editor">
+      <comments-editor
+        @addComment="addComment"
+        @deleteComment="deleteComment" />
+    </div>
+    <div v-show="!selectAttribute || !selectedSignChar" class="comments-editor">
+        Select a sign and attribute to add a comment.
     </div>
 
     <!-- Editor Tabs -->
     <el-tabs v-model="activeName">
       <el-tab-pane label="Sign Attributes" name="attributes">
         <tab>
-          <attributes-editor :sign="sign"></attributes-editor>
+          <attributes-editor :sign="sign" @selectAttribute="selectAttribute"></attributes-editor>
         </tab>
       </el-tab-pane>
       <el-tab-pane label="ROI" title="Regions of Interest" name="roi">
@@ -65,6 +72,8 @@ export default {
   data() {
     return {
       activeName: 'attributes',
+      selectedAttribute: undefined,
+      selectedSignChar: undefined,
     }
   },
   computed: {
@@ -96,7 +105,60 @@ export default {
      * @param {Sign} sign  the sign to switch to
      */
     changeSign(sign) {
+      this.selectedAttribute = undefined
+      this.selectedSignChar = undefined
       this.$emit('change-sign', sign)
+    },
+    selectAttribute(attribute) {
+      if (attribute >= 0) {
+        this.selectedAttribute = attribute
+        // We need a more reliable way to know whis sign_char_id is intended
+        // when there is more than one.
+        this.selectedSignChar = this.sign.chars._items[0].sign_char_id
+      } else {
+        this.selectedAttribute = undefined
+        this.selectedSignChar = undefined
+      }
+    },
+    addComment(commentary) {
+      if (this.selectedSignChar && this.selectedAttribute) {
+        const payload = {
+          transaction: 'addSignCharAttributeCommentary',
+          scroll_version_id: this.$route.params.scrollVersionID,
+          sign_char_id: this.selectedSignChar,
+          attribute_id: this.selectedAttribute,
+          commentary: commentary,
+        }
+        this.$store.commit('addWorking')
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', payload)
+          .then(res => {
+            this.$store.commit('delWorking')
+          })
+          .catch(err => {
+            this.$store.commit('delWorking')
+            console.error(err)
+          })
+      }
+    },
+    deleteComment() {
+      // if (this.selectedSignChar && this.selectedAttribute) {
+      //   const payload = {
+      //     transaction: 'removeSignCharAttributeCommentary',
+      //     scroll_version_id: this.$route.params.scrollVersionID,
+      //     sign_char_id: this.selectedSignChar,
+      //     attribute_id: this.selectedAttribute,
+      //     sign_char_commentary_id: //I don't have this yet,
+      //   }
+      //   this.$store.commit('addWorking')
+      //   this.$post('resources/cgi-bin/scrollery-cgi.pl', payload)
+      //     .then(res => {
+      //       this.$store.commit('delWorking')
+      //      })
+      //     .catch(err => {
+      //       this.$store.commit('delWorking')
+      //       console.error(err)
+      //     })
+      // }
     },
   },
 }

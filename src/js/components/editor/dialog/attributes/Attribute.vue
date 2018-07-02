@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr @click="$emit('selectAttribute', attribute.sign_char_attribute_id)">
     <td class="attribute-name">
       {{ attribute.attribute_name }}
     </td>

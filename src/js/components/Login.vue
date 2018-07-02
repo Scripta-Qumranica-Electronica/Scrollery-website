@@ -149,6 +149,7 @@ export default {
           // Set store state
           this.setSessionID(res.data.SESSION_ID)
           this.setUserID(~~res.data.USER_ID)
+          // Maybe we have the AJAX function send back the user_name as well.
           this.setUsername(
             window.localStorage.getItem('name')
               ? JSON.parse(window.localStorage.getItem('name'))[~~res.data.USER_ID]
