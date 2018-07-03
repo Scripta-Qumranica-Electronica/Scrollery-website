@@ -1,7 +1,16 @@
 <template>
   <div>
     <div :style="{background: $route.params.scrollVersionID === combination.scroll_version_id ? 'lightblue' : '#dedede'}">
-      <span class="clickable-menu-item" @click="selectCombination">{{combination.name}}{{combination.user_id !== 1 ? ` - ${username}` : ' - default'}}</span>
+      <span v-show="!nameInput" class="clickable-menu-item" @click="selectCombination">{{combination.name}}{{combination.user_id !== 1 ? ` - ${username}` : ' - default'}}</span>
+      <el-input 
+        class="artefact-name-change"
+        v-show="nameInput" 
+        placeholder="Label" 
+        v-model="nameInput"
+        size="mini"
+        @blur="setName"
+        @keyup.enter.native="setName"></el-input>
+      <i class="fa fa-edit" @click="startNameChange"></i>
       <i 
         class="fa" 
         :class="{'fa-lock': combination.locked, 'fa-unlock': !combination.locked}" 
@@ -99,6 +108,7 @@ export default {
       showImages: false,
       addType: '',
       dialogVisible: false,
+      nameInput: undefined,
     }
   },
   computed: {
@@ -147,6 +157,25 @@ export default {
           .then(res => (this.loadingImages = false))
           .catch(err => {
             this.loadingImages = false
+            console.error(err)
+          })
+      }
+    },
+
+    startNameChange() {
+      this.nameInput = this.combination.name
+    },
+    setName() {
+      if (this.nameInput) {
+        this.$store.commit('addWorking')
+        this.corpus.combinations
+          .updateName(this.combination.scroll_version_id, this.nameInput)
+          .then(res => {
+            this.$store.commit('delWorking')
+            this.nameInput = undefined
+          })
+          .catch(err => {
+            this.$store.commit('delWorking')
             console.error(err)
           })
       }

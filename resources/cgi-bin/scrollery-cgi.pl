@@ -1028,4 +1028,14 @@ sub changeColName() {
     '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
 }
 
+# This needs to be added to the SQE_DB_API.
+
+sub changeCombinationName() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->change_scroll_name($json_post->{scroll_version_id}, $json_post->{name});
+  print '{"name":"' . $json_post->{name} . 
+    '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
+}
+
 processCGI();
