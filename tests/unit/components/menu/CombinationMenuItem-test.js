@@ -84,6 +84,34 @@ describe("CombinationMenuItem", function() {
       expect(push.firstCall.args[0].params.scrollID).to.equal(combination.scroll_id)
       expect(push.firstCall.args[0].params.scrollVersionID).to.equal(combination.scroll_version_id)
     })
+
+    it('can start editing a name', () => {
+      vm.startNameChange()
+
+      // assertions 
+      expect(vm.nameInput).to.equal(combination.name)
+    })
+
+    it('can change a name', () => {
+      const newName = 'new name'
+      const oldName = combination.name
+      vm.startNameChange()
+      vm.nameInput = newName
+      vm.setName()
+
+      // assertions 
+      expect(vm.nameInput).to.equal(newName)
+      // expect the write to fail without AJAX completion
+      expect(combination.name).to.equal(oldName)
+    })
+
+    it('does nothing when changing to undefined name', () => {
+      vm.nameInput = undefined
+      vm.setName()
+
+      // assertions 
+      expect(vm.nameInput).to.equal(undefined)
+    })
   })
 
   describe('Only scroll version change', () => {

@@ -143,9 +143,14 @@ export default {
             scroll_version_id: this.combination.scroll_version_id,
             scroll_id: this.combination.scroll_id,
           })
-          .then(res => (this.loadingColumns = false))
-          .catch(err => {
+          .then(res => {
+            /* istanbul ignore next */
             this.loadingColumns = false
+          })
+          .catch(err => {
+            /* istanbul ignore next */
+            this.loadingColumns = false
+            /* istanbul ignore next */
             console.error(err)
           })
         this.loadingImages = true
@@ -154,9 +159,14 @@ export default {
             scroll_version_id: this.combination.scroll_version_id,
             scroll_id: this.combination.scroll_id,
           })
-          .then(res => (this.loadingImages = false))
-          .catch(err => {
+          .then(res => {
+            /* istanbul ignore next */
             this.loadingImages = false
+          })
+          .catch(err => {
+            /* istanbul ignore next */
+            this.loadingImages = false
+            /* istanbul ignore next */
             console.error(err)
           })
       }
@@ -172,11 +182,15 @@ export default {
         this.corpus.combinations
           .updateName(this.combination.scroll_version_id, this.nameInput)
           .then(res => {
+            /* istanbul ignore next */
             this.$store.commit('delWorking')
+            /* istanbul ignore next */
             this.nameInput = undefined
           })
           .catch(err => {
+            /* istanbul ignore next */
             this.$store.commit('delWorking')
+            /* istanbul ignore next */
             console.error(err)
           })
       }
@@ -187,10 +201,13 @@ export default {
       this.corpus.combinations
         .cloneScroll(this.combination.scroll_version_id)
         .then(res => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
         })
         .catch(err => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           console.error(err)
         })
     },

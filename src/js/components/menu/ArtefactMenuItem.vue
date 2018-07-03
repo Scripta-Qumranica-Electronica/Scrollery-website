@@ -64,11 +64,15 @@ export default {
         this.corpus.artefacts
           .updateName(this.artefact.artefact_id, this.nameInput, this.scrollVersionID)
           .then(res => {
+            /* istanbul ignore next */
             this.$store.commit('delWorking')
+            /* istanbul ignore next */
             this.nameInput = undefined
           })
           .catch(err => {
+            /* istanbul ignore next */
             this.$store.commit('delWorking')
+            /* istanbul ignore next */
             console.error(err)
           })
       }
