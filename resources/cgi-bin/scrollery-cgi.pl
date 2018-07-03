@@ -62,7 +62,9 @@ sub processCGI {
 		getRoiOfCol => \&getRoiOfCol,
 		getRoisOfCombination => \&getRoisOfCombination,
 		getTextOfFragment => \&getTextOfFragment,
-		getListOfAttributes => \& getListOfAttributes
+		getListOfAttributes => \&getListOfAttributes,
+    changeColName => \&changeColName,
+    changeCombinationName => \&changeCombinationName
 	);
 	my $json_post = $cgi->{CGIDATA};
 
@@ -671,7 +673,7 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
 	$sql->execute($clonedScroll);
-	print Encode::decode('utf8', encode_json($sql->fetchrow_hashref));
+  readResults($sql);
 	print "}";
 }
 
@@ -1013,6 +1015,28 @@ MYSQL
 
 	readResults($sql);
 	return;
+}
+
+# This seems to run without error, but the relevant data
+# is not inserted.
+
+sub changeColName() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->change_col_name($json_post->{col_id}, $json_post->{name});
+  print '{"col_id":' . $json_post->{col_id} . 
+    ',"name":"' . $json_post->{name} . 
+    '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
+}
+
+# This needs to be added to the SQE_DB_API.
+
+sub changeCombinationName() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->change_scroll_name($json_post->{name});
+  print '{"name":"' . $json_post->{name} . 
+    '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
 }
 
 processCGI();

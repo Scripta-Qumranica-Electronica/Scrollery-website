@@ -193,8 +193,8 @@ describe('manipulate artefact data', () => {
           assert(typeof res.body.set_scroll_version.returned_info === 'number')
           assert(typeof res.body.new_scroll_id === 'number')
           assert(res.body.scroll_data)
-          assert(res.body.scroll_data.locked === 0)
-          assert(typeof res.body.scroll_data.name === 'string')
+          assert(res.body.scroll_data.results[0].locked === 0)
+          assert(typeof res.body.scroll_data.results[0].name === 'string')
           scroll_version_id = res.body.new_scroll_id
         } catch (err) {
           console.log(res.body)
@@ -220,6 +220,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }
@@ -255,6 +257,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }
@@ -295,6 +299,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }
@@ -333,6 +339,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }
@@ -369,6 +377,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }
