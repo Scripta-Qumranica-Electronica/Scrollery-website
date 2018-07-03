@@ -673,7 +673,7 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
 	$sql->execute($clonedScroll);
-	print Encode::decode('utf8', encode_json($sql->fetchrow_hashref));
+  readResults($sql);
 	print "}";
 }
 

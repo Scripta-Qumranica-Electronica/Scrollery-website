@@ -42,7 +42,7 @@ export default class Combinations extends ItemList {
             // data transmission.
             // this._hash = res.data.hash
 
-            const scroll_data = res.data.scroll_data
+            const scroll_data = res.data.scroll_data.results[0]
             this._insertItem(new this.recordModel(scroll_data), undefined, 0)
             resolve(res)
           }
