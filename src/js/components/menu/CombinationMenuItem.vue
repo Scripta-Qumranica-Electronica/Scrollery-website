@@ -165,6 +165,7 @@ export default {
     startNameChange() {
       this.nameInput = this.combination.name
     },
+
     setName() {
       if (this.nameInput) {
         this.$store.commit('addWorking')

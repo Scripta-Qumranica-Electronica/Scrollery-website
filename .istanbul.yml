@@ -5,5 +5,8 @@ instrumentation:
     default-excludes: true
     excludes: [
       './src/js/main.js',
-      './src/js/routes.js'
+      './src/js/routes.js',
+      './src/js/components/ArtefactCanvas.vue',
+      './src/js/components/ArtefactCanvas.vue',
+      './src/js/components/SingleImage.vue'
     ]
