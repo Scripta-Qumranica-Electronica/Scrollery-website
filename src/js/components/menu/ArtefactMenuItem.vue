@@ -62,7 +62,7 @@ export default {
       if (this.nameInput) {
         this.$store.commit('addWorking')
         this.corpus.artefacts
-          .updateArtefactName(this.artefact.artefact_id, this.nameInput, this.scrollVersionID)
+          .updateName(this.artefact.artefact_id, this.nameInput, this.scrollVersionID)
           .then(res => {
             this.$store.commit('delWorking')
             this.nameInput = undefined

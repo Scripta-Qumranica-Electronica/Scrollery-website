@@ -11,6 +11,11 @@ export default class Cols extends ItemList {
     super(corpus, idKey, Col, listType, connectedLists, relativeToScrollVersion, defaultPostData)
   }
 
+  /* istanbul ignore next */
+  updateName(item_id, name, scroll_version_id) {
+    return super.updateName(item_id, name, scroll_version_id, 'changeColName')
+  }
+
   removeItem(key, scroll_version_id = undefined) {
     /**
      * Add axios command to remove from database.

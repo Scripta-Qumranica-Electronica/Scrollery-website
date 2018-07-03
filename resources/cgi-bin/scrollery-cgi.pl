@@ -62,7 +62,8 @@ sub processCGI {
 		getRoiOfCol => \&getRoiOfCol,
 		getRoisOfCombination => \&getRoisOfCombination,
 		getTextOfFragment => \&getTextOfFragment,
-		getListOfAttributes => \& getListOfAttributes
+		getListOfAttributes => \&getListOfAttributes,
+    changeColName => \&changeColName
 	);
 	my $json_post = $cgi->{CGIDATA};
 
@@ -1013,6 +1014,18 @@ MYSQL
 
 	readResults($sql);
 	return;
+}
+
+# This seems to run without error, but the relevant data
+# is not inserted.
+
+sub changeColName() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->change_line_name($json_post->{col_id}, $json_post->{name});
+  print '{"col_id":' . $json_post->{col_id} . 
+    ',"name":"' . $json_post->{name} . 
+    '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
 }
 
 processCGI();
