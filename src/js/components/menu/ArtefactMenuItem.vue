@@ -10,7 +10,7 @@
         size="mini"
         @blur="setName"
         @keyup.enter.native="setName"></el-input>
-      <i class="fa fa-edit" @click="startNameChange"></i>
+      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-edit" @click="startNameChange"></i>
       <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="corpus.artefacts.removeItem(artefact.artefact_id, scrollVersionID)"></i>
     </span>
   </div>

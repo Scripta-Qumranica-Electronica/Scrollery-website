@@ -63,7 +63,8 @@ sub processCGI {
 		getRoisOfCombination => \&getRoisOfCombination,
 		getTextOfFragment => \&getTextOfFragment,
 		getListOfAttributes => \&getListOfAttributes,
-    changeColName => \&changeColName
+    changeColName => \&changeColName,
+    changeCombinationName => \&changeCombinationName
 	);
 	my $json_post = $cgi->{CGIDATA};
 
@@ -1022,7 +1023,7 @@ MYSQL
 sub changeColName() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
-	$cgi->change_line_name($json_post->{col_id}, $json_post->{name});
+	$cgi->change_col_name($json_post->{col_id}, $json_post->{name});
   print '{"col_id":' . $json_post->{col_id} . 
     ',"name":"' . $json_post->{name} . 
     '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
@@ -1033,7 +1034,7 @@ sub changeColName() {
 sub changeCombinationName() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
-	$cgi->change_scroll_name($json_post->{scroll_version_id}, $json_post->{name});
+	$cgi->change_scroll_name($json_post->{name});
   print '{"name":"' . $json_post->{name} . 
     '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
 }

@@ -10,7 +10,7 @@
         size="mini"
         @blur="setName"
         @keyup.enter.native="setName"></el-input>
-      <i class="fa fa-edit" @click="startNameChange"></i>
+      <i v-if="!combination.locked" class="fa fa-edit" @click="startNameChange"></i>
       <i 
         class="fa" 
         :class="{'fa-lock': combination.locked, 'fa-unlock': !combination.locked}" 
