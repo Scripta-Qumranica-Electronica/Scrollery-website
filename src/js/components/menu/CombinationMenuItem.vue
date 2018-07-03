@@ -22,8 +22,9 @@
           aria-hidden="true"
           style="color: black"></i>
       </div>
-      <ul v-show="showColumns">
-        <li
+      <div v-show="showColumns">
+        <div
+          class="submenu-items"
           v-for="col_id in combination.cols" 
           :key="'menu' + combination.scroll_version_id + '-' + col_id">
           <column-menu-item 
@@ -32,8 +33,8 @@
             :column="corpus.cols.get(col_id)"
             :corpus="corpus">
           </column-menu-item>
-        </li>
-      </ul>
+        </div>
+      </div>
       <div @click="toggleImages">
         <i class="fa" :class="{'fa-caret-right': !showImages, 'fa-caret-down': showImages}"></i>
         <span>images</span>
@@ -43,8 +44,9 @@
           aria-hidden="true"
           style="color: black"></i>
       </div>
-      <ul v-show="showImages">
+      <div v-show="showImages">
         <div
+          class="submenu-items"
           v-for="image_catalog_id in combination.imageReferences" 
           :key="'menu' + combination.scroll_version_id + '-' + image_catalog_id">
           <image-menu-item 
@@ -54,7 +56,7 @@
             :corpus="corpus">
           </image-menu-item>
         </div>
-      </ul>
+      </div>
     </div>
 
     <el-dialog
@@ -189,5 +191,8 @@ export default {
 }
 i {
   padding: 2px;
+}
+.submenu-items {
+  margin-left: 20px;
 }
 </style>

@@ -220,6 +220,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }
@@ -255,6 +257,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }
@@ -295,6 +299,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }
@@ -333,6 +339,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }
@@ -369,6 +377,8 @@ describe('manipulate artefact data', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function(err, res) {
+        console.log('Response:')
+        console.log(res.body)
         if (err) {
           return done(err)
         }

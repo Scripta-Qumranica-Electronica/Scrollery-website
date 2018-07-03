@@ -81,6 +81,35 @@ export default class Artefacts extends ItemList {
   }
 
   /* istanbul ignore next */
+  updateArtefactName(artefact_id, name, scroll_version_id) {
+    const oldName = this.get(artefact_id, scroll_version_id).name
+    console.log(`Artefect name: ${name}`)
+    const payload = {
+      scroll_version_id: scroll_version_id,
+      artefact_id: artefact_id,
+      name: name,
+      transaction: 'changeArtefactData',
+    }
+    return new Promise((resolve, reject) => {
+      this.alterItemAtKey(artefact_id, { name: name }, scroll_version_id)
+      this.axios
+        .post('resources/cgi-bin/scrollery-cgi.pl', payload)
+        .then(res => {
+          if (res.status === 200 && res.data) {
+            resolve(res)
+          } else {
+            this.alterItemAtKey(artefact_id, { name: oldName }, scroll_version_id)
+            reject(res)
+          }
+        })
+        .catch(err => {
+          this.alterItemAtKey(artefact_id, { name: oldName }, scroll_version_id)
+          reject(err)
+        })
+    })
+  }
+
+  /* istanbul ignore next */
   addNewArtefact(scroll_version_id, id_of_sqe_image, image_catalog_id, region_in_master_image) {
     const payload = {
       scroll_version_id: scroll_version_id,

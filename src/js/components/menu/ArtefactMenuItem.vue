@@ -1,7 +1,16 @@
 <template>
   <div>
     <span class="clickable-menu-item" @click="setRouter" :style="{background: $route.params.artID === artefact.artefact_id ? 'lightblue' : '#dedede'}">
-      <span>Artefact: {{artefact.name}}</span>
+      <span v-show="!nameInput">{{artefact.name}}</span>
+      <el-input 
+        class="artefact-name-change"
+        v-show="nameInput" 
+        placeholder="Label" 
+        v-model="nameInput"
+        size="mini"
+        @blur="setName"
+        @keyup.enter.native="setName"></el-input>
+      <i class="fa fa-edit" @click="startNameChange"></i>
       <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="corpus.artefacts.removeItem(artefact.artefact_id, scrollVersionID)"></i>
     </span>
   </div>
@@ -15,6 +24,11 @@ export default {
     scrollVersionID: undefined,
     imageID: undefined,
     corpus: undefined,
+  },
+  data() {
+    return {
+      nameInput: undefined,
+    }
   },
   methods: {
     setRouter() {
@@ -41,6 +55,30 @@ export default {
       // associated with it, and should be prepared to recieve a message back
       // saying "nothing changed" and it can leave the artefact alone.
     },
+    startNameChange() {
+      this.nameInput = this.artefact.name
+    },
+    setName() {
+      if (this.nameInput) {
+        this.$store.commit('addWorking')
+        this.corpus.artefacts
+          .updateArtefactName(this.artefact.artefact_id, this.nameInput, this.scrollVersionID)
+          .then(res => {
+            this.$store.commit('delWorking')
+            this.nameInput = undefined
+          })
+          .catch(err => {
+            this.$store.commit('delWorking')
+            console.error(err)
+          })
+      }
+    },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.artefact-name-change {
+  width: 100px;
+}
+</style>
