@@ -15,7 +15,7 @@
         <span v-html="signText"></span>
       </div>
       <div class="line text-sbl-hebrew" dir="rtl">
-          <span v-for="s in signs" class="line-sign" :class='{"edited-sign": (s.getID() === sign.getID())}' @click="changeSign(s)">{{ s.isWhitespace() ? ' ' : s.toDOMString() }}</span>
+          <span v-for="s in signs" class="line-sign" :class='signCSS(s)' @click="changeSign(s)" :key="s.sign_id + '-ed-dialog'">{{ s.isWhitespace() ? ' ' : s.toDOMString() }}</span>
       </div>
     </div>
 
@@ -231,6 +231,27 @@ export default {
           })
       })
     },
+
+    signCSS(sign) {
+      let cssClasses = []
+      for (let i = 0, char; (char = sign.chars.items()[i]); i++) {
+        for (let n = 0, attr; (attr = char.attributes.items()[n]); n++) {
+          for (let z = 0, value; (value = attr.values.items()[z]); z++) {
+            cssClasses.push(
+              `${attr.attribute_name}_${
+                value.attribute_numeric_value === -1
+                  ? value.attribute_value
+                  : value.attribute_numeric_value
+              }`
+            )
+          }
+        }
+      }
+      if (sign.getID() === this.sign.getID()) {
+        cssClasses.push('edited-sign')
+      }
+      return cssClasses
+    },
   },
 }
 </script>
@@ -268,6 +289,7 @@ export default {
   }
 
   & .line {
+    color: black;
     & .line-sign {
       display: inline-block;
       font-size: 20px;
@@ -278,6 +300,28 @@ export default {
         border-bottom: 0.5px solid #000;
       }
     }
+  }
+
+  .is_reconstructed_TRUE {
+    color: grey;
+  }
+
+  .readability_INCOMPLETE_AND_NOT_CLEAR {
+    color: blue;
+  }
+
+  .readability_INCOMPLETE_AND_NOT_CLEAR:after {
+    content: '֯';
+    color: blue;
+  }
+
+  .readability_INCOMPLETE_BUT_CLEAR {
+    color: red;
+  }
+
+  .readability_INCOMPLETE_BUT_CLEAR:after {
+    content: 'ׄ';
+    color: red;
   }
 }
 
