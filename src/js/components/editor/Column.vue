@@ -25,6 +25,7 @@
       :sign="dialogSign"
       :dialogVisible="dialogVisible"
       @close="onDialogClosed"
+      @refresh="$emit('refresh')"
       @change-sign="onDialogChangeSign"
     />
   </div>

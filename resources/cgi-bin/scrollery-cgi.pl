@@ -833,7 +833,7 @@ sub removeSignAttribute() {
 	print "[{";
 
 	foreach my $sign (@{$json_post->{signs}}) {
-		print "{\"$sign->{sign_char_id}\":[";
+		print "\"$sign->{sign_char_id}\":[";
 		my $attributeCounter = 1;
 		my $attributeRepeatLength = scalar @{$sign->{attributes}};
 		foreach my $attribute (@{$sign->{attributes}}) {
@@ -851,12 +851,7 @@ sub removeSignAttribute() {
 			$counter++;
 		}
 	}
-	print "}]";
-	if (!defined $key) {
-		print("}");
-	} elsif (!$lastItem) {
-		print(",");
-	}
+	print "]}";
 }
 
 #Give a sign_id, a character with the variant reading, and a 1 if it should be the main reading.
@@ -890,6 +885,7 @@ sub removeSignCharAttributeCommentary() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
 	$cgi->remove_sign_char_commentary($json_post->{sign_char_commentary_id});
+  print "{\"$json_post->{sign_char_commentary_id}\":\"deleted\"}";
 }
 
 #Give a sign_char_commentary_id.

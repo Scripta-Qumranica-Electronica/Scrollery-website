@@ -242,14 +242,6 @@ export default {
   },
 
   mounted() {
-    // Uncomment when the commentary is ready
-    // this.quill = new Quill(`[data-id="${this.id}"]`, {
-    //   theme: 'snow',
-    //   modules: {
-    //     toolbar: false,
-    //   },
-    // })
-
     const canonicalAttribute = this.$store.getters.cannonicalAttribute(
       this.attribute.attribute_name
     )

@@ -1,5 +1,13 @@
 <template>
-  <el-dialog title="Editor" :visible="dialogVisible" width="90vw" height="90vh" class="editor-dialog" @close="$emit('close')">
+  <el-dialog :visible="dialogVisible" width="90vw" height="90vh" class="editor-dialog" @close="$emit('close')">
+    <template slot="title">
+      <span>Editor</span>
+      <i 
+        v-show="working > 0" 
+        class="fa fa-spinner fa-spin fa-fw" 
+        aria-hidden="true"
+        style="color: black"></i>
+    </template>
 
     <!-- Display the sign in context of the line -->
     <div class="line-subheader">
@@ -46,6 +54,7 @@
 
 <script>
 // components
+import { mapGetters } from 'vuex'
 import Tab from './Tab.vue'
 import AttributesEditor from './attributes/AttributesEditor.vue'
 import CommentsEditor from './CommentsEditor.vue'
@@ -75,10 +84,13 @@ export default {
       activeName: 'attributes',
       selectedAttribute: undefined,
       selectedSignChar: undefined,
+      selectedCommentary: undefined,
       currentComment: '',
     }
   },
   computed: {
+    ...mapGetters(['working']),
+
     /**
      * @type {array.<Sign>}
      */
@@ -121,11 +133,6 @@ export default {
             if (attr.attribute_id === this.selectedAttribute) {
               this.selectedSignChar = signChar.sign_char_id
               if (attr.commentary_id) {
-                console.log(
-                  `We have a comment for sign ${this.selectedSignChar}, attribute ${
-                    this.selectedAttribute
-                  }`
-                )
                 this.$store.commit('addWorking')
                 this.$post('resources/cgi-bin/scrollery-cgi.pl', {
                   transaction: 'getSignCharAttributeCommentary',
@@ -134,33 +141,54 @@ export default {
                 })
                   .then(res => {
                     this.currentComment = res.data[attr.commentary_id]
+                    this.selectedCommentary = attr.commentary_id
                     this.$store.commit('delWorking')
                   })
                   .catch(err => {
                     this.$store.commit('delWorking')
                     console.error(err)
                   })
-                this.currentComment = 'Some initial comment.'
               } else {
-                console.log(
-                  `No comment for sign ${this.selectedSignChar}, attribute ${
-                    this.selectedAttribute
-                  }`
-                )
                 this.currentComment = ''
               }
               break
             }
           }
         }
-        this.selectedSignChar = this.sign.chars._items[0].sign_char_id
       } else {
         this.selectedAttribute = undefined
         this.selectedSignChar = undefined
       }
     },
+
     addComment(commentary) {
       if (this.selectedSignChar && this.selectedAttribute) {
+        if (this.selectedCommentary) {
+          this.removeCommentFromDB(this.selectedCommentary)
+            .then(res => {
+              return this.insertCommentToDB(commentary)
+            })
+            .catch(err => {
+              console.error(err)
+            })
+        } else {
+          this.insertCommentToDB(commentary).catch(err => {
+            console.error(err)
+          })
+        }
+      }
+    },
+
+    deleteComment() {
+      if (this.selectedCommentary) {
+        this.removeCommentFromDB(this.selectedCommentary).catch(err => {
+          console.error(err)
+        })
+      }
+    },
+
+    insertCommentToDB(commentary) {
+      return new Promise((resolve, reject) => {
         const payload = {
           transaction: 'addSignCharAttributeCommentary',
           scroll_version_id: this.$route.params.scrollVersionID,
@@ -172,32 +200,36 @@ export default {
         this.$post('resources/cgi-bin/scrollery-cgi.pl', payload)
           .then(res => {
             this.$store.commit('delWorking')
+            this.currentComment = commentary
+            resolve(res)
           })
           .catch(err => {
             this.$store.commit('delWorking')
-            console.error(err)
+            reject(err)
           })
-      }
+      })
     },
-    deleteComment() {
-      // if (this.selectedSignChar && this.selectedAttribute) {
-      //   const payload = {
-      //     transaction: 'removeSignCharAttributeCommentary',
-      //     scroll_version_id: this.$route.params.scrollVersionID,
-      //     sign_char_id: this.selectedSignChar,
-      //     attribute_id: this.selectedAttribute,
-      //     sign_char_commentary_id: //I don't have this yet,
-      //   }
-      //   this.$store.commit('addWorking')
-      //   this.$post('resources/cgi-bin/scrollery-cgi.pl', payload)
-      //     .then(res => {
-      //       this.$store.commit('delWorking')
-      //      })
-      //     .catch(err => {
-      //       this.$store.commit('delWorking')
-      //       console.error(err)
-      //     })
-      // }
+
+    removeCommentFromDB(commentary_id) {
+      return new Promise((resolve, reject) => {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+          transaction: 'removeSignCharAttributeCommentary',
+          scroll_version_id: this.$route.params.scrollVersionID,
+          sign_char_commentary_id: commentary_id,
+        })
+          .then(res => {
+            this.$store.commit('delWorking')
+            if (res.data[commentary_id] === 'deleted') {
+              this.currentComment = ''
+              this.selectedCommentary = undefined
+              resolve(res)
+            }
+          })
+          .catch(err => {
+            this.$store.commit('delWorking')
+            reject(err)
+          })
+      })
     },
   },
 }
