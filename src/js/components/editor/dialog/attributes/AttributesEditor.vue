@@ -16,7 +16,7 @@
           :key="attribute.getUUID()"
           :attribute="attribute"
           :sign="sign"
-          :class="selectedAttribute === attribute.sign_char_attribute_id ? 'selected-char-attribute' : ''"
+          :class="selectedAttribute === attribute.attribute_id ? 'selected-char-attribute' : ''"
           @delete-attribute="deleteAttribute(attribute.getUUID())"
           @selectAttribute="selectAttribute"
         />

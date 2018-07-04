@@ -16,6 +16,7 @@
       v-show="selectAttribute && selectedSignChar" 
       class="comments-editor">
       <comments-editor
+        :initialText="currentComment"
         @addComment="addComment"
         @deleteComment="deleteComment" />
     </div>
@@ -74,6 +75,7 @@ export default {
       activeName: 'attributes',
       selectedAttribute: undefined,
       selectedSignChar: undefined,
+      currentComment: '',
     }
   },
   computed: {
@@ -112,8 +114,45 @@ export default {
     selectAttribute(attribute) {
       if (attribute >= 0) {
         this.selectedAttribute = attribute
-        // We need a more reliable way to know whis sign_char_id is intended
-        // when there is more than one.
+        // We have to loop through the attributes to find the sign_char_id
+        // and whether or not a comment exists.
+        for (let i = 0, signChar; (signChar = this.sign.chars._items[i]); i++) {
+          for (let n = 0, attr; (attr = signChar.attributes._items[n]); n++) {
+            if (attr.attribute_id === this.selectedAttribute) {
+              this.selectedSignChar = signChar.sign_char_id
+              if (attr.commentary_id) {
+                console.log(
+                  `We have a comment for sign ${this.selectedSignChar}, attribute ${
+                    this.selectedAttribute
+                  }`
+                )
+                this.$store.commit('addWorking')
+                this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+                  transaction: 'getSignCharAttributeCommentary',
+                  scroll_version_id: this.$route.params.scrollVersionID,
+                  sign_char_commentary_id: attr.commentary_id,
+                })
+                  .then(res => {
+                    this.currentComment = res.data[attr.commentary_id]
+                    this.$store.commit('delWorking')
+                  })
+                  .catch(err => {
+                    this.$store.commit('delWorking')
+                    console.error(err)
+                  })
+                this.currentComment = 'Some initial comment.'
+              } else {
+                console.log(
+                  `No comment for sign ${this.selectedSignChar}, attribute ${
+                    this.selectedAttribute
+                  }`
+                )
+                this.currentComment = ''
+              }
+              break
+            }
+          }
+        }
         this.selectedSignChar = this.sign.chars._items[0].sign_char_id
       } else {
         this.selectedAttribute = undefined

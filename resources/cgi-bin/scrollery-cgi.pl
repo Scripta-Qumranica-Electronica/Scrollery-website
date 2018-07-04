@@ -57,6 +57,7 @@ sub processCGI {
 		removeSignChar => \&removeSignChar,
 		addSignCharAttributeCommentary => \&addSignCharAttributeCommentary,
 		removeSignCharAttributeCommentary => \&removeSignCharAttributeCommentary,
+    getSignCharAttributeCommentary => \& getSignCharAttributeCommentary,
 		addRoiToScroll => \&addRoiToScroll,
 		removeROI => \&removeROI,
 		getRoiOfCol => \&getRoiOfCol,
@@ -889,6 +890,18 @@ sub removeSignCharAttributeCommentary() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
 	$cgi->remove_sign_char_commentary($json_post->{sign_char_commentary_id});
+}
+
+#Give a sign_char_commentary_id.
+#It returns the text of the comment.
+sub getSignCharAttributeCommentary() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	my $comment = $cgi->get_sign_char_commentary($json_post->{sign_char_commentary_id});
+  my %response = (
+    "$json_post->{sign_char_commentary_id}" => "$comment"
+  );
+  print Encode::decode('utf8', encode_json(\%response));
 }
 
 #Give the sign_char_id, a GEOJSON poly, a JSON transform_matrix for the position,

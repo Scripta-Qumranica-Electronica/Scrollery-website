@@ -359,6 +359,7 @@ export default {
      * @param {mixed} args  The event args
      */
     onDialogClosed() {
+      this.$emit('refresh')
       this.dialogLine = null
       this.dialogSign = null
       this.dialogVisible = false

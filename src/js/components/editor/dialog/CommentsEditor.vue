@@ -9,6 +9,9 @@ import Quill from 'quill'
 import uuid from 'uuid/v1'
 
 export default {
+  props: {
+    initialText: '',
+  },
   data() {
     return {
       id: uuid(),
@@ -41,6 +44,7 @@ export default {
       },
       theme: 'snow',
     })
+    this.quill.setText(this.initialText)
   },
   methods: {
     commitComment() {
@@ -48,6 +52,13 @@ export default {
     },
     deleteComment() {
       this.$emit('deleteComment')
+    },
+  },
+  watch: {
+    initialText(to, from) {
+      if (to !== from) {
+        this.quill.setText(to)
+      }
     },
   },
 }
