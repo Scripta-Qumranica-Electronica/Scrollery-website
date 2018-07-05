@@ -17,6 +17,7 @@ if [ -d "../resources/data-files/.git" ];
 then
     echo "Fetching changes."
     cd ../resources/data-files
+    mkdir -p ../data-backup
     git checkout master
     git fetch --tags
     git pull origin master
@@ -25,6 +26,7 @@ else
     git clone https://github.com/Scripta-Qumranica-Electronica/Data-files.git ../resources/data-files
     # cd into the directory
     cd ../resources/data-files
+    mkdir -p ../data-backup
     git fetch --all --tags --prune
 fi
 
@@ -49,7 +51,8 @@ docker build -t sqe-maria:latest .
 
 # start the container
 echo "Starting the new container."
-docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 sqe-maria:latest
+backup=$(pwd)
+docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 -v "${backup%data-files}data-backup":/tmp/backup sqe-maria:latest
 
 # Wait a minute or so to ensure the container is started, and the DB process is initialized
 echo "waiting until container is ready ..."
