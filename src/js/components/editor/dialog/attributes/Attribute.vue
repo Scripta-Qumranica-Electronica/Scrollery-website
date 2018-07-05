@@ -45,7 +45,6 @@
 
 <script>
 import uuid from 'uuid/v1'
-import Quill from 'quill'
 
 // models
 import AttributeValue from '~/models/AttributeValue.js'
@@ -62,7 +61,6 @@ export default {
   data() {
     return {
       id: uuid(),
-      quill: null,
       actualValues: [],
       canonicalValues: [],
     }
@@ -133,7 +131,10 @@ export default {
                 },
               ],
             })
-              .then(res => console.log(res))
+              .then(res => {
+                this.$emit('refresh')
+                console.log(res)
+              })
               .catch(err => console.error(err))
             break
         }
@@ -192,6 +193,7 @@ export default {
           ],
         })
           .then(res => {
+            this.$emit('refresh')
             console.log(res)
           })
           .catch(err => console.error(err))

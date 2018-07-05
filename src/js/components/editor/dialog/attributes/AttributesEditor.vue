@@ -19,6 +19,7 @@
           :class="selectedAttribute === attribute.attribute_id ? 'selected-char-attribute' : ''"
           @delete-attribute="deleteAttribute(attribute.getUUID())"
           @selectAttribute="selectAttribute"
+          @refresh="$emit('refresh')"
         />
       </tbody>
     </table>
