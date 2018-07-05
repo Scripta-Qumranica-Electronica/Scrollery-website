@@ -159,11 +159,6 @@ export default {
       this.fullscreen = !this.fullscreen
     },
   },
-  mounted() {
-    // check to see if there's a columnID in the route
-    // if so, attempt to load up the text straightaway
-    this.refresh()
-  },
   watch: {
     $route(to, from) {
       if (
