@@ -204,7 +204,7 @@ export default class ItemList {
               record = new this.recordModel(record)
               temporaryList[recordKey] = record
               temporaryOrder.push(recordKey)
-              this.propagateAddData(recordKey, res.data.payload, scroll_version_id)
+              this.propagateAddData(record[this.idKey], res.data.payload)
             }
             this._items = Object.assign({}, this._items, temporaryList)
             for (let i = 0, newItem; (newItem = temporaryOrder[i]); i++) {

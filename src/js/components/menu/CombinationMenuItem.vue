@@ -39,7 +39,7 @@
           <column-menu-item 
             :scroll-i-d="combination.scroll_id"
             :scroll-version-i-d="combination.scroll_version_id"
-            :column="corpus.cols.get(col_id)"
+            :column="corpus.cols.get(col_id, combination.scroll_version_id)"
             :corpus="corpus">
           </column-menu-item>
         </div>

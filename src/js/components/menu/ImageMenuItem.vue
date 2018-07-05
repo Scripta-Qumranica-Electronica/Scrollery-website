@@ -20,7 +20,7 @@
         <ul>
           <li v-if="image.artefacts" v-for="artefact_id in image.artefacts" :key="'menu-' + scrollVersionID + '-' + artefact_id">
             <artefact-menu-item 
-              :artefact="corpus.artefacts.get(artefact_id)" 
+              :artefact="corpus.artefacts.get(artefact_id, scrollVersionID)" 
               :scroll-i-d="scrollID"
               :scroll-version-i-d="scrollVersionID"
               :image-i-d="image.image_catalog_id"
