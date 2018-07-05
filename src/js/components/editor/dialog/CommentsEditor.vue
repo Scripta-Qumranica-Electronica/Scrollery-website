@@ -1,6 +1,6 @@
 <template>
   <div class="comments-wrapper">
-    <div :data-id="id"></div>
+    <div :ref="id"></div>
   </div>
 </template>
 
@@ -33,12 +33,18 @@ export default {
         ['delete'],
       ],
       handlers: {
-        commit: () => this.commitComment(),
-        delete: () => this.deleteComment(),
+        commit: () => {
+          /* istanbul ignore next */
+          this.commitComment()
+        },
+        delete: () => {
+          /* istanbul ignore next */
+          this.deleteComment()
+        },
       },
     }
 
-    this.quill = new Quill(`[data-id="${this.id}"]`, {
+    this.quill = new Quill(this.$refs[this.id], {
       modules: {
         toolbar: toolbarOptions,
       },
@@ -56,9 +62,7 @@ export default {
   },
   watch: {
     initialText(to, from) {
-      if (to !== from) {
-        this.quill.setText(to)
-      }
+      to !== from && this.quill.setText(to)
     },
   },
 }
