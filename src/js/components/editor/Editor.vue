@@ -166,6 +166,7 @@ export default {
         to.params.scrollVersionID !== from.params.scrollVersionID
       ) {
         if (to.params.colID !== '~' && to.params.colID > 0) {
+          this.text = new CompositionModel()
           this.getText(to.params.scrollVersionID, to.params.colID)
         } else {
           this.text = new CompositionModel()

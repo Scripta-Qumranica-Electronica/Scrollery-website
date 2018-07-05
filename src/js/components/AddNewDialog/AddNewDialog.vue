@@ -29,7 +29,7 @@
         v-if="selectedArtefact || selectedImageReference"
         :image-reference="selectedImageReference"
         :artefact="selectedArtefact"
-        :scrollVersionId="selectedCombination"
+        :scrollVersionID="selectedCombination"
         :corpus="corpus">
       </add-new-dialog-image>
     </div>
@@ -111,7 +111,7 @@ export default {
         this.corpus.artefacts
           .populate({
             scroll_version_id: this.selectedCombination,
-            image_catalog_id: this.selectedImageReference,
+            image_catalog_id: imageReference,
           })
           .then(res => {
             /* istanbul ignore next */
@@ -151,7 +151,8 @@ export default {
       }
     },
     setArtefact(artefact) {
-      const newImageReference = this.corpus.artefacts.get(artefact).image_catalog_id
+      const newImageReference = this.corpus.artefacts.get(artefact, this.selectedCombination)
+        .image_catalog_id
       this.$store.commit('addWorking')
       this.corpus.images
         .populate({

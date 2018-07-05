@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-        <span>Artefacts ({{artefactReferences.length}}): {{selectedArtefact ? corpus.artefacts.get(selectedArtefact).name : ''}}</span>
+        <span>Artefacts ({{artefactReferences.length}}): {{selectedArtefact ? corpus.artefacts.get(selectedArtefact, selectedCombination).name : ''}}</span>
     </div>
     <ul>
       <li 
@@ -18,7 +18,7 @@
         :key="'add-new-menu-artefact-' + artefact"
         @click="setArtefact(artefact)"
         :style="{background: selectedArtefact === artefact ? 'lightblue' : '#222f5b'}">
-        {{corpus.artefacts.get(artefact) | label}}
+        {{corpus.artefacts.get(artefact, selectedCombination) | label}}
       </li>
     </ul>
   </div>

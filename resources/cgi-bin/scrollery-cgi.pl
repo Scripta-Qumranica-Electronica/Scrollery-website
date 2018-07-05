@@ -299,21 +299,9 @@ MYSQL
 }
 
 sub getColOfComb {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getColOfCombQuery = <<'MYSQL';
-		SELECT DISTINCT col_data.name AS name,
-      col_data.col_id AS col_id,
-      col_data_owner.scroll_version_id
-		FROM col_data
-			JOIN col_data_owner USING(col_data_id)
-			JOIN scroll_to_col USING(col_id)
-		WHERE col_data_owner.scroll_version_id = ?
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
-			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{scroll_version_id});
-
-	readResults($sql, $key, $lastItem);
+	my ($cgi, $json_post) = @_;
+  my $cols = $cgi->get_cols_for_scrollversion($json_post->{scroll_version_id});
+  print "{\"results\":$cols}";
 	return;
 }
 
