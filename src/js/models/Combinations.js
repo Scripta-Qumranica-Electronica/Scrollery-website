@@ -22,6 +22,11 @@ export default class Combinations extends ItemList {
   }
 
   /* istanbul ignore next */
+  updateName(item_id, name, scroll_version_id) {
+    return super.updateName(item_id, name, undefined, 'changeCombinationName')
+  }
+
+  /* istanbul ignore next */
   cloneScroll(scroll_version_id) {
     const payload = {
       scroll_version_id: scroll_version_id,
@@ -37,7 +42,7 @@ export default class Combinations extends ItemList {
             // data transmission.
             // this._hash = res.data.hash
 
-            const scroll_data = res.data.scroll_data
+            const scroll_data = res.data.scroll_data.results[0]
             this._insertItem(new this.recordModel(scroll_data), undefined, 0)
             resolve(res)
           }

@@ -83,9 +83,14 @@ export default {
             image_catalog_id: this.image.image_catalog_id,
             scroll_version_id: this.scrollVersionID,
           })
-          .then(res => (this.loadingArtefacts = false))
-          .catch(err => {
+          .then(res => {
+            /* istanbul ignore next */
             this.loadingArtefacts = false
+          })
+          .catch(err => {
+            /* istanbul ignore next */
+            this.loadingArtefacts = false
+            /* istanbul ignore next */
             console.error(err)
           })
       }
