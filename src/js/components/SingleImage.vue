@@ -5,6 +5,7 @@
     style="{width: 100%; height: 100%;}">
     <image-menu
       :corpus="corpus"
+      :scrollVersionID="scrollVersionID"
       :images="filenames"
       :imageSettings="imageSettings"
       :artefact="artefact"
@@ -201,11 +202,14 @@ export default {
         to.params.scrollVersionID !== from.params.scrollVersionID
       ) {
         this.viewMode = 'ART'
-        this.artefact = to.params.artID >>> 0
-        this.scrollVersionID = to.params.scrollVersionID >>> 0
-        this.firstClipMask = this.clipMask = wktPolygonToSvg(
-          this.corpus.artefacts.get(this.artefact, this.scrollVersionID).mask
+        this.artefact = ~~to.params.artID
+        this.scrollVersionID = ~~to.params.scrollVersionID
+        this.firstClipMask = this.clipMask = this.corpus.artefacts.get(
+          this.artefact,
+          this.scrollVersionID
         )
+          ? wktPolygonToSvg(this.corpus.artefacts.get(this.artefact, this.scrollVersionID).mask)
+          : undefined
         this.lock = false
       }
     },

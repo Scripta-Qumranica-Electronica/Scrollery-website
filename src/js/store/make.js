@@ -17,6 +17,7 @@ export default function(Vuex, sessionID = '') {
       language: state => state.language,
       languages: state => state.languages,
       working: state => state.working,
+      lockedScrolls: state => state.lockedScrolls,
       isScrollLocked: state => scroll_version_id => {
         return Boolean(state.lockedScrolls[scroll_version_id])
       },

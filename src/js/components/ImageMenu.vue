@@ -63,19 +63,19 @@
         :format-tooltip="formatTooltip">
       </el-slider>
     </el-col>
-    <el-col v-if="roiEditable" v-show="artefact && artefact !== 'new'"  :span="4">
+    <el-col v-if="roiEditable && !scrollLocked" v-show="artefact"  :span="4">
       <el-radio-group v-model="changeViewMode" size="mini">
         <el-radio-button label="ROI">{{$i18n.str('ROI')}}</el-radio-button>
         <el-radio-button label="ART">{{$i18n.str('ART')}}</el-radio-button>
       </el-radio-group>
     </el-col>
-    <el-col v-show="artefact || artefact === 'new'"  :span="3">
+    <el-col v-show="artefact"  :span="3">
       <el-button @click="toggleMask" size="mini">Mask</el-button>
     </el-col>
-    <el-col v-if="roiEditable" v-show="viewMode === 'ROI' && artefact" :span="3">
+    <el-col v-if="roiEditable && !scrollLocked" v-show="viewMode === 'ROI' && artefact" :span="3">
       <el-button @click="delSelectedRoi" size="mini">Del ROI</el-button>
     </el-col>
-    <el-col v-if="artefactEditable" v-show="viewMode === 'ART' && (artefact || artefact === 'new')" :span="3">
+    <el-col v-if="artefactEditable && !scrollLocked" v-show="viewMode === 'ART' && artefact" :span="3">
       <el-button
               @click="toggleDrawingMode"
               :type="drawingMode === 'draw' ? 'primary' : 'warning'"
@@ -83,7 +83,7 @@
         {{drawingMode === 'draw' ? 'Draw' : 'Erase'}}
       </el-button>
     </el-col>
-    <el-col v-if="artefactEditable" v-show="viewMode === 'ART' && (artefact || artefact === 'new')" :span="4">
+    <el-col v-if="artefactEditable && !scrollLocked" v-show="viewMode === 'ART' && artefact" :span="4">
       <el-slider
         class="image-slider"
         v-model="changeBrushSize"
@@ -117,6 +117,7 @@
 export default {
   props: {
     corpus: undefined,
+    scrollVersionID: undefined,
     images: undefined,
     imageSettings: undefined,
     artefact: undefined,
@@ -156,6 +157,9 @@ export default {
       set(val) {
         this.$emit('changeZoom', val)
       },
+    },
+    scrollLocked() {
+      return this.artefact ? this.$store.getters.isScrollLocked(this.scrollVersionID) : false
     },
   },
   methods: {

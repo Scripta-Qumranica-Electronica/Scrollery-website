@@ -156,6 +156,12 @@ export default {
         .cloneScroll(this.combination.scroll_version_id)
         .then(res => {
           this.$store.commit('delWorking')
+          this.$store.commit(
+            'setLockedScrolls',
+            Object.assign({}, this.$store.getters.lockedScrolls, {
+              [res.data.scroll_data.scroll_version_id]: Boolean(res.data.scroll_data.locked),
+            })
+          )
         })
         .catch(err => {
           this.$store.commit('delWorking')
