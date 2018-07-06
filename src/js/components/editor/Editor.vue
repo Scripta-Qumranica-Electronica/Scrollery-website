@@ -36,6 +36,11 @@ export default {
     toolbar: Toolbar,
     'message-bar': MessageBar,
   },
+  props: {
+    colID: undefined,
+    scrollVersionID: undefined,
+  },
+  // TODO delete this?
   computed: {
     colInRouter() {
       return this.$route.params.colID !== '~' && this.$route.params.colID > 0
@@ -146,9 +151,11 @@ export default {
       this.text = new CompositionModel()
 
       // get the new model from the server
-      const colID = this.$route.params.colID
-      if (colID !== '~' && colID > 0) {
-        this.getText(this.$route.params.scrollVersionID, colID)
+      const col_id = this.$route.params.colID
+      if (col_id !== '~' && col_id > 0) {
+        this.getText(this.$route.params.scrollVersionID, col_id)
+      } else if (this.colID !== undefined && this.scrollVersionID !== undefined) {
+        this.getText(this.scrollVersionID, this.colID)
       }
     },
 

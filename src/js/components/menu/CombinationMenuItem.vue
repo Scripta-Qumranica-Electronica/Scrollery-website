@@ -21,7 +21,8 @@
     </div>
     <!-- Use v-if here so we don't waste space on the DOM -->
     <div class="children" v-if="open">
-      <li v-if="combination.locked === 0" @click="addArtefact"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
+      <li v-if="combination.locked === 0" @click="addNew('artefacts')"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
+      <li v-if="combination.locked === 0" @click="addNew('combinations')"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Column') }}</span></li>
       <div @click="toggleColumns">
         <i class="fa" :class="{'fa-caret-right': !showColumns, 'fa-caret-down': showColumns}"></i>
         <span>columns</span>
@@ -69,13 +70,13 @@
     </div>
 
     <el-dialog
-      :title="addType"
+      :title="addTitle"
       :visible.sync="dialogVisible"
       width="80vw"
       height="60vh"
       >
       <add-new-dialog
-        :add-type="'artefacts'"
+        :add-type="addType"
         :corpus="corpus"
         :currentScrollVersionID="combination.scroll_version_id">
       </add-new-dialog>
@@ -106,6 +107,7 @@ export default {
       showColumns: false,
       loadingImages: false,
       showImages: false,
+      addTitle: '',
       addType: '',
       dialogVisible: false,
       nameInput: undefined,
@@ -228,10 +230,13 @@ export default {
 
     lockScroll() {},
 
-    addArtefact() {
-      this.addType = `Add new artefact to combination: ${this.combination.name} (v. ${
+    /* istanbul ignore next */
+    addNew(type) {
+      this.addType = type
+      this.addTitle = `Add new ${type} to combination: ${this.combination.name} (v. ${
         this.combination.scroll_version_id
       })`
+
       this.dialogVisible = true
     },
   },

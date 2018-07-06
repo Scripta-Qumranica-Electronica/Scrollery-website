@@ -8,6 +8,7 @@
             :corpus="corpus"
             v-on:setCombination="setCombination"/>
           <add-new-image-reference-menu
+            v-if="addType === 'artefacts'"
             class="add-new-menu-select-item"
             :selected-combination="selectedCombination"
             :selectedImageReference="selectedImageReference"
@@ -26,12 +27,17 @@
     <!-- TODO add code to display selected columns -->
     <div class="add-new-display">
       <add-new-dialog-image
-        v-if="selectedArtefact || selectedImageReference"
+        v-if="addType === 'artefacts' && (selectedArtefact || selectedImageReference)"
         :image-reference="selectedImageReference"
         :artefact="selectedArtefact"
         :scrollVersionID="selectedCombination"
         :corpus="corpus">
       </add-new-dialog-image>
+      <editor
+        v-if="addType === 'columns' && selectedColumn"
+        :scrollVersionID="selectedCombination"
+        :colID="selectedColumn">
+      </editor>
     </div>
     <div class="add-new-dialog-footer">
       <el-button 
@@ -47,6 +53,7 @@ import AddNewDialogImage from './AddNewDialogImage.vue'
 import AddNewCombinationMenu from './AddNewCombinationMenu.vue'
 import AddNewImageReferenceMenu from './AddNewImageReferenceMenu.vue'
 import AddNewArtefactMenu from './AddNewArtefactMenu.vue'
+import Editor from '~/components/editor/Editor.vue'
 
 export default {
   components: {
@@ -54,6 +61,7 @@ export default {
     addNewCombinationMenu: AddNewCombinationMenu,
     addNewImageReferenceMenu: AddNewImageReferenceMenu,
     addNewArtefactMenu: AddNewArtefactMenu,
+    editor: Editor,
   },
   props: {
     addType: undefined,
@@ -65,6 +73,7 @@ export default {
       selectedCombination: undefined,
       selectedImageReference: undefined,
       selectedArtefact: undefined,
+      selectedColumn: undefined,
     }
   },
   methods: {
