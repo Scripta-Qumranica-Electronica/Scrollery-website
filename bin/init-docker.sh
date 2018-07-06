@@ -30,6 +30,15 @@ else
     git fetch --all --tags --prune
 fi
 
+# setup the database backup directory
+if [ -d "../data-backup" ];
+then
+rm -rf ../data-backup
+fi
+mkdir ../data-backup
+mkdir ../data-backup/tables
+mkdir ../data-backup/geom_tables
+
 echo "Checking for desired version"
 if [ -n "${version}" ];
 then
