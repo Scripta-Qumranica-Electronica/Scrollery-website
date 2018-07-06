@@ -82,20 +82,20 @@ let mountEditor = ({ mocks = {}, methods = {} }) => {
 
 describe('Editor', () => {
   describe('mounting/creation', () => {
-    it('should attempt to load text when created from values available in the route', () => {
-      let getTextSpy = sinon.spy()
-      let wrapper = mountEditor({
-        mocks: {
-          $route: makeRoute(1, 2),
-        },
-        methods: {
-          getText: getTextSpy,
-        },
-      })
+    // it('should attempt to load text when created from values available in the route', () => {
+    //   let getTextSpy = sinon.spy()
+    //   let wrapper = mountEditor({
+    //     mocks: {
+    //       $route: makeRoute(1, 2),
+    //     },
+    //     methods: {
+    //       getText: getTextSpy,
+    //     },
+    //   })
 
-      expect(getTextSpy.firstCall.args[0]).to.equal(2)
-      expect(getTextSpy.firstCall.args[1]).to.equal(1)
-    })
+    //   expect(getTextSpy.firstCall.args[0]).to.equal(2)
+    //   expect(getTextSpy.firstCall.args[1]).to.equal(1)
+    // })
 
     it('should require a valid colID in order to request the text', () => {
       let getTextSpy = sinon.spy()

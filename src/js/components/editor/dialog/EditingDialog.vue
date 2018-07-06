@@ -1,5 +1,13 @@
 <template>
-  <el-dialog title="Editor" :visible="dialogVisible" width="90vw" height="90vh" class="editor-dialog" @close="$emit('close')">
+  <el-dialog :visible="dialogVisible" width="90vw" height="90vh" class="editor-dialog" @close="$emit('close')">
+    <template slot="title">
+      <span>Editor</span>
+      <i 
+        v-show="working > 0" 
+        class="fa fa-spinner fa-spin fa-fw" 
+        aria-hidden="true"
+        style="color: black"></i>
+    </template>
 
     <!-- Display the sign in context of the line -->
     <div class="line-subheader">
@@ -7,20 +15,28 @@
         <span v-html="signText"></span>
       </div>
       <div class="line text-sbl-hebrew" dir="rtl">
-          <span v-for="s in signs" class="line-sign" :class='{"edited-sign": (s.getID() === sign.getID())}' @click="changeSign(s)">{{ s.isWhitespace() ? ' ' : s.toDOMString() }}</span>
+          <span v-for="s in signs" class="line-sign" :class='signCSS(s)' @click="changeSign(s)" :key="s.sign_id + '-ed-dialog'">{{ s.isWhitespace() ? ' ' : s.toDOMString() }}</span>
       </div>
     </div>
 
     <!-- Comments -->
-    <!-- <div class="comments-editor">
-        <comments-editor />
-    </div> -->
+    <div 
+      v-show="selectAttribute && selectedSignChar" 
+      class="comments-editor">
+      <comments-editor
+        :initialText="currentComment"
+        @addComment="addComment"
+        @deleteComment="deleteComment" />
+    </div>
+    <div v-show="!selectAttribute || !selectedSignChar" class="comments-editor">
+        Select a sign and attribute to add a comment.
+    </div>
 
     <!-- Editor Tabs -->
     <el-tabs v-model="activeName">
       <el-tab-pane label="Sign Attributes" name="attributes">
         <tab>
-          <attributes-editor :sign="sign"></attributes-editor>
+          <attributes-editor :sign="sign" @selectAttribute="selectAttribute" @refresh="$emit('refresh')"></attributes-editor>
         </tab>
       </el-tab-pane>
       <el-tab-pane label="ROI" title="Regions of Interest" name="roi">
@@ -38,6 +54,7 @@
 
 <script>
 // components
+import { mapGetters } from 'vuex'
 import Tab from './Tab.vue'
 import AttributesEditor from './attributes/AttributesEditor.vue'
 import CommentsEditor from './CommentsEditor.vue'
@@ -65,9 +82,15 @@ export default {
   data() {
     return {
       activeName: 'attributes',
+      selectedAttribute: undefined,
+      selectedSignChar: undefined,
+      selectedCommentary: undefined,
+      currentComment: '',
     }
   },
   computed: {
+    ...mapGetters(['working']),
+
     /**
      * @type {array.<Sign>}
      */
@@ -96,7 +119,138 @@ export default {
      * @param {Sign} sign  the sign to switch to
      */
     changeSign(sign) {
+      this.selectedAttribute = undefined
+      this.selectedSignChar = undefined
       this.$emit('change-sign', sign)
+    },
+    selectAttribute(attribute) {
+      if (attribute >= 0) {
+        this.selectedAttribute = attribute
+        // We have to loop through the attributes to find the sign_char_id
+        // and whether or not a comment exists.
+        for (let i = 0, signChar; (signChar = this.sign.chars._items[i]); i++) {
+          for (let n = 0, attr; (attr = signChar.attributes._items[n]); n++) {
+            if (attr.attribute_id === this.selectedAttribute) {
+              this.selectedSignChar = signChar.sign_char_id
+              if (attr.commentary_id) {
+                this.$store.commit('addWorking')
+                this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+                  transaction: 'getSignCharAttributeCommentary',
+                  scroll_version_id: this.$route.params.scrollVersionID,
+                  sign_char_commentary_id: attr.commentary_id,
+                })
+                  .then(res => {
+                    this.currentComment = res.data[attr.commentary_id]
+                    this.selectedCommentary = attr.commentary_id
+                    this.$store.commit('delWorking')
+                  })
+                  .catch(err => {
+                    this.$store.commit('delWorking')
+                    console.error(err)
+                  })
+              } else {
+                this.currentComment = ''
+              }
+              break
+            }
+          }
+        }
+      } else {
+        this.selectedAttribute = undefined
+        this.selectedSignChar = undefined
+      }
+    },
+
+    addComment(commentary) {
+      if (this.selectedSignChar && this.selectedAttribute) {
+        if (this.selectedCommentary) {
+          this.removeCommentFromDB(this.selectedCommentary)
+            .then(res => {
+              return this.insertCommentToDB(commentary)
+            })
+            .catch(err => {
+              console.error(err)
+            })
+        } else {
+          this.insertCommentToDB(commentary).catch(err => {
+            console.error(err)
+          })
+        }
+      }
+    },
+
+    deleteComment() {
+      if (this.selectedCommentary) {
+        this.removeCommentFromDB(this.selectedCommentary).catch(err => {
+          console.error(err)
+        })
+      }
+    },
+
+    insertCommentToDB(commentary) {
+      return new Promise((resolve, reject) => {
+        const payload = {
+          transaction: 'addSignCharAttributeCommentary',
+          scroll_version_id: this.$route.params.scrollVersionID,
+          sign_char_id: this.selectedSignChar,
+          attribute_id: this.selectedAttribute,
+          commentary: commentary,
+        }
+        this.$store.commit('addWorking')
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', payload)
+          .then(res => {
+            this.$store.commit('delWorking')
+            this.currentComment = commentary
+            resolve(res)
+          })
+          .catch(err => {
+            this.$store.commit('delWorking')
+            reject(err)
+          })
+      })
+    },
+
+    removeCommentFromDB(commentary_id) {
+      return new Promise((resolve, reject) => {
+        this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+          transaction: 'removeSignCharAttributeCommentary',
+          scroll_version_id: this.$route.params.scrollVersionID,
+          sign_char_commentary_id: commentary_id,
+        })
+          .then(res => {
+            this.$store.commit('delWorking')
+            if (res.data[commentary_id] === 'deleted') {
+              this.currentComment = ''
+              this.selectedCommentary = undefined
+              resolve(res)
+            }
+          })
+          .catch(err => {
+            this.$store.commit('delWorking')
+            reject(err)
+          })
+      })
+    },
+
+    signCSS(sign) {
+      let cssClasses = []
+      for (let i = 0, char; (char = sign.chars.items()[i]); i++) {
+        for (let n = 0, attr; (attr = char.attributes.items()[n]); n++) {
+          for (let z = 0, value; (value = attr.values.items()[z]); z++) {
+            cssClasses.push(
+              `${attr.attribute_name}_${
+                value.attribute_numeric_value === -1
+                  ? value.attribute_value
+                  : value.attribute_numeric_value
+              }`
+            )
+          }
+        }
+      }
+      if (sign.getID() === this.sign.getID()) {
+        cssClasses.push('edited-sign')
+      }
+      return cssClasses
     },
   },
 }
@@ -135,6 +289,7 @@ export default {
   }
 
   & .line {
+    color: black;
     & .line-sign {
       display: inline-block;
       font-size: 20px;
@@ -145,6 +300,28 @@ export default {
         border-bottom: 0.5px solid #000;
       }
     }
+  }
+
+  .is_reconstructed_TRUE {
+    color: grey;
+  }
+
+  .readability_INCOMPLETE_AND_NOT_CLEAR {
+    color: blue;
+  }
+
+  .readability_INCOMPLETE_AND_NOT_CLEAR:after {
+    content: '֯';
+    color: blue;
+  }
+
+  .readability_INCOMPLETE_BUT_CLEAR {
+    color: red;
+  }
+
+  .readability_INCOMPLETE_BUT_CLEAR:after {
+    content: 'ׄ';
+    color: red;
   }
 }
 

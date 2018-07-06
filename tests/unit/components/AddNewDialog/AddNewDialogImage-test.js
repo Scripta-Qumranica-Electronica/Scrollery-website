@@ -16,7 +16,7 @@ describe('AddNewDialogImage', function() {
       propsData: {
         corpus: corpus,
         artefact: artefact,
-        scroll_version_id: combination.scroll_version_id,
+        scrollVersionID: combination.scroll_version_id,
         imageReference: image.image_catalog_id,
       },
     })
@@ -26,7 +26,7 @@ describe('AddNewDialogImage', function() {
   it('has a proper initial state', () => {
     expect(vm.corpus).to.deep.equal(corpus)
     expect(vm.artefact).to.equal(artefact)
-    expect(vm.scroll_version_id).to.equal(combination.scroll_version_id)
+    expect(vm.scrollVersionID).to.equal(combination.scroll_version_id)
     expect(vm.imageReference).to.equal(image.image_catalog_id)
   })
 

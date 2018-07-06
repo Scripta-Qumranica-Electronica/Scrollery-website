@@ -8,13 +8,16 @@
             :corpus="corpus"
             v-on:setCombination="setCombination"/>
           <add-new-image-reference-menu
+            v-if="addType === 'artefacts'"
             class="add-new-menu-select-item"
             :selected-combination="selectedCombination"
             :selectedImageReference="selectedImageReference"
             :corpus="corpus"
             v-on:setImageReference="setImageReference"/>
           <add-new-artefact-menu
-            v-if="addType === 'artefacts' && (selectedCombination || selectedImageReference)"
+            v-if="addType === 'artefacts' && 
+              ((selectedCombination && corpus.combinations.get(selectedCombination).artefacts) || 
+              (selectedImageReference && corpus.imageReferences.get(selectedImageReference).artefacts))"
             class="add-new-artefact-menu-select-item"
             :selected-combination="selectedCombination"
             :selected-image-reference="selectedImageReference"
@@ -26,12 +29,17 @@
     <!-- TODO add code to display selected columns -->
     <div class="add-new-display">
       <add-new-dialog-image
-        v-if="selectedArtefact || selectedImageReference"
+        v-if="addType === 'artefacts' && (selectedArtefact || selectedImageReference)"
         :image-reference="selectedImageReference"
         :artefact="selectedArtefact"
-        :scrollVersionId="selectedCombination"
+        :scrollVersionID="selectedCombination"
         :corpus="corpus">
       </add-new-dialog-image>
+      <editor
+        v-if="addType === 'columns' && selectedColumn"
+        :scrollVersionID="selectedCombination"
+        :colID="selectedColumn">
+      </editor>
     </div>
     <div class="add-new-dialog-footer">
       <el-button 
@@ -47,6 +55,7 @@ import AddNewDialogImage from './AddNewDialogImage.vue'
 import AddNewCombinationMenu from './AddNewCombinationMenu.vue'
 import AddNewImageReferenceMenu from './AddNewImageReferenceMenu.vue'
 import AddNewArtefactMenu from './AddNewArtefactMenu.vue'
+import Editor from '~/components/editor/Editor.vue'
 
 export default {
   components: {
@@ -54,6 +63,7 @@ export default {
     addNewCombinationMenu: AddNewCombinationMenu,
     addNewImageReferenceMenu: AddNewImageReferenceMenu,
     addNewArtefactMenu: AddNewArtefactMenu,
+    editor: Editor,
   },
   props: {
     addType: undefined,
@@ -65,12 +75,14 @@ export default {
       selectedCombination: undefined,
       selectedImageReference: undefined,
       selectedArtefact: undefined,
+      selectedColumn: undefined,
     }
   },
   methods: {
     setCombination(combination) {
-      this.selectedCombination = combination
+      this.selectedArtefact = undefined
       this.selectedImageReference = undefined
+      this.selectedCombination = combination
       const payload =
         this.selectedCombination >= 0 ? { scroll_version_id: this.selectedCombination } : {}
       this.$store.commit('addWorking')
@@ -111,7 +123,7 @@ export default {
         this.corpus.artefacts
           .populate({
             scroll_version_id: this.selectedCombination,
-            image_catalog_id: this.selectedImageReference,
+            image_catalog_id: imageReference,
           })
           .then(res => {
             /* istanbul ignore next */
@@ -151,7 +163,8 @@ export default {
       }
     },
     setArtefact(artefact) {
-      const newImageReference = this.corpus.artefacts.get(artefact).image_catalog_id
+      const newImageReference = this.corpus.artefacts.get(artefact, this.selectedCombination)
+        .image_catalog_id
       this.$store.commit('addWorking')
       this.corpus.images
         .populate({
@@ -162,19 +175,11 @@ export default {
           this.$store.commit('delWorking')
           /* istanbul ignore next */
           this.selectedImageReference = newImageReference
-        })
-        .catch(err => {
-          /* istanbul ignore next */
-          this.$store.commit('delWorking')
-          /* istanbul ignore next */
-          console.error(err)
-        })
-
-      this.$store.commit('addWorking')
-      this.corpus.artefacts
-        .populate({
-          scroll_version_id: this.selectedCombination,
-          image_catalog_id: newImageReference,
+          this.$store.commit('addWorking')
+          return this.corpus.artefacts.populate({
+            scroll_version_id: this.selectedCombination,
+            image_catalog_id: newImageReference,
+          })
         })
         .then(res => {
           /* istanbul ignore next */

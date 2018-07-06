@@ -25,6 +25,7 @@
       :sign="dialogSign"
       :dialogVisible="dialogVisible"
       @close="onDialogClosed"
+      @refresh="$emit('refresh')"
       @change-sign="onDialogChangeSign"
     />
   </div>
@@ -359,6 +360,7 @@ export default {
      * @param {mixed} args  The event args
      */
     onDialogClosed() {
+      this.$emit('refresh')
       this.dialogLine = null
       this.dialogSign = null
       this.dialogVisible = false

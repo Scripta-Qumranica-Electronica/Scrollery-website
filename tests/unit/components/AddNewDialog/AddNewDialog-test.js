@@ -54,7 +54,7 @@ describe('AddNewDialog', function() {
 
   it('can set an artefact', () => {
     vm.setCombination(combination.scroll_version_id)
-    vm.setArtefact(`${combination.scroll_version_id}-${artefact}`)
+    vm.setArtefact(artefact)
     // expect(vm.selectedCombination).to.equal(combination.scroll_version_id)
     // expect(vm.selectedImageReference).to.equal(image.image_catalog_id)
     // expect(vm.selectedArtefact).to.equal(undefined)

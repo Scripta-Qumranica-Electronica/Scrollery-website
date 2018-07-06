@@ -17,6 +17,7 @@ export default function(Vuex, sessionID = '') {
       language: state => state.language,
       languages: state => state.languages,
       working: state => state.working,
+      lockedScrolls: state => state.lockedScrolls,
       isScrollLocked: state => scroll_version_id => {
         return Boolean(state.lockedScrolls[scroll_version_id])
       },
@@ -28,6 +29,9 @@ export default function(Vuex, sessionID = '') {
         state.sessionID = ''
         state.userID = -1
         state.username = ''
+        window.localStorage.removeItem('sqe-session')
+        window.localStorage.removeItem('name')
+        window.localStorage.removeItem('language')
       },
       setSessionID(state, sessionID) {
         window.localStorage.setItem('sqe-session', sessionID)
@@ -37,9 +41,13 @@ export default function(Vuex, sessionID = '') {
         state.userID = userID
       },
       setUsername(state, name) {
+        name === '' && state.userID === -1
+          ? window.localStorage.removeItem('name')
+          : window.localStorage.setItem('name', JSON.stringify({ [state.userID]: name }))
         state.username = name
       },
       setLanguage(state, language) {
+        window.localStorage.setItem('language', language)
         state.language = language
       },
       loadLanguage(state, { key, data }) {

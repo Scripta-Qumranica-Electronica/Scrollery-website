@@ -81,6 +81,11 @@ export default class Artefacts extends ItemList {
   }
 
   /* istanbul ignore next */
+  updateName(item_id, name, scroll_version_id) {
+    return super.updateName(item_id, name, scroll_version_id, 'changeArtefactData')
+  }
+
+  /* istanbul ignore next */
   addNewArtefact(scroll_version_id, id_of_sqe_image, image_catalog_id, region_in_master_image) {
     const payload = {
       scroll_version_id: scroll_version_id,

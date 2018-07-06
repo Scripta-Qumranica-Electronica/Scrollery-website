@@ -11,3 +11,4 @@ coverage/
 resources/cgi-bin/local
 resources/perl-libs
 resources/data-files
+resources/data-backup

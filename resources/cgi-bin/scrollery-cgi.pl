@@ -56,13 +56,16 @@ sub processCGI {
 		addSignCharVariant => \&addSignCharVariant,
 		removeSignChar => \&removeSignChar,
 		addSignCharAttributeCommentary => \&addSignCharAttributeCommentary,
-		removeSignCharCommentary => \&removeSignCharCommentary,
+		removeSignCharAttributeCommentary => \&removeSignCharAttributeCommentary,
+    getSignCharAttributeCommentary => \& getSignCharAttributeCommentary,
 		addRoiToScroll => \&addRoiToScroll,
 		removeROI => \&removeROI,
 		getRoiOfCol => \&getRoiOfCol,
 		getRoisOfCombination => \&getRoisOfCombination,
 		getTextOfFragment => \&getTextOfFragment,
-		getListOfAttributes => \& getListOfAttributes
+		getListOfAttributes => \&getListOfAttributes,
+    changeColName => \&changeColName,
+    changeCombinationName => \&changeCombinationName
 	);
 	my $json_post = $cgi->{CGIDATA};
 
@@ -166,8 +169,8 @@ SELECT DISTINCT
 			scroll_version.user_id
 FROM scroll_version
 	JOIN scroll_version_group USING(scroll_version_group_id)
-	JOIN scroll_data using(scroll_id)
-	JOIN scroll_data_owner using(scroll_data_id)
+	JOIN scroll_data_owner using(scroll_version_id)
+	JOIN scroll_data using(scroll_data_id)
 WHERE scroll_version.user_id = ?
 	OR scroll_version.user_id = 1
 ORDER BY scroll_version.user_id DESC, LPAD(SPLIT_STRING(name, "Q", 1), 3, "0"),
@@ -296,21 +299,9 @@ MYSQL
 }
 
 sub getColOfComb {
-	my ($cgi, $json_post, $key, $lastItem) = @_;
-	my $getColOfCombQuery = <<'MYSQL';
-		SELECT DISTINCT col_data.name AS name,
-      col_data.col_id AS col_id,
-      col_data_owner.scroll_version_id
-		FROM col_data
-			JOIN col_data_owner USING(col_data_id)
-			JOIN scroll_to_col USING(col_id)
-		WHERE col_data_owner.scroll_version_id = ?
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getColOfCombQuery) or die
-			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute($json_post->{scroll_version_id});
-
-	readResults($sql, $key, $lastItem);
+	my ($cgi, $json_post) = @_;
+  my $cols = $cgi->get_cols_for_scrollversion($json_post->{scroll_version_id});
+  print "{\"results\":$cols}";
 	return;
 }
 
@@ -671,7 +662,7 @@ MYSQL
 	my $sql = $cgi->dbh->prepare_cached($getCombsQuery) or die
 			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
 	$sql->execute($clonedScroll);
-	print Encode::decode('utf8', encode_json($sql->fetchrow_hashref));
+  readResults($sql);
 	print "}";
 }
 
@@ -832,7 +823,7 @@ sub removeSignAttribute() {
 	print "[{";
 
 	foreach my $sign (@{$json_post->{signs}}) {
-		print "{\"$sign->{sign_char_id}\":[";
+		print "\"$sign->{sign_char_id}\":[";
 		my $attributeCounter = 1;
 		my $attributeRepeatLength = scalar @{$sign->{attributes}};
 		foreach my $attribute (@{$sign->{attributes}}) {
@@ -850,12 +841,7 @@ sub removeSignAttribute() {
 			$counter++;
 		}
 	}
-	print "}]";
-	if (!defined $key) {
-		print("}");
-	} elsif (!$lastItem) {
-		print(",");
-	}
+	print "]}";
 }
 
 #Give a sign_id, a character with the variant reading, and a 1 if it should be the main reading.
@@ -885,10 +871,23 @@ sub addSignCharAttributeCommentary() {
 
 #Give a sign_char_commentary_id.
 #I don't know yet what it returns.
-sub removeSignCharCommentary() {
+sub removeSignCharAttributeCommentary() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
 	$cgi->remove_sign_char_commentary($json_post->{sign_char_commentary_id});
+  print "{\"$json_post->{sign_char_commentary_id}\":\"deleted\"}";
+}
+
+#Give a sign_char_commentary_id.
+#It returns the text of the comment.
+sub getSignCharAttributeCommentary() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	my $comment = $cgi->get_sign_char_commentary($json_post->{sign_char_commentary_id});
+  my %response = (
+    "$json_post->{sign_char_commentary_id}" => "$comment"
+  );
+  print Encode::decode('utf8', encode_json(\%response));
 }
 
 #Give the sign_char_id, a GEOJSON poly, a JSON transform_matrix for the position,
@@ -1013,6 +1012,28 @@ MYSQL
 
 	readResults($sql);
 	return;
+}
+
+# This seems to run without error, but the relevant data
+# is not inserted.
+
+sub changeColName() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->change_col_name($json_post->{col_id}, $json_post->{name});
+  print '{"col_id":' . $json_post->{col_id} . 
+    ',"name":"' . $json_post->{name} . 
+    '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
+}
+
+# This needs to be added to the SQE_DB_API.
+
+sub changeCombinationName() {
+	my ($cgi, $json_post) = @_;
+	$cgi->set_scrollversion($json_post->{scroll_version_id});
+	$cgi->change_scroll_name($json_post->{name});
+  print '{"name":"' . $json_post->{name} . 
+    '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
 }
 
 processCGI();

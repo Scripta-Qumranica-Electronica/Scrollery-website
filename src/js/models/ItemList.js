@@ -204,7 +204,7 @@ export default class ItemList {
               record = new this.recordModel(record)
               temporaryList[recordKey] = record
               temporaryOrder.push(recordKey)
-              this.propagateAddData(recordKey, res.data.payload, scroll_version_id)
+              this.propagateAddData(record[this.idKey], res.data.payload)
             }
             this._items = Object.assign({}, this._items, temporaryList)
             for (let i = 0, newItem; (newItem = temporaryOrder[i]); i++) {
@@ -219,6 +219,44 @@ export default class ItemList {
         })
       } catch (err) {
         reject(err)
+      }
+    })
+  }
+
+  /* istanbul ignore next */
+  updateName(item_id, name, scroll_version_id, transaction) {
+    return new Promise((resolve, reject) => {
+      if (
+        (this.get(item_id) && this.get(item_id).name) ||
+        (this.get(item_id, scroll_version_id) && this.get(item_id, scroll_version_id).name)
+      ) {
+        const oldName = this.relativeToScrollVersion
+          ? this.get(item_id, scroll_version_id).name
+          : this.get(item_id).name
+        console.log(`Artefect name: ${name}`)
+        const payload = {
+          scroll_version_id: scroll_version_id,
+          name: name,
+          [this.idKey]: item_id,
+          transaction: transaction,
+        }
+        this.alterItemAtKey(item_id, { name: name }, scroll_version_id)
+        this.axios
+          .post('resources/cgi-bin/scrollery-cgi.pl', payload)
+          .then(res => {
+            if (res.status === 200 && res.data) {
+              resolve(res)
+            } else {
+              this.alterItemAtKey(artefact_id, { name: oldName }, scroll_version_id)
+              reject(res)
+            }
+          })
+          .catch(err => {
+            this.alterItemAtKey(artefact_id, { name: oldName }, scroll_version_id)
+            reject(err)
+          })
+      } else {
+        reject(`Item ${item_id} doesn't exist or has no name field`)
       }
     })
   }

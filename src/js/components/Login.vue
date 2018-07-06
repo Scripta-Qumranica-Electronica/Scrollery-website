@@ -138,12 +138,24 @@ export default {
           this.errMsg = res.data.error
           console.error(res.data)
           reject(new Error('Login invalid'))
-        } else if (res.data && res.data.SESSION_ID && res.data.USER_ID) {
+        } else if (
+          res.data &&
+          res.data.SESSION_ID &&
+          res.data.USER_ID &&
+          ((window.localStorage.getItem('name') &&
+            JSON.parse(window.localStorage.getItem('name'))[~~res.data.USER_ID]) ||
+            this.user)
+        ) {
           // Set store state
           this.setSessionID(res.data.SESSION_ID)
           this.setUserID(~~res.data.USER_ID)
-          this.setUsername(this.user.trim())
-          this.setLanguage(this.language)
+          // Maybe we have the AJAX function send back the user_name as well.
+          this.setUsername(
+            window.localStorage.getItem('name')
+              ? JSON.parse(window.localStorage.getItem('name'))[~~res.data.USER_ID]
+              : this.user.trim()
+          )
+          this.setLanguage(window.localStorage.getItem('language') || this.language)
           // Load language files
           this.$i18n
             .load()

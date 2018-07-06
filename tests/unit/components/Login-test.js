@@ -6,6 +6,7 @@ import Login from '~/components/Login.vue'
 describe('Login', function() {
   let $post = () => (new Promise((r) => r({})))
   let wrapper, vm
+
   beforeEach(() => {
     let $postPromise = new Promise((_, r) => r({}))
     wrapper = mount(Login, {
@@ -243,6 +244,8 @@ describe('Login', function() {
           expect(route.name).to.equal('workbenchAddress')
         },
       }
+
+      window.localStorage.setItem('name', JSON.stringify({1:'name'}))
 
       const res = {
         data: {
