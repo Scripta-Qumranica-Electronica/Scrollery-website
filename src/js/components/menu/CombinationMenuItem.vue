@@ -22,7 +22,7 @@
     <!-- Use v-if here so we don't waste space on the DOM -->
     <div class="children" v-if="open">
       <li v-if="combination.locked === 0" @click="addNew('artefacts')"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Artefact') }}</span></li>
-      <li v-if="combination.locked === 0" @click="addNew('combinations')"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Column') }}</span></li>
+      <!-- <li v-if="combination.locked === 0" @click="addNew('combinations')"><i class="fa fa-plus-square"></i><span> {{ $i18n.str('New.Column') }}</span></li> -->
       <div @click="toggleColumns">
         <i class="fa" :class="{'fa-caret-right': !showColumns, 'fa-caret-down': showColumns}"></i>
         <span>columns</span>

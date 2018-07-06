@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-        <span>Artefacts ({{artefactReferences.length}}): {{selectedArtefact ? corpus.artefacts.get(selectedArtefact, selectedCombination).name : ''}}</span>
+        <span>Artefacts ({{artefactReferences.length}}): {{corpus.artefacts.get(selectedArtefact, selectedCombination) ? corpus.artefacts.get(selectedArtefact, selectedCombination).name : ''}}</span>
     </div>
     <ul>
       <li 

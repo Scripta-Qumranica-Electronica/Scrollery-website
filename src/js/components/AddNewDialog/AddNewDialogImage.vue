@@ -77,7 +77,9 @@ export default {
   },
   computed: {
     images() {
-      return this.corpus.imageReferences.get(this.imageReference).images
+      return this.corpus.imageReferences.get(this.imageReference)
+        ? this.corpus.imageReferences.get(this.imageReference).images
+        : undefined
     },
     mask() {
       return this.artefact

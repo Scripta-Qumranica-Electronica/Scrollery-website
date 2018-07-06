@@ -15,7 +15,9 @@
             :corpus="corpus"
             v-on:setImageReference="setImageReference"/>
           <add-new-artefact-menu
-            v-if="addType === 'artefacts' && (selectedCombination || selectedImageReference)"
+            v-if="addType === 'artefacts' && 
+              ((selectedCombination && corpus.combinations.get(selectedCombination).artefacts) || 
+              (selectedImageReference && corpus.imageReferences.get(selectedImageReference).artefacts))"
             class="add-new-artefact-menu-select-item"
             :selected-combination="selectedCombination"
             :selected-image-reference="selectedImageReference"
@@ -78,8 +80,9 @@ export default {
   },
   methods: {
     setCombination(combination) {
-      this.selectedCombination = combination
+      this.selectedArtefact = undefined
       this.selectedImageReference = undefined
+      this.selectedCombination = combination
       const payload =
         this.selectedCombination >= 0 ? { scroll_version_id: this.selectedCombination } : {}
       this.$store.commit('addWorking')
@@ -172,19 +175,11 @@ export default {
           this.$store.commit('delWorking')
           /* istanbul ignore next */
           this.selectedImageReference = newImageReference
-        })
-        .catch(err => {
-          /* istanbul ignore next */
-          this.$store.commit('delWorking')
-          /* istanbul ignore next */
-          console.error(err)
-        })
-
-      this.$store.commit('addWorking')
-      this.corpus.artefacts
-        .populate({
-          scroll_version_id: this.selectedCombination,
-          image_catalog_id: newImageReference,
+          this.$store.commit('addWorking')
+          return this.corpus.artefacts.populate({
+            scroll_version_id: this.selectedCombination,
+            image_catalog_id: newImageReference,
+          })
         })
         .then(res => {
           /* istanbul ignore next */
