@@ -88,7 +88,6 @@
     "axios": "^0.17.1",
     "body-parser": "^1.18.2",
     "element-ui": "^2.0.11",
-    "favicons-webpack-plugin": "^0.0.9",
     "immutable": "^3.8.2",
     "js-clipper": "^1.0.1",
     "lodash": "^4.17.10",
