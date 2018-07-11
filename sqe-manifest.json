@@ -4,6 +4,6 @@
   "status": "production",
   "dependencies": {
     "SQE_DB_API": "0.5.3",
-    "Data-files": "0.2.16"
+    "Data-files": "0.2.17"
   }
 }
