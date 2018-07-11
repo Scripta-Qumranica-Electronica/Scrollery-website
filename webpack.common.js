@@ -2,6 +2,7 @@ const path = require('path')
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
 module.exports = {
   entry: path.join(__dirname, 'src', 'js', 'main.js'),
@@ -99,6 +100,7 @@ module.exports = {
     new ExtractTextPlugin({
       filename: 'styles.css',
       allChunks: true
-    })
+    }),
+    new FaviconsWebpackPlugin('favicon.png')
   ],
 }
