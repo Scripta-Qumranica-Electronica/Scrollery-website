@@ -17,7 +17,7 @@
         :style="{color: combination.locked ? 'red' : 'green'}"
         @click="lockScroll"></i>
       <i class="fa fa-clone" @click="cloneCombination"></i>
-      <i v-if="!combination.locked" class="fa fa-trash-o" @click="corpus.combinations.removeItem(combination.scroll_version_id)"></i>
+      <i v-if="!combination.locked" class="fa fa-trash-o" @click="deleteCombination"></i>
     </div>
     <!-- Use v-if here so we don't waste space on the DOM -->
     <div class="children" v-if="open">
@@ -216,6 +216,29 @@ export default {
           /* istanbul ignore next */
           this.$store.commit('delWorking')
           /* istanbul ignore next */
+          console.error(err)
+        })
+    },
+
+    deleteCombination() {
+      this.$store.commit('addWorking')
+      this.corpus.combinations
+        .removeItem(this.combination.scroll_version_id)
+        .then(res => {
+          this.$store.commit('delWorking')
+          this.$router.push({
+            name: 'workbenchAddress',
+            params: {
+              scrollID: '~',
+              scrollVersionID: '~',
+              imageID: '~',
+              colID: '~',
+              artID: '~',
+            },
+          })
+        })
+        .catch(err => {
+          this.$store.commit('delWorking')
           console.error(err)
         })
     },

@@ -101,6 +101,6 @@ export default class Char extends extendModel(defaults) {
    * @returns {string}
    */
   toDOMString() {
-    return this.is_whitespace ? '&nbsp;' : this.sign_char
+    return this.is_whitespace ? '·' : this.sign_char
   }
 }

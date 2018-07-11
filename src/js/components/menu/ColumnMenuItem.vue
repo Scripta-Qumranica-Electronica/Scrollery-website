@@ -11,7 +11,7 @@
         @blur="setName"
         @keyup.enter.native="setName"></el-input>
       <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-edit" @click="startNameChange"></i>
-      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="corpus.cols.removeItem(column.col_id, scrollVersionID)"></i>
+      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="deleteColumn"></i>
     </span>
   </div>
 </template>
@@ -74,6 +74,28 @@ export default {
             console.error(err)
           })
       }
+    },
+    deleteColumn() {
+      this.$store.commit('addWorking')
+      this.corpus.cols
+        .removeItem(this.column.col_id, this.scrollVersionID)
+        .then(res => {
+          this.$store.commit('delWorking')
+          this.$router.push({
+            name: 'workbenchAddress',
+            params: {
+              scrollID: this.scrollID,
+              scrollVersionID: this.scrollVersionID,
+              colID: '~',
+              imageID: this.$route.params.imageID,
+              artID: this.$route.params.artID,
+            },
+          })
+        })
+        .catch(err => {
+          this.$store.commit('delWorking')
+          console.error(err)
+        })
     },
   },
 }

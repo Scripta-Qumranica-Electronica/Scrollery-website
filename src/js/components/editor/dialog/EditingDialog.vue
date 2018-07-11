@@ -15,7 +15,7 @@
         <span v-html="signText"></span>
       </div>
       <div class="line text-sbl-hebrew" dir="rtl">
-          <span v-for="s in signs" class="line-sign" :class='signCSS(s)' @click="changeSign(s)" :key="s.sign_id + '-ed-dialog'">{{ s.isWhitespace() ? ' ' : s.toDOMString() }}</span>
+          <span v-for="s in signs" class="line-sign" :class='signCSS(s)' @click="changeSign(s)" :key="s.sign_id + '-ed-dialog'">{{ s.toDOMString() }}</span>
       </div>
     </div>
 
@@ -300,28 +300,6 @@ export default {
         border-bottom: 0.5px solid #000;
       }
     }
-  }
-
-  .is_reconstructed_TRUE {
-    color: grey;
-  }
-
-  .readability_INCOMPLETE_AND_NOT_CLEAR {
-    color: blue;
-  }
-
-  .readability_INCOMPLETE_AND_NOT_CLEAR:after {
-    content: '֯';
-    color: blue;
-  }
-
-  .readability_INCOMPLETE_BUT_CLEAR {
-    color: red;
-  }
-
-  .readability_INCOMPLETE_BUT_CLEAR:after {
-    content: 'ׄ';
-    color: red;
   }
 }
 
