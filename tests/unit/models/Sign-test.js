@@ -117,7 +117,7 @@ describe('Sign', () => {
       })
 
       it('should return an HTML encoded non-breaking space', () => {
-        expect(sign.toDOMString()).to.equal(' ')
+        expect(sign.toDOMString()).to.equal('·')
       })
     })
 
