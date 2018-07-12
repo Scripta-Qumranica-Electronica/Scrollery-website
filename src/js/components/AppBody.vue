@@ -80,7 +80,7 @@ export default {
           this.$store.commit(
             'setLockedScrolls',
             scrolls.reduce((hash, scrollVersion) => {
-              if (scrollVersion.locked) {
+              if (~~scrollVersion.locked) {
                 hash[scrollVersion.scroll_version_id] = true
               }
               return hash
