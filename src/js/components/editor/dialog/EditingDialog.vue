@@ -15,7 +15,7 @@
         <span v-html="signText"></span>
       </div>
       <div class="line text-sbl-hebrew" dir="rtl">
-          <span v-for="s in signs" class="line-sign" :class='signCSS(s)' @click="changeSign(s)" :key="s.sign_id + '-ed-dialog'">{{ s.toDOMString() }}</span>
+          <span v-for="s in signs" class="line-sign" :class='signCSS(s)' @click="changeSign(s)" :key="s.sign_id + '-ed-dialog'">{{ s.isWhitespace() ? '·' : s.toDOMString() }}</span>
       </div>
     </div>
 
