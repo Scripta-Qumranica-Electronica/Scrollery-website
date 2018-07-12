@@ -112,6 +112,14 @@ describe("CombinationMenuItem", function() {
       // assertions 
       expect(vm.nameInput).to.equal(undefined)
     })
+
+    it('can delete itself', () => {
+      const oldName = combination.name
+      vm.deleteCombination()
+
+      // expect the write to fail without AJAX completion
+      expect(combination.name).to.equal(oldName)
+    })
   })
 
   describe('Only scroll version change', () => {

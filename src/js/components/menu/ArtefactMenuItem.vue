@@ -11,7 +11,7 @@
         @blur="setName"
         @keyup.enter.native="setName"></el-input>
       <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-edit" @click="startNameChange"></i>
-      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="corpus.artefacts.removeItem(artefact.artefact_id, scrollVersionID)"></i>
+      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="deleteArtefact"></i>
     </span>
   </div>
 </template>
@@ -76,6 +76,32 @@ export default {
             console.error(err)
           })
       }
+    },
+    deleteArtefact() {
+      this.$store.commit('addWorking')
+      this.corpus.artefacts
+        .removeItem(this.artefact.artefact_id, this.scrollVersionID)
+        .then(res => {
+          /* istanbul ignore next */
+          this.$store.commit('delWorking')
+          /* istanbul ignore next */
+          this.$router.push({
+            name: 'workbenchAddress',
+            params: {
+              scrollID: this.scrollID,
+              scrollVersionID: this.scrollVersionID,
+              colID: this.$route.params.colID,
+              imageID: this.imageID,
+              artID: '~',
+            },
+          })
+        })
+        .catch(err => {
+          /* istanbul ignore next */
+          this.$store.commit('delWorking')
+          /* istanbul ignore next */
+          console.error(err)
+        })
     },
   },
 }

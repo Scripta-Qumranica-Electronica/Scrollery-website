@@ -66,11 +66,11 @@ export default class Combinations extends ItemList {
           if (res.data && res.data[key] === 'deleted') {
             // Delete all linked cols from corpus model.
             for (let i = 0, col; (col = this.get(key).cols[i]); i++) {
-              this.corpus.cols._removeItem(col)
+              this.corpus.cols._removeItem(col, key)
             }
             // Delete all linked artefacts from corpus model.
             for (let i = 0, artefact; (artefact = this.get(key).artefacts[i]); i++) {
-              this.corpus.artefacts._removeItem(artefact)
+              this.corpus.artefacts._removeItem(artefact, key)
             }
             // Delete all linked image references from corpus model.
             for (
@@ -90,9 +90,9 @@ export default class Combinations extends ItemList {
             }
             // Delete all linked ROI's from corpus model
             for (let i = 0, roi; (roi = this.get(key).rois[i]); i++) {
-              this.corpus.rois._removeItem(roi)
+              this.corpus.rois._removeItem(roi, key)
             }
-            super.removeItem(key, scroll_version_id)
+            resolve(super.removeItem(key, scroll_version_id))
           } else {
             reject(res)
           }

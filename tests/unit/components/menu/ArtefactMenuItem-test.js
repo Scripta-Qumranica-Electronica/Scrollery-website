@@ -257,5 +257,13 @@ describe("ArtefactMenuItem", function() {
       // assertions 
       expect(vm.nameInput).to.equal(undefined)
     })
+
+    it('can delete itself', () => {
+      const oldName = artefact.name
+      vm.deleteArtefact()
+      
+      // expect the write to fail without AJAX completion
+      expect(artefact.name).to.equal(oldName)
+    })
   })
 })

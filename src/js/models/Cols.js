@@ -16,11 +16,14 @@ export default class Cols extends ItemList {
     return super.updateName(item_id, name, scroll_version_id, 'changeColName')
   }
 
+  /* istanbul ignore next */
   removeItem(key, scroll_version_id = undefined) {
     /**
      * Add axios command to remove from database.
      * run super on successful completion.
      */
-    super.removeItem(key, scroll_version_id)
+    return new Promise(resolve => {
+      resolve(super.removeItem(key, scroll_version_id))
+    })
   }
 }
