@@ -461,7 +461,7 @@ export default {
 
 .text-col {
   height: 100%;
-  width: 96%;
+  width: calc(100% - 35px);
   overflow-x: scroll;
 
   &:focus {
@@ -481,7 +481,7 @@ export default {
 .line-number-col {
   vertical-align: top;
   overflow: hidden;
-  width: 4%;
+  width: 35px;
   height: 100%;
   line-height: 1.25;
   background-color: $dkTan;
@@ -500,7 +500,7 @@ export default {
 }
 
 /* here are all the CSS directives for sign attributes */
-.is_reconstructed_TRUE {
+span.is_reconstructed_TRUE {
   color: grey;
   /* cursor does not show properly when using outline font */
   // text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
@@ -521,14 +521,36 @@ export default {
 //   color: black;
 // }
 
-.readability_INCOMPLETE_AND_NOT_CLEAR {
+span.readability_INCOMPLETE_AND_NOT_CLEAR {
   color: blue;
 }
 
-.readability_INCOMPLETE_AND_NOT_CLEAR:after {
+span.readability_INCOMPLETE_AND_NOT_CLEAR:after {
   content: '֯';
   color: blue;
 }
+
+.readability_INCOMPLETE_BUT_CLEAR {
+  color: red;
+}
+
+.readability_INCOMPLETE_BUT_CLEAR:after {
+  content: 'ׄ';
+  color: red;
+}
+
+span.relative_position_ABOVE_LINE {
+  vertical-align: super;
+}
+
+span.relative_position_BELOW_LINE {
+  vertical-align: sub;
+}
+
+// span.sign_type_SPACE {
+//   padding-left: 2pt;
+//   padding-right: 2pt;
+// }
 
 div.hide-reconstructed-text p span.is_reconstructed_TRUE {
   opacity: 0;

@@ -205,5 +205,13 @@ describe("ColumnMenuItem", function() {
       // assertions 
       expect(vm.nameInput).to.equal(undefined)
     })
+
+    it('can delete itself', () => {
+      const oldName = column.name
+      vm.deleteColumn()
+
+      // expect the write to fail without AJAX completion
+      expect(column.name).to.equal(oldName)
+    })
   })
 })

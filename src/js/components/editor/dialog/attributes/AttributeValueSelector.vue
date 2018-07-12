@@ -54,11 +54,14 @@ export default {
     actualNumberValue: {
       required: false,
     },
+    actualStringValue: {
+      required: false,
+    },
   },
   data() {
     return {
       numberValue: 0,
-      dropdownValue: 'Add an attribute value',
+      dropdownValue: this.actualStringValue,
     }
   },
   computed: {

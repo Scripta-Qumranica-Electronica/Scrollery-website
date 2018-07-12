@@ -162,12 +162,12 @@ export default class ItemList {
    */
   /* istanbul ignore next */
   removeItem(key, scroll_version_id = undefined) {
-    key = this._formatKey(key, scroll_version_id)
+    const formattedKey = this._formatKey(key, scroll_version_id)
     for (let i = 0, list; (list = this.connectedLists[i]); i++) {
-      const listKey = this.get(key)[list.idKey]
+      const listKey = this.get(formattedKey)[list.idKey]
       list.removeItemFromSublist(listKey, this.listType, key)
     }
-    this._removeItem(key)
+    this._removeItem(formattedKey)
   }
 
   get(key, scroll_version_id = undefined) {

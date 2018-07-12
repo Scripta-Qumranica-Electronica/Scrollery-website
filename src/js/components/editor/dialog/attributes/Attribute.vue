@@ -11,7 +11,8 @@
           :canonicalValues="canonicalValues"
           :isSingleValue="isSingleValue"
           :isNumberValue="isNumberValue"
-          :numberValue="actualNumberValue"
+          :actualNumberValue="actualNumberValue"
+          :actualStringValue="actualStringValue"
         />
         <div v-if="!isSingleValue" class="attribute-values">
           <span class="attribute-value" v-for="attributeValue in actualValues">
@@ -87,7 +88,18 @@ export default {
       if (!this.isNumberValue) {
         return null
       }
-      return this.actualValues[0] ? this.actualValues[0].attribute_numeric_value : null
+      return this.attribute.values._items[0]
+        ? this.attribute.values._items[0].attribute_value
+        : null
+    },
+    actualStringValue() {
+      // safeguard
+      if (this.isNumberValue || this.isSingleValue) {
+        return null
+      }
+      return this.attribute.values._items[0]
+        ? this.attribute.values._items[0].attribute_value
+        : null
     },
   },
 

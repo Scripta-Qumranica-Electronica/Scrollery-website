@@ -17,7 +17,7 @@
         :style="{color: combination.locked ? 'red' : 'green'}"
         @click="lockScroll"></i>
       <i class="fa fa-clone" @click="cloneCombination"></i>
-      <i v-if="!combination.locked" class="fa fa-trash-o" @click="corpus.combinations.removeItem(combination.scroll_version_id)"></i>
+      <i v-if="!combination.locked" class="fa fa-trash-o" @click="deleteCombination"></i>
     </div>
     <!-- Use v-if here so we don't waste space on the DOM -->
     <div class="children" v-if="open">
@@ -205,12 +205,40 @@ export default {
         .then(res => {
           /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           this.$store.commit(
             'setLockedScrolls',
             Object.assign({}, this.$store.getters.lockedScrolls, {
               [res.data.scroll_data.scroll_version_id]: Boolean(res.data.scroll_data.locked),
             })
           )
+        })
+        .catch(err => {
+          /* istanbul ignore next */
+          this.$store.commit('delWorking')
+          /* istanbul ignore next */
+          console.error(err)
+        })
+    },
+
+    deleteCombination() {
+      this.$store.commit('addWorking')
+      this.corpus.combinations
+        .removeItem(this.combination.scroll_version_id)
+        .then(res => {
+          /* istanbul ignore next */
+          this.$store.commit('delWorking')
+          /* istanbul ignore next */
+          this.$router.push({
+            name: 'workbenchAddress',
+            params: {
+              scrollID: '~',
+              scrollVersionID: '~',
+              imageID: '~',
+              colID: '~',
+              artID: '~',
+            },
+          })
         })
         .catch(err => {
           /* istanbul ignore next */

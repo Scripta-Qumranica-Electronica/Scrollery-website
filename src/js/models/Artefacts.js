@@ -133,4 +133,30 @@ export default class Artefacts extends ItemList {
         })
     })
   }
+
+  /* istanbul ignore next */
+  removeItem(key, scroll_version_id) {
+    /**
+     * Add axios command to remove from database.
+     * run super on successful completion.
+     */
+    return new Promise((resolve, reject) => {
+      const postData = {
+        transaction: 'removeArtefact',
+        scroll_version_id: scroll_version_id,
+        artefact_id: key,
+      }
+      try {
+        this.axios.post('resources/cgi-bin/scrollery-cgi.pl', postData).then(res => {
+          if (res.data && res.data[key] === 'deleted') {
+            resolve(super.removeItem(key, scroll_version_id))
+          } else {
+            reject(res)
+          }
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
 }
