@@ -80,7 +80,9 @@ export default {
       this.corpus.cols
         .removeItem(this.column.col_id, this.scrollVersionID)
         .then(res => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           this.$router.push({
             name: 'workbenchAddress',
             params: {
@@ -93,7 +95,9 @@ export default {
           })
         })
         .catch(err => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           console.error(err)
         })
     },

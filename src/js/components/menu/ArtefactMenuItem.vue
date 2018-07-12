@@ -82,7 +82,9 @@ export default {
       this.corpus.artefacts
         .removeItem(this.artefact.artefact_id, this.scrollVersionID)
         .then(res => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           this.$router.push({
             name: 'workbenchAddress',
             params: {
@@ -95,7 +97,9 @@ export default {
           })
         })
         .catch(err => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           console.error(err)
         })
     },

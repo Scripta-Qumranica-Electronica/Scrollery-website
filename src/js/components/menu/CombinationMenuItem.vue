@@ -205,6 +205,7 @@ export default {
         .then(res => {
           /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           this.$store.commit(
             'setLockedScrolls',
             Object.assign({}, this.$store.getters.lockedScrolls, {
@@ -225,7 +226,9 @@ export default {
       this.corpus.combinations
         .removeItem(this.combination.scroll_version_id)
         .then(res => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           this.$router.push({
             name: 'workbenchAddress',
             params: {
@@ -238,7 +241,9 @@ export default {
           })
         })
         .catch(err => {
+          /* istanbul ignore next */
           this.$store.commit('delWorking')
+          /* istanbul ignore next */
           console.error(err)
         })
     },
