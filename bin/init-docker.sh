@@ -61,7 +61,7 @@ docker build -t sqe-maria:latest .
 # start the container
 echo "Starting the new container."
 backup=$(pwd)
-docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 -v "${backup%data-files}data-backup":/tmp/backup sqe-maria:latest
+docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 -v "${backup%data-files}data-backup":/tmp/backup --network=SQE sqe-maria:latest
 
 # Wait a minute or so to ensure the container is started, and the DB process is initialized
 echo "waiting until container is ready ..."
