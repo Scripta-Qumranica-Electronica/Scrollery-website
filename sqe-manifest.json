@@ -3,7 +3,7 @@
   "version": "0.2.1",
   "status": "production",
   "dependencies": {
-    "SQE_DB_API": "0.5.3",
+    "SQE_DB_API": "0.5.5",
     "Data-files": "0.2.17"
   }
 }

@@ -55,13 +55,14 @@ echo "Cleaning up any past instances."
 docker stop SQE_Database && docker rm SQE_Database
 
 # Build the image
-echo "Building the new docker container."
-docker build -t sqe-maria:latest .
+# echo "Building the new docker container."
+# docker build -t sqe-maria:latest .
 
 # start the container
 echo "Starting the new container."
 backup=$(pwd)
-docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 -v "${backup%data-files}data-backup":/tmp/backup --network=SQE sqe-maria:latest
+docker pull bronsonbdevost/sqe-database:latest
+docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 -v "${backup%data-files}data-backup":/tmp/backup --network=SQE bronsonbdevost/sqe-database:latest
 
 # Wait a minute or so to ensure the container is started, and the DB process is initialized
 echo "waiting until container is ready ..."

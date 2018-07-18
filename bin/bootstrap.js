@@ -51,7 +51,7 @@ if (cmd.status !== 0) {
 console.log(GREEN, '✓ SQE_DB_API has been installed.', NC)
 
 console.log('Loading Database Docker, version', versions.dependencies['Data-files'], '...')
-cmd = spawnSync('sh', ['init-docker.sh', '-v', versions.dependencies['Data-files']], { encoding : 'utf8', cwd: './bin/', stdio: [null, process.stdout, process.stderr] })
+cmd = spawnSync('sh', ['init-database-docker.sh', '-v', versions.dependencies['Data-files']], { encoding : 'utf8', cwd: './bin/', stdio: [null, process.stdout, process.stderr] })
 if (cmd.status !== 0) {
     console.log(RED, '✗ Failed to install database.', NC)
     process.exit(1)
