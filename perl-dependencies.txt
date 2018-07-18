@@ -1,0 +1,13 @@
+JSON::XS
+MIME::Base64 Encode
+strict
+warnings
+Data::UUID
+Scalar::Util
+DBI
+DBD::mysql
+Package::Constants
+Ref::Util
+CGI
+Math::Geometry::Planar
+utf8::all

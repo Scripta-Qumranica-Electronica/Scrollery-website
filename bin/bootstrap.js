@@ -23,18 +23,24 @@ if (cmd.status !== 0) {
 }
 console.log(GREEN, '✓ All necessary npm dependencies have been installed.', NC)
 
-console.log('Building Perl dependencies...')
-cmd = spawnSync('carton', ['install'], { encoding : 'utf8', cwd: './resources/cgi-bin/', stdio: [null, process.stdout, process.stderr] })
-if(cmd.status !== 0) {
-    console.log(YELLOW, '✗ Failed to install perl dependencies, trying with sudo.', NC)
-    console.log('Please enter your password.')
-    cmd = spawnSync('sudo', ['carton', 'install'], { encoding : 'utf8', cwd: './resources/cgi-bin/', stdio: [null, process.stdout, process.stderr] })
-    if(cmd.status !== 0) {
-        console.log(RED, '✗ Cannot install Perl dependencies, there is probably something wrong with your MariaDB libs.', NC)
-        process.exit(1)
-    }
+console.log('Setting up the Docker network...')
+cmd = spawnSync('docker', ['network', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
+if (cmd.output[1].indexOf(' SQE ') === -1) {
+  cmd = spawnSync('docker', ['network', 'create', '--driver', 'bridge', 'SQE'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+  if(cmd.status !== 0) {
+    console.log(RED, '✗ Cannot setup the Docker network', NC)
+    process.exit(1)
+  }
 }
-console.log(GREEN, '✓ All Perl dependencies are installed.', NC)
+console.log(GREEN, '✓ The Docker network is setup.', NC)
+
+console.log('Building Web CGI Docker...')
+cmd = spawnSync('sh', ['bin/init-web-docker.sh'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+if(cmd.status !== 0) {
+  console.log(RED, '✗ Cannot install Web CGI Docker', NC)
+  process.exit(1)
+}
+console.log(GREEN, '✓ Web CGI Docker is installed.', NC)
 
 console.log('Loading SQE_DB_API, version', versions.dependencies['SQE_DB_API'], '...')
 cmd = spawnSync('sh', ['load-perl-libs.sh', '-v', versions.dependencies['SQE_DB_API']], { encoding : 'utf8', cwd: './bin/', stdio: [null, process.stdout, process.stderr] })
@@ -45,7 +51,7 @@ if (cmd.status !== 0) {
 console.log(GREEN, '✓ SQE_DB_API has been installed.', NC)
 
 console.log('Loading Database Docker, version', versions.dependencies['Data-files'], '...')
-cmd = spawnSync('sh', ['init-docker.sh', '-v', versions.dependencies['Data-files']], { encoding : 'utf8', cwd: './bin/', stdio: [null, process.stdout, process.stderr] })
+cmd = spawnSync('sh', ['init-database-docker.sh', '-v', versions.dependencies['Data-files']], { encoding : 'utf8', cwd: './bin/', stdio: [null, process.stdout, process.stderr] })
 if (cmd.status !== 0) {
     console.log(RED, '✗ Failed to install database.', NC)
     process.exit(1)

@@ -51,6 +51,18 @@ export default {
       theme: 'snow',
     })
     this.quill.setText(this.initialText)
+    this.quill.on('selection-change', (range, oldRange, source) => {
+      if (range) {
+        // if (range.length == 0) {
+        //   console.log('User cursor is on', range.index);
+        // } else {
+        //   var text = quill.getText(range.index, range.length);
+        //   console.log('User has highlighted', text);
+        // }
+      } else {
+        this.commitComment()
+      }
+    })
   },
   methods: {
     commitComment() {
