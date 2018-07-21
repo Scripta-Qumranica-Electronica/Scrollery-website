@@ -19,20 +19,21 @@ if (os.platform() === 'win32') {
   yarn = 'yarn'
 }
 
-console.log('Installing npm dependencies...')
+console.log('Installing npm dependencies with yarn...')
 cmd = spawnSync(yarn, ['--pure-lockfile'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
 if (cmd.status !== 0) {
     console.log('✗ Installation of npm dependencies failed.')
     console.log('✗ You are missing either node/npm or yarn.')
     process.exit(1)
 }
-console.log('✓ All necessary npm dependencies have been installed.')
 
 const commandExists = require('command-exists').sync
 const fs = require('fs')
 const rimraf = require('rimraf')
 const mariadb = require('mariadb')
 const chalk = require('chalk')
+
+console.log(chalk.green('✓ All necessary npm dependencies have been installed.'))
 
 console.log(chalk.blue('Checking for Docker dependency...'))
 if (commandExists('docker')) {
