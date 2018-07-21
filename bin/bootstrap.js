@@ -206,7 +206,7 @@ const pool = mariadb.createPool({
 })
 
 const loadDB = (repeatCount) => {
-  if (repeatCount < 10) {
+  if (repeatCount < 11) {
     pool.getConnection()
     .then(conn => {
       console.log(chalk.green('✓ Connected to Database.'))
@@ -230,12 +230,14 @@ const loadDB = (repeatCount) => {
           conn.end()
         })
         .catch(err => {
-          console.log(chalk.red(err))
+          console.log(chalk.yellow(err))
+          console.log(chalk.yellow(`Please wait while we try for ${repeatCount} times out of 10`))
           loadDB(repeatCount + 1)
           conn.end()
         })
     }).catch(err => {
-      console.log(chalk.red(err))
+      console.log(chalk.yellow(err))
+      console.log(chalk.yellow(`Please wait while we try for ${repeatCount} times out of 10`))
       loadDB(repeatCount + 1)
     })
   } else {
@@ -246,4 +248,4 @@ const loadDB = (repeatCount) => {
   
 }
 
-loadDB(0)
+loadDB(1)
