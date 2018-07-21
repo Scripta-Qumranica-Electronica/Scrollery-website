@@ -1,10 +1,6 @@
-const { execSync, spawnSync } = require('child_process')
+const { spawnSync } = require('child_process')
+const os = require('os')
 const versions = require('../sqe-manifest.json')
-const commandExists = require('command-exists').sync
-const fs = require('fs')
-const rimraf = require('rimraf')
-const mariadb = require('mariadb')
-const chalk = require('chalk')
 /**
  * See: https://stackoverflow.com/questions/13696148/node-js-create-folder-or-use-existing
  */
@@ -16,34 +12,65 @@ const mkdirSync = (dirPath) => {
   }
 }
 
-console.log(chalk.blue('Checking for dependencies...'))
-if (commandExists('npm')) {
-  console.log(chalk.green('✓ NPM is installed.'))
+let yarn = ''
+if (os.platform() === 'win32') {
+  yarn = 'yarn.cmd'
 } else {
-  console.log(chalk.red('✗ You are missing NPM.'))
-  process.exit(1)
+  yarn = 'yarn'
 }
+
+console.log('Installing npm dependencies...')
+cmd = spawnSync(yarn, ['--pure-lockfile'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+if (cmd.status !== 0) {
+    console.log('✗ Installation of npm dependencies failed.')
+    console.log('✗ You are missing either node/npm or yarn.')
+    process.exit(1)
+}
+console.log('✓ All necessary npm dependencies have been installed.')
+
+const commandExists = require('command-exists').sync
+const fs = require('fs')
+const rimraf = require('rimraf')
+const mariadb = require('mariadb')
+const chalk = require('chalk')
+
+console.log(chalk.blue('Checking for Docker dependency...'))
 if (commandExists('docker')) {
   console.log(chalk.green('✓ Docker is installed.'))
 } else {
   console.log(chalk.red('✗ You are missing Docker.'))
   process.exit(1)
 }
-if (commandExists('yarn')) {
-  console.log(chalk.green('✓ Yarn is installed.'))
-} else {
-  console.log(chalk.red('✗ You are missing Yarn.'))
-  process.exit(1)
-}
 console.log(chalk.green('✓ All necessary dependencies are installed.'))
 
-console.log(chalk.blue('Installing npm dependencies...'))
-cmd = spawnSync('yarn', ['--pure-lockfile'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-if (cmd.status !== 0) {
-    console.log(chalk.red('✗ Installation of npm dependencies failed.'))
+console.log(chalk.blue(`Loading SQE_DB_API, version ${versions.dependencies.SQE_DB_API}...`))
+console.log(chalk.blue('Checking for perl-libs repository.'))
+if (fs.existsSync("./resources/perl-libs/.git")) {
+  console.log(chalk.blue('Fetching changes.'))
+  cmd = spawnSync('git', ['fetch', '--all', '--tags', '--prune'], { encoding : 'utf8', cwd: './resources/perl-libs', stdio: [null, process.stdout, process.stderr] })
+  if (cmd.status !== 0) {
+      console.log(chalk.red('✗ Failed to fetch SQE_DB_API.'))
+      process.exit(1)
+  }
+} else {
+  console.log(chalk.blue('Cloning repository.'))
+  cmd = spawnSync('git', ['clone', 'https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API.git', 'resources/perl-libs'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+  if (cmd.status !== 0) {
+    console.log(chalk.red('✗ Failed to clone SQE_DB_API.'))
     process.exit(1)
+  }
 }
-console.log(chalk.green('✓ All necessary npm dependencies have been installed.'))
+
+console.log(chalk.blue('Checking for desired version.'))
+if (versions.dependencies['SQE_DB_API']) {
+  console.log(chalk.blue(`Checking out tag ${versions.dependencies.SQE_DB_API}.`))
+  cmd = spawnSync('git', ['checkout', versions.dependencies.SQE_DB_API], { encoding : 'utf8', cwd: './resources/perl-libs', stdio: [null, process.stdout, process.stderr] })
+} else {
+  console.log(chalk.blue(`Checking out latest master version.`))
+  cmd = spawnSync('git', ['checkout', 'master'], { encoding : 'utf8', cwd: './resources/perl-libs', stdio: [null, process.stdout, process.stderr] })
+  cmd = spawnSync('git', ['pull', 'origin', 'master'], { encoding : 'utf8', cwd: './resources/perl-libs', stdio: [null, process.stdout, process.stderr] })
+}
+console.log(chalk.green('✓ SQE_DB_API has been installed.'))
 
 console.log(chalk.blue('Setting up the Docker network...'))
 cmd = spawnSync('docker', ['network', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
@@ -78,35 +105,6 @@ while (cmd.stdout.indexOf('SQE_CGI') === -1) {
   cmd = spawnSync('docker', ['container', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
 }
 console.log(chalk.green('✓ Web CGI Docker is installed.'))
-
-console.log(chalk.blue(`Loading SQE_DB_API, version ${versions.dependencies.SQE_DB_API}...`))
-console.log(chalk.blue('Checking for perl-libs repository.'))
-if (fs.existsSync("./resources/perl-libs/.git")) {
-  console.log(chalk.blue('Fetching changes.'))
-  cmd = spawnSync('git', ['fetch', '--all', '--tags', '--prune'], { encoding : 'utf8', cwd: './resources/perl-libs', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-      console.log(chalk.red('✗ Failed to fetch SQE_DB_API.'))
-      process.exit(1)
-  }
-} else {
-  console.log(chalk.blue('Cloning repository.'))
-  cmd = spawnSync('git', ['clone', 'https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API.git', 'resources/perl-libs'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-    console.log(chalk.red('✗ Failed to clone SQE_DB_API.'))
-    process.exit(1)
-  }
-}
-
-console.log(chalk.blue('Checking for desired version.'))
-if (versions.dependencies['SQE_DB_API']) {
-  console.log(chalk.blue(`Checking out tag ${versions.dependencies.SQE_DB_API}.`))
-  cmd = spawnSync('git', ['checkout', versions.dependencies.SQE_DB_API], { encoding : 'utf8', cwd: './resources/perl-libs', stdio: [null, process.stdout, process.stderr] })
-} else {
-  console.log(chalk.blue(`Checking out latest master version.`))
-  cmd = spawnSync('git', ['checkout', 'master'], { encoding : 'utf8', cwd: './resources/perl-libs', stdio: [null, process.stdout, process.stderr] })
-  cmd = spawnSync('git', ['pull', 'origin', 'master'], { encoding : 'utf8', cwd: './resources/perl-libs', stdio: [null, process.stdout, process.stderr] })
-}
-console.log(chalk.green('✓ SQE_DB_API has been installed.'))
 
 console.log(chalk.blue(`Loading Database Docker version ${versions.dependencies["Data-files"]}.`))
 console.log(chalk.blue('Checking for Database repository.'))
