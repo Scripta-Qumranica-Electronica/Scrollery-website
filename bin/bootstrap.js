@@ -204,14 +204,17 @@ const pool = mariadb.createPool({
   password: 'none',
   connectionLimit: 5
 })
-pool.getConnection()
+
+const loadDB = (repeatCount) => {
+  if (repeatCount < 10) {
+    pool.getConnection()
     .then(conn => {
       console.log(chalk.green('✓ Connected to Database.'))
       conn.query("SHOW DATABASES")
         .then((rows) => {
           if (rows.length > 1) {
             console.log(chalk.green('✓ Database ready for data insertion.'))
-
+  
             console.log(chalk.blue('Loading data...'))
             cmd = spawnSync('docker', ['exec', '-i', 'SQE_Database', '/tmp/import-docker.sh'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
             if (cmd.stdout > 0) {
@@ -227,12 +230,20 @@ pool.getConnection()
           conn.end()
         })
         .catch(err => {
-          console.log(chalk.red(`Error: ${err}`))
+          console.log(chalk.red(err))
+          loadDB(repeatCount + 1)
           conn.end()
         })
-        
     }).catch(err => {
-      console.log(chalk.red(`Error: ${err}`))
-    });
+      console.log(chalk.red(err))
+      loadDB(repeatCount + 1)
+    })
+  } else {
+    console.log(chalk.red(`Tried ${repeatCount} times, but couldn't connect to Docker database.`))
+    console.log(chalk.red(`The bootstrap has failed at the last step.`))
+    process.exit(1)
+  }
+  
+}
 
-
+loadDB(0)
