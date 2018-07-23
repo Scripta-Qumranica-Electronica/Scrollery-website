@@ -73,35 +73,19 @@ if (versions.dependencies['SQE_DB_API']) {
 }
 console.log(chalk.green('✓ SQE_DB_API has been installed.'))
 
-console.log(chalk.blue('Setting up the Docker network...'))
-cmd = spawnSync('docker', ['network', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
-if (cmd.output[1].indexOf(' SQE ') === -1) {
-  cmd = spawnSync('docker', ['network', 'create', '--driver', 'bridge', 'SQE'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-  if(cmd.status !== 0) {
-    console.log(chalk.red('✗ Cannot setup the Docker network'))
-    process.exit(1)
-  }
-}
-console.log(chalk.green('✓ The Docker network is setup.'))
+// console.log(chalk.blue('Building Web CGI Docker...'))
+// console.log(chalk.blue('Cleaning up any past instances.'))
+// spawnSync('docker', ['stop', 'SQE_CGI'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+// spawnSync('docker', ['rm', 'SQE_CGI'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
 
-console.log(chalk.blue('Building Web CGI Docker...'))
-console.log(chalk.blue('Cleaning up any past instances.'))
-spawnSync('docker', ['stop', 'SQE_CGI'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-spawnSync('docker', ['rm', 'SQE_CGI'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-
-console.log(chalk.blue('Starting the new container.'))
-cmd = spawnSync('docker', ['pull', 'bronsonbdevost/cgi-web-server:devel'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-if(cmd.status !== 0) {
-  console.log(chalk.red('✗ Cannot pull down the Web CGI Docker'))
-  process.exit(1)
-}
-// cmd = spawnSync('docker', ['run', '--name', 'SQE_CGI', '-d', '-p', '9080:80', '-v', process.cwd() + '/resources/cgi-bin/:/usr/local/apache2/htdocs/resources/cgi-bin/', '-v', process.cwd() + '/resources/perl-libs/:/usr/local/apache2/htdocs/resources/perl-libs/', '--network=SQE', 'bronsonbdevost/cgi-web-server:devel'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+// console.log(chalk.blue('Starting the new container.'))
+// cmd = spawnSync('docker', ['pull', 'bronsonbdevost/cgi-web-server:0.5.9'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
 // if(cmd.status !== 0) {
-//   console.log(chalk.red('✗ Cannot start the Web CGI Docker'))
+//   console.log(chalk.red('✗ Cannot pull down the Web CGI Docker'))
 //   process.exit(1)
 // }
 
-console.log(chalk.green('✓ Web CGI Docker is installed.'))
+// console.log(chalk.green('✓ Web CGI Docker is installed.'))
 
 console.log(chalk.blue(`Loading Database Docker version ${versions.dependencies["Data-files"]}.`))
 console.log(chalk.blue('Checking for Database repository.'))
@@ -169,19 +153,19 @@ if (versions.dependencies["Data-files"]) {
   }
 }
 
-console.log(chalk.blue('Cleaning up past instances.'))
-spawnSync('docker', ['stop', 'SQE_Database'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-spawnSync('docker', ['rm', 'SQE_Database'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-console.log(chalk.green('✓ Successfully cleaned the SQE_Database Docker.'))
+// console.log(chalk.blue('Cleaning up past instances.'))
+// spawnSync('docker', ['stop', 'SQE_Database'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+// spawnSync('docker', ['rm', 'SQE_Database'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+// console.log(chalk.green('✓ Successfully cleaned the SQE_Database Docker.'))
 
-console.log(chalk.blue('Starting the new container'))
-cmd = spawnSync('docker', ['pull', 'bronsonbdevost/sqe-database:latest'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-if (cmd.status !== 0) {
-    console.log(chalk.red('✗ Failed to pull the latest SQE_Database Docker.'))
-    process.exit(1)
-}
+// console.log(chalk.blue('Starting the new container'))
+// cmd = spawnSync('docker', ['pull', 'bronsonbdevost/sqe-database:latest'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+// if (cmd.status !== 0) {
+//     console.log(chalk.red('✗ Failed to pull the latest SQE_Database Docker.'))
+//     process.exit(1)
+// }
 
-cmd = spawnSync('docker-compose', ['--no-start', 'up'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+cmd = spawnSync('docker-compose', ['up', '--no-start'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
 if (cmd.status !== 0) {
     console.log(chalk.red('✗ Failed to create the composed Docker.'))
     process.exit(1)
@@ -233,7 +217,7 @@ const loadDB = (repeatCount) => {
                 process.exit(1)
             }
             console.log(chalk.green('✓ The SQE database Docker has been installed and all data has been loaded.'))
-            console.log(chalk.green('✓ The system is now fully installed: type `npm start` to run it.'))
+            console.log(chalk.green('✓ The system is now fully installed: type `yarn start` to run it.'))
             process.exit(0)
           } else {
             console.log(chalk.red('✗ Database could not be made ready for data insertion.'))

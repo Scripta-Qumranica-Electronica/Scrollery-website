@@ -16,7 +16,7 @@ services:
       - sqe-dev
 
   sqe-cgi.api:
-    image: bronsonbdevost/cgi-web-server:devel
+    image: bronsonbdevost/cgi-web-server:0.5.9
     container_name: SQE_CGI
     environment:
       - ConnectionString=Server=sql.data;Initial Catalog=CatalogData;User Id=sa;Password=your@password
