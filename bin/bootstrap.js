@@ -181,7 +181,7 @@ if (cmd.status !== 0) {
     process.exit(1)
 }
 
-cmd = spawnSync('docker-compose', ['create'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+cmd = spawnSync('docker-compose', ['--no-start', 'up'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
 if (cmd.status !== 0) {
     console.log(chalk.red('✗ Failed to create the composed Docker.'))
     process.exit(1)
