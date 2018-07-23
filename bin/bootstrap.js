@@ -95,16 +95,12 @@ if(cmd.status !== 0) {
   console.log(chalk.red('✗ Cannot pull down the Web CGI Docker'))
   process.exit(1)
 }
-cmd = spawnSync('docker', ['run', '--name', 'SQE_CGI', '-d', '-p', '9080:80', '-v', process.cwd() + '/resources/cgi-bin/:/usr/local/apache2/htdocs/resources/cgi-bin/', '-v', process.cwd() + '/resources/perl-libs/:/usr/local/apache2/htdocs/resources/perl-libs/', '--network=SQE', 'bronsonbdevost/cgi-web-server:devel'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-if(cmd.status !== 0) {
-  console.log(chalk.red('✗ Cannot start the Web CGI Docker'))
-  process.exit(1)
-}
-cmd = spawnSync('docker', ['container', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
-while (cmd.stdout.indexOf('SQE_CGI') === -1) {
-  console.log(chalk.yellow('✗ Waiting for the Web CGI Docker to start'))
-  cmd = spawnSync('docker', ['container', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
-}
+// cmd = spawnSync('docker', ['run', '--name', 'SQE_CGI', '-d', '-p', '9080:80', '-v', process.cwd() + '/resources/cgi-bin/:/usr/local/apache2/htdocs/resources/cgi-bin/', '-v', process.cwd() + '/resources/perl-libs/:/usr/local/apache2/htdocs/resources/perl-libs/', '--network=SQE', 'bronsonbdevost/cgi-web-server:devel'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+// if(cmd.status !== 0) {
+//   console.log(chalk.red('✗ Cannot start the Web CGI Docker'))
+//   process.exit(1)
+// }
+
 console.log(chalk.green('✓ Web CGI Docker is installed.'))
 
 console.log(chalk.blue(`Loading Database Docker version ${versions.dependencies["Data-files"]}.`))
@@ -185,10 +181,22 @@ if (cmd.status !== 0) {
     process.exit(1)
 }
 
-cmd = spawnSync('docker', ['run', '--name', 'SQE_Database', '-e', 'MYSQL_ROOT_PASSWORD=none', '-d', '-p', '3307:3306', '-v', process.cwd() + '/resources/data-backup:/tmp/backup', '--network=SQE', 'bronsonbdevost/sqe-database:latest'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+cmd = spawnSync('docker-compose', ['create'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
 if (cmd.status !== 0) {
-    console.log(chalk.red('✗ Failed to run the SQE_Database Docker.'))
+    console.log(chalk.red('✗ Failed to create the composed Docker.'))
     process.exit(1)
+}
+
+cmd = spawnSync('docker-compose', ['start'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
+if (cmd.status !== 0) {
+    console.log(chalk.red('✗ Failed to start the composed Docker.'))
+    process.exit(1)
+}
+
+cmd = spawnSync('docker', ['container', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
+while (cmd.stdout.indexOf('SQE_CGI') === -1) {
+  console.log(chalk.yellow('✗ Waiting for the Web CGI Docker to start'))
+  cmd = spawnSync('docker', ['container', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
 }
 
 cmd = spawnSync('docker', ['container', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
@@ -196,6 +204,8 @@ while (cmd.stdout.indexOf('SQE_Database') === -1) {
   console.log(chalk.yellow('✗ Waiting for the SQE_Database Docker to start'))
   cmd = spawnSync('docker', ['container', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
 }
+
+console.log(chalk.green('✓ Docker-compose is functional.'))
 
 console.log(chalk.blue('Connecting to DB.  This may take a moment.'))
 const pool = mariadb.createPool({
