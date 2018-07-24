@@ -2,7 +2,7 @@
 - [Contents](#contents)
 - [Quick Start Instructions](#quick-start-instructions)
 - [Full Setup Description](#full-setup-description)
-  - [Summary](#summary)
+  - [Summary (currently deprecated, use the quick instructions for now)](#summary-currently-deprecated-use-the-quick-instructions-for-now)
   - [Server Side](#server-side)
     - [Build Server Side Code](#build-server-side-code)
   - [Client](#client)
@@ -48,7 +48,7 @@ yarn start
 
 If everything runs with no errors, then after executing `yarn start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.  The CGI requests provided in this project are ducumented in [CGI-Functions.md](./CGI-Functions.md).  Documentation for the database structure can be found in the [Data-files project documentation](https://github.com/Scripta-Qumranica-Electronica/Data-files/blob/master/docs/Database-structure.md).
 
-You may also run `yarn run bootstrap` again after pulling down a new version of the Scrollery-website, and it will make any necessary updates to the dependencies and the database <span style="color:red">(Warning!!! this will overwrite your existing SQE_DEV database)</span>.  You can always reset the database to defaults with `yarn run reset:db`.  After running several times, you may find that your Docker runs out of space, I have found the suggestions [here](https://lebkowski.name/docker-volumes/) to be helpful in such circumstances.
+You may also run `yarn run bootstrap` again after pulling down a new version of the Scrollery-website, and it will make any necessary updates to the dependencies and the database <span style="color:red">(Warning!!! this will overwrite your existing SQE_DEV database)</span>.  If you suspect the development database has become corrupt, you can always reset it to defaults with `yarn run reset:db`.  After running several times, you may find that your Docker runs out of space, I have found the suggestions [here](https://lebkowski.name/docker-volumes/) to be helpful in such circumstances.
 
 You should use `docker-compose stop` to shutdown the SQE Docker containers before rebooting your system, otherwise you may have trouble using it after reboot. In that case, you may clean up the system using `docker rm $(docker ps -q -f status=exited)`, and then start the Docker contiainers again with `docker-compose up` or `docker-compose start`.
 
@@ -60,9 +60,9 @@ The SQE Scrollery website depends on three components to function fully:
 2. [A local installation of the Perl modules that provide a low level API to that database.](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API)
 3. A local installation of the Scrollery website maintained in this repository.
 
-## Summary
+## Summary (currently deprecated, use the quick instructions for now)
 
-These instructions will walk you through programs and settings involved in running the Scrollery website on your development machine.  The following dependencies are required:
+These instructions will walk you through programs and settings involved in running the Scrollery website.  The following dependencies are required:
 * [Node 8.9.4](https://nodejs.org/en/download/)
 * Npm 5+ (bundled with node)
 * [Yarn](https://yarnpkg.com/en/docs/install)
