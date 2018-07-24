@@ -36,17 +36,21 @@ git clone https://github.com/Scripta-Qumranica-Electronica/Scrollery-website.git
 cd Scrollery-website
 
 #built the project (can take several minutes)
+#you can build the full environment `bootstrap`
+#or load a minimal environment `bootstrap:min`
 yarn run bootstrap
+#or
+yarn run bootstrap:min
 
 #launch the website
 yarn start
 ```
 
-If everything runs with no errors, then after executing `npm start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.  The CGI requests provided in this project are ducumented in [CGI-Functions.md](./CGI-Functions.md).  Documentation for the database structure can be found in the [Data-files project documentation](https://github.com/Scripta-Qumranica-Electronica/Data-files/blob/master/docs/Database-structure.md).
+If everything runs with no errors, then after executing `yarn start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.  The CGI requests provided in this project are ducumented in [CGI-Functions.md](./CGI-Functions.md).  Documentation for the database structure can be found in the [Data-files project documentation](https://github.com/Scripta-Qumranica-Electronica/Data-files/blob/master/docs/Database-structure.md).
 
-You may also run `npm run bootstrap` again after pulling down a new version of the Scrollery-website, and it will make any necessary updates to the dependencies and the database <span style="color:red">(Warning!!! this will overwrite your existing SQE_DEV database)</span>.  After running several times, you may find that your Docker runs out of space, I have found the suggestions [here](https://lebkowski.name/docker-volumes/) to be helpful in such circumstances.
+You may also run `yarn run bootstrap` again after pulling down a new version of the Scrollery-website, and it will make any necessary updates to the dependencies and the database <span style="color:red">(Warning!!! this will overwrite your existing SQE_DEV database)</span>.  You can always reset the database to defaults with `yarn run reset:db`.  After running several times, you may find that your Docker runs out of space, I have found the suggestions [here](https://lebkowski.name/docker-volumes/) to be helpful in such circumstances.
 
-You should use `docker stop SQE-Database` to shutdown the SQE database Docker before rebooting your system, otherwise you may have trouble using it after reboot. In that case, you may clean up the system using `docker rm $(docker ps -q -f status=exited)`, and then start the database Docker again with `docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 sqe-maria:latest`.
+You should use `docker-compose stop` to shutdown the SQE Docker containers before rebooting your system, otherwise you may have trouble using it after reboot. In that case, you may clean up the system using `docker rm $(docker ps -q -f status=exited)`, and then start the Docker contiainers again with `docker-compose up` or `docker-compose start`.
 
 # Full Setup Description
 
