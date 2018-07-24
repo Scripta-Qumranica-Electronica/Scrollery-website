@@ -2,7 +2,7 @@ version: '2'
 
 services:
   sqe.data:
-    image: bronsonbdevost/sqe-database:latest
+    image: bronsonbdevost/sqe-database:0.4.2
     container_name: SQE_Database
     environment:
       - MYSQL_ROOT_PASSWORD=none
@@ -16,7 +16,7 @@ services:
       - sqe-dev
 
   sqe-cgi.api:
-    image: bronsonbdevost/cgi-web-server:0.5.9
+    image: bronsonbdevost/cgi-web-server:0.5.10
     container_name: SQE_CGI
     environment:
       - ConnectionString=Server=sql.data;Initial Catalog=CatalogData;User Id=sa;Password=your@password

@@ -73,75 +73,8 @@ if (versions.dependencies['SQE_DB_API']) {
 }
 console.log(chalk.green('✓ SQE_DB_API has been installed.'))
 
-console.log(chalk.blue(`Loading Database Docker version ${versions.dependencies["Data-files"]}.`))
-console.log(chalk.blue('Checking for Database repository.'))
-mkdirSync('./resources/data-backup')
-if (fs.existsSync("./resources/data-files/.git")) {
-  console.log(chalk.blue('Fetching changes.'))
-  cmd = spawnSync('git', ['checkout', 'master'], { encoding : 'utf8', cwd: './resources/data-files', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-      console.log(chalk.red('✗ Failed to checkout Database-files.'))
-      process.exit(1)
-  }
-  cmd = spawnSync('git', ['fetch', '--tags'], { encoding : 'utf8', cwd: './resources/data-files', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-      console.log(chalk.red('✗ Failed to fetch tags.'))
-      process.exit(1)
-  }
-  cmd = spawnSync('git', ['pull', 'origin', 'master'], { encoding : 'utf8', cwd: './resources/data-files', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-      console.log(chalk.red('✗ Failed to pull master for Database-files.'))
-      process.exit(1)
-  }
-} else {
-  console.log(chalk.blue('Cloning Data-files repository.'))
-  cmd = spawnSync('git', ['clone', 'https://github.com/Scripta-Qumranica-Electronica/Data-files.git', './resources/data-files'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-      console.log(chalk.red('✗ Failed to checkout Database-files.'))
-      process.exit(1)
-  }
-  cmd = spawnSync('git', ['fetch', '--all', '--tags', '--prune'], { encoding : 'utf8', cwd: './resources/data-files', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-      console.log(chalk.red('✗ Failed to fetch changes to Database-files.'))
-      process.exit(1)
-  }
-}
-console.log(chalk.green('✓ Fetched Data-files from github.'))
-
-console.log(chalk.blue('Resetting the data-backup folder.'))
-if (fs.existsSync("./resources/data-backup")) {
-  rimraf.sync('./resources/data-backup/*')
-} else {
-  mkdirSync("./resources/data-backup")
-}
-mkdirSync("./resources/data-backup/tables")
-mkdirSync("./resources/data-backup/geom_tables")
-
-
-if (versions.dependencies["Data-files"]) {
-  console.log(chalk.blue(`Checking out tag ${versions.dependencies["Data-files"]}.`))
-  cmd = spawnSync('git', ['checkout', `tags/${versions.dependencies["Data-files"]}`], { encoding : 'utf8', cwd: './resources/data-files', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-      console.log(chalk.red(`✗ Failed to checkout tag ${versions.dependencies["Data-files"]}.`))
-      process.exit(1)
-  }
-} else {
-  console.log(chalk.blue('Checking out latest master.'))
-  cmd = spawnSync('git', ['checkout', 'master'], { encoding : 'utf8', cwd: './resources/data-files', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-      console.log(chalk.red('✗ Failed to checkout maser branch of Database-files.'))
-      process.exit(1)
-  }
-  cmd = spawnSync('git', ['pull', 'origin', 'master'], { encoding : 'utf8', cwd: './resources/data-files', stdio: [null, process.stdout, process.stderr] })
-  if (cmd.status !== 0) {
-      console.log(chalk.red('✗ Failed to pull latest master of Database-files.'))
-      process.exit(1)
-  }
-}
-
-console.log(chalk.green('✓ Successfully checked out the proper Data-files branch/tag.'))
-
 console.log(chalk.blue('Building the Docker containers with docker-compose.'))
+console.log(chalk.blue(`Database version ${versions.dependencies["Data-files"]}, SQE_CGI_API version ${versions.dependencies.SQE_DB_API}.`))
 cmd = spawnSync('docker-compose', ['up', '--no-start'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
 if (cmd.status !== 0) {
     console.log(chalk.red('✗ Failed to create the composed Docker.'))
@@ -165,7 +98,6 @@ while (cmd.stdout.indexOf('SQE_Database') === -1) {
   console.log(chalk.yellow('✗ Waiting for the SQE_Database Docker to start'))
   cmd = spawnSync('docker', ['container', 'list'], { encoding : 'utf8', cwd: './', stdio: 'pipe' })
 }
-
 console.log(chalk.green('✓ Docker-compose is functional.'))
 
 console.log(chalk.blue('Connecting to DB.  This may take a moment.'))
