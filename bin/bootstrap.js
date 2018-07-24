@@ -108,7 +108,7 @@ if (fs.existsSync("./resources/data-files/.git")) {
       process.exit(1)
   }
 } else {
-  console.log(chalk.blue('Cloning repository.'))
+  console.log(chalk.blue('Cloning Data-files repository.'))
   cmd = spawnSync('git', ['clone', 'https://github.com/Scripta-Qumranica-Electronica/Data-files.git', './resources/data-files'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
   if (cmd.status !== 0) {
       console.log(chalk.red('✗ Failed to checkout Database-files.'))
@@ -129,6 +129,7 @@ if (fs.existsSync("./resources/data-backup")) {
   mkdirSync("./resources/data-backup")
 }
 mkdirSync("./resources/data-backup/tables")
+mkdirSync("./resources/data-backup/geom_tables")
 
 
 if (versions.dependencies["Data-files"]) {
@@ -152,6 +153,8 @@ if (versions.dependencies["Data-files"]) {
   }
 }
 
+console.log(chalk.green('✓ Successfully checked out the proper Data-files branch/tag.'))
+
 // console.log(chalk.blue('Cleaning up past instances.'))
 // spawnSync('docker', ['stop', 'SQE_Database'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
 // spawnSync('docker', ['rm', 'SQE_Database'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
@@ -164,6 +167,7 @@ if (versions.dependencies["Data-files"]) {
 //     process.exit(1)
 // }
 
+console.log(chalk.blue('Building the Docker containers with docker-compose.'))
 cmd = spawnSync('docker-compose', ['up', '--no-start'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] })
 if (cmd.status !== 0) {
     console.log(chalk.red('✗ Failed to create the composed Docker.'))
