@@ -5,13 +5,14 @@ const compressing = require('compressing')
 const md5File = require('md5-file')
 const mariadb = require('mariadb')
 const chalk = require('chalk')
-const md5sums = require('../resources/data-files/tables/md5sums.json')
+const md5sums = require('./tables/md5sums.json')
 
 // Default settings
-const schemaBackupPath = './resources/data-files/schema/'
-const schemaTempBackupPath = './resources/data-backup/'
+const schemaBackupPath = 'resources/data-files/schema/'
+const schemaTempBackupPath = 'resources/data-backup/'
 const schemaBackupName = 'SQE-Schema-current.sql'
-const tableBackupPath = './resources/data-backup/tables/'
+const tableBackupPath = 'resources/data-files/tables/'
+const tableTempBackupPath = 'resources/data-backup/tables/'
 const tableBlackList = ['user', 'user_sessions', 'sqe_session', 'single_action', 'main_action']
 let allFiles = []
 let filesMD5 = {}
@@ -29,6 +30,7 @@ if (cmd.status !== 0) {
   console.log(chalk.red('✗ Failed to backup the schema from SQE_Database Docker.'))
   process.exit(1)
 } else {
+  console.log('saving to ' + schemaTempBackupPath + schemaBackupName)
   fs.writeFile(schemaTempBackupPath + schemaBackupName, cmd.stdout, (err) => {
     if(err) {
         return console.log(chalk.red(err))
@@ -146,7 +148,7 @@ const saveDefaultTable = (pool, table, repeatCount) => {
               backupQuery += ` FROM \`${table}\``
               conn.query(backupQuery)
                 .then(rows => {
-                  const file = fs.createWriteStream(tableBackupPath + table + '.sql')
+                  const file = fs.createWriteStream(tableTempBackupPath + table + '.sql')
                   file.on('error', function(err) { reject(err)})
                   file.write(fields.map((col) => {
                     return col[Object.keys(col)[0]] === 'polygon' || col[Object.keys(col)[0]] === 'multipolygon' ? 
@@ -158,7 +160,7 @@ const saveDefaultTable = (pool, table, repeatCount) => {
                   })
                   file.end()
                   allFiles.push(table + '.sql')
-                  console.log(chalk.green(`✓ The database table ${table} has been saved to ${tableBackupPath + table + '.sql'}`))
+                  console.log(chalk.green(`✓ The database table ${table} has been saved to ${tableTempBackupPath + table + '.sql'}`))
                   conn.end()
                     .then(() => {
                       resolve('Table saved.')
@@ -235,7 +237,7 @@ const saveOwnerTable = (pool, table, repeatCount) => {
               WHERE \`scroll_version\`.\`user_id\` = 1`
               conn.query(backupQuery)
                 .then(rows => {
-                  const file = fs.createWriteStream(tableBackupPath + table + '.sql')
+                  const file = fs.createWriteStream(tableTempBackupPath + table + '.sql')
                   file.on('error', function(err) { reject(err)})
                   file.write(fields.map((col) => {
                     return col[Object.keys(col)[0]] === 'polygon' || col[Object.keys(col)[0]] === 'multipolygon' ? 
@@ -247,7 +249,7 @@ const saveOwnerTable = (pool, table, repeatCount) => {
                   })
                   file.end()
                   allFiles.push(table + '.sql')
-                  console.log(chalk.green(`✓ The database table ${table} has been saved to ${tableBackupPath + table + '.sql'}`))
+                  console.log(chalk.green(`✓ The database table ${table} has been saved to ${tableTempBackupPath + table + '.sql'}`))
                   return('Table saved.')
                 })
             } else {
@@ -282,7 +284,7 @@ const saveOwnerTable = (pool, table, repeatCount) => {
                 WHERE \`scroll_version\`.\`user_id\` = 1`
                 conn.query(backupQuery)
                   .then(rows => {
-                    const file = fs.createWriteStream(tableBackupPath + ownedTable + '.sql')
+                    const file = fs.createWriteStream(tableTempBackupPath + ownedTable + '.sql')
                     file.on('error', function(err) { reject(err)})
                     file.write(fields.map((col) => {
                       return col[Object.keys(col)[0]] === 'polygon' || col[Object.keys(col)[0]] === 'multipolygon' ? 
@@ -294,7 +296,7 @@ const saveOwnerTable = (pool, table, repeatCount) => {
                     })
                     file.end()
                     allFiles.push(ownedTable + '.sql')
-                    console.log(chalk.green(`✓ The database table ${ownedTable} has been saved to ${tableBackupPath + ownedTable + '.sql'}`))
+                    console.log(chalk.green(`✓ The database table ${ownedTable} has been saved to ${tableTempBackupPath + ownedTable + '.sql'}`))
                     conn.end()
                       .then(() => {
                         resolve('Table saved.')
@@ -355,14 +357,14 @@ const gzipFiles = () => {
   let count = 0
   let writing = 0
   allFiles.forEach(file => {
-    md5File(tableBackupPath + file, (err, hash) => {
+    md5File(tableTempBackupPath + file, (err, hash) => {
       if (err) throw err
 
       filesMD5[file] = hash
       if (!md5sums[file] || md5sums[file] !== hash) {
         writing += 1
         console.log(chalk.yellow(`+ The file ${file} has been updated, copying now...`))
-        compressing.gzip.compressFile(tableBackupPath + file, './resources/data-files/tables/' + file + '.gz')
+        compressing.gzip.compressFile(tableTempBackupPath + file, tableBackupPath + file + '.gz')
         .then(() => {
           count += 1
           writing -= 1
@@ -383,7 +385,7 @@ const gzipFiles = () => {
  }
 
 const finishBackup = () => {
-  fs.writeFile('./resources/data-files/tables/md5sums.json', JSON.stringify(filesMD5), (err) => {
+  fs.writeFile(tableBackupPath + 'md5sums.json', JSON.stringify(filesMD5), (err) => {
     if(err) {
         return console.log(chalk.red(err))
     }

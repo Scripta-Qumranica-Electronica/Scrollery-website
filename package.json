@@ -10,6 +10,7 @@
     "prod": "webpack --config webpack.prod.js",
     "start": "node ./tools/dev_server.js",
     "bootstrap": "node ./bin/bootstrap.js",
+    "backup:db": "node ./resources/data-files/database-backup.js",
     "setup:db": "sh ./bin/init-docker.sh",
     "reset:db": "docker exec -i SQE_Database /tmp/import-docker.sh",
     "test": "karma start --config karma.conf.js",

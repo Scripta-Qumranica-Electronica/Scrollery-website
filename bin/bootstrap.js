@@ -129,7 +129,6 @@ if (fs.existsSync("./resources/data-backup")) {
   mkdirSync("./resources/data-backup")
 }
 mkdirSync("./resources/data-backup/tables")
-mkdirSync("./resources/data-backup/geom_tables")
 
 
 if (versions.dependencies["Data-files"]) {
