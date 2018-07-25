@@ -9,7 +9,7 @@
         class="image-select-entry" 
         :value="selectedImage"
         @input="selectedImage = []"
-        placeholder="Select Images" 
+        :placeholder="$i18n.str('Select Images')" 
         multiple size="mini">
         <el-option
           v-for="image of images"
@@ -51,7 +51,7 @@
       </el-select>
     </el-col>
     <el-col :span="1">
-      <span class="label">Zoom</span>
+      <span class="label">{{ $i18n.str('Zoom') }}</span>
     </el-col>
     <el-col :span="4">
       <el-slider

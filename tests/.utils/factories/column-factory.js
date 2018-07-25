@@ -1,7 +1,7 @@
 import faker from 'faker'
 import signFactory from './sign-factory.js'
 import Column from '~/models/Column.js'
-import Line from '~/models/Line.js';
+import Line from '~/models/Line.js'
 
 export default ({ signs = 20, props = {} } = {}) => {
   props = Object.assign(
@@ -20,7 +20,7 @@ export default ({ signs = 20, props = {} } = {}) => {
     lineName = faker.random.word(),
     line = new Line({
       id: lineID,
-      name: lineName
+      name: lineName,
     }),
     signsInLine = 0
 
@@ -33,7 +33,7 @@ export default ({ signs = 20, props = {} } = {}) => {
       lineName = faker.random.word()
       line = new Line({
         id: lineID,
-        name: lineName
+        name: lineName,
       })
       col.push(line)
       signsInLine = 0
@@ -45,7 +45,7 @@ export default ({ signs = 20, props = {} } = {}) => {
     // create the sign
     let sign = signFactory.model({
       sign_id: nextSignID,
-      next_sign_ids: [ faker.random.number() ],
+      next_sign_ids: [faker.random.number()],
     })
     line.push(sign)
 

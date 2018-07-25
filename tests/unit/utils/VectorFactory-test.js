@@ -34,7 +34,9 @@ describe('VectorFactory.wktPolygonToSvg', () => {
       x: 1,
       y: 5,
     }
-    const wktPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${point3.y},${point1.x} ${point1.y}))`
+    const wktPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${
+      point3.y
+    },${point1.x} ${point1.y}))`
     const boundingRect = {
       x: point1.x - point1.x,
       y: point1.y - point1.y,
@@ -64,7 +66,9 @@ describe('VectorFactory.wktPolygonToSvg', () => {
       x: 1,
       y: 5,
     }
-    const wktPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${point3.y}))`
+    const wktPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${
+      point3.y
+    }))`
     const boundingRect = {
       x: point1.x - point1.x,
       y: point1.y - point1.y,
@@ -194,30 +198,15 @@ describe('VectorFactory.svgPolygonToGeoJSON', () => {
   it('should convert a simple SVG path to a GeoJSON representation', () => {
     // Setup the input and result
     const svg = 'M0 0 10 0 10 10 0 10M1 1 1 3 3 3 3 1'
-    const geoJSON = 
-    {
-      type:'Polygon',
-      coordinates:
-      [
-        [
-          [0,0],
-          [10,0],
-          [10,10],
-          [0,10],
-          [0,0]
-        ],
-        [
-          [1,1],
-          [1,3],
-          [3,3],
-          [3,1],
-          [1,1]
-        ]
-      ]
+    const geoJSON = {
+      type: 'Polygon',
+      coordinates: [
+        [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]],
+        [[1, 1], [1, 3], [3, 3], [3, 1], [1, 1]],
+      ],
     }
     // assert expected value
-    expect(JSON.stringify(svgPolygonToGeoJSON(svg)))
-    .to.equal(JSON.stringify(geoJSON))
+    expect(JSON.stringify(svgPolygonToGeoJSON(svg))).to.equal(JSON.stringify(geoJSON))
   })
 
   it('should convert a complex terminated SVG path to a valid GeoJSON representation', () => {
@@ -237,26 +226,12 @@ describe('VectorFactory.svgPolygonToClipper', () => {
   it('should convert a simple SVG path to a Clipper representation', () => {
     // Setup the input and result
     const svg = 'M0 0 10 0 10 10 0 10M1 1 1 3 3 3 3 1'
-    const clipper = 
-    [
-      [
-        {"X": 0, "Y": 0},
-        {"X": 10, "Y": 0},
-        {"X": 10, "Y": 10},
-        {"X": 0, "Y": 10},
-        {"X": 0, "Y": 0}
-      ],
-      [
-        {"X": 1, "Y": 1},
-        {"X": 1, "Y": 3},
-        {"X": 3, "Y": 3},
-        {"X": 3, "Y": 1},
-        {"X": 1, "Y": 1}
-      ]
+    const clipper = [
+      [{ X: 0, Y: 0 }, { X: 10, Y: 0 }, { X: 10, Y: 10 }, { X: 0, Y: 10 }, { X: 0, Y: 0 }],
+      [{ X: 1, Y: 1 }, { X: 1, Y: 3 }, { X: 3, Y: 3 }, { X: 3, Y: 1 }, { X: 1, Y: 1 }],
     ]
     // assert expected value
-    expect(svgPolygonToClipper(svg))
-    .to.deep.equal(clipper)
+    expect(svgPolygonToClipper(svg)).to.deep.equal(clipper)
   })
 
   it('should convert a complex terminated SVG path to a valid Clipper representation', () => {
@@ -276,49 +251,23 @@ describe('VectorFactory.clipperToSVGPolygon', () => {
   it('should convert a simple Clipper representation to a SVG path', () => {
     // Setup the input and result
     const svg = 'M0 0L10 0L10 10L0 10L0 0M1 1L1 3L3 3L3 1L1 1'
-    const clipper = 
-    [
-      [
-        {"X": 0, "Y": 0},
-        {"X": 10, "Y": 0},
-        {"X": 10, "Y": 10},
-        {"X": 0, "Y": 10},
-        {"X": 0, "Y": 0}
-      ],
-      [
-        {"X": 1, "Y": 1},
-        {"X": 1, "Y": 3},
-        {"X": 3, "Y": 3},
-        {"X": 3, "Y": 1},
-        {"X": 1, "Y": 1}
-      ]
+    const clipper = [
+      [{ X: 0, Y: 0 }, { X: 10, Y: 0 }, { X: 10, Y: 10 }, { X: 0, Y: 10 }, { X: 0, Y: 0 }],
+      [{ X: 1, Y: 1 }, { X: 1, Y: 3 }, { X: 3, Y: 3 }, { X: 3, Y: 1 }, { X: 1, Y: 1 }],
     ]
     // assert expected value
-    expect(clipperToSVGPolygon(clipper))
-    .to.equal(svg)
+    expect(clipperToSVGPolygon(clipper)).to.equal(svg)
   })
 
   it('should convert a simple unterminated Clipper representation to a SVG path', () => {
     // Setup the input and result
     const svg = 'M0 0L10 0L10 10L0 10L0 0M1 1L1 3L3 3L3 1L1 1'
-    const clipper = 
-    [
-      [
-        {"X": 0, "Y": 0},
-        {"X": 10, "Y": 0},
-        {"X": 10, "Y": 10},
-        {"X": 0, "Y": 10}
-      ],
-      [
-        {"X": 1, "Y": 1},
-        {"X": 1, "Y": 3},
-        {"X": 3, "Y": 3},
-        {"X": 3, "Y": 1}
-      ]
+    const clipper = [
+      [{ X: 0, Y: 0 }, { X: 10, Y: 0 }, { X: 10, Y: 10 }, { X: 0, Y: 10 }],
+      [{ X: 1, Y: 1 }, { X: 1, Y: 3 }, { X: 3, Y: 3 }, { X: 3, Y: 1 }],
     ]
     // assert expected value
-    expect(clipperToSVGPolygon(clipper))
-    .to.equal(svg)
+    expect(clipperToSVGPolygon(clipper)).to.equal(svg)
   })
 
   it('should convert a complex valid Clipper representation to a terminated SVG path', () => {
@@ -334,16 +283,8 @@ describe('VectorFactory.geoJSONPolygonToWKT', () => {
   it('should convert a GeoJSON representation to a WKT representation', () => {
     // Setup the input and result
     const geoJSON = {
-      type: "Polygon",
-      coordinates: [
-        [
-          [0,0],
-          [0,1],
-          [1,1],
-          [1,0],
-          [0,0]
-        ]
-      ]
+      type: 'Polygon',
+      coordinates: [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]],
     }
     const wkt = 'POLYGON((0 0,0 1,1 1,1 0,0 0))'
     // assert expected value
@@ -354,15 +295,8 @@ describe('VectorFactory.geoJSONPolygonToWKT', () => {
   it('should convert a simple unterminated GeoJSON representation to a WKT representation', () => {
     // Setup the input and result
     const geoJSON = {
-      type: "Polygon",
-      coordinates: [
-        [
-          [0,0],
-          [0,1],
-          [1,1],
-          [1,0]
-        ]
-      ]
+      type: 'Polygon',
+      coordinates: [[[0, 0], [0, 1], [1, 1], [1, 0]]],
     }
     const wkt = 'POLYGON((0 0,0 1,1 1,1 0,0 0))'
     // assert expected value
@@ -394,7 +328,7 @@ describe('VectorFactory.dbMatrixToSVG', () => {
 
   it('should convert string representation of a 2D DB matrix to 1D SVG matrix', () => {
     // setup initial input
-    const dbMatrix = {matrix: [[1, 3, 5], [2, 4, 6]]}
+    const dbMatrix = { matrix: [[1, 3, 5], [2, 4, 6]] }
 
     //define expected result
     const svgMatrix = [1, 2, 3, 4, 5, 6]

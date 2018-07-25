@@ -3,7 +3,6 @@ import Record from '~/models/Record.js'
 const name = 'test'
 
 describe('Record', () => {
-
   let record, BaseClass
   beforeEach(() => {
     BaseClass = Record({ name })
@@ -33,7 +32,7 @@ describe('Record', () => {
 
   it('should extend the object with new properties in place (not create a new instance', () => {
     const updates = {
-      val: true
+      val: true,
     }
     record.extend(updates)
     expect(record.val).to.equal(updates.val)
@@ -52,8 +51,7 @@ describe('Record', () => {
     record.name = 'new name'
     expect(record.changedProperties()).to.include('name')
 
-    record.persisted({name: 'new name'})
+    record.persisted({ name: 'new name' })
     expect(Object.keys(record.changedProperties()).length).to.equal(0)
   })
-
 })

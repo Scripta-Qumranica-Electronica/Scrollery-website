@@ -9,19 +9,19 @@ describe('AppBody', () => {
     wrapper = mount(AppBody, {
       // provide stubs for all children
       stubs: Object.keys(AppBody.components),
-      mocks: { 
+      mocks: {
         $router: { push },
-        $post: () => (new Promise(r => r({}))),
+        $post: () => new Promise(r => r({})),
         $route: {
-          params: { 
+          params: {
             scrollID: 20,
             scrollVersionID: 324,
             colID: 123,
-            imageID:432,
-            artID:657
-          }
+            imageID: 432,
+            artID: 657,
+          },
         },
-      }
+      },
     })
     vm = wrapper.vm
   })

@@ -22,12 +22,12 @@ describe('PathIdentifier.pathIdentifier', () => {
   })
 
   it('should reject an invalid GeoJSON path', () => {
-    expect(pathIdentifier({"tpye": "Junk"}) instanceof Error).to.equal(true)
-    expect(pathIdentifier({"type": "Junk"}) instanceof Error).to.equal(true)
+    expect(pathIdentifier({ tpye: 'Junk' }) instanceof Error).to.equal(true)
+    expect(pathIdentifier({ type: 'Junk' }) instanceof Error).to.equal(true)
   })
 
   it('should reject an invalid GeoJSON path string', () => {
-    expect(pathIdentifier(JSON.stringify({"tpye": "Junk"})) instanceof Error).to.equal(true)
-    expect(pathIdentifier(JSON.stringify({"type": "Junk"})) instanceof Error).to.equal(true)
+    expect(pathIdentifier(JSON.stringify({ tpye: 'Junk' })) instanceof Error).to.equal(true)
+    expect(pathIdentifier(JSON.stringify({ type: 'Junk' })) instanceof Error).to.equal(true)
   })
 })

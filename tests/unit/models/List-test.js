@@ -28,7 +28,6 @@ describe('List', () => {
 
   describe('destroying', () => {
     it('should destroy itself and all sub-items', () => {
-
       // setup
       const model = new Model({ id: 1, name: 'test' })
       list.push(model)
@@ -36,7 +35,7 @@ describe('List', () => {
 
       // initialize destruction
       list.destroy()
-      
+
       // assert
       expect(model.destroy).to.have.been.called
     })
@@ -117,8 +116,8 @@ describe('List', () => {
       list.push(model)
       list.persisted({
         additions: {
-          [model.getUUID()]: true
-        }
+          [model.getUUID()]: true,
+        },
       })
       list.delete(0)
       expect(list.hasChanges()).to.equal(true)
@@ -134,8 +133,8 @@ describe('List', () => {
       // 1.b. persist
       list.persisted({
         additions: {
-          [model.getUUID()]: true
-        }
+          [model.getUUID()]: true,
+        },
       })
       expect(list.hasChanges()).to.equal(false)
 
@@ -146,8 +145,8 @@ describe('List', () => {
       // 2.b. persist
       list.persisted({
         deletions: {
-          [model.getUUID()]: true
-        }
+          [model.getUUID()]: true,
+        },
       })
       expect(list.hasChanges()).to.equal(false)
     })
@@ -157,8 +156,8 @@ describe('List', () => {
       list.push(model)
       list.persisted({
         additions: {
-          [model.getUUID()]: true
-        }
+          [model.getUUID()]: true,
+        },
       })
       model.name = 'new name'
       expect(list.hasChanges()).to.equal(true)
@@ -181,8 +180,8 @@ describe('List', () => {
       // mark everything persisted ... then do removal
       list.persisted({
         additions: {
-          [model.getUUID()]: true
-        }
+          [model.getUUID()]: true,
+        },
       })
 
       // remove an item that should be marked in the changes object
@@ -192,7 +191,7 @@ describe('List', () => {
       expect(changes.deletions[model.getUUID()]).to.equal(model)
     })
 
-    it('should not track the deletion of an item that hasn\'t been persisted', () => {
+    it("should not track the deletion of an item that hasn't been persisted", () => {
       let model = new Model({ id: 1, name: 'test' })
       list.push(model)
 
@@ -263,7 +262,6 @@ describe('List', () => {
 
   describe('items', () => {
     it('should expose the items (dangerously?) of the list as an array', () => {
-
       // two methods do this, items / toArray: consider simplifying
       expect(Array.isArray(list.items())).to.equal(true)
       expect(Array.isArray(list.toArray())).to.equal(true)

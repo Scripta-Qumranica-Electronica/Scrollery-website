@@ -34,7 +34,7 @@ describe('Sign', () => {
       sign = new Sign({
         sign_id: 1,
         chars: {
-          sign_char: '·'
+          sign_char: '·',
         },
       })
     })
@@ -48,16 +48,12 @@ describe('Sign', () => {
     })
 
     it('should know about the varieties of whitespace', () => {
-      ;[false, '', ' ', '&nbsp;', '·'].forEach(
-        signChar => {
-          sign = new Sign({ 
-            chars: [
-              {sign_char: signChar}
-            ]
-           })
-          expect(sign.getMainChar().is_whitespace).to.equal(true)
-        }
-      )
+      ;[false, '', ' ', '&nbsp;', '·'].forEach(signChar => {
+        sign = new Sign({
+          chars: [{ sign_char: signChar }],
+        })
+        expect(sign.getMainChar().is_whitespace).to.equal(true)
+      })
     })
   })
 
@@ -68,9 +64,9 @@ describe('Sign', () => {
           sign_id: 1,
           chars: [
             {
-              sign_char: '·'
-            }
-          ]
+              sign_char: '·',
+            },
+          ],
         }
       beforeEach(() => {
         sign = new Sign(attrs)
@@ -88,8 +84,8 @@ describe('Sign', () => {
           chars: [
             {
               sign_char: 'א',
-            }
-          ]
+            },
+          ],
         }
       beforeEach(() => {
         sign = new Sign(attrs)
@@ -109,8 +105,8 @@ describe('Sign', () => {
           chars: [
             {
               sign_char: '·',
-            }
-          ]
+            },
+          ],
         }
       beforeEach(() => {
         sign = new Sign(attrs)
@@ -128,8 +124,8 @@ describe('Sign', () => {
           chars: [
             {
               sign_char: 'א',
-            }
-          ]
+            },
+          ],
         }
       beforeEach(() => {
         sign = new Sign(attrs)

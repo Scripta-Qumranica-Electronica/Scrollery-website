@@ -5,16 +5,15 @@ import Corpus from '../../.utils/factories/Corpus-factory.js'
 describe('ImageMenu', () => {
   let wrapper, vm
   const push = sinon.spy()
-  const corpus = new Corpus() 
+  const corpus = new Corpus()
   const combination = corpus.combinations.get(corpus.combinations.keys()[0])
   const image = corpus.imageReferences.get(combination.imageReferences[0])
   const artefact = image.artefacts[0]
   let imageSettings = {}
 
   for (let i = 0, entry; (entry = image.images[i]); i++) {
-    imageSettings[entry] = i === 0 ? 
-      { visible: true, opacity: 1.0 } : 
-      { visible: false, opacity: 1.0 }
+    imageSettings[entry] =
+      i === 0 ? { visible: true, opacity: 1.0 } : { visible: false, opacity: 1.0 }
   }
 
   describe('change controls', () => {
@@ -30,7 +29,7 @@ describe('ImageMenu', () => {
           roiEditable: false,
           brushCursorSize: 20,
           imageSettings: imageSettings,
-        }
+        },
       })
       vm = wrapper.vm
     })

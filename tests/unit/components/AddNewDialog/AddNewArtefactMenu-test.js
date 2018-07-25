@@ -1,10 +1,10 @@
-"use strict"
+'use strict'
 
 import { mount } from '@test'
 import AddNewArtefactMenu from '~/components/AddNewDialog/AddNewArtefactMenu.vue'
 import Corpus from '../../../.utils/factories/Corpus-factory.js'
 
-describe("AddNewArtefactMenu", function() {
+describe('AddNewArtefactMenu', function() {
   let wrapper, vm
   const corpus = Corpus()
   const combination = corpus.combinations.get(corpus.combinations.keys()[0])
@@ -12,7 +12,7 @@ describe("AddNewArtefactMenu", function() {
   const image = corpus.imageReferences.get(combination.imageReferences[0])
   const push = sinon.spy()
   beforeEach(() => push.reset())
-  
+
   describe('Both image reference and scroll version', () => {
     beforeEach(() => {
       wrapper = mount(AddNewArtefactMenu, {
@@ -25,10 +25,10 @@ describe("AddNewArtefactMenu", function() {
       vm = wrapper.vm
     })
     it('selects an artefact', () => {
-        vm.setArtefact(vm.artefactReferences[0])
+      vm.setArtefact(vm.artefactReferences[0])
 
-        // assertions 
-        expect(vm.selectedArtefact).to.equal(vm.artefactReferences[0])
+      // assertions
+      expect(vm.selectedArtefact).to.equal(vm.artefactReferences[0])
     })
   })
 
@@ -43,11 +43,11 @@ describe("AddNewArtefactMenu", function() {
       })
       vm = wrapper.vm
     })
-    
+
     it('responds properly to clicks', () => {
       vm.setArtefact(vm.artefactReferences[0])
 
-      // assertions 
+      // assertions
       expect(vm.selectedArtefact).to.equal(vm.artefactReferences[0])
       expect(wrapper.emitted().setArtefact[0][0]).to.equal(vm.artefactReferences[0])
     })
@@ -69,7 +69,7 @@ describe("AddNewArtefactMenu", function() {
       })
       vm = wrapper.vm
     })
-    
+
     it('has nothing to display', () => {
       expect(vm.artefactReferences.length).to.equal(0)
     })

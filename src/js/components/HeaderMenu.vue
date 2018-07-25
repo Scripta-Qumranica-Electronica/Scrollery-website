@@ -11,7 +11,7 @@
           <span>{{corpus.combinations 
                     && corpus.combinations.get(scrollVersionID) 
                     ? corpus.combinations.get(scrollVersionID).name 
-                    : 'No scroll selected'}}</span>
+                    : $i18n.str('No Scroll Selected')}}</span>
       </div>
     </el-col>
     <el-col :span="12">

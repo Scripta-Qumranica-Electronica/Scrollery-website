@@ -15,15 +15,13 @@ try {
   const srcContext = require.context('../src/js', true, /^\.\/(?!main(\.js)?$)/)
   srcContext.keys().forEach(srcContext)
 } catch (e) {
-
   // This dummy suite only runs if Webpack encounters a hard error attempting
-  // to build the test context. If it does, then this catches it and gives 
+  // to build the test context. If it does, then this catches it and gives
   // something intelligible.
   /* istanbul ignore next */
   describe('test compilation', () => {
     it('should not throw an error', () => {
-      expect(e).to.equal(null);
+      expect(e).to.equal(null)
     })
   })
 }
-

@@ -3,12 +3,10 @@
 import { mount } from '@test'
 import Combination from '~/components/Combination.vue'
 
-describe("Combination", function() {
-
-    let wrapper, vm
-    beforeEach(() => {
-      wrapper = mount(Combination, {
-      })
+describe('Combination', function() {
+  let wrapper, vm
+  beforeEach(() => {
+    wrapper = mount(Combination, {})
     vm = wrapper.vm
   })
 

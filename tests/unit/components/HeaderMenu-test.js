@@ -7,16 +7,16 @@ describe('HeaderMenu', () => {
   beforeEach(() => {
     wrapper = mount(HeaderMenu, {
       propsData: {
-        corpus: {}
+        corpus: {},
       },
       mocks: {
         $router: { push },
         $route: {
           params: {
             scrollVersionID: 1,
-          }
-        }
-      }
+          },
+        },
+      },
     })
     vm = wrapper.vm
   })
@@ -37,7 +37,7 @@ describe('HeaderMenu', () => {
 
   describe('router watcher', () => {
     it('should respond to router changes', done => {
-      wrapper.setData({$route: {params: {scrollVersionID: 2}}})
+      wrapper.setData({ $route: { params: { scrollVersionID: 2 } } })
       vm.$nextTick(() => {
         expect(vm.scrollVersionID).to.equal(2)
         done()

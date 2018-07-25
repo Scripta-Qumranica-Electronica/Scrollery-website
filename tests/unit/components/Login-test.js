@@ -4,15 +4,17 @@ import { mount } from '@test'
 import Login from '~/components/Login.vue'
 
 describe('Login', function() {
-  let $post = () => (new Promise((r) => r({})))
+  let $post = () => new Promise(r => r({}))
   let wrapper, vm
 
   beforeEach(() => {
     let $postPromise = new Promise((_, r) => r({}))
     wrapper = mount(Login, {
       mocks: {
-        $post: function() { return $postPromise },
-      }
+        $post: function() {
+          return $postPromise
+        },
+      },
     })
     vm = wrapper.vm
   })
@@ -245,7 +247,7 @@ describe('Login', function() {
         },
       }
 
-      window.localStorage.setItem('name', JSON.stringify({1:'name'}))
+      window.localStorage.setItem('name', JSON.stringify({ 1: 'name' }))
 
       const res = {
         data: {

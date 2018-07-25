@@ -31,9 +31,7 @@ let mockAPIResponse = (status = 200) => {
     } else {
       resolve({
         status,
-        data: status === 200
-          ? getTextOfFragment
-          : {text: []},
+        data: status === 200 ? getTextOfFragment : { text: [] },
       })
     }
   })
@@ -55,7 +53,6 @@ let mountEditor = ({ mocks = {}, methods = {} }) => {
   $post.onFirstCall(mockAPIResponse())
   let wrapper = mount(Editor, {
     mocks: {
-      
       $route: makeRoute('~'),
       ...mocks,
     },
@@ -72,10 +69,10 @@ let mountEditor = ({ mocks = {}, methods = {} }) => {
   wrapper.vm.$refs = {
     messageBar: {
       close: () => {},
-      flash: () => {}
+      flash: () => {},
     },
-    toolbar: {}
-  };
+    toolbar: {},
+  }
 
   return wrapper
 }

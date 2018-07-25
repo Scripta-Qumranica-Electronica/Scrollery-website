@@ -23,4 +23,9 @@ module.exports = {
   'Editor.HandOf': 'היד של',
   'Editor.Fullscreen': 'מסך מלא',
   'Editor.ToggleReconstructedText': 'הפעלת טקסט משוחזר',
+
+  // Header
+  'No Scroll Selected': 'לא נבחרה מגילה',
+  'Select Images': 'בחרו תמונות',
+  Zoom: 'הגדלה',
 }

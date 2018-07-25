@@ -2,14 +2,13 @@ import { mount } from '@test'
 import CommentsEditor from '~/components/editor/dialog/CommentsEditor.vue'
 
 describe('CommentsEditor', () => {
-
   let wrapper, vm
   const initialText = 'This is a test comment.'
   beforeEach(() => {
     wrapper = mount(CommentsEditor, {
       propsData: {
-        initialText: initialText
-      }
+        initialText: initialText,
+      },
     })
     vm = wrapper.vm
   })
@@ -24,12 +23,12 @@ describe('CommentsEditor', () => {
 
   it('should update its text', () => {
     const updatedText = 'Some updated comment text.'
-    wrapper.setProps({initialText: updatedText})
+    wrapper.setProps({ initialText: updatedText })
     expect(vm.quill.getText(0)).to.equal(updatedText + '\n')
   })
 
   it('should properly handle no change to text', () => {
-    wrapper.setProps({initialText: initialText})
+    wrapper.setProps({ initialText: initialText })
     expect(vm.quill.getText(0)).to.equal(initialText + '\n')
   })
 

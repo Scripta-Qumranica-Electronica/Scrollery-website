@@ -23,4 +23,9 @@ module.exports = {
   'Editor.HandOf': 'Hand of',
   'Editor.Fullscreen': 'Show fullscreen',
   'Editor.ToggleReconstructedText': 'Toggle reconstructed text',
+
+  // Misc.
+  'No Scroll Selected': 'No scroll selected',
+  'Select Images': 'Select Images',
+  Zoom: 'Zoom',
 }

@@ -1,7 +1,7 @@
 import Combination from '~/models/Combination.js'
 import faker from 'faker'
 
-const plain = props => 
+const plain = props =>
   Object.assign(
     {
       name: faker.random.word(),
@@ -12,7 +12,7 @@ const plain = props =>
       cols: [],
       imageReferences: [],
       artefacts: [],
-      rois: []
+      rois: [],
     },
     props
   )
