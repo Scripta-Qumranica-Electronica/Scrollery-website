@@ -19,12 +19,11 @@ Vue.use(VueRouter)
 const router = new VueRouter({ routes })
 
 // Store
-const vuexLocalStorage = new VuexPersist({
-  key: 'sqe',
-  storage: window.localStorage,
-})
 Vue.use(Vuex)
-const store = makeStore(Vuex, [vuexLocalStorage.plugin])
+const store = makeStore(
+  Vuex,
+  window.localStorage ? window.localStorage.getItem('sqe-session') || '' : ''
+)
 
 // Localization
 Vue.use(i18n, { store })

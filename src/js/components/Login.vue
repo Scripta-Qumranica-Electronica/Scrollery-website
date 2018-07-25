@@ -95,7 +95,7 @@ export default {
           if (res.data && res.data.error) {
             // blow away localStorage on session error
             this.errMsg = ''
-            storage.removeItem('sqe')
+            storage.removeItem('sqe-session')
           } else if (res.data) {
             return this.validateLogin(res)
           }
@@ -107,7 +107,8 @@ export default {
           // The Session is invalid, so clear out local Vuex storage but
           // no error message required.
           this.errMsg = ''
-          storage && storage.removeItem('sqe')
+          storage && storage.removeItem('sqe-session')
+          this.visible = true
         })
     },
     attemptLogin() {
@@ -118,32 +119,58 @@ export default {
         SCROLLVERSION: 1,
       })
         .then(res => this.validateLogin(res))
-        .catch(({ response }) => {
-          this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
-        })
+        .catch(
+          function({ response }) {
+            this.errMsg = this.$i18n.str('Errors.ServiceUnavailable')
+          }.bind(this)
+        )
     },
     validateLogin(res) {
       return new Promise((resolve, reject) => {
         // Safeguard to ensure data given
         if (!res) {
           reject(new Error('Login.validateLogin requires a server response'))
+          return
         }
+
+        // got a successful response
         if (res.data && res.data.error) {
           this.errMsg = res.data.error
           console.error(res.data)
           reject(new Error('Login invalid'))
-        } else if (res.data && res.data.SESSION_ID && res.data.USER_ID) {
+        } else if (
+          res.data &&
+          res.data.SESSION_ID &&
+          res.data.USER_ID &&
+          ((window.localStorage.getItem('name') &&
+            JSON.parse(window.localStorage.getItem('name'))[~~res.data.USER_ID]) ||
+            this.user)
+        ) {
           // Set store state
           this.setSessionID(res.data.SESSION_ID)
-          this.setUserID(res.data.USER_ID)
-          this.setUsername(this.user.trim())
-          this.setLanguage(this.language)
+          this.setUserID(~~res.data.USER_ID)
+          // Maybe we have the AJAX function send back the user_name as well.
+          this.setUsername(
+            window.localStorage.getItem('name')
+              ? JSON.parse(window.localStorage.getItem('name'))[~~res.data.USER_ID]
+              : this.user.trim()
+          )
+          this.setLanguage(window.localStorage.getItem('language') || this.language)
           // Load language files
           this.$i18n
             .load()
             .then(() => {
               // success!
-              this.$router.push({ name: 'workbench' })
+              this.$router.push({
+                name: 'workbenchAddress',
+                params: {
+                  scrollID: '~',
+                  scrollVersionID: '~',
+                  imageID: '~',
+                  colID: '~',
+                  artID: '~',
+                },
+              })
               resolve()
             })
             .catch(() => {

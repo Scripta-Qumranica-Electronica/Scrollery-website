@@ -4,9 +4,13 @@ import Workbench from '~/components/Workbench.vue'
 describe('Workbench', () => {
   let wrapper, vm
   beforeEach(() => {
+    let $postPromise = new Promise((_, r) => r({}))
     wrapper = mount(Workbench, {
       // provide stubs for all children
       stubs: Object.keys(Workbench.components),
+      mocks: {
+        $post: function() { return $postPromise },
+      },
     })
     vm = wrapper.vm
   })

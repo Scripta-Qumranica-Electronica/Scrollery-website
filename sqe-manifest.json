@@ -1,9 +1,9 @@
 {
-    "_comment" : "This file maintains the specific version of SQE_DB_API and Data-files necessary for the current Scrollery-website version.",
-    "version": "0.2.0",
-    "status": "development",
-    "dependencies": {
-        "SQE_DB_API": "0.1.10",
-        "Data-files": "0.1.12"
-    }
+  "_comment" : "This file maintains the specific version of SQE_DB_API and Data-files necessary for the current Scrollery-website version. Dependencies are now set in docker-compose.yml",
+  "version": "0.2.4",
+  "status": "production",
+  "dependencies": {
+    "SQE_DB_API": "0.5.10",
+    "Data-files": "0.4.2"
+  }
 }

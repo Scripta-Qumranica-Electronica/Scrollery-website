@@ -22,7 +22,7 @@
           aria-hidden="true"
           style="color: white"></i>
         <span> {{ $i18n.str('User.LoggedInMessage', {name: username}) }}</span>
-        <el-button @click="onLogout">{{ $i18n.str('Logout') }}</el-button>
+        <el-button size="mini" @click="onLogout">{{ $i18n.str('Logout') }}</el-button>
       </div>
     </el-col>
   </el-row>

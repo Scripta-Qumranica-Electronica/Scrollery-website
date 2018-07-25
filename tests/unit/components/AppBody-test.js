@@ -11,6 +11,7 @@ describe('AppBody', () => {
       stubs: Object.keys(AppBody.components),
       mocks: { 
         $router: { push },
+        $post: () => (new Promise(r => r({}))),
         $route: {
           params: { 
             scrollID: 20,

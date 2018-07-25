@@ -32,7 +32,11 @@ export default class Char extends extendModel(defaults) {
 
     // coerce attributes to the a List
     if (attrs.attributes && !(attrs.attributes instanceof AttributeList)) {
-      attrs.attributes = new AttributeList({}, attrs.attributes.map(a => new Attribute(a)))
+      attrs.attributes = new AttributeList(
+        {},
+        attrs.attributes.map(a => new Attribute(a, isPersisted)),
+        isPersisted
+      )
     }
 
     attrs.id = attrs.sign_char_id
@@ -52,7 +56,17 @@ export default class Char extends extendModel(defaults) {
    * @param {Attribute|object} attribute  The attribute to add
    */
   addAttribute(attribute) {
-    this.attributes.push(attribute instanceof Attribute ? attribute : new Attribute(attribute))
+    attribute = attribute instanceof Attribute ? attribute : new Attribute(attribute)
+
+    if (!attribute.attribute_name) {
+      throw new Error('attributes must have names')
+    }
+
+    // ensure there's no duplicates
+    if (!this.attributes.find(attr => attr.attribute_name == attribute.attribute_name)) {
+      this.attributes.push(attribute)
+    }
+
     return this.attributes.items()
   }
 

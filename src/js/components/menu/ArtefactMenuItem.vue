@@ -1,30 +1,34 @@
 <template>
-  <span class="clickable-menu-item" @click="setRouter">Artefact: {{corpus.artefacts.get(artefactID).name}}</span>
+  <div>
+    <span class="clickable-menu-item" @click="setRouter" :style="{background: $route.params.artID === artefact.artefact_id ? 'lightblue' : '#dedede'}">
+      <span v-show="!nameInput">{{artefact.name}}</span>
+      <el-input 
+        class="artefact-name-change"
+        v-show="nameInput" 
+        placeholder="Label" 
+        v-model="nameInput"
+        size="mini"
+        @blur="setName"
+        @keyup.enter.native="setName"></el-input>
+      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-edit" @click="startNameChange"></i>
+      <i v-if="!corpus.combinations.get(scrollVersionID).locked" class="fa fa-trash-o" @click="deleteArtefact"></i>
+    </span>
+  </div>
 </template>
 
 <script>
 export default {
   props: {
-    artefactID: {
-      required: true,
-      type: Number,
-    },
-    scrollID: {
-      required: true,
-      type: Number,
-    },
-    scrollVersionID: {
-      required: true,
-      type: Number,
-    },
-    imageID: {
-      required: true,
-      type: Number,
-    },
-    corpus: {
-      required: true,
-      type: Object,
-    },
+    artefact: undefined,
+    scrollID: undefined,
+    scrollVersionID: undefined,
+    imageID: undefined,
+    corpus: undefined,
+  },
+  data() {
+    return {
+      nameInput: undefined,
+    }
   },
   methods: {
     setRouter() {
@@ -33,7 +37,7 @@ export default {
         params.scrollID !== this.scrollID ||
         params.scrollVersionID !== this.scrollVersionID ||
         params.imageID !== this.imageID ||
-        params.artID !== this.artefactID
+        params.artID !== this.artefact.artefact_id
       ) {
         this.$router.push({
           name: 'workbenchAddress',
@@ -42,7 +46,7 @@ export default {
             scrollVersionID: this.scrollVersionID,
             colID: params.colID,
             imageID: this.imageID,
-            artID: this.artefactID,
+            artID: this.artefact.artefact_id,
           },
         })
       }
@@ -51,6 +55,60 @@ export default {
       // associated with it, and should be prepared to recieve a message back
       // saying "nothing changed" and it can leave the artefact alone.
     },
+    startNameChange() {
+      this.nameInput = this.artefact.name
+    },
+    setName() {
+      if (this.nameInput) {
+        this.$store.commit('addWorking')
+        this.corpus.artefacts
+          .updateName(this.artefact.artefact_id, this.nameInput, this.scrollVersionID)
+          .then(res => {
+            /* istanbul ignore next */
+            this.$store.commit('delWorking')
+            /* istanbul ignore next */
+            this.nameInput = undefined
+          })
+          .catch(err => {
+            /* istanbul ignore next */
+            this.$store.commit('delWorking')
+            /* istanbul ignore next */
+            console.error(err)
+          })
+      }
+    },
+    deleteArtefact() {
+      this.$store.commit('addWorking')
+      this.corpus.artefacts
+        .removeItem(this.artefact.artefact_id, this.scrollVersionID)
+        .then(res => {
+          /* istanbul ignore next */
+          this.$store.commit('delWorking')
+          /* istanbul ignore next */
+          this.$router.push({
+            name: 'workbenchAddress',
+            params: {
+              scrollID: this.scrollID,
+              scrollVersionID: this.scrollVersionID,
+              colID: this.$route.params.colID,
+              imageID: this.imageID,
+              artID: '~',
+            },
+          })
+        })
+        .catch(err => {
+          /* istanbul ignore next */
+          this.$store.commit('delWorking')
+          /* istanbul ignore next */
+          console.error(err)
+        })
+    },
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.artefact-name-change {
+  width: 100px;
+}
+</style>

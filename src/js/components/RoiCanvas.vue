@@ -13,7 +13,7 @@
       <clipPath id="Full-clipping-outline">
         <use stroke="none" fill="black" fill-rule="evenodd" href="#Full-clip-path"></use>
       </clipPath>
-      <path id="Clip-path" :d="clippingMask" :transform="`scale(${scale})`"></path>
+      <path id="Clip-path" v-if="clippingMask" :d="svgMask" :transform="`scale(${scale})`"></path>
       <clipPath id="Clipping-outline">
         <use stroke="none" fill="black" fill-rule="evenodd" href="#Clip-path"></use>
       </clipPath>
@@ -29,7 +29,7 @@
             :opacity="imageSettings[image].opacity"
             :visibility="imageSettings[image].visible ? 'visible' : 'hidden'"></image>
     </g>
-    <use class="pulsate" v-show="!clip" stroke="blue" fill="none" fill-rule="evenodd" stroke-width="2" href="#Clip-path"></use>
+    <use class="pulsate" v-if="clippingMask && !clip" stroke="blue" fill="none" fill-rule="evenodd" stroke-width="2" href="#Clip-path"></use>
     <g v-for="box of boxes">
       <rect :x="box.x" 
             :y="box.y" 
@@ -86,6 +86,7 @@
 
 <script>
 import uuid from 'uuid/v1'
+import { wktPolygonToSvg } from '~/utils/VectorFactory.js'
 
 export default {
   props: {
@@ -101,7 +102,7 @@ export default {
       default: {},
     },
     divisor: 0,
-    clippingMask: '',
+    clippingMask: undefined,
     clip: false,
     corpus: {
       type: Object,
@@ -123,6 +124,9 @@ export default {
     },
     fullImageMask() {
       return `M0 0L${this.width} 0L${this.width} ${this.height}L0 ${this.height}`
+    },
+    svgMask() {
+      return wktPolygonToSvg(this.clippingMask)
     },
   },
   methods: {

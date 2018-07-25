@@ -1,35 +1,19 @@
-import extendModel from './extendModel.js'
-
-/**
- * Default values for a new sign object
- * 
- * @static
- * @constant
- */
-const defaults = {
-  url: '',
-  filename: '',
-  width: 0,
-  height: 0,
-  dpi: 0,
-  type: 0,
-  start: 0,
-  end: 0,
-  is_master: 0,
-  suffix: '',
-  editionSide: 0,
-  artefacts: [],
-}
-
-/**
- * Manage all the data related to a sign
- * 
- * Signs are immutable, and any mutations create new signs
- * 
- * @class
- * @extends Record
- */
-export default class Image extends extendModel(defaults) {
+export default class Image {
+  constructor(record = {}) {
+    this.sqe_image_id = ~~record.sqe_image_id
+    this.image_catalog_id = ~~record.image_catalog_id
+    this.url = record.url
+    this.filename = record.filename
+    this.width = record.width
+    this.height = record.height
+    this.dpi = ~~record.dpi
+    this.type = ~~record.type
+    this.start = ~~record.start
+    this.end = ~~record.end
+    this.is_master = ~~record.is_master
+    this.suffix = record.suffix
+    this.editionSide = ~~record.editionSide
+  }
 
   /**
    * @return {string} the address of the image file

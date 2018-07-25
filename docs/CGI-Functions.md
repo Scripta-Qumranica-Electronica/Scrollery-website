@@ -882,9 +882,9 @@ Adds a sign attribute to an existing sign_char.  Returns **I cant remember now**
 {
   "results": [
     {
-      540125: [
+      "540125": [ // Old sign_char_id
         {
-          4503920: {
+          "4503920": { // New sign_char_id
             "attribute_value": "21",
             "numeric_value": null,
             "sequence": "1)"
@@ -898,19 +898,47 @@ Adds a sign attribute to an existing sign_char.  Returns **I cant remember now**
 
 ## removeSignAttribute
 
+Removes a sign attribute from an existing sign_char.  Returns **I cant remember now**.
+
 **Request**
 
 ```JSON
+{
+  "SESSION_ID": "8788956A-709F-11E8-9AA3-9ECD5A6463E7",
+  "removeSignAttribute": "removeSignAttribute",
+  "scroll_version_id": 1606,
+  "signs": [
+    {
+      "sign_char_id": 540125,
+      "attributes": [
+        {
+          "sign_char_attribute_id": 21,
+        }
+      ]
+    }
+  ]
+}
 ```
 
 **Response**
 
 ```JSON
+{
+  "results": [
+    {
+      "540125": [ // Returned sign_char_id for edited sign char
+        {
+          "21":"deleted" // Confirmation of removed sign_char_attribute_id
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ## addSignCharVariant
 
-This is currently broken.  Waiting on a fix.
+This may currently be broken.  It adds a sign char to a sign_id.  The added sign_char can be set to the "main" reading ("main":1), or secondary ("main":0).  Return is currently unknown.
 
 **Request**
 
@@ -932,6 +960,8 @@ This is currently broken.  Waiting on a fix.
 
 ## removeSignChar
 
+Removes a sign_char from a sign_id.  Return is currently unknown.
+
 **Request**
 
 ```JSON
@@ -950,9 +980,19 @@ This is currently broken.  Waiting on a fix.
 
 ## addSignCharCommentary
 
+Adds commentary to a sign_char_id and connected attribute_id.  Returns the new_sign_char_commentary_id of the new comment.
+
 **Request**
 
 ```JSON
+{
+  "SESSION_ID": "369EEAB8-7078-11E8-9185-CB47E803D4E5",
+  "transaction": "addSignCharCommentary",
+  "scroll_version_id": 1606,
+  "sign_char_id": 7867,
+  "attribute_id": 6578,
+  "commentary": "My comments..."
+}
 ```
 
 **Response**
@@ -962,9 +1002,17 @@ This is currently broken.  Waiting on a fix.
 
 ## removeSignCharCommentary
 
+Removes a sign_char commentary.
+
 **Request**
 
 ```JSON
+{
+  "SESSION_ID": "369EEAB8-7078-11E8-9185-CB47E803D4E5",
+  "transaction": "removeSignChar",
+  "scroll_version_id": 1606,
+  "sign_char_commentary_id": 87456231
+}
 ```
 
 **Response**

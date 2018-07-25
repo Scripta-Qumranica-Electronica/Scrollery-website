@@ -1,9 +1,7 @@
 const { resolve } = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
-const perl = require('./perl-cgi-middleware.js')
-
-
+var proxy = require('express-http-proxy')
 const app = express()
 
 // parse JSON bodies 
@@ -15,7 +13,7 @@ app.get('/', (req, res) => {
 })
 
 // handle Perl requests
-app.post(/\.pl/, perl)
+app.post('/resources/cgi-bin/scrollery-cgi.pl', proxy('http://localhost:9080/resources/cgi-bin/scrollery-cgi.pl'))
 
 // expose the Express app instance
 module.exports = app

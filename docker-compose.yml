@@ -1,0 +1,39 @@
+version: '2'
+
+services:
+  sqe.data:
+    image: bronsonbdevost/sqe-database:0.4.2
+    container_name: SQE_Database
+    environment:
+      - MYSQL_ROOT_PASSWORD=none
+    expose:
+      - "3306"
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./resources/data-backup:/tmp/backup
+    networks:
+      - sqe-dev
+
+  sqe-cgi.api:
+    image: bronsonbdevost/cgi-web-server:0.5.10
+    container_name: SQE_CGI
+    environment:
+      - ConnectionString=Server=sql.data;Initial Catalog=CatalogData;User Id=sa;Password=your@password
+    expose:
+      - "80"
+    ports:
+      - "9080:80"
+    volumes:
+      - ./resources/cgi-bin:/usr/local/apache2/htdocs/resources/cgi-bin
+      - ./resources/perl-libs:/usr/local/apache2/htdocs/resources/perl-libs
+    networks:
+      - sqe-dev
+
+# volumes:
+#   resources/data-backup:
+#   resources/cgi-bin:
+#   resources/perl-libs:
+
+networks:
+  sqe-dev:

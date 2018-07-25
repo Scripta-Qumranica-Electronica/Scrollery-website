@@ -2,38 +2,31 @@
 - [Contents](#contents)
 - [Quick Start Instructions](#quick-start-instructions)
 - [Full Setup Description](#full-setup-description)
-    - [Summary](#summary)
-    - [Server Side](#server-side)
-        - [Build Server Side Code](#build-server-side-code)
-    - [Client](#client)
-        - [Install Dependencies](#install-dependencies)
-            - [Clone the Scrollery-website repository (if not already done)](#clone-the-scrollery-website-repository-if-not-already-done)
-            - [Install website dependencies](#install-website-dependencies)
-            - [Install SQE_API](#install-sqe_api)
-            - [Build the Perl cgi script dependencies](#build-the-perl-cgi-script-dependencies)
-        - [Starting up the server for development or production](#starting-up-the-server-for-development-or-production)
-                - [`npm start`](#npm-start)
-                - [`npm run dev`](#npm-run-dev)
-                - [`npm run prod`](#npm-run-prod)
-        - [Testing in Browser](#testing-in-browser)
-        - [Note](#note)
+  - [Summary (currently deprecated, use the quick instructions for now)](#summary-currently-deprecated-use-the-quick-instructions-for-now)
+  - [Server Side](#server-side)
+    - [Build Server Side Code](#build-server-side-code)
+  - [Client](#client)
+    - [Install Dependencies](#install-dependencies)
+      - [Clone the Scrollery-website repository (if not already done)](#clone-the-scrollery-website-repository-if-not-already-done)
+      - [Install website dependencies](#install-website-dependencies)
+      - [Install SQE_API](#install-sqe_api)
+      - [Build the Perl cgi script dependencies](#build-the-perl-cgi-script-dependencies)
+    - [Starting up the server for development or production](#starting-up-the-server-for-development-or-production)
+        - [`npm start`](#npm-start)
+        - [`npm run dev`](#npm-run-dev)
+        - [`npm run prod`](#npm-run-prod)
+    - [Testing in Browser](#testing-in-browser)
+    - [Note](#note)
 
 # Quick Start Instructions
 The Scrollery-website comes with a quick start script.  In order to run it, you must already have installed the following dependencies:
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 * [Node 8.9.4](https://nodejs.org/en/download/)
 * Npm 5+ (bundled with node)
 * [Yarn](https://yarnpkg.com/en/docs/install)
-* [Perl 5.18+](https://www.perl.org/get.html)
-* [Carton](http://search.cpan.org/~miyagawa/Carton-v1.0.31/lib/Carton.pm)
-    * `(sudo) cpan Carton`
-    * `(sudo) cpanm Carton`
-    * Or in Ubuntu `sudo apt install carton`
-* MariaDB/mysql libraries (for Perl's [DBD::mysql](http://search.cpan.org/dist/DBD-mysql/lib/DBD/mysql.pm))
-    * Ubuntu `sudo apt install libmysqlclient-dev`
-    * Mac `brew install MariaDB` (If you run into problems, perhaps try https://dev.mysql.com/downloads/connector/c/ or `brew install mysql-connector-c`)
 * [Docker](https://docs.docker.com/install/)
 
-If you have all these dependencies installed and agree to using project's the default settings (see descriptions below), then you can simply run the install script to download all necessary packages and build the database.
+If you have all these dependencies installed and agree to using project's the default settings (see descriptions below), then you can simply run the install script to download all necessary packages and build the database.  Make sure Docker is running (and is fully started), open a terminal and run:
 
 ```bash
 #clone the Scrollery website project
@@ -43,17 +36,21 @@ git clone https://github.com/Scripta-Qumranica-Electronica/Scrollery-website.git
 cd Scrollery-website
 
 #built the project (can take several minutes)
-npm run bootstrap
+#you can build the full environment `bootstrap`
+#or load a minimal environment `bootstrap:min`
+yarn run bootstrap
+#or
+yarn run bootstrap:min
 
 #launch the website
-npm start
+yarn start
 ```
 
-If everything runs with no errors, then after executing `npm start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.  The CGI requests provided in this project are ducumented in [CGI-Functions.md](./CGI-Functions.md).  Documentation for the database structure can be found in the [Data-files project documentation](https://github.com/Scripta-Qumranica-Electronica/Data-files/blob/master/docs/Database-structure.md).
+If everything runs with no errors, then after executing `yarn start` to launch the website you can navigate to [localhost:9090](http://localhost:9090) in your browser and test it out.  The CGI requests provided in this project are ducumented in [CGI-Functions.md](./CGI-Functions.md).  Documentation for the database structure can be found in the [Data-files project documentation](https://github.com/Scripta-Qumranica-Electronica/Data-files/blob/master/docs/Database-structure.md).
 
-You may also run `npm run bootstrap` again after pulling down a new version of the Scrollery-website, and it will make any necessary updates to the dependencies and the database <span style="color:red">(Warning!!! this will overwrite your existing SQE_DEV database)</span>.  After running several times, you may find that your Docker runs out of space, I have found the suggestions [here](https://lebkowski.name/docker-volumes/) to be helpful in such circumstances.
+You may also run `yarn run bootstrap` again after pulling down a new version of the Scrollery-website, and it will make any necessary updates to the dependencies and the database <span style="color:red">(Warning!!! this will overwrite your existing SQE_DEV database)</span>.  If you suspect the development database has become corrupt, you can always reset it to defaults with `yarn run reset:db`.  After running several times, you may find that your Docker runs out of space, I have found the suggestions [here](https://lebkowski.name/docker-volumes/) to be helpful in such circumstances.
 
-You should use `docker stop SQE-Database` to shutdown the SQE database Docker before rebooting your system, otherwise you may have trouble using it after reboot. In that case, you may clean up the system using `docker rm $(docker ps -q -f status=exited)`, and then start the database Docker again with `docker run --name SQE_Database -e MYSQL_ROOT_PASSWORD=none -d -p 3307:3306 sqe-maria:latest`.
+You should use `docker-compose stop` to shutdown the SQE Docker containers before rebooting your system, otherwise you may have trouble using it after reboot. In that case, you may clean up the system using `docker rm $(docker ps -q -f status=exited)`, and then start the Docker contiainers again with `docker-compose up` or `docker-compose start`.
 
 # Full Setup Description
 
@@ -63,9 +60,9 @@ The SQE Scrollery website depends on three components to function fully:
 2. [A local installation of the Perl modules that provide a low level API to that database.](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API)
 3. A local installation of the Scrollery website maintained in this repository.
 
-## Summary
+## Summary (currently deprecated, use the quick instructions for now)
 
-These instructions will walk you through programs and settings involved in running the Scrollery website on your development machine.  The following dependencies are required:
+These instructions will walk you through programs and settings involved in running the Scrollery website.  The following dependencies are required:
 * [Node 8.9.4](https://nodejs.org/en/download/)
 * Npm 5+ (bundled with node)
 * [Yarn](https://yarnpkg.com/en/docs/install)

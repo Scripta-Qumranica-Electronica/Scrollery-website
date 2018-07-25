@@ -44,15 +44,15 @@
 </template>
 
 <script>
-/*
- * The mask seems to dilate with every edit.
- * Check for fix, perhaps something to do with
- * potrace algorithm, or perhaps the vector path
- * stroke makes the path a bit larger with every
- * draw.
- */
-import { trace } from '../utils/Potrace.js'
-import { clipCanvas } from '../utils/VectorFactory'
+import { trace } from '~/utils/Potrace.js'
+import {
+  clipCanvas,
+  wktPolygonToSvg,
+  svgPolygonToGeoJSON,
+  svgPolygonToClipper,
+  clipperToSVGPolygon,
+} from '~/utils/VectorFactory'
+import ClipperLib from 'js-clipper/clipper'
 
 export default {
   props: {
@@ -73,6 +73,8 @@ export default {
       },
       mouseOver: false,
       drawing: false,
+      editingCanvas: document.createElement('canvas'),
+      currentClipperPolygon: [[]],
     }
   },
   methods: {
@@ -102,13 +104,33 @@ export default {
           2 * Math.PI
         )
         ctx.closePath()
+
+        const editingCTX = this.editingCanvas.getContext('2d')
+        editingCTX.beginPath()
+        editingCTX.arc(
+          this.cursorPos.x / this.scale,
+          this.cursorPos.y / this.scale,
+          this.brushSize / 2 / this.scale,
+          0,
+          2 * Math.PI
+        )
+        editingCTX.closePath()
+
         if (this.drawMode === 'erase') {
           ctx.globalCompositeOperation = 'destination-out'
           ctx.fill()
+
+          editingCTX.globalCompositeOperation = 'source-over'
+          editingCTX.fillStyle = 'purple'
+          editingCTX.fill()
         } else {
           ctx.globalCompositeOperation = 'source-over'
           ctx.fillStyle = 'purple'
           ctx.fill()
+
+          editingCTX.globalCompositeOperation = 'source-over'
+          editingCTX.fillStyle = 'purple'
+          editingCTX.fill()
         }
       }
     },
@@ -121,18 +143,52 @@ export default {
       return returnPos
     },
     canvasToSVG() {
-      trace(this.$refs.maskCanvas, this.divisor).then(res => {
-        this.$emit('mask', res)
+      trace(this.editingCanvas, this.divisor).then(res => {
+        const newClipperPolygon = svgPolygonToClipper(res)
+        let cpr = new ClipperLib.Clipper()
+        cpr.AddPaths(this.currentClipperPolygon, ClipperLib.PolyType.ptSubject, true)
+        cpr.AddPaths(newClipperPolygon, ClipperLib.PolyType.ptClip, true)
+        let solution_paths = new ClipperLib.Paths()
+        if (this.drawMode === 'erase') {
+          let succeeded = cpr.Execute(
+            ClipperLib.ClipType.ctDifference,
+            solution_paths,
+            ClipperLib.PolyFillType.pftNonZero,
+            ClipperLib.PolyFillType.pftNonZero
+          )
+        } else {
+          let succeeded = cpr.Execute(
+            ClipperLib.ClipType.ctUnion,
+            solution_paths,
+            ClipperLib.PolyFillType.pftNonZero,
+            ClipperLib.PolyFillType.pftNonZero
+          )
+        }
+        let ctx = this.editingCanvas.getContext('2d')
+        ctx.clearRect(0, 0, this.editingCanvas.width, this.editingCanvas.height)
+        this.$emit('mask', clipperToSVGPolygon(solution_paths))
       })
     },
   },
   watch: {
     mask(to, from) {
       if (to && from !== to) {
-        clipCanvas(this.$refs.maskCanvas, this.mask, this.divisor)
+        const svgMask = wktPolygonToSvg(to)
+        clipCanvas(this.$refs.maskCanvas, svgMask, this.divisor)
+        this.currentClipperPolygon = svgPolygonToClipper(svgMask)
       } else {
         let ctx = this.$refs.maskCanvas.getContext('2d')
         ctx.clearRect(0, 0, this.$refs.maskCanvas.width, this.$refs.maskCanvas.height)
+      }
+    },
+    width(to, from) {
+      if (to && from !== to) {
+        this.editingCanvas.width = to
+      }
+    },
+    height(to, from) {
+      if (to && from !== to) {
+        this.editingCanvas.height = to
       }
     },
   },

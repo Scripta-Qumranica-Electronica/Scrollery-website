@@ -1,6 +1,7 @@
 import Char from '~/models/Char.js'
 import Attribute from '~/models/Attribute.js'
 import AttributeList from '~/models/AttributeList.js'
+import cloneDeep from 'lodash/cloneDeep'
 
 const mockData = {
   "sign_char_id": 998006,
@@ -37,9 +38,10 @@ const mockData = {
 
 describe('Char', () => {
 
-  let char
+  let char,
+  id = 12345
   beforeEach(() => {
-    char = new Char(mockData)
+    char = new Char(cloneDeep(mockData))
   })
 
   describe('attributes', () => {
@@ -50,7 +52,8 @@ describe('Char', () => {
       sign_char: 'א',
       attributes: [
         {
-          attribute_id: attributeID,
+          attribute_name: 'before_each_name', // deduplicates on attribute_name, so use a distinct one for beforeEach
+          attribute_id: attributeID++,
           attribute_value: 'some_value',
           attribute_description: 'attribute description'
         }
@@ -66,7 +69,8 @@ describe('Char', () => {
 
     it('should accept a new attribute as an object', () => {
       char.addAttribute({
-        attribute_id: 12346,
+        attribute_name: 'some_name',
+        attribute_id: attributeID++,
         attribute_value: 'some_value',
         attribute_description: 'attribute description'
       })
@@ -75,7 +79,8 @@ describe('Char', () => {
 
     it('should accept a new attribute as an instance of Attribute', () => {
       const attribute = new Attribute({
-        attribute_id: 12346,
+        attribute_name: 'some_name',
+        attribute_id: attributeID++,
         attribute_value: 'some_value',
         attribute_description: 'attribute description'
       })
@@ -85,7 +90,7 @@ describe('Char', () => {
     })
 
     it('should remove an attribute by id', () => {
-      char.removeAttribute(attributeID)
+      char.removeAttribute(attributeID - 1)
       expect(char.attributes.length).to.equal(0)
     })
   })

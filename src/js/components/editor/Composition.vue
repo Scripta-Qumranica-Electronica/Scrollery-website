@@ -1,16 +1,26 @@
 <template>
     <section class="editor">
-      <column v-for="(column, columnIndex) of columns" :key="columnIndex + column.id" :state="state" :column="column" @persist-error="refresh" /></column>
+      <column
+        v-for="(column, columnIndex) of columns"
+        :key="columnIndex + column.id"
+        :state="state"
+        :column="column"
+        :toolbar="toolbar"
+        :messageBar="messageBar"
+        @refresh="$emit('refresh')"
+      />
     </section>
 </template>
 
 <script>
+import MessageBar from './MessageBar.vue'
 import Composition from '~/models/Composition.js'
 import Column from './Column.vue'
 
 export default {
   components: {
     column: Column,
+    'message-bar': MessageBar,
   },
   props: {
     text: {
@@ -21,11 +31,8 @@ export default {
     state: {
       required: true,
     },
-  },
-  methods: {
-    refresh() {
-      this.$emit('refresh')
-    },
+    toolbar: null,
+    messageBar: null,
   },
   computed: {
     columns() {
@@ -43,6 +50,10 @@ export default {
   overflow: hidden;
   background-color: rgba($ltOrange, 0.1);
   width: 100%;
-  height: 100%;
+  height: calc(100% - 32px);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 </style>

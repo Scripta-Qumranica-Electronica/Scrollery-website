@@ -4,9 +4,16 @@ import { mount } from '@test'
 import Login from '~/components/Login.vue'
 
 describe('Login', function() {
+  let $post = () => (new Promise((r) => r({})))
   let wrapper, vm
+
   beforeEach(() => {
-    wrapper = mount(Login)
+    let $postPromise = new Promise((_, r) => r({}))
+    wrapper = mount(Login, {
+      mocks: {
+        $post: function() { return $postPromise },
+      }
+    })
     vm = wrapper.vm
   })
 
@@ -20,14 +27,6 @@ describe('Login', function() {
 
   it('has the initial language set to English', () => {
     expect(vm.language).to.equal('en')
-  })
-
-  it('sets initial visibility to false until session is validated', () => {
-    expect(Login.data().visible).to.equal(false)
-
-    // since, on create, it will check the session and immediately become
-    // visible, this is true for the actual Vue component instance
-    expect(vm.visible).to.equal(true)
   })
 
   it('should post a transaction to validate the session ID', done => {
@@ -53,7 +52,7 @@ describe('Login', function() {
     vm.setSessionID(sessionID)
     vm.validateSession({
       removeItem: key => {
-        expect(key).to.equal('sqe')
+        expect(key).to.equal('sqe-session')
         expect(vm.errMsg).to.equal('')
         done()
       },
@@ -71,7 +70,7 @@ describe('Login', function() {
     vm.setSessionID(sessionID)
     vm.validateSession({
       removeItem: key => {
-        expect(key).to.equal('sqe')
+        expect(key).to.equal('sqe-session')
         expect(vm.errMsg).to.equal('')
         done()
       },
@@ -172,31 +171,6 @@ describe('Login', function() {
     })
   })
 
-  it('should show an error message on failure', done => {
-    const user = 'name'
-    const passwd = 'password'
-    wrapper.setData({ user, passwd })
-
-    vm.$18n = {
-      str: key => key
-    }
-    vm.$post = () => (new Promise((resolve, reject) => {
-      reject({})
-
-      // since the `catch` block is handled asychronously,
-      // use setTimeout to wait until Vue has updates the
-      // VM.
-      // TODO: figure out better way to not use setTimeout
-      setTimeout(() => {
-        expect(vm.errMsg.length > 0).to.equal(true)
-        done()
-      }, 5)
-    }))
-
-    // trigger form submission
-    wrapper.vm.onSubmit()
-  })
-
   it('should attempt login on form submit', done => {
     const user = 'name'
     const passwd = 'password'
@@ -266,10 +240,12 @@ describe('Login', function() {
       vm.$i18n.load = $i18nLoadStub
       vm.$router = {
         push: route => {
-          // ensure route is workbench
-          expect(route.name).to.equal('workbench')
+          // ensure route is workbenchAddress
+          expect(route.name).to.equal('workbenchAddress')
         },
       }
+
+      window.localStorage.setItem('name', JSON.stringify({1:'name'}))
 
       const res = {
         data: {
