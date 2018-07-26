@@ -219,7 +219,7 @@ export default {
             this.currentScrollVersionID,
             id_of_sqe_image,
             image_catalog_id,
-            region_in_master_imageregion_in_master_image
+            region_in_master_image
           )
           .then(res => {
             const h = this.$createElement
