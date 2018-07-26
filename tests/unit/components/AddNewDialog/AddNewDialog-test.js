@@ -68,18 +68,22 @@ describe('AddNewDialog', function() {
   })
 
   it('can commit a new artefact', () => {
-    vm.selectedArtefact = artefact[0]
+    vm.selectedCombination = combination.scroll_version_id
+    vm.selectedArtefact = artefact
     vm.selectedImageReference = combination.imageReferences[0]
     vm.commitNewArtefact()
 
-    vm.selectedArtefact = artefact[0]
+    vm.selectedCombination = combination.scroll_version_id
+    vm.selectedArtefact = artefact
     vm.selectedImageReference = undefined
     vm.commitNewArtefact()
 
+    vm.selectedCombination = combination.scroll_version_id
     vm.selectedArtefact = undefined
     vm.selectedImageReference = combination.imageReferences[0]
     vm.commitNewArtefact()
     
+    vm.selectedCombination = combination.scroll_version_id
     vm.selectedArtefact = undefined
     vm.selectedImageReference = undefined
     vm.commitNewArtefact()
