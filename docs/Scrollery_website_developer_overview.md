@@ -5,6 +5,8 @@
   - [Design principles](#design-principles)
     - [Templating and user interaction](#templating-and-user-interaction)
     - [Data models](#data-models)
+      - [src/js/models/Corpus.js](#srcjsmodelscorpusjs)
+      - [src/js/models/Composition.js](#srcjsmodelscompositionjs)
 
 # Scrollery-website Overview for developers
 
@@ -13,7 +15,7 @@
 The [scrollery-website](https://github.com/Scripta-Qumranica-Electronica/Scrollery-website) project is dependent on the [SQE_DB_API](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API) and the [SQE database](https://github.com/Scripta-Qumranica-Electronica/Data-files).  These are automatically downloaded and installed by the `yarn run bootstrap` install script.
 
 ## Introduction
-The Scrollery-website provides a front end for access to the data stored in the SQE database and the relevant images served mainly by the IAA. It accesses the images using the [iiif Image API](http://iiif.io/api/image/2.1/), and the SQE Database via `resources/cgi-bin/scrollery-cgi.pl`, which is a wrapper for the low level [SQE_DB_API](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API).
+The Scrollery-website provides a front end for access to the data stored in the SQE database and the relevant images served mainly by the IAA. It accesses the images using the [iiif Image API](http://iiif.io/api/image/2.1/), and the SQE Database ([see here](https://qumranica.org/database)) via `resources/cgi-bin/scrollery-cgi.pl`, which is a wrapper for the low level [SQE_DB_API](https://github.com/Scripta-Qumranica-Electronica/SQE_DB_API).
 
 It is built using the Vue.js framework, but efforts have been made to minimize dependence on that framework.  Thus a number of utilities, data models, and controllers are written in plain javascript to facilitate greater portability of the code.
 
@@ -23,7 +25,7 @@ Vuex is used minimally to store stateful data.  Most importantly it stores a ses
 
 ## Design structure
 
-The website consists of four main sections: a header, a hiding menu, a panel for working with images, and a panel for working with text.  A fifth panel is currently hidden, it is a wide panel made for working with a graphical reconstruction of the full scroll.  It can display cut outs of the scroll fragments and allows you to drag them around.  In the end, this may very well become the main display with many controlls for establishing columns, groups of fragments, linking text transcription to regions on the images, and even text editing.  There are currently two situations wher one experiences pop-up dialogues (adding a new column/artefact and editing text attributes).  We currently prefer to keep pop-up dialogues to a minimum.  We also make the components dynamic in nature, so certain functionality appears or disappears based on the router and other factors (like a scroll being locked).
+The website consists of four main sections: a header, a hiding menu ([see here](./Scrollery_menu_vue.md)), a panel for working with images, and a panel for working with text.  A fifth panel is currently hidden, it is a wide panel made for working with a graphical reconstruction of the full scroll.  It can display cut outs of the scroll fragments and allows you to drag them around.  In the end, this may very well become the main display with many controlls for establishing columns, groups of fragments, linking text transcription to regions on the images, and even text editing.  There are currently two situations wher one experiences pop-up dialogues (adding a new column/artefact and editing text attributes).  We currently prefer to keep pop-up dialogues to a minimum.  We also make the components dynamic in nature, so certain functionality appears or disappears based on the router and other factors (like a scroll being locked).
 
 Code for the Header and Image pane is located in `/src/js/components`, the Menus are located in `/src/js/components/menu`, the editor pane is in `/src/js/components/editor`, and the dialog for adding new artefacts and columns to a scroll is in `/src/js/components/AddNewDialog`.
 
@@ -53,7 +55,9 @@ As just noted, the data models are responsible for collecting data from the serv
 
 There are currently two different data models in the project, each designed by a different developer for different parts of the website.  We would like to eventually bring these in line with each other and merge them.
 
-`src/js/models/Corpus.js` contains all the data for the menu system, the images, the artefacts, and the ROI's.  It is a self-contained model containing its own controller.  This large Object is composed of several lists, and the data in them is mostly normalized.  The corpus object has a lists of combinations (i.e., reconstructed scrolls), columns, images, artefacts, and ROI's.  The data in these lists are linked to each other by unique id.  Data can by requested by accessing the relevant list and making a request, for instance to fill the data model with all columns in a scroll, one simply calls: 
+#### src/js/models/Corpus.js
+
+The model in `src/js/models/Corpus.js` contains all the data for the menu system, the images, the artefacts, and the ROI's.  It is a self-contained model containing its own controller.  This large Object is composed of several lists, and the data in them is mostly normalized.  The corpus object has a lists of combinations (i.e., reconstructed scrolls), columns, images, artefacts, and ROI's.  The data in these lists are linked to each other by unique id.  Data can by requested by accessing the relevant list and making a request, for instance to fill the data model with all columns in a scroll, one simply calls: 
 
 ```Javascript
 this.corpus.cols.populate({
@@ -76,4 +80,6 @@ The model updates itself immediately, then asks the server to accept the change,
 
 The functions provided by the corpus model return promises, so the Vue component can also react to responses from the database.  This is most commonly used to increment the "busy" indicator in the Vuex store before making a request `this.$store.commit('addWorking')` and to decrement it when the request finishes `this.$store.commit('delWorking')`.  This is also useful when you need to access data in a particular order, like getting some ImageReferences and then after that getting the Images corresponding to those ImageReferences.
 
-`src/js/models/Composition.js` contains all the data for the text of a scroll or scroll column.  It works in conjunction with `src/js/controllers/column-persistance-service.js` as the controller in charge of syncing it with the server database.  It is a deeply nested data model and I do not fully understand how it all works yet.  __You can help with the documentation by adding to this section.__
+#### src/js/models/Composition.js
+
+The model in `src/js/models/Composition.js` contains all the data for the text of a scroll or scroll column.  It works in conjunction with `src/js/controllers/column-persistance-service.js` as the controller in charge of syncing it with the server database.  It is a deeply nested data model and I do not fully understand how it all works yet.  __You can help with the documentation by adding to this section.__
