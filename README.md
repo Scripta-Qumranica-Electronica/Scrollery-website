@@ -10,6 +10,8 @@ For an overview of the project, [see here](./docs/Project_overview.md).
 
 For a brief introduction to development in the project, [see here](./docs/Scrollery_website_developer_overview.md).
 
+For a description of our database, [see here](./docs/SQE_Database_Overview.md).
+
 For our database schema with comments, [see here](https://qumranica.org/database/index.html).
 
 For instructional on using the website, [see here](./docs/Scrollery_Usage.md)
