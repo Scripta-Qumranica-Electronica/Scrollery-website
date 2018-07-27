@@ -57,15 +57,15 @@ In the interest of time, I put together a few demo videos to display some of the
 
 <video width="800" height="600" controls>
   <source src="media/Scrollery-Editing-2.mp4" type="video/mp4">
-Your browser does not support the video tag.
+Cannot play video in browser, <a href="media/Scrollery-Editing-2.mp4">click here to download</a>.
 </video>
 
 <video width="800" height="600" controls>
   <source src="media/Scrollery-Editing-3.mp4" type="video/mp4">
-Your browser does not support the video tag.
+Cannot play video in browser, <a href="media/Scrollery-Editing-3.mp4">click here to download</a>.
 </video>
 
 <video width="800" height="600" controls>
   <source src="media/Scrollery-Editing.mp4" type="video/mp4">
-Your browser does not support the video tag.
+Cannot play video in browser, <a href="media/Scrollery-Editing.mp4">click here to download</a>.
 </video>
