@@ -82,7 +82,7 @@ describe('AddNewDialog', function() {
     vm.selectedArtefact = undefined
     vm.selectedImageReference = combination.imageReferences[0]
     vm.commitNewArtefact()
-    
+
     vm.selectedCombination = combination.scroll_version_id
     vm.selectedArtefact = undefined
     vm.selectedImageReference = undefined
