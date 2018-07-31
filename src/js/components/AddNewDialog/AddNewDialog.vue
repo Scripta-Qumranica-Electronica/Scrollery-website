@@ -204,13 +204,15 @@ export default {
     commitNewArtefact() {
       if (this.selectedArtefact || this.selectedImageReference) {
         const image_catalog_id = this.selectedArtefact
-          ? this.corpus.artefacts.get(this.selectedArtefact).image_catalog_id
+          ? this.corpus.artefacts.get(this.selectedArtefact, this.selectedCombination)
+              .image_catalog_id
           : this.corpus.imageReferences.get(this.selectedImageReference).image_catalog_id
         const id_of_sqe_image = this.selectedArtefact
-          ? this.corpus.artefacts.get(this.selectedArtefact).id_of_sqe_image
+          ? this.corpus.artefacts.get(this.selectedArtefact, this.selectedCombination)
+              .id_of_sqe_image
           : this.corpus.imageReferences.get(this.selectedImageReference).master_sqe_image_id
         const region_in_master_image = this.selectedArtefact
-          ? this.corpus.artefacts.get(this.selectedArtefact).mask
+          ? this.corpus.artefacts.get(this.selectedArtefact, this.selectedCombination).mask
           : 'POLYGON((0 0,0 0,0 0,0 0))'
         this.corpus.artefacts
           .addNewArtefact(
