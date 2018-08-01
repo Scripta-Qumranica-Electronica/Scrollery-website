@@ -16,7 +16,7 @@
         <span slot="icon"><i class="fa fa-hashtag"></i></span>
         <div slot="body">
           <div>
-            <el-input class="searchBox" autosize placeholder="Enter search string" v-model="queryString"></el-input>
+            <el-input class="searchBox" autosize :placeholder="$i18n.str('Enter search string')" v-model="queryString"></el-input>
           </div>
           <div>
             <ul class="combination-menu" placeholder="Search for scroll">

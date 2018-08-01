@@ -10,7 +10,7 @@
           style="color: white"></i>
     </div>
     <div v-show="show">
-      <el-input size="mini" class="searchBox" autosize placeholder="Enter search string" v-model="queryString"/>
+      <el-input size="mini" class="searchBox" autosize :placeholder="$i18n.str('Enter search string')" v-model="queryString"/>
     </div>
     <ul v-show="show">
       <li @click="setCombination(-1)" >None</li>

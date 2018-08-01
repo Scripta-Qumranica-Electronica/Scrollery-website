@@ -27,5 +27,6 @@ module.exports = {
   // Misc.
   'No Scroll Selected': 'No scroll selected',
   'Select Images': 'Select Images',
+  'Enter search string': 'Enter search string 123412',
   Zoom: 'Zoom',
 }

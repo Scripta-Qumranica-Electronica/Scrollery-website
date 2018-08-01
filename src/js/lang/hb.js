@@ -27,5 +27,6 @@ module.exports = {
   // Header
   'No Scroll Selected': 'לא נבחרה מגילה',
   'Select Images': 'בחרו תמונות',
+  'Enter search string': 'טקסט לחיפוש',
   Zoom: 'הגדלה',
 }
