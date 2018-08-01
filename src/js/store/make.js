@@ -31,7 +31,7 @@ export default function(Vuex, sessionID = '') {
         state.username = ''
         window.localStorage.removeItem('sqe-session')
         window.localStorage.removeItem('name')
-        window.localStorage.removeItem('language')
+        // window.localStorage.removeItem('language')
       },
       setSessionID(state, sessionID) {
         window.localStorage.setItem('sqe-session', sessionID)

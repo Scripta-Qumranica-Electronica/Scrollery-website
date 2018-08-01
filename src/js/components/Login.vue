@@ -39,7 +39,7 @@ export default {
       errMsg: '',
       usernameErr: '',
       passwordErr: '',
-      language: 'en',
+      language: window.localStorage.getItem('language') || 'en',
       labelPosition: 'top',
     }
   },
@@ -62,6 +62,7 @@ export default {
       const isUserValid = this.validateUsername()
       const isPasswordValid = this.validatePassword()
       if (isUserValid && isPasswordValid) {
+        // Todo: Set language in localStorage
         this.attemptLogin()
       } else {
         this.errMsg = this.$i18n.str('Errors.Login')
@@ -155,7 +156,7 @@ export default {
               ? JSON.parse(window.localStorage.getItem('name'))[~~res.data.USER_ID]
               : this.user.trim()
           )
-          this.setLanguage(window.localStorage.getItem('language') || this.language)
+          this.setLanguage(this.language)
           // Load language files
           this.$i18n
             .load()
