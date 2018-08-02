@@ -21,6 +21,22 @@
           class="fa fa-spinner fa-spin fa-fw" 
           aria-hidden="true"
           style="color: white"></i>
+        <span><i class="fa fa-language" aria-hidden="true"></i></span>
+        <el-select class="langSelect" v-model="language" @change="languageChanged">
+          <el-option value="en">English</el-option>
+          <el-option value="de">Deutsche</el-option>
+          <el-option value="hb">עברית</el-option>
+        </el-select>
+      </div>
+    </el-col>
+
+    <el-col :span="4">
+      <div class="right">
+        <i 
+          v-show="working > 0" 
+          class="fa fa-spinner fa-spin fa-fw" 
+          aria-hidden="true"
+          style="color: white"></i>
         <span> {{ $i18n.str('User.LoggedInMessage', {name: username}) }}</span>
         <el-button size="mini" @click="onLogout">{{ $i18n.str('Logout') }}</el-button>
       </div>
@@ -41,6 +57,7 @@ export default {
     return {
       scrolleryVersion: sqeManifest.version,
       scrollVersionID: this.$route.params.scrollVersionID,
+      language: window.localStorage.getItem('language') || 'en',
     }
   },
 
@@ -48,10 +65,13 @@ export default {
     ...mapGetters(['username', 'working']),
   },
   methods: {
-    ...mapMutations(['setSessionID', 'setUsername', 'setUserID']),
+    ...mapMutations(['setSessionID', 'setUsername', 'setUserID', 'setLanguage']),
     onLogout() {
       this.$store.commit('logout')
       this.$router.push({ name: 'login' })
+    },
+    languageChanged() {
+      this.setLanguage(this.language)
     },
   },
 

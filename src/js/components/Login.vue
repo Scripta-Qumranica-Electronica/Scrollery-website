@@ -1,17 +1,17 @@
 // TODO: check if the session is valid before trying to login with locatdata
 <template>
-  <el-card v-show="visible" class="loginCard" header="Login" :body-style="{ background: 'white' }">
+  <el-card v-show="visible" class="loginCard" :header="$i18n.str('Login')" :body-style="{ background: 'white' }">
     <el-form id="login" @submit.native.prevent="onSubmit" :label-position="labelPosition">
       <el-form-item class="error warningText" v-show='errMsg.length'>
         {{ errMsg }}
       </el-form-item>
       <el-form-item>
-        <span slot="label">User name <span class="reqired warningText"></span> <span class="error warningText">{{ usernameErr }}</span></span>
-        <el-input class="loginUsername" type="text" placeholder="Your login name" :class='{"error": usernameErr.length}' v-model='user'></el-input>
+        <span slot="label">{{ $i18n.str('User name') }}<span class="reqired warningText"></span> <span class="error warningText">{{ usernameErr }}</span></span>
+        <el-input class="loginUsername" type="text" :placeholder="$i18n.str('Your login name')" :class='{"error": usernameErr.length}' v-model='user'></el-input>
       </el-form-item>
       <el-form-item>
-        <span slot="label">Password <span class="reqired warningText"></span> <span class="error warningText">{{ passwordErr }}</span></span>
-        <el-input class="loginPassword" type="password" placeholder="Your password" :class='{"error": passwordErr.length}' v-model='passwd'></el-input>
+        <span slot="label">{{ $i18n.str('Password') }}<span class="reqired warningText"></span> <span class="error warningText">{{ passwordErr }}</span></span>
+        <el-input class="loginPassword" type="password" :placeholder="$i18n.str('Your password')" :class='{"error": passwordErr.length}' v-model='passwd'></el-input>
       </el-form-item>
       <el-form-item label="Language / Sprache / שפה">
         <el-select class="langSelect" v-model="language">
@@ -21,8 +21,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" native-type="submit">Submit</el-button>
-        <a href="mailto:Bronson.Brown-deVost@theologie.uni-goettingen.de?subject=Forgot%20password">Forgot my login</a>
+        <el-button type="primary" native-type="submit">{{ $i18n.str('Submit') }}</el-button>
+        <a href="mailto:Bronson.Brown-deVost@theologie.uni-goettingen.de?subject=Forgot%20password">{{ $i18n.str('Forgot my login') }}</a>
       </el-form-item>
     </el-form>
   </el-card>
@@ -57,12 +57,12 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setSessionID', 'setUserID', 'setUsername', 'setLanguage']),
+    ...mapMutations(['setSessionID', 'setUserID', 'setUsername', 'setLanguage', 'loadLanguage']),
     onSubmit() {
       const isUserValid = this.validateUsername()
       const isPasswordValid = this.validatePassword()
       if (isUserValid && isPasswordValid) {
-        // Todo: Set language in localStorage
+        this.setLanguage(this.language)
         this.attemptLogin()
       } else {
         this.errMsg = this.$i18n.str('Errors.Login')
@@ -70,7 +70,7 @@ export default {
     },
     validateUsername() {
       if (!this.user.trim()) {
-        this.usernameErr = 'Username is required'
+        this.usernameErr = this.$i18n.str('Username is required')
         return false
       } else {
         this.usernameErr = ''
@@ -79,7 +79,7 @@ export default {
     },
     validatePassword() {
       if (!this.passwd.trim()) {
-        this.passwordErr = 'Password is required'
+        this.passwordErr = this.$i18n.str('Password is required')
         return false
       } else {
         this.passwordErr = ''

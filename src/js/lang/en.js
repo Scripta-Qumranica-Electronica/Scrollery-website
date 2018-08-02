@@ -9,6 +9,15 @@ module.exports = {
   // Auth
   Logout: 'Logout',
   'User.LoggedInMessage': 'Logged in as: :name:',
+  Login: 'Login',
+  'User name': 'User name',
+  Password: 'Password',
+  Submit: 'Submit',
+  'Forgot my login': 'Forgot my login',
+  'Your login name': 'Your login name',
+  'Your password': 'Your password',
+  'Password is required': 'Password is required',
+  'Username is required': 'Username is required',
 
   // Errors
   'Errors.Login': 'Please correct errors and resubmit.',

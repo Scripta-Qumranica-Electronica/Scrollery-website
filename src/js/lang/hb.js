@@ -9,6 +9,15 @@ module.exports = {
   // Auth
   Logout: 'יציאה',
   'User.LoggedInMessage': 'שלום :name:',
+  Login: 'כניסה',
+  'User name': 'שם משתמש',
+  Password: 'סיסמא',
+  Submit: 'אישור',
+  'Forgot my login': 'שכחתי סיסמא',
+  'Your login name': 'שם המשתמש שלך',
+  'Your password': 'הסיסמא שלך',
+  'Password is required': 'דרושה סיסמא',
+  'Username is required': 'דרוש שם משתמש',
 
   // Errors
   'Errors.Login': 'לא ניתן להכנס למערכת, הערכים באחד השדות שגויים',
