@@ -1,5 +1,4 @@
 import axios from 'axios'
-import debounce from 'lodash/debounce'
 import PersistanceService from './persistance-service.js'
 
 /* istanbul ignore next */
@@ -108,7 +107,7 @@ export default class ColumnPersistanceService extends PersistanceService {
    * @private
    * @instance
    */
-  _gatherTransactions({ additions, deletions, updates }) {
+  _gatherTransactions({ additions, deletions }) {
     const transactions = []
 
     // create a new object so that the additions
@@ -201,7 +200,7 @@ export default class ColumnPersistanceService extends PersistanceService {
       // for loop calculates the keys in the additions object on every
       // pass through the loop. The
       for (
-        let i = 0, uuids = Object.keys(additions), uuid;
+        let uuids = Object.keys(additions), uuid;
         uuids.length > 0;
         uuids = Object.keys(additions)
       ) {

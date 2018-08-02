@@ -50,8 +50,8 @@ class List extends EventEmitter {
       item.on('change', this._itemChanged.bind(this, item))
 
       if (item instanceof List) {
-        item.on('delete', ({ item, index }) => this.emit('delete'))
-        item.on('addition', ({ item, index }) => this.emit('addition'))
+        item.on('delete', () => this.emit('delete'))
+        item.on('addition', () => this.emit('addition'))
       }
 
       this.emit('addition', { item, index })
@@ -79,7 +79,7 @@ class List extends EventEmitter {
    * @param {Model}  item
    * @param {object} args
    */
-  _itemChanged(item, args) {
+  _itemChanged(item) {
     this.emit('change', {
       item
     })

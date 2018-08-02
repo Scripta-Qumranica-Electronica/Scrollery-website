@@ -1,4 +1,3 @@
-import Sign from './Sign.js'
 import List from './List.js'
 import Line from './Line.js'
 

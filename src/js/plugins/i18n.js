@@ -24,7 +24,7 @@ export default {
         str = data[key]
 
         // process vars
-        const re = /(\:(\w+)(\=[^\:]+)?\:)/
+        const re = /(:(\w+)(=[^:]+)?:)/
         let matches
         while ((matches = re.exec(str)) !== null) {
           str = str.replace(matches[0], args[matches[2]] || matches[3] || matches[2])

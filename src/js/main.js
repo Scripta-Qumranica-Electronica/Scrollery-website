@@ -4,7 +4,6 @@ import '../sass/index.scss'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
-import VuexPersist from 'vuex-persist'
 import i18n from './plugins/i18n'
 import ajax from './plugins/ajax'
 import routes from './routes'
@@ -38,6 +37,7 @@ Vue.use(ajax, { store })
 Vue.use(ElementUI)
 
 // Turn on the lights
+/* eslint no-unused-vars: "off" */
 const app = new Vue({
   router,
   store

@@ -22,7 +22,7 @@ export default class Combinations extends ItemList {
   }
 
   /* istanbul ignore next */
-  updateName(item_id, name, scroll_version_id) {
+  updateName(item_id, name) {
     return super.updateName(item_id, name, undefined, 'changeCombinationName')
   }
 

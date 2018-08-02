@@ -4,3 +4,6 @@ resources/
 server-code/
 vendors/
 tests/
+src/js/utils/
+tools/
+webpack.*.js
