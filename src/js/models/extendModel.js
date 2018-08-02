@@ -1,7 +1,7 @@
 import Record from './Record'
 
 const baseDefaults = {
-  id: 0,
+  id: 0
 }
 
 /**

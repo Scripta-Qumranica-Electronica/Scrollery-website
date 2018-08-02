@@ -73,7 +73,7 @@ export function wktPointToSvg(geoJSON) {
   return geoJSON.substring(0, 6) === 'POINT('
     ? {
         x: parseFloat(geoJSON.split(' ')[0].replace('POINT(', '')),
-        y: parseFloat(geoJSON.split(' ')[1]),
+        y: parseFloat(geoJSON.split(' ')[1])
       }
     : undefined
 }
@@ -325,7 +325,7 @@ export function matrix6To16(matrix) {
         matrix[4],
         matrix[5],
         0,
-        1,
+        1
       ]
     : undefined
 }

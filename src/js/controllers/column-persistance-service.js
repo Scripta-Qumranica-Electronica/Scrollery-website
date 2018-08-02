@@ -45,7 +45,7 @@ export default class ColumnPersistanceService extends PersistanceService {
       return axios
         .post('resources/cgi-bin/scrollery-cgi.pl', {
           SESSION_ID: this.session_id,
-          requests,
+          requests
         })
         .then(res => {
           if (res.status === 200 && res.data) {
@@ -74,7 +74,7 @@ export default class ColumnPersistanceService extends PersistanceService {
     const persistedMap = {
       additions: {},
       deletions: {},
-      updates: {},
+      updates: {}
     }
     for (const id in replies) {
       const transaction = transactions[id]
@@ -93,7 +93,7 @@ export default class ColumnPersistanceService extends PersistanceService {
             const signRequested = transaction.signs[i]
             persistedMap.additions[signIdenfifier] = {
               next_sign_id: ~~signRequested.next_sign_id || -1,
-              sign_id: ~~singleAction[signIdenfifier],
+              sign_id: ~~singleAction[signIdenfifier]
             }
           }
           // need case for updates...
@@ -123,7 +123,7 @@ export default class ColumnPersistanceService extends PersistanceService {
         scroll_version_id: this.scroll_version_id,
 
         // turn `sign_id` into an array of ids for deletion
-        sign_id: deletedKeys.map(key => deletions[key].getID()),
+        sign_id: deletedKeys.map(key => deletions[key].getID())
       })
     }
 
@@ -152,7 +152,7 @@ export default class ColumnPersistanceService extends PersistanceService {
             // if so, we add it in to the run and ...
             run.unshift({
               sign: prev.toString(),
-              uuid: prevUuid,
+              uuid: prevUuid
             })
             // .. recurse backwards
             return getPreviousFromAdditions(prevUuid, run)
@@ -182,7 +182,7 @@ export default class ColumnPersistanceService extends PersistanceService {
             // if so, we push it onto to the run and ...
             run.push({
               sign: next.toString(),
-              uuid: nextUuid,
+              uuid: nextUuid
             })
             // .. recurse forwards
             return getNextFromAdditions(nextUuid, run)
@@ -216,8 +216,8 @@ export default class ColumnPersistanceService extends PersistanceService {
         let run = [
           {
             sign: sign.toString(),
-            uuid: sign.getUUID(),
-          },
+            uuid: sign.getUUID()
+          }
         ]
 
         // create the run going backwards
@@ -236,7 +236,7 @@ export default class ColumnPersistanceService extends PersistanceService {
         transactions.push({
           transaction: 'addSigns',
           scroll_version_id: this.scroll_version_id,
-          signs: run,
+          signs: run
         })
       })
     }

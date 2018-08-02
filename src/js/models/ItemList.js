@@ -240,7 +240,7 @@ export default class ItemList {
           scroll_version_id: scroll_version_id,
           name: name,
           [this.idKey]: item_id,
-          transaction: transaction,
+          transaction: transaction
         }
         this.alterItemAtKey(item_id, { name: name }, scroll_version_id)
         this.axios

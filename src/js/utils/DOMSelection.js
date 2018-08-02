@@ -13,5 +13,5 @@ export default {
     range.setStart(elem.firstChild, start)
     range.setEnd(elem.firstChild, end)
     getSelection().addRange(range)
-  },
+  }
 }

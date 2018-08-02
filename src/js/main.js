@@ -40,5 +40,5 @@ Vue.use(ElementUI)
 // Turn on the lights
 const app = new Vue({
   router,
-  store,
+  store
 }).$mount('#app')

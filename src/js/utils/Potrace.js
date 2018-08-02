@@ -147,7 +147,7 @@ function Potrace(canvas, multiplyFactor) {
       turdsize: 2,
       optcurve: true,
       alphamax: 0, // We set alphamx to 0 for a polygon with no beziers.
-      opttolerance: 0.2, // Get more detailed outline than 0.2.
+      opttolerance: 0.2 // Get more detailed outline than 0.2.
     }
   // if (imgElement) {
   //     imgElement.onload = function() {
@@ -1524,6 +1524,6 @@ function Potrace(canvas, multiplyFactor) {
     process: process,
     // getSVG: getSVG,
     getPolyPath: getPolyPath,
-    img: imgElement,
+    img: imgElement
   }
 }

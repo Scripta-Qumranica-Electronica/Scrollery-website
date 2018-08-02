@@ -114,7 +114,7 @@
       diffs = [
         [DIFF_INSERT, longtext.substring(0, i)],
         [DIFF_EQUAL, shorttext],
-        [DIFF_INSERT, longtext.substring(i + shorttext.length)],
+        [DIFF_INSERT, longtext.substring(i + shorttext.length)]
       ]
       // Swap insertions for deletions if diff is reversed.
       if (text1.length > text2.length) {
@@ -495,12 +495,12 @@
             if (count_delete === 0) {
               diffs.splice(pointer - count_insert, count_delete + count_insert, [
                 DIFF_INSERT,
-                text_insert,
+                text_insert
               ])
             } else if (count_insert === 0) {
               diffs.splice(pointer - count_delete, count_delete + count_insert, [
                 DIFF_DELETE,
-                text_delete,
+                text_delete
               ])
             } else {
               diffs.splice(

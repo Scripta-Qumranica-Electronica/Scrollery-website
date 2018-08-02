@@ -23,7 +23,7 @@ class Column extends List {
     const changes = {
       additions: {},
       deletions: {},
-      updates: {},
+      updates: {}
     }
 
     if (this.hasChanges()) {

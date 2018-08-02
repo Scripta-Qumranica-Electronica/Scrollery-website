@@ -6,5 +6,5 @@ module.exports = {
   'User.LoggedInMessage': 'Angemeldet als: :name:',
   Logout: 'Abmelden',
   Image: 'Bild',
-  Text: 'Text',
+  Text: 'Text'
 }

@@ -49,9 +49,9 @@ class Line extends List {
               new Sign({
                 chars: [
                   {
-                    sign_char: char,
-                  },
-                ],
+                    sign_char: char
+                  }
+                ]
               }),
               diffIndex
             )

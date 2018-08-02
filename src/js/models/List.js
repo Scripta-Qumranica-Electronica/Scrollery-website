@@ -31,7 +31,7 @@ class List extends EventEmitter {
 
         // create a list-namespaced uid for the model
         __uuid: namespacedUuid(`${attributes.id || Date.now()}`, List.namespace()),
-        __persisted: isPersisted,
+        __persisted: isPersisted
       },
       attributes
     )
@@ -39,7 +39,7 @@ class List extends EventEmitter {
     this._items = []
     this.__changes = {
       additions: {},
-      deletions: {},
+      deletions: {}
     }
 
     this.on(['insert', 'push', 'splice'], ({ item, index }) => {
@@ -58,7 +58,7 @@ class List extends EventEmitter {
       this.emit('change', {
         type: 'addition',
         item,
-        index,
+        index
       })
     })
 
@@ -68,7 +68,7 @@ class List extends EventEmitter {
     // add a length property that forwards to the `count` method
     Object.defineProperty(this, 'length', {
       get: () => this.count(),
-      writeable: false,
+      writeable: false
     })
   }
 
@@ -81,7 +81,7 @@ class List extends EventEmitter {
    */
   _itemChanged(item, args) {
     this.emit('change', {
-      item,
+      item
     })
   }
 
@@ -99,7 +99,7 @@ class List extends EventEmitter {
         }
         return acc
       }, {}),
-      ...this.__changes,
+      ...this.__changes
     }
   }
 
@@ -253,7 +253,7 @@ class List extends EventEmitter {
 
     this.emit('insert', {
       index: newIndex,
-      item,
+      item
     })
 
     return newIndex
@@ -282,7 +282,7 @@ class List extends EventEmitter {
     const newIndex = this._items.length
     this.emit('push', {
       index: newIndex,
-      item,
+      item
     })
 
     return newIndex

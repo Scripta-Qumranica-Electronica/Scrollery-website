@@ -13,7 +13,7 @@ const defaults = {
   sign_char: '',
 
   // > attributes
-  attributes: new AttributeList(),
+  attributes: new AttributeList()
 }
 
 /**

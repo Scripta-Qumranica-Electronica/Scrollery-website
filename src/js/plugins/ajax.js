@@ -24,12 +24,12 @@ export default {
           transformResponse: axios.defaults.transformResponse.concat(responseData => {
             responseData = Object.assign({}, responseData, { payload: data })
             return responseData
-          }),
+          })
         })
       }
 
       // make the AJAX request
       return axios.post(url, data, opt)
     }
-  },
+  }
 }

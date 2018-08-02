@@ -8,7 +8,7 @@ export default function(Vuex, sessionID = '') {
       languages: {},
       working: 0,
       lockedScrolls: {},
-      signAttributeList: {},
+      signAttributeList: {}
     },
     getters: {
       sessionID: state => state.sessionID,
@@ -22,7 +22,7 @@ export default function(Vuex, sessionID = '') {
         return Boolean(state.lockedScrolls[scroll_version_id])
       },
       attributes: state => state.signAttributeList,
-      cannonicalAttribute: state => name => state.signAttributeList[name],
+      cannonicalAttribute: state => name => state.signAttributeList[name]
     },
     mutations: {
       logout(state) {
@@ -72,7 +72,7 @@ export default function(Vuex, sessionID = '') {
               attribute_name: attr.name,
               attribute_id: attr.attribute_id,
               attribute_description: attr.attribute_description || '',
-              values: [],
+              values: []
             }
           }
           const values = state.signAttributeList[attr.name].values
@@ -83,11 +83,11 @@ export default function(Vuex, sessionID = '') {
               attribute_value_id: attr.attribute_value_id,
               attribute_value_description: attr.attribute_value_description,
               string_value: attr.string_value,
-              type: attr.type,
+              type: attr.type
             })
           }
         })
-      },
-    },
+      }
+    }
   })
 }
