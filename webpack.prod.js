@@ -9,8 +9,8 @@ module.exports = merge(common, {
     new UglifyJS()
   ],
   performance: {
-    hints: "warning",
+    hints: 'warning',
     maxAssetSize: 200000,
-    maxEntrypointSize: 400000,
+    maxEntrypointSize: 400000
   }
 })

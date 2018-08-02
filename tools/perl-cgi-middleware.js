@@ -5,9 +5,9 @@ const { exec } = require('child_process')
 /**
  * Constants.
  */
-var SERVER_SOFTWARE = 'Node/' + process.version
-var SERVER_PROTOCOL = 'HTTP/1.1'
-var GATEWAY_INTERFACE = 'CGI/1.1'
+const SERVER_SOFTWARE = 'Node/' + process.version
+const SERVER_PROTOCOL = 'HTTP/1.1'
+const GATEWAY_INTERFACE = 'CGI/1.1'
 
 const perl = (req, res) => {
   const file = resolve.apply(null, [__dirname, '..'].concat(req.url.split('/')))
@@ -22,23 +22,23 @@ const perl = (req, res) => {
     req.uri = url.parse(req.url)
   }
 
-  var host = (req.headers.host || '').split(':')
-  var address = host[0]
-  var port = host[1]
+  const host = (req.headers.host || '').split(':')
+  const address = host[0]
+  const port = host[1]
 
-  var env = {
+  const env = {
     GATEWAY_INTERFACE: GATEWAY_INTERFACE,
     SCRIPT_NAME: file,
     SERVER_NAME: address || 'unknown',
     SERVER_PORT: port || 80,
     SERVER_PROTOCOL: SERVER_PROTOCOL,
-    SERVER_SOFTWARE: SERVER_SOFTWARE,
+    SERVER_SOFTWARE: SERVER_SOFTWARE
   }
 
   // The client HTTP request headers are attached to the env as well,
   // in the format: "User-Agent" -> "HTTP_USER_AGENT"
-  for (var header in req.headers) {
-    var name = 'HTTP_' + header.toUpperCase().replace(/-/g, '_')
+  for (const header in req.headers) {
+    const name = 'HTTP_' + header.toUpperCase().replace(/-/g, '_')
     env[name] = req.headers[header]
   }
   env.REQUEST_METHOD = req.method.toUpperCase()
@@ -52,15 +52,15 @@ const perl = (req, res) => {
     env.CONTENT_TYPE = req.headers['content-type']
   }
   if ('authorization' in req.headers) {
-    var auth = req.headers.authorization.split(' ')
+    const auth = req.headers.authorization.split(' ')
     env.AUTH_TYPE = auth[0]
   }
 
   // Stringify together the environment
   const stringifiedEnv = []
-  for (let k in env) {
+  for (const k in env) {
     // coerce the environment value to a string and replace and plain semicolons with escaped versions
-    let exported = ('' + env[k]).replace(';', ';')
+    const exported = ('' + env[k]).replace(';', ';')
     stringifiedEnv.push(`export ${k}="${exported}"`)
   }
 

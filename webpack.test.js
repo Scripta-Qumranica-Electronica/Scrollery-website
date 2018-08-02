@@ -10,7 +10,7 @@ module.exports = merge(common, {
   devtool: 'inline-source-map',
   resolve: {
     alias: {
-      "@test": resolve(__dirname, 'tests/.utils')
+      '@test': resolve(__dirname, 'tests/.utils')
     }
   },
   plugins: [
