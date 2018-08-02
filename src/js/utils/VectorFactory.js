@@ -349,7 +349,7 @@ export function matrix16To6(matrix) {
  */
 export function clipCanvas(canvas, svgClipPath, divisor) {
   divisor = divisor ? divisor : 1
-  let ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext('2d')
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.globalCompositeOperation = 'source-over'
   ctx.fillStyle = 'purple'

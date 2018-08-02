@@ -5,8 +5,8 @@ export default class Combinations extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
     idKey = idKey || 'scroll_version_id'
     const listType = 'combinations'
-    let connectedLists = []
-    let relativeToScrollVersion = false
+    const connectedLists = []
+    const relativeToScrollVersion = false
     defaultPostData = defaultPostData
       ? defaultPostData
       : { transaction: 'getCombs', user_id: corpus.user }

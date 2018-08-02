@@ -111,14 +111,14 @@ class List extends EventEmitter {
    */
   persisted(persistedMap = {}) {
     // remove each deleted item from the change set
-    for (let key in persistedMap.deletions) {
+    for (const key in persistedMap.deletions) {
       delete this.__changes.deletions[key]
     }
 
     // for each addition, if there's a corresponding property in the
     // additions map, call persisted on it and remove it from the
     // cahnge object
-    for (let key in persistedMap.additions) {
+    for (const key in persistedMap.additions) {
       if (this.__changes.additions[key]) {
         this.__changes.additions[key].persisted(persistedMap.additions[key])
       }
@@ -138,7 +138,7 @@ class List extends EventEmitter {
    * @instance
    */
   destroy() {
-    for (var i = 0, n = this._items.length; i < n; i++) {
+    for (let i = 0, n = this._items.length; i < n; i++) {
       this._items[i].destroy()
       delete this._items[i]
     }
@@ -346,7 +346,7 @@ class List extends EventEmitter {
    * @returns {List} A new list with the slice which is either the list or one created on the fly
    */
   sliceInto(start, count, target) {
-    let slice = this._items.splice(start, count)
+    const slice = this._items.splice(start, count)
 
     // use or create the new List, and insert the slice into it
     target = target || new this.constructor()

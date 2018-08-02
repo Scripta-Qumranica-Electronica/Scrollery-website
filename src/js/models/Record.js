@@ -84,8 +84,8 @@ function Record(defaults = {}, settings = {}) {
            * @return {string[]}  an array of property names that have changed
            */
           value: function() {
-            var changes = []
-            for (let key in values) {
+            const changes = []
+            for (const key in values) {
               ;(function(k) {
                 if (values[k].original !== values[k].value) {
                   changes.push(k)
@@ -113,13 +113,13 @@ function Record(defaults = {}, settings = {}) {
             delete propUpdates.__uuid
 
             // write properties onto the record
-            for (let prop in propUpdates) {
+            for (const prop in propUpdates) {
               this[prop] = propUpdates[prop]
             }
 
             // reset the original values to the current state now
             // the record has been persisted.
-            for (let prop in values) {
+            for (const prop in values) {
               if (values[prop].original !== this[prop]) {
                 values[prop].original = this[prop]
               }
@@ -130,7 +130,7 @@ function Record(defaults = {}, settings = {}) {
 
             // iterate through properties to find others that
             // have persisted methods, and pass them down.
-            for (let k in this) {
+            for (const k in this) {
               ;(function(key, property) {
                 if (propUpdates[key] && property && typeof property.persisted === 'function') {
                   property.persisted(propUpdates[key])
@@ -148,7 +148,7 @@ function Record(defaults = {}, settings = {}) {
       props = mergeDefaults(props)
 
       // iterate through the properties
-      for (let key in props) {
+      for (const key in props) {
         // setup closures to preserve the key value as k in each
         ;(function(k) {
           // initialize the value to track the value
@@ -181,7 +181,7 @@ function Record(defaults = {}, settings = {}) {
               this.__persisted = value !== values[k].value ? false : this.__persisted
 
               // apply the value
-              var oldValue = values[k].value
+              const oldValue = values[k].value
               values[k].value = value
 
               // emit a change
@@ -203,7 +203,7 @@ function Record(defaults = {}, settings = {}) {
       // Object.freeze(this)
 
       if (settings.propogate !== false) {
-        for (let k in this) {
+        for (const k in this) {
           ;(function(key, property) {
             if (property instanceof EventEmitter) {
               // emit upwards

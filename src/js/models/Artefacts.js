@@ -29,7 +29,7 @@ export default class Artefacts extends ItemList {
     scroll_version_id = Array.isArray(scroll_version_id) ? scroll_version_id : [scroll_version_id]
     return new Promise((resolve, reject) => {
       if (shape.length === artefact_id.length && shape.length === scroll_version_id.length) {
-        let payload = { requests: [], SESSION_ID: this.session_id }
+        const payload = { requests: [], SESSION_ID: this.session_id }
         for (
           let index = 0, svgMask, currentArtefactID, currentScrollVersionID;
           (svgMask = shape[index]) &&

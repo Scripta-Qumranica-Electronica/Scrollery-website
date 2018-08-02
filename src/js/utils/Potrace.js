@@ -1,6 +1,6 @@
 export function trace(canvas, multiplyFactor) {
   return new Promise(resolve => {
-    var potrace = new Potrace(canvas, multiplyFactor)
+    const potrace = new Potrace(canvas, multiplyFactor)
     potrace.process(() => {
       let path = potrace.getPolyPath(1)
       if (path === '') {
@@ -91,7 +91,7 @@ function Potrace(canvas, multiplyFactor) {
   }
 
   Bitmap.prototype.index = function(i) {
-    var point = new Point()
+    const point = new Point()
     point.y = Math.floor(i / this.w)
     point.x = i - point.y * this.w
     return point
@@ -106,7 +106,7 @@ function Potrace(canvas, multiplyFactor) {
   }
 
   Bitmap.prototype.copy = function() {
-    var bm = new Bitmap(this.w, this.h),
+    let bm = new Bitmap(this.w, this.h),
       i
     for (i = 0; i < this.size; i++) {
       bm.data[i] = this.data[i]
@@ -136,7 +136,7 @@ function Potrace(canvas, multiplyFactor) {
     this.beta = new Array(n)
   }
 
-  var imgElement = canvas ? undefined : document.createElement('img'),
+  let imgElement = canvas ? undefined : document.createElement('img'),
     imgCanvas = canvas ? canvas : document.createElement('canvas'),
     bm = null,
     pathlist = [],
@@ -197,10 +197,10 @@ function Potrace(canvas, multiplyFactor) {
   // }
 
   function loadBm() {
-    var ctx = imgCanvas.getContext('2d')
+    const ctx = imgCanvas.getContext('2d')
     bm = new Bitmap(imgCanvas.width, imgCanvas.height)
-    var imgdataobj = ctx.getImageData(0, 0, bm.w, bm.h)
-    var l = imgdataobj.data.length,
+    const imgdataobj = ctx.getImageData(0, 0, bm.w, bm.h)
+    let l = imgdataobj.data.length,
       i,
       j,
       color
@@ -212,12 +212,12 @@ function Potrace(canvas, multiplyFactor) {
   }
 
   function bmToPathlist() {
-    var bm1 = bm.copy(),
+    let bm1 = bm.copy(),
       currentPoint = new Point(0, 0),
       path
 
     function findNext(point) {
-      var i = bm1.w * point.y + point.x
+      let i = bm1.w * point.y + point.x
       while (i < bm1.size && bm1.data[i] !== 1) {
         i++
       }
@@ -225,7 +225,7 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function majority(x, y) {
-      var i, a, ct
+      let i, a, ct
       /* istanbul ignore next */
       for (i = 2; i < 5; i++) {
         ct = 0
@@ -249,7 +249,7 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function findPath(point) {
-      var path = new Path(),
+      let path = new Path(),
         x = point.x,
         y = point.y,
         dirx = 0,
@@ -260,20 +260,30 @@ function Potrace(canvas, multiplyFactor) {
 
       while (1) {
         path.pt.push(new Point(x, y))
-        if (x > path.maxX) path.maxX = x
-        if (x < path.minX) path.minX = x
-        if (y > path.maxY) path.maxY = y
-        if (y < path.minY) path.minY = y
+        if (x > path.maxX) {
+          path.maxX = x
+        }
+        if (x < path.minX) {
+          path.minX = x
+        }
+        if (y > path.maxY) {
+          path.maxY = y
+        }
+        if (y < path.minY) {
+          path.minY = y
+        }
         path.len++
 
         x += dirx
         y += diry
         path.area -= x * diry
 
-        if (x === point.x && y === point.y) break
+        if (x === point.x && y === point.y) {
+          break
+        }
 
-        var l = bm1.at(x + (dirx + diry - 1) / 2, y + (diry - dirx - 1) / 2)
-        var r = bm1.at(x + (dirx - diry - 1) / 2, y + (diry + dirx - 1) / 2)
+        const l = bm1.at(x + (dirx + diry - 1) / 2, y + (diry - dirx - 1) / 2)
+        const r = bm1.at(x + (dirx - diry - 1) / 2, y + (diry + dirx - 1) / 2)
 
         if (r && !l) {
           /* istanbul ignore next */
@@ -306,7 +316,7 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function xorPath(path) {
-      var y1 = path.pt[0].y,
+      let y1 = path.pt[0].y,
         len = path.len,
         x,
         y,
@@ -378,7 +388,7 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function quadform(Q, w) {
-      var v = new Array(3),
+      let v = new Array(3),
         i,
         j,
         sum
@@ -397,7 +407,7 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function interval(lambda, a, b) {
-      var res = new Point()
+      const res = new Point()
 
       res.x = a.x + lambda * (b.x - a.x)
       res.y = a.y + lambda * (b.y - a.y)
@@ -405,7 +415,7 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function dorth_infty(p0, p2) {
-      var r = new Point()
+      const r = new Point()
 
       r.y = sign(p2.x - p0.x)
       r.x = -sign(p2.y - p0.y)
@@ -414,13 +424,13 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function ddenom(p0, p2) {
-      var r = dorth_infty(p0, p2)
+      const r = dorth_infty(p0, p2)
 
       return r.y * (p2.x - p0.x) - r.x * (p2.y - p0.y)
     }
 
     function dpara(p0, p1, p2) {
-      var x1, y1, x2, y2
+      let x1, y1, x2, y2
 
       x1 = p1.x - p0.x
       y1 = p1.y - p0.y
@@ -431,7 +441,7 @@ function Potrace(canvas, multiplyFactor) {
     }
     /* istanbul ignore next */
     function cprod(p0, p1, p2, p3) {
-      var x1, y1, x2, y2
+      let x1, y1, x2, y2
 
       x1 = p1.x - p0.x
       y1 = p1.y - p0.y
@@ -442,7 +452,7 @@ function Potrace(canvas, multiplyFactor) {
     }
     /* istanbul ignore next */
     function iprod(p0, p1, p2) {
-      var x1, y1, x2, y2
+      let x1, y1, x2, y2
 
       x1 = p1.x - p0.x
       y1 = p1.y - p0.y
@@ -453,7 +463,7 @@ function Potrace(canvas, multiplyFactor) {
     }
     /* istanbul ignore next */
     function iprod1(p0, p1, p2, p3) {
-      var x1, y1, x2, y2
+      let x1, y1, x2, y2
 
       x1 = p1.x - p0.x
       y1 = p1.y - p0.y
@@ -468,7 +478,7 @@ function Potrace(canvas, multiplyFactor) {
     }
     /* istanbul ignore next */
     function bezier(t, p0, p1, p2, p3) {
-      var s = 1 - t,
+      let s = 1 - t,
         res = new Point()
 
       res.x = s * s * s * p0.x + 3 * (s * s * t) * p1.x + 3 * (t * t * s) * p2.x + t * t * t * p3.x
@@ -478,7 +488,7 @@ function Potrace(canvas, multiplyFactor) {
     }
     /* istanbul ignore next */
     function tangent(p0, p1, p2, p3, q0, q1) {
-      var A, B, C, a, b, c, d, s, r1, r2
+      let A, B, C, a, b, c, d, s, r1, r2
 
       A = cprod(p0, p1, q0, q1)
       B = cprod(p1, p2, q0, q1)
@@ -509,12 +519,12 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function calcSums(path) {
-      var i, x, y
+      let i, x, y
       path.x0 = path.pt[0].x
       path.y0 = path.pt[0].y
 
       path.sums = []
-      var s = path.sums
+      const s = path.sums
       s.push(new Sum(0, 0, 0, 0, 0))
       for (i = 0; i < path.len; i++) {
         x = path.pt[i].x - path.x0
@@ -524,7 +534,7 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function calcLon(path) {
-      var n = path.len,
+      let n = path.len,
         pt = path.pt,
         dir,
         pivk = new Array(n),
@@ -532,13 +542,13 @@ function Potrace(canvas, multiplyFactor) {
         ct = new Array(4)
       path.lon = new Array(n)
 
-      var constraint = [new Point(), new Point()],
+      let constraint = [new Point(), new Point()],
         cur = new Point(),
         off = new Point(),
         dk = new Point(),
         foundk
 
-      var i,
+      let i,
         j,
         k1,
         a,
@@ -643,10 +653,10 @@ function Potrace(canvas, multiplyFactor) {
 
     function bestPolygon(path) {
       function penalty3(path, i, j) {
-        var n = path.len,
+        let n = path.len,
           pt = path.pt,
           sums = path.sums
-        var x,
+        let x,
           y,
           xy,
           x2,
@@ -696,7 +706,7 @@ function Potrace(canvas, multiplyFactor) {
         return Math.sqrt(s)
       }
 
-      var i,
+      let i,
         j,
         m,
         k,
@@ -772,7 +782,7 @@ function Potrace(canvas, multiplyFactor) {
 
     function adjustVertices(path) {
       function pointslope(path, i, j, ctr, dir) {
-        var n = path.len,
+        let n = path.len,
           sums = path.sums,
           x,
           y,
@@ -845,7 +855,7 @@ function Potrace(canvas, multiplyFactor) {
         }
       }
 
-      var m = path.m,
+      let m = path.m,
         po = path.po,
         n = path.len,
         pt = path.pt,
@@ -894,7 +904,7 @@ function Potrace(canvas, multiplyFactor) {
         }
       }
 
-      var Q, w, dx, dy, det, min, cand, xmin, ymin, z
+      let Q, w, dx, dy, det, min, cand, xmin, ymin, z
       for (i = 0; i < m; i++) {
         Q = new Quad()
         w = new Point()
@@ -998,7 +1008,7 @@ function Potrace(canvas, multiplyFactor) {
     }
     /* istanbul ignore next */
     function reverse(path) {
-      var curve = path.curve,
+      let curve = path.curve,
         m = curve.n,
         v = curve.vertex,
         i,
@@ -1013,10 +1023,10 @@ function Potrace(canvas, multiplyFactor) {
     }
 
     function smooth(path) {
-      var m = path.curve.n,
+      let m = path.curve.n,
         curve = path.curve
 
-      var i, j, k, dd, denom, alpha, p2, p3, p4
+      let i, j, k, dd, denom, alpha, p2, p3, p4
 
       for (i = 0; i < m; i++) {
         j = mod(i + 1, m)
@@ -1075,7 +1085,7 @@ function Potrace(canvas, multiplyFactor) {
       }
 
       function opti_penalty(path, i, j, res, opttolerance, convc, areac) {
-        var m = path.curve.n,
+        let m = path.curve.n,
           curve = path.curve,
           vertex = curve.vertex,
           k,
@@ -1242,7 +1252,7 @@ function Potrace(canvas, multiplyFactor) {
         return 0
       }
 
-      var curve = path.curve,
+      let curve = path.curve,
         m = curve.n,
         vert = curve.vertex,
         pt = new Array(m + 1),
@@ -1262,7 +1272,7 @@ function Potrace(canvas, multiplyFactor) {
         s,
         t
 
-      var convc = new Array(m),
+      let convc = new Array(m),
         areac = new Array(m + 1)
 
       for (i = 0; i < m; i++) {
@@ -1361,8 +1371,8 @@ function Potrace(canvas, multiplyFactor) {
       path.curve = ocurve
     }
 
-    for (var i = 0; i < pathlist.length; i++) {
-      var path = pathlist[i]
+    for (let i = 0; i < pathlist.length; i++) {
+      const path = pathlist[i]
       calcSums(path)
       calcLon(path)
       bestPolygon(path)
@@ -1464,7 +1474,7 @@ function Potrace(canvas, multiplyFactor) {
   function getPolyPath(size, opt_type) {
     function path(curve) {
       function segment(i) {
-        var s =
+        let s =
           'L ' +
           (curve.c[i * 3 + 1].x * size).toFixed(3) * multiplyFactor +
           ' ' +
@@ -1478,9 +1488,9 @@ function Potrace(canvas, multiplyFactor) {
         return s
       }
 
-      var n = curve.n,
+      let n = curve.n,
         i
-      var p =
+      let p =
         'M' +
         (curve.c[(n - 1) * 3 + 2].x * size).toFixed(3) * multiplyFactor +
         ' ' +

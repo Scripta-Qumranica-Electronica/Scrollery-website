@@ -82,7 +82,7 @@ export default class Char extends extendModel(defaults) {
     }
 
     // determine the index of the item to remove
-    let i = this.attributes.findIndex(attributeID)
+    const i = this.attributes.findIndex(attributeID)
     return i >= 0 ? this.attributes.delete(i) : null
   }
 

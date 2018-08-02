@@ -76,10 +76,10 @@ export default class ColumnPersistanceService extends PersistanceService {
       deletions: {},
       updates: {},
     }
-    for (let id in replies) {
+    for (const id in replies) {
       const transaction = transactions[id]
       replies[id].forEach((singleAction, i) => {
-        for (let signIdenfifier in singleAction) {
+        for (const signIdenfifier in singleAction) {
           // the value is the keyword 'deleted', then the corresponding
           // sign has been removed.
           // In the case of deletions, the signIdentifier is it's ID.
@@ -90,7 +90,7 @@ export default class ColumnPersistanceService extends PersistanceService {
 
             // if the value is a number, it's the sign's id after being persisted.
           } else if (typeof singleAction[signIdenfifier] === 'number') {
-            let signRequested = transaction.signs[i]
+            const signRequested = transaction.signs[i]
             persistedMap.additions[signIdenfifier] = {
               next_sign_id: ~~signRequested.next_sign_id || -1,
               sign_id: ~~singleAction[signIdenfifier],
@@ -135,16 +135,16 @@ export default class ColumnPersistanceService extends PersistanceService {
       // guarantee of set order ... additionally, there are potentially
       // multiple runs of sequential signs to gath. Essentially, we have
       // to contend with multiple linked lists that are not ordered in any way
-      let signRuns = []
+      const signRuns = []
 
       // a recursive function to create a run
       const getPreviousFromAdditions = (uuid, run) => {
-        let prev = signStream[signStream.map[uuid] - 1]
+        const prev = signStream[signStream.map[uuid] - 1]
 
         // there's a previous sign
         if (prev) {
           // check to see if it's also an addition
-          let prevUuid = prev.getUUID()
+          const prevUuid = prev.getUUID()
           if (additions[prevUuid]) {
             // remove it from the additions once handled
             delete additions[prevUuid]
@@ -169,12 +169,12 @@ export default class ColumnPersistanceService extends PersistanceService {
       }
 
       const getNextFromAdditions = (uuid, run) => {
-        let next = signStream[signStream.map[uuid] + 1]
+        const next = signStream[signStream.map[uuid] + 1]
 
         // there's a next sign
         if (next) {
           // check to see if it's also an addition
-          let nextUuid = next.getUUID()
+          const nextUuid = next.getUUID()
           if (additions[nextUuid]) {
             // remove it from the additions once handled
             delete additions[nextUuid]
@@ -205,7 +205,7 @@ export default class ColumnPersistanceService extends PersistanceService {
         uuids.length > 0;
         uuids = Object.keys(additions)
       ) {
-        let sign = additions[(uuid = uuids.pop())]
+        const sign = additions[(uuid = uuids.pop())]
 
         // delete the addition from the additions
         // since it's now been handles

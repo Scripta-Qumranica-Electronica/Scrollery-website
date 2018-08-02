@@ -28,7 +28,7 @@ class Column extends List {
 
     if (this.hasChanges()) {
       this.forEach(line => {
-        let { additions, deletions, updates } = line.getChanges()
+        const { additions, deletions, updates } = line.getChanges()
         Object.assign(changes.additions, additions || {})
         Object.assign(changes.deletions, deletions || {})
         Object.assign(changes.updates, updates || {})
@@ -67,7 +67,7 @@ class Column extends List {
    * @return {Line}       The new line model
    */
   splitLine(line, splitIndex = -1) {
-    let index = line instanceof Line ? this.findIndex(line.getID()) : line
+    const index = line instanceof Line ? this.findIndex(line.getID()) : line
 
     // safeguard to ensure we have a line
     // and a place to split that line
@@ -76,7 +76,7 @@ class Column extends List {
     }
 
     // split the line into a new line
-    let target = this.get(index).sliceInto(splitIndex, line.length)
+    const target = this.get(index).sliceInto(splitIndex, line.length)
 
     // finally, insert the new line just after the previous one
     this.insert(target, index + 1)
@@ -107,9 +107,9 @@ class Column extends List {
     // as we go. Going in reverse order allows us to remove things
     // but keep indexes the same.
     for (let i = this.length - 1; i > -1; i--) {
-      let line = this.get(i)
-      let t = target[targetIndex]
-      let tId = parseInt(t.id)
+      const line = this.get(i)
+      const t = target[targetIndex]
+      const tId = parseInt(t.id)
 
       // there is no corresponding target element or the target id doesn't match,
       // remove the line
@@ -126,7 +126,7 @@ class Column extends List {
     // if there are remaining items in the target list
     // at the beginning, add those in.
     while (targetIndex > -1) {
-      let line = new Line({})
+      const line = new Line({})
       line.synchronizeTo(target[targetIndex].text)
       this.insert(line, 0)
       targetIndex--

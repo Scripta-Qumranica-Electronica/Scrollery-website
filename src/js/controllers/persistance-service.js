@@ -75,7 +75,7 @@ export default class PersistanceService extends EventEmitter {
       return this._queue()
     }
 
-    var q = this.queued
+    const q = this.queued
     if (
       q &&
       (Object.keys(q.additions).length ||
