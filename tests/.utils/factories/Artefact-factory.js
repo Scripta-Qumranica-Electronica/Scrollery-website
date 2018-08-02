@@ -13,7 +13,7 @@ const props = attrs =>
       transform_matrix: '{"matrix":[[1,0,0],[0,1,0]]}',
       rect: 'POLYGON((0 0,0 10,10 10,10 0,0 0))',
       image_catalog_id: faker.random.number(1000000),
-      rois: [],
+      rois: []
     },
     attrs
   )

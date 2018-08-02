@@ -16,8 +16,8 @@ describe('AddNewCombinationMenu', function() {
       wrapper = mount(AddNewCombinationMenu, {
         propsData: {
           selectedCombination: combination.scroll_version_id,
-          corpus: corpus,
-        },
+          corpus: corpus
+        }
       })
       vm = wrapper.vm
     })

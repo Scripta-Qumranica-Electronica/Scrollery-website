@@ -21,14 +21,14 @@ describe('Artefact', function() {
           side: 0,
           rect: 'POLYGON((0 0,0 1,1 1,1 0,0 0))',
           mask: 'POLYGON((0 0,0 1,1 1,1 0,0 0))',
-          image_catalog_id: 0,
+          image_catalog_id: 0
         },
         index: 0,
         images: [0, 1, 2, 3, 4],
         corpus: new MenuCorpus(),
-        baseDPI: baseDPI,
+        baseDPI: baseDPI
       },
-      baseDPI: baseDPI,
+      baseDPI: baseDPI
     })
     vm = wrapper.vm
   })
@@ -81,8 +81,8 @@ class ImageReferences {
   constructor() {
     this._items = {
       0: {
-        images: [0, 1, 2, 3, 4],
-      },
+        images: [0, 1, 2, 3, 4]
+      }
     }
   }
 
@@ -100,8 +100,8 @@ class Images {
         //Maybe in the future we put in a real image
         url: 'url',
         filename: 'filename',
-        suffix: 'suffix',
-      },
+        suffix: 'suffix'
+      }
     }
   }
   get(id) {

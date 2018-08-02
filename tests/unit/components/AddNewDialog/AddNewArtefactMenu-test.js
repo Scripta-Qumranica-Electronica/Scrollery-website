@@ -19,8 +19,8 @@ describe('AddNewArtefactMenu', function() {
         propsData: {
           selectedImageReference: image.image_catalog_id,
           selectedCombination: combination.scroll_version_id,
-          corpus: corpus,
-        },
+          corpus: corpus
+        }
       })
       vm = wrapper.vm
     })
@@ -38,8 +38,8 @@ describe('AddNewArtefactMenu', function() {
         propsData: {
           selectedImageReference: undefined,
           selectedCombination: combination.scroll_version_id,
-          corpus: corpus,
-        },
+          corpus: corpus
+        }
       })
       vm = wrapper.vm
     })
@@ -64,8 +64,8 @@ describe('AddNewArtefactMenu', function() {
         propsData: {
           selectedImageReference: undefined,
           selectedCombination: undefined,
-          corpus: corpus,
-        },
+          corpus: corpus
+        }
       })
       vm = wrapper.vm
     })

@@ -21,7 +21,7 @@ describe('get image data', () => {
         PASSWORD: 'asdf',
         SCROLLVERSION: 1,
         USER_NAME: 'test',
-        transaction: 'validateSession',
+        transaction: 'validateSession'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -51,7 +51,7 @@ describe('get image data', () => {
       .send({
         SESSION_ID: session_id,
         image_catalog_id: image.image_catalog_id,
-        transaction: 'imagesOfInstFragments',
+        transaction: 'imagesOfInstFragments'
       })
       .expect('Content-Type', /json/)
       .expect(200)

@@ -17,8 +17,8 @@ describe('AddNewDialogImage', function() {
         corpus: corpus,
         artefact: artefact,
         scrollVersionID: combination.scroll_version_id,
-        imageReference: image.image_catalog_id,
-      },
+        imageReference: image.image_catalog_id
+      }
     })
     vm = wrapper.vm
   })

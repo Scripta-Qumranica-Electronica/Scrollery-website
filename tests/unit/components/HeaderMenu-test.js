@@ -7,16 +7,16 @@ describe('HeaderMenu', () => {
   beforeEach(() => {
     wrapper = mount(HeaderMenu, {
       propsData: {
-        corpus: {},
+        corpus: {}
       },
       mocks: {
         $router: { push },
         $route: {
           params: {
-            scrollVersionID: 1,
-          },
-        },
-      },
+            scrollVersionID: 1
+          }
+        }
+      }
     })
     vm = wrapper.vm
   })

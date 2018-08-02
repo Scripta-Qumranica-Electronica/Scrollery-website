@@ -9,10 +9,10 @@ const plain = props =>
       chars: [
         {
           sign_char: faker.random.word()[0],
-          attributs: [],
-        },
+          attributs: []
+        }
       ],
-      next_sign_ids: [faker.random.number()],
+      next_sign_ids: [faker.random.number()]
     },
     props
   )

@@ -13,7 +13,7 @@ let createTargetFromNodeList = nodes => {
     let child = nodes[i]
     target.push({
       id: child.dataset.lineId,
-      text: child.innerText,
+      text: child.innerText
     })
   }
   return target

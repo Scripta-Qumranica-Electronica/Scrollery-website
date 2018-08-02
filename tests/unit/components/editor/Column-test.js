@@ -16,17 +16,17 @@ const columnFactory = () => {
     attachToDocument: true, // important to ensure selection API works
     propsData: {
       state: editorStore({
-        str: key => key,
+        str: key => key
       }),
-      column: factory.column(),
+      column: factory.column()
     },
     mocks: {
       // route is accessed during mount. Just need a simple
       // stub of the $route global to avoid hard errors.
       $route: {
-        params: {},
-      },
-    },
+        params: {}
+      }
+    }
   })
 }
 
@@ -54,7 +54,7 @@ describe('ColumnComponent', () => {
           const e = new KeyboardEvent('keydown', {
             metaKey: true,
             keyCode: KEY_CODES.ALPHA.I,
-            key: 'i',
+            key: 'i'
           })
           sinon.spy(e, 'preventDefault')
 
@@ -66,7 +66,7 @@ describe('ColumnComponent', () => {
           const e = new KeyboardEvent('keydown', {
             metaKey: true,
             keyCode: KEY_CODES.ALPHA.B,
-            key: 'b',
+            key: 'b'
           })
           sinon.spy(e, 'preventDefault')
 

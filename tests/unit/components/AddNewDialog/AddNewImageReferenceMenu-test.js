@@ -18,8 +18,8 @@ describe('AddNewImageReferenceMenu', function() {
         propsData: {
           selectedCombination: combination.scroll_version_id,
           selectedImageReference: image.image_catalog_id,
-          corpus: corpus,
-        },
+          corpus: corpus
+        }
       })
       vm = wrapper.vm
     })
@@ -43,8 +43,8 @@ describe('AddNewImageReferenceMenu', function() {
         propsData: {
           selectedCombination: undefined,
           selectedImageReference: undefined,
-          corpus: corpus,
-        },
+          corpus: corpus
+        }
       })
       vm = wrapper.vm
     })

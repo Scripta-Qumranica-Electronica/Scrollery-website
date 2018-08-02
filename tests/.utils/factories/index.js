@@ -3,5 +3,5 @@ import sign from './sign-factory.js'
 
 export default {
   sign,
-  column,
+  column
 }

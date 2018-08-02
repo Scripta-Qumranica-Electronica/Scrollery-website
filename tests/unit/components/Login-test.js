@@ -13,8 +13,8 @@ describe('Login', function() {
       mocks: {
         $post: function() {
           return $postPromise
-        },
-      },
+        }
+      }
     })
     vm = wrapper.vm
   })
@@ -57,14 +57,14 @@ describe('Login', function() {
         expect(key).to.equal('sqe-session')
         expect(vm.errMsg).to.equal('')
         done()
-      },
+      }
     })
   })
 
   it('should clear localStorage on error message received', done => {
     const sessionID = '1234567890'
     const data = {
-      error: 'Some error message',
+      error: 'Some error message'
     }
     vm.$post = function() {
       return new Promise((resolve, reject) => resolve({ data }))
@@ -75,14 +75,14 @@ describe('Login', function() {
         expect(key).to.equal('sqe-session')
         expect(vm.errMsg).to.equal('')
         done()
-      },
+      }
     })
   })
 
   it('should login after successful sessionID check', done => {
     const sessionID = '1234567890'
     const data = {
-      success: true,
+      success: true
     }
     vm.$post = function() {
       return new Promise((resolve, reject) => resolve({ data }))
@@ -222,8 +222,8 @@ describe('Login', function() {
       const partialData = {
         data: {
           // missing a USER_ID
-          SESSION_ID: 12345,
-        },
+          SESSION_ID: 12345
+        }
       }
 
       vm
@@ -244,7 +244,7 @@ describe('Login', function() {
         push: route => {
           // ensure route is workbenchAddress
           expect(route.name).to.equal('workbenchAddress')
-        },
+        }
       }
 
       window.localStorage.setItem('name', JSON.stringify({ 1: 'name' }))
@@ -252,8 +252,8 @@ describe('Login', function() {
       const res = {
         data: {
           USER_ID: 1,
-          SESSION_ID: 12345,
-        },
+          SESSION_ID: 12345
+        }
       }
 
       vm

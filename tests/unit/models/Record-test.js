@@ -32,7 +32,7 @@ describe('Record', () => {
 
   it('should extend the object with new properties in place (not create a new instance', () => {
     const updates = {
-      val: true,
+      val: true
     }
     record.extend(updates)
     expect(record.val).to.equal(updates.val)

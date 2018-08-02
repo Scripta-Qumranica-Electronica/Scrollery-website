@@ -15,7 +15,7 @@ const props = attrs =>
       end: 920,
       is_master: faker.random.number(1),
       suffix: 'default.jpg',
-      editionSide: faker.random.number(1),
+      editionSide: faker.random.number(1)
     },
     attrs
   )

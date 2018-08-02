@@ -24,7 +24,7 @@ describe('get menu data', () => {
         PASSWORD: 'asdf',
         SCROLLVERSION: 1,
         USER_NAME: 'test',
-        transaction: 'validateSession',
+        transaction: 'validateSession'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -55,7 +55,7 @@ describe('get menu data', () => {
       .send({
         SESSION_ID: session_id,
         user_id: user_id,
-        transaction: 'getCombs',
+        transaction: 'getCombs'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -90,7 +90,7 @@ describe('get menu data', () => {
       .send({
         SESSION_ID: session_id,
         scroll_version_id: scroll_version_id,
-        transaction: 'getColOfComb',
+        transaction: 'getColOfComb'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -122,7 +122,7 @@ describe('get menu data', () => {
       .send({
         SESSION_ID: session_id,
         scroll_version_id: scroll_version_id,
-        transaction: 'getArtOfComb',
+        transaction: 'getArtOfComb'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -154,7 +154,7 @@ describe('get menu data', () => {
       .send({
         SESSION_ID: session_id,
         scroll_version_id: scroll_version_id,
-        transaction: 'getScrollArtefacts',
+        transaction: 'getScrollArtefacts'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -201,7 +201,7 @@ describe('get menu data', () => {
       .send({
         SESSION_ID: session_id,
         scroll_version_id: scroll_version_id,
-        transaction: 'getImgOfComb',
+        transaction: 'getImgOfComb'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -238,7 +238,7 @@ describe('get menu data', () => {
         SESSION_ID: session_id,
         scroll_version_id: image.scroll_version_id,
         image_catalog_id: image.image_catalog_id,
-        transaction: 'getArtOfImage',
+        transaction: 'getArtOfImage'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -278,7 +278,7 @@ describe('get menu data', () => {
       .send({
         SESSION_ID: session_id,
         scroll_version_id: image.scroll_version_id,
-        transaction: 'getScrollWidth',
+        transaction: 'getScrollWidth'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -309,7 +309,7 @@ describe('get menu data', () => {
       .send({
         SESSION_ID: session_id,
         scroll_version_id: image.scroll_version_id,
-        transaction: 'getScrollHeight',
+        transaction: 'getScrollHeight'
       })
       .expect('Content-Type', /json/)
       .expect(200)

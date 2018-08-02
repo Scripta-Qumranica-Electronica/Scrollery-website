@@ -28,8 +28,8 @@ describe('ImageMenu', () => {
           artefactEditable: true,
           roiEditable: false,
           brushCursorSize: 20,
-          imageSettings: imageSettings,
-        },
+          imageSettings: imageSettings
+        }
       })
       vm = wrapper.vm
     })

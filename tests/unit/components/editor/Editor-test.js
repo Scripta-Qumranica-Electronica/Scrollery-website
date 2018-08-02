@@ -13,8 +13,8 @@ import getTextOfFragment from './getTextOfFragment.json'
 let makeRoute = (colID = 1, scrollVersionID = 2) => ({
   params: {
     colID,
-    scrollVersionID,
-  },
+    scrollVersionID
+  }
 })
 
 /**
@@ -31,7 +31,7 @@ let mockAPIResponse = (status = 200) => {
     } else {
       resolve({
         status,
-        data: status === 200 ? getTextOfFragment : { text: [] },
+        data: status === 200 ? getTextOfFragment : { text: [] }
       })
     }
   })
@@ -54,9 +54,9 @@ let mountEditor = ({ mocks = {}, methods = {} }) => {
   let wrapper = mount(Editor, {
     mocks: {
       $route: makeRoute('~'),
-      ...mocks,
+      ...mocks
     },
-    methods,
+    methods
   })
 
   // reset stub.
@@ -69,9 +69,9 @@ let mountEditor = ({ mocks = {}, methods = {} }) => {
   wrapper.vm.$refs = {
     messageBar: {
       close: () => {},
-      flash: () => {},
+      flash: () => {}
     },
-    toolbar: {},
+    toolbar: {}
   }
 
   return wrapper
@@ -98,8 +98,8 @@ describe('Editor', () => {
       let getTextSpy = sinon.spy()
       let wrapper = mountEditor({
         methods: {
-          getText: getTextSpy,
-        },
+          getText: getTextSpy
+        }
       })
       expect(getTextSpy.called).to.equal(false)
     })
@@ -110,11 +110,11 @@ describe('Editor', () => {
       // set the closure-scope colID to an invalid value
       let wrapper = mountEditor({
         mocks: {
-          $route: makeRoute('~'),
+          $route: makeRoute('~')
         },
         methods: {
-          getText: getTextSpy,
-        },
+          getText: getTextSpy
+        }
       })
 
       // initially, called should be false
@@ -122,13 +122,13 @@ describe('Editor', () => {
 
       // set route to something valid
       wrapper.setData({
-        $route: makeRoute(1),
+        $route: makeRoute(1)
       })
       expect(getTextSpy.called).to.equal(true)
 
       // reset route to something invalid
       wrapper.setData({
-        $route: makeRoute('~'),
+        $route: makeRoute('~')
       })
       expect(getTextSpy.getCalls().length).to.equal(1)
       expect(wrapper.vm.text.length).to.equal(0)
@@ -138,7 +138,7 @@ describe('Editor', () => {
   describe('fullscreen', () => {
     it('should toggle full screen', () => {
       let wrapper = mountEditor({
-        $route: makeRoute(1),
+        $route: makeRoute(1)
       })
       wrapper.vm.toggleFullScreen()
       expect(wrapper.vm.fullscreen).to.equal(true)
@@ -155,7 +155,7 @@ describe('Editor', () => {
 
       // trigger a retrieval of that column
       wrapper.setData({
-        $route: makeRoute(colID),
+        $route: makeRoute(colID)
       })
 
       // detecting async event -- better way?

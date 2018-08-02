@@ -21,7 +21,7 @@ describe('ArtefactMenuItem', function() {
           scrollID: combination.scroll_id,
           imageID: image.image_catalog_id,
           scrollVersionID: combination.scroll_version_id,
-          corpus: corpus,
+          corpus: corpus
         },
         mocks: {
           $router: { push },
@@ -30,10 +30,10 @@ describe('ArtefactMenuItem', function() {
               artID: 10000001,
               scrollID: 10000001,
               scrollVersionID: 10000001,
-              imageID: 10000001,
-            },
-          },
-        },
+              imageID: 10000001
+            }
+          }
+        }
       })
       vm = wrapper.vm
     })
@@ -58,7 +58,7 @@ describe('ArtefactMenuItem', function() {
           scrollID: combination.scroll_id,
           imageID: image.image_catalog_id,
           scrollVersionID: combination.scroll_version_id,
-          corpus: corpus,
+          corpus: corpus
         },
         mocks: {
           $router: { push },
@@ -67,10 +67,10 @@ describe('ArtefactMenuItem', function() {
               artID: 10000001,
               scrollID: 10000001,
               scrollVersionID: 10000001,
-              imageID: image.image_catalog_id,
-            },
-          },
-        },
+              imageID: image.image_catalog_id
+            }
+          }
+        }
       })
       vm = wrapper.vm
     })
@@ -95,7 +95,7 @@ describe('ArtefactMenuItem', function() {
           scrollID: combination.scroll_id,
           imageID: image.image_catalog_id,
           scrollVersionID: combination.scroll_version_id,
-          corpus: corpus,
+          corpus: corpus
         },
         mocks: {
           $router: { push },
@@ -104,10 +104,10 @@ describe('ArtefactMenuItem', function() {
               artID: 10000001,
               scrollID: combination.scroll_id,
               scrollVersionID: 10000001,
-              imageID: image.image_catalog_id,
-            },
-          },
-        },
+              imageID: image.image_catalog_id
+            }
+          }
+        }
       })
       vm = wrapper.vm
     })
@@ -132,7 +132,7 @@ describe('ArtefactMenuItem', function() {
           scrollID: combination.scroll_id,
           imageID: image.image_catalog_id,
           scrollVersionID: combination.scroll_version_id,
-          corpus: corpus,
+          corpus: corpus
         },
         mocks: {
           $router: { push },
@@ -141,10 +141,10 @@ describe('ArtefactMenuItem', function() {
               artID: 10000001,
               scrollID: combination.scroll_id,
               scrollVersionID: combination.scroll_version_id,
-              imageID: image.image_catalog_id,
-            },
-          },
-        },
+              imageID: image.image_catalog_id
+            }
+          }
+        }
       })
       vm = wrapper.vm
     })
@@ -169,7 +169,7 @@ describe('ArtefactMenuItem', function() {
           scrollID: combination.scroll_id,
           imageID: image.image_catalog_id,
           scrollVersionID: combination.scroll_version_id,
-          corpus: corpus,
+          corpus: corpus
         },
         mocks: {
           $router: { push },
@@ -178,10 +178,10 @@ describe('ArtefactMenuItem', function() {
               artID: 10000001,
               scrollID: combination.scroll_id,
               scrollVersionID: combination.scroll_version_id,
-              imageID: 10000001,
-            },
-          },
-        },
+              imageID: 10000001
+            }
+          }
+        }
       })
       vm = wrapper.vm
     })
@@ -206,7 +206,7 @@ describe('ArtefactMenuItem', function() {
           scrollID: combination.scroll_id,
           imageID: image.image_catalog_id,
           scrollVersionID: combination.scroll_version_id,
-          corpus: corpus,
+          corpus: corpus
         },
         mocks: {
           $router: { push },
@@ -215,10 +215,10 @@ describe('ArtefactMenuItem', function() {
               artID: artefact.artefact_id,
               scrollID: combination.scroll_id,
               scrollVersionID: combination.scroll_version_id,
-              imageID: image.image_catalog_id,
-            },
-          },
-        },
+              imageID: image.image_catalog_id
+            }
+          }
+        }
       })
       vm = wrapper.vm
     })
