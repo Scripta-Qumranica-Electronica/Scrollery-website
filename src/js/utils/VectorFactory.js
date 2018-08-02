@@ -72,9 +72,9 @@ export function wktPolygonToSvg(wkt, boundingRect) {
 export function wktPointToSvg(geoJSON) {
   return geoJSON.substring(0, 6) === 'POINT('
     ? {
-        x: parseFloat(geoJSON.split(' ')[0].replace('POINT(', '')),
-        y: parseFloat(geoJSON.split(' ')[1])
-      }
+      x: parseFloat(geoJSON.split(' ')[0].replace('POINT(', '')),
+      y: parseFloat(geoJSON.split(' ')[1])
+    }
     : undefined
 }
 
@@ -297,8 +297,8 @@ export function dbMatrixToSVG(matrix) {
 export function svgMatrixToDB(matrix) {
   return Array.isArray(matrix) && matrix.length === 6
     ? `{"matrix": [[${matrix[0]},${matrix[2]},${matrix[4]}],[${matrix[1]},${matrix[3]},${
-        matrix[5]
-      }]]}`
+      matrix[5]
+    }]]}`
     : undefined
 }
 
@@ -310,23 +310,23 @@ export function svgMatrixToDB(matrix) {
 export function matrix6To16(matrix) {
   return Array.isArray(matrix) && matrix.length === 6
     ? [
-        matrix[0],
-        matrix[1],
-        0,
-        0,
-        matrix[2],
-        matrix[3],
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        matrix[4],
-        matrix[5],
-        0,
-        1
-      ]
+      matrix[0],
+      matrix[1],
+      0,
+      0,
+      matrix[2],
+      matrix[3],
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      matrix[4],
+      matrix[5],
+      0,
+      1
+    ]
     : undefined
 }
 

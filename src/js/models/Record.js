@@ -86,7 +86,7 @@ function Record(defaults = {}, settings = {}) {
           value: function() {
             const changes = []
             for (const key in values) {
-              ;(function(k) {
+              (function(k) {
                 if (values[k].original !== values[k].value) {
                   changes.push(k)
                 }
@@ -131,7 +131,7 @@ function Record(defaults = {}, settings = {}) {
             // iterate through properties to find others that
             // have persisted methods, and pass them down.
             for (const k in this) {
-              ;(function(key, property) {
+              (function(key, property) {
                 if (propUpdates[key] && property && typeof property.persisted === 'function') {
                   property.persisted(propUpdates[key])
                 }
@@ -150,7 +150,7 @@ function Record(defaults = {}, settings = {}) {
       // iterate through the properties
       for (const key in props) {
         // setup closures to preserve the key value as k in each
-        ;(function(k) {
+        (function(k) {
           // initialize the value to track the value
           values[k] = {
             original: props[k],
@@ -204,7 +204,7 @@ function Record(defaults = {}, settings = {}) {
 
       if (settings.propogate !== false) {
         for (const k in this) {
-          ;(function(key, property) {
+          (function(key, property) {
             if (property instanceof EventEmitter) {
               // emit upwards
               property.on('change', args => {

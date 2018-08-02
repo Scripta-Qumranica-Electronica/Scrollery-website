@@ -1,5 +1,5 @@
 /* istanbul ignore next */
-;(function() {
+(function() {
   /**
    * This library modifies the diff-patch-match library by Neil Fraser
    * by removing the patch and match functionality and certain advanced
@@ -450,85 +450,85 @@
     let commonlength
     while (pointer < diffs.length) {
       switch (diffs[pointer][0]) {
-        case DIFF_INSERT:
-          count_insert++
-          text_insert += diffs[pointer][1]
-          pointer++
-          break
-        case DIFF_DELETE:
-          count_delete++
-          text_delete += diffs[pointer][1]
-          pointer++
-          break
-        case DIFF_EQUAL:
-          // Upon reaching an equality, check for prior redundancies.
-          if (count_delete + count_insert > 1) {
-            if (count_delete !== 0 && count_insert !== 0) {
-              // Factor out any common prefixies.
-              commonlength = diff_commonPrefix(text_insert, text_delete)
-              if (commonlength !== 0) {
-                if (
-                  pointer - count_delete - count_insert > 0 &&
+      case DIFF_INSERT:
+        count_insert++
+        text_insert += diffs[pointer][1]
+        pointer++
+        break
+      case DIFF_DELETE:
+        count_delete++
+        text_delete += diffs[pointer][1]
+        pointer++
+        break
+      case DIFF_EQUAL:
+        // Upon reaching an equality, check for prior redundancies.
+        if (count_delete + count_insert > 1) {
+          if (count_delete !== 0 && count_insert !== 0) {
+            // Factor out any common prefixies.
+            commonlength = diff_commonPrefix(text_insert, text_delete)
+            if (commonlength !== 0) {
+              if (
+                pointer - count_delete - count_insert > 0 &&
                   diffs[pointer - count_delete - count_insert - 1][0] == DIFF_EQUAL
-                ) {
-                  diffs[pointer - count_delete - count_insert - 1][1] += text_insert.substring(
-                    0,
-                    commonlength
-                  )
-                } else {
-                  diffs.splice(0, 0, [DIFF_EQUAL, text_insert.substring(0, commonlength)])
-                  pointer++
-                }
-                text_insert = text_insert.substring(commonlength)
-                text_delete = text_delete.substring(commonlength)
+              ) {
+                diffs[pointer - count_delete - count_insert - 1][1] += text_insert.substring(
+                  0,
+                  commonlength
+                )
+              } else {
+                diffs.splice(0, 0, [DIFF_EQUAL, text_insert.substring(0, commonlength)])
+                pointer++
               }
-              // Factor out any common suffixies.
-              commonlength = diff_commonSuffix(text_insert, text_delete)
-              if (commonlength !== 0) {
-                diffs[pointer][1] =
+              text_insert = text_insert.substring(commonlength)
+              text_delete = text_delete.substring(commonlength)
+            }
+            // Factor out any common suffixies.
+            commonlength = diff_commonSuffix(text_insert, text_delete)
+            if (commonlength !== 0) {
+              diffs[pointer][1] =
                   text_insert.substring(text_insert.length - commonlength) + diffs[pointer][1]
-                text_insert = text_insert.substring(0, text_insert.length - commonlength)
-                text_delete = text_delete.substring(0, text_delete.length - commonlength)
-              }
+              text_insert = text_insert.substring(0, text_insert.length - commonlength)
+              text_delete = text_delete.substring(0, text_delete.length - commonlength)
             }
-            // Delete the offending records and add the merged ones.
-            if (count_delete === 0) {
-              diffs.splice(pointer - count_insert, count_delete + count_insert, [
-                DIFF_INSERT,
-                text_insert
-              ])
-            } else if (count_insert === 0) {
-              diffs.splice(pointer - count_delete, count_delete + count_insert, [
-                DIFF_DELETE,
-                text_delete
-              ])
-            } else {
-              diffs.splice(
-                pointer - count_delete - count_insert,
-                count_delete + count_insert,
-                [DIFF_DELETE, text_delete],
-                [DIFF_INSERT, text_insert]
-              )
-            }
-            pointer =
+          }
+          // Delete the offending records and add the merged ones.
+          if (count_delete === 0) {
+            diffs.splice(pointer - count_insert, count_delete + count_insert, [
+              DIFF_INSERT,
+              text_insert
+            ])
+          } else if (count_insert === 0) {
+            diffs.splice(pointer - count_delete, count_delete + count_insert, [
+              DIFF_DELETE,
+              text_delete
+            ])
+          } else {
+            diffs.splice(
+              pointer - count_delete - count_insert,
+              count_delete + count_insert,
+              [DIFF_DELETE, text_delete],
+              [DIFF_INSERT, text_insert]
+            )
+          }
+          pointer =
               pointer -
               count_delete -
               count_insert +
               (count_delete ? 1 : 0) +
               (count_insert ? 1 : 0) +
               1
-          } else if (pointer !== 0 && diffs[pointer - 1][0] == DIFF_EQUAL) {
-            // Merge this equality with the previous one.
-            diffs[pointer - 1][1] += diffs[pointer][1]
-            diffs.splice(pointer, 1)
-          } else {
-            pointer++
-          }
-          count_insert = 0
-          count_delete = 0
-          text_delete = ''
-          text_insert = ''
-          break
+        } else if (pointer !== 0 && diffs[pointer - 1][0] == DIFF_EQUAL) {
+          // Merge this equality with the previous one.
+          diffs[pointer - 1][1] += diffs[pointer][1]
+          diffs.splice(pointer, 1)
+        } else {
+          pointer++
+        }
+        count_insert = 0
+        count_delete = 0
+        text_delete = ''
+        text_insert = ''
+        break
       }
     }
     if (diffs[diffs.length - 1][1] === '') {

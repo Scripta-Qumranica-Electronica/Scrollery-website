@@ -39,18 +39,18 @@ export default class Artefacts extends ItemList {
         ) {
           let maskWKT = undefined
           switch (pathIdentifier(svgMask)) {
-            case 'SVG':
-              maskWKT = svgPolygonToWKT(svgMask)
-              break
-            case 'WKT':
-              maskWKT = svgMask
-              break
-            case 'GeoJSON':
-              maskWKT = geoJSONPolygonToWKT(svgMask)
-              break
-            case 'GeoJSON String':
-              maskWKT = geoJSONPolygonToWKT(svgMask)
-              break
+          case 'SVG':
+            maskWKT = svgPolygonToWKT(svgMask)
+            break
+          case 'WKT':
+            maskWKT = svgMask
+            break
+          case 'GeoJSON':
+            maskWKT = geoJSONPolygonToWKT(svgMask)
+            break
+          case 'GeoJSON String':
+            maskWKT = geoJSONPolygonToWKT(svgMask)
+            break
           }
           payload.requests.push({
             region_in_master_image: maskWKT,

@@ -37,32 +37,32 @@ class Line extends List {
       // [code = 0, 1, -1, change = 'string difference']
       const d = diffs[i]
       switch (d[0]) {
-        // no change, simply increment up our string index
-        case diff.EQUAL:
-          diffIndex = diffIndex + d[1].length
-          break
+      // no change, simply increment up our string index
+      case diff.EQUAL:
+        diffIndex = diffIndex + d[1].length
+        break
 
         // there's been (a) sign(s) inserted
-        case diff.INSERT:
-          d[1].split('').forEach(char => {
-            this.insert(
-              new Sign({
-                chars: [
-                  {
-                    sign_char: char
-                  }
-                ]
-              }),
-              diffIndex
-            )
-            diffIndex++
-          })
-          break
+      case diff.INSERT:
+        d[1].split('').forEach(char => {
+          this.insert(
+            new Sign({
+              chars: [
+                {
+                  sign_char: char
+                }
+              ]
+            }),
+            diffIndex
+          )
+          diffIndex++
+        })
+        break
 
         // there's been a sign deleted
-        case diff.DELETE:
-          d[1].split('').forEach(() => this.delete(diffIndex))
-          break
+      case diff.DELETE:
+        d[1].split('').forEach(() => this.delete(diffIndex))
+        break
       }
     }
   }

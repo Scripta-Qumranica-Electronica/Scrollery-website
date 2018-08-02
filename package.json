@@ -3,7 +3,6 @@
   "description": "Scripta Qumranica Electronica - Digital Tools for the Dead Sea Scrolls",
   "version": "0.1.1",
   "scripts": {
-    "precommit": "lint-staged",
     "prepush": "karma start --config karma.conf.js --browsers=Chrome --single-run",
     "prettier": "prettier --config ./.prettierrc.yml --write ./{tests,gstsrc}/**/*.{js,vue}",
     "dev": "webpack --config webpack.dev.js",
