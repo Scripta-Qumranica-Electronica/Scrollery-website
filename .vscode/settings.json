@@ -1,0 +1,8 @@
+{
+    "eslint.enable": true,
+    "eslint.provideLintTask": true,
+    "eslint.options": {
+        "extensions": [".js", ".vue"]
+    },
+    "editor.tabSize": 2
+}

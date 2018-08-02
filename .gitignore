@@ -1,5 +1,9 @@
 .vstags
 .vscode
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
+
 .idea
 yarn-error.log
 node_modules
