@@ -1,6 +1,20 @@
 <template>
   <div>
-    <div class="clickable-menu-item" @click="selectImage" :style="{background: $route.params.imageID === image.image_catalog_id ? 'lightblue' : '#dedede'}">
+    <el-popover
+      ref="popover"
+      placement="right"
+      title="Info"
+      width="200"
+      trigger="hover">
+        <img
+          class="thumbnail-preview" 
+          v-if="corpus.imageReferences.getMasterImage(image.image_catalog_id)" 
+          :src="`${corpus.images.get(corpus.imageReferences.getMasterImage(image.image_catalog_id)).getAddress}full/pct:3/0/default.jpg`"/>
+          <span v-if="corpus.imageReferences.getMasterImage(image.image_catalog_id)">
+            {{`${corpus.images.get(corpus.imageReferences.getMasterImage(image.image_catalog_id)).getAddress}full/pct:3/0/default.jpg`}}</span>
+          <span>{{image.image_catalog_id}}</span>
+    </el-popover>
+    <div class="clickable-menu-item" v-popover:popover @click="selectImage" :style="{background: $route.params.imageID === image.image_catalog_id ? 'lightblue' : '#dedede'}">
       <i class="fa" :class="{'fa-caret-right': !open, 'fa-caret-down': open}"></i>
       <span>
         {{image.institution}}: {{image.lvl1}}, {{image.lvl2}} {{image.side === 0 ? 'recto' : 'verso'}}
@@ -105,5 +119,14 @@ export default {
 }
 .fa-exclamation-circle {
   color: red;
+}
+.thumbnail-preview {
+  visibility: visible;
+  content: 'hidden';
+}
+.clickable-menu-item:hover .thumbnail-preview {
+  visibility: visible;
+  content: 'visible';
+  color: green;
 }
 </style>
