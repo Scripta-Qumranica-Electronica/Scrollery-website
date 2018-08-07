@@ -284,7 +284,7 @@ FROM image_catalog
   JOIN scroll_version USING(scroll_version_group_id)
   LEFT JOIN SQE_image USING(image_catalog_id)
   LEFT JOIN artefact_shape ON artefact_shape.id_of_sqe_image = SQE_image.sqe_image_id
-  JOIN artefact_shape_owner USING(artefact_shape_id)
+  LEFT JOIN artefact_shape_owner USING(artefact_shape_id)
 WHERE (scroll_version.scroll_version_id = ?
   OR artefact_shape_owner.scroll_version_id = ?)
   AND (SQE_image.is_master = 1 OR SQE_image.is_master IS NULL) 
