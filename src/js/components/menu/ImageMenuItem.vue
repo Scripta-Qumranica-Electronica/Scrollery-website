@@ -1,13 +1,14 @@
 <template>
-  <div>
+  <div @mouseover="hovered = true">
     <el-popover
       ref="popover"
       placement="right"
       title="Info"
       width="200"
       trigger="hover"
-      :openDelay="1">
+      :openDelay="100">
         <image-catalog-preview 
+          v-if="hovered"
           :scrollVersionID="scrollVersionID"
           :imageCatalogID="image.image_catalog_id"
           :corpus="corpus"

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img v-if="fileName" :src="`${fileName}full/pct:3/0/default.jpg`" />
+    <img v-if="fileName" :src="`${fileName}full/150,/0/default.jpg`" />
   </div>
 </template>
 
