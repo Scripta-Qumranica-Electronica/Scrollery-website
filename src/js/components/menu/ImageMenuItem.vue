@@ -5,14 +5,20 @@
       placement="right"
       title="Info"
       width="200"
-      trigger="hover">
-        <img
+      trigger="hover"
+      :openDelay="1">
+        <image-catalog-preview 
+          :scrollVersionID="scrollVersionID"
+          :imageCatalogID="image.image_catalog_id"
+          :corpus="corpus"
+        />
+        <!-- <img
           class="thumbnail-preview" 
           v-if="corpus.imageReferences.getMasterImage(image.image_catalog_id)" 
-          :src="`${corpus.images.get(corpus.imageReferences.getMasterImage(image.image_catalog_id)).getAddress}full/pct:3/0/default.jpg`"/>
-          <span v-if="corpus.imageReferences.getMasterImage(image.image_catalog_id)">
+          :src="`${corpus.images.get(corpus.imageReferences.getMasterImage(image.image_catalog_id)).getAddress}full/pct:3/0/default.jpg`"/> -->
+          <!-- <span v-if="corpus.imageReferences.getMasterImage(image.image_catalog_id)">
             {{`${corpus.images.get(corpus.imageReferences.getMasterImage(image.image_catalog_id)).getAddress}full/pct:3/0/default.jpg`}}</span>
-          <span>{{image.image_catalog_id}}</span>
+          <span>{{image.image_catalog_id}}</span> -->
     </el-popover>
     <div class="clickable-menu-item" v-popover:popover @click="selectImage" :style="{background: $route.params.imageID === image.image_catalog_id ? 'lightblue' : '#dedede'}">
       <i class="fa" :class="{'fa-caret-right': !open, 'fa-caret-down': open}"></i>
@@ -49,6 +55,7 @@
 <script>
 import ArtefactMenuItem from './ArtefactMenuItem.vue'
 import AddNewDialog from '~/components/AddNewDialog/AddNewDialog.vue'
+import ImageCatalogPreview from '~/components/ImageCatalogPreview.vue'
 
 export default {
   props: {
@@ -60,11 +67,13 @@ export default {
   components: {
     'artefact-menu-item': ArtefactMenuItem,
     'add-new-dialog': AddNewDialog,
+    'image-catalog-preview': ImageCatalogPreview,
   },
   data() {
     return {
       open: false,
       loadingArtefacts: false,
+      hovered: false,
     }
   },
   methods: {

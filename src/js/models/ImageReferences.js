@@ -30,7 +30,7 @@ export default class ImageReferences extends ItemList {
   getMasterImage(imageReferenceID) {
     let masterImage = undefined
     for (let i = 0, image; (image = this.get(imageReferenceID).images[i]); i++) {
-      if (this.corpus.images(image).is_master === 1) masterImage = this.corpus.images(image)
+      if (this.corpus.images.get(image).is_master === 1) masterImage = this.corpus.images.get(image)
     }
     return masterImage
   }

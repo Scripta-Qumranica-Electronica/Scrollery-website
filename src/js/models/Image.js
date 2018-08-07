@@ -19,6 +19,6 @@ export default class Image {
    * @return {string} the address of the image file
    */
   getAddress() {
-    return `${this.url}${this.filename}/`
+    return this.url && this.filename ? `${this.url}${this.filename}/` : undefined
   }
 }
