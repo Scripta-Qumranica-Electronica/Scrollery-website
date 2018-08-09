@@ -43,7 +43,7 @@ As you click on items, the relevant sub-items are loaded from the server.  So cl
 
 The images dropdown list shows a little green check or red x icon on each image entry letting you know whether that image is available on the NLI image server or not.  We will soon add functionality that will display a thumbnail and some metadata when you hover over the image entry.
 
-Clicking on an image entry will open one final dropdown, which shows the artefacts that have been created in that image (there may be as many as 0–∞ artefacts for each image).
+Clicking on an image entry will open one final dropdown, which shows the artefacts that have been created in that image (there may be as many as 0 – ∞ artefacts for each image).
 
 ![image available](media/Image-available.png "Image available")
 
