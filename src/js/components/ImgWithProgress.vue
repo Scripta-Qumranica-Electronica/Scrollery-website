@@ -35,33 +35,46 @@ export default {
     }
   },
   mounted() {
-    console.log(this.url)
     this.loadImage(this.url)
-      .then(url => (this.imageURL = url))
-      .catch(err => console.error(err))
+      .then(
+        /* istanbul ignore next */
+        url => (this.imageURL = url)
+      )
+      .catch(
+        /* istanbul ignore next */
+        err => console.error(err)
+      )
   },
   methods: {
-    loadImage(imageUrl, onprogress) {
+    loadImage(imageUrl) {
       return new Promise((resolve, reject) => {
+        /* istanbul ignore next */
         this.$get(imageUrl, {
           onDownloadProgress: progressEvent => {
+            /* istanbul ignore next */
             if (progressEvent.total) {
               this.progress = progressEvent.total / progressEvent.loaded
-              console.log('loaded', progressEvent.loaded, '/', progressEvent.total, 'of', imageUrl)
             } else {
-              console.log('finished loading', imageUrl)
               this.progress = 1
             }
           },
+          /* istanbul ignore next */
           responseType: 'blob',
         })
-          .then(image => {
-            console.log(image)
-            resolve(window.URL.createObjectURL(image.data))
-          })
-          .catch(err => {
-            reject(err)
-          })
+          .then(
+            /* istanbul ignore next */
+            image => {
+              /* istanbul ignore next */
+              resolve(window.URL.createObjectURL(image.data))
+            }
+          )
+          .catch(
+            /* istanbul ignore next */
+            err => {
+              /* istanbul ignore next */
+              reject(err)
+            }
+          )
       })
     },
   },

@@ -49,50 +49,73 @@ export default {
   },
   methods: {
     fetchImages() {
+      /* istanbul ignore next */
       this.fileName = undefined
+      /* istanbul ignore next */
       this.$store.commit('addWorking')
+      /* istanbul ignore next */
       this.corpus.images
         .populate({
           scroll_version_id: this.scrollVersionID,
           image_catalog_id: this.imageCatalogID,
         })
-        .then(res => {
-          this.$store.commit('delWorking')
-          const filenames = this.corpus.imageReferences.get(this.imageCatalogID >>> 0).images
+        .then(
+          /* istanbul ignore next */
+          res => {
+            /* istanbul ignore next */
+            this.$store.commit('delWorking')
+            /* istanbul ignore next */
+            const filenames = this.corpus.imageReferences.get(this.imageCatalogID >>> 0).images
 
-          for (let i = 0, key; (key = filenames[i]); i++) {
-            if (this.corpus.images.get(key).is_master) {
-              this.fileName = this.corpus.images.get(key).getAddress()
+            /* istanbul ignore next */
+            for (let i = 0, key; (key = filenames[i]); i++) {
+              if (this.corpus.images.get(key).is_master) {
+                this.fileName = this.corpus.images.get(key).getAddress()
+              }
             }
           }
-        })
-        .catch(err => {
-          this.$store.commit('delWorking')
-          console.error(err)
-        })
+        )
+        .catch(
+          /* istanbul ignore next */
+          err => {
+            /* istanbul ignore next */
+            this.$store.commit('delWorking')
+            /* istanbul ignore next */
+            console.error(err)
+          }
+        )
     },
     fetchArtefacts() {
+      /* istanbul ignore next */
       this.$store.commit('addWorking')
+      /* istanbul ignore next */
       this.loadingArtefacts = true
+      /* istanbul ignore next */
       this.corpus.artefacts
         .populate({
           image_catalog_id: this.imageCatalogID,
           scroll_version_id: this.scrollVersionID,
         })
-        .then(res => {
+        .then(
           /* istanbul ignore next */
-          this.$store.commit('delWorking')
+          res => {
+            /* istanbul ignore next */
+            this.$store.commit('delWorking')
+            /* istanbul ignore next */
+            this.loadingArtefacts = false
+          }
+        )
+        .catch(
           /* istanbul ignore next */
-          this.loadingArtefacts = false
-        })
-        .catch(err => {
-          /* istanbul ignore next */
-          this.$store.commit('delWorking')
-          /* istanbul ignore next */
-          this.loadingArtefacts = false
-          /* istanbul ignore next */
-          console.error(err)
-        })
+          err => {
+            /* istanbul ignore next */
+            this.$store.commit('delWorking')
+            /* istanbul ignore next */
+            this.loadingArtefacts = false
+            /* istanbul ignore next */
+            console.error(err)
+          }
+        )
     },
   },
 }
