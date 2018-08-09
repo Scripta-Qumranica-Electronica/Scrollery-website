@@ -4,7 +4,7 @@ export default {
   /* istanbul ignore next */
   install(Vue, { store }) {
     /* istanbul ignore next */
-    Vue.prototype.$post = function(url, data = {}, opt = {}) {
+    ;(Vue.prototype.$post = function(url, data = {}, opt = {}) {
       // Set SESSION_ID if available
       if (!data.SESSION_ID && store.getters.sessionID) {
         data.SESSION_ID = store.getters.sessionID
@@ -30,6 +30,11 @@ export default {
 
       // make the AJAX request
       return axios.post(url, data, opt)
-    }
+    }),
+      /* istanbul ignore next */
+      (Vue.prototype.$get = function(url, config = {}) {
+        // make the AJAX request
+        return axios.get(url, config)
+      })
   },
 }

@@ -1,25 +1,20 @@
 <template>
-  <div @mouseover="hovered = true">
+  <div>
     <el-popover
       ref="popover"
       placement="right"
-      title="Info"
+      title="Image Preview"
       width="200"
       trigger="hover"
-      :openDelay="100">
+      :disabled="!hovered"
+      :openDelay="500"
+      v-on:show="hovered = true">
         <image-catalog-preview 
           v-if="hovered"
           :scrollVersionID="scrollVersionID"
           :imageCatalogID="image.image_catalog_id"
           :corpus="corpus"
         />
-        <!-- <img
-          class="thumbnail-preview" 
-          v-if="corpus.imageReferences.getMasterImage(image.image_catalog_id)" 
-          :src="`${corpus.images.get(corpus.imageReferences.getMasterImage(image.image_catalog_id)).getAddress}full/pct:3/0/default.jpg`"/> -->
-          <!-- <span v-if="corpus.imageReferences.getMasterImage(image.image_catalog_id)">
-            {{`${corpus.images.get(corpus.imageReferences.getMasterImage(image.image_catalog_id)).getAddress}full/pct:3/0/default.jpg`}}</span>
-          <span>{{image.image_catalog_id}}</span> -->
     </el-popover>
     <div class="clickable-menu-item" v-popover:popover @click="selectImage" :style="{background: $route.params.imageID === image.image_catalog_id ? 'lightblue' : '#dedede'}">
       <i class="fa" :class="{'fa-caret-right': !open, 'fa-caret-down': open}"></i>
@@ -30,12 +25,14 @@
         :class="{
           'fa-check-circle-o': image.master_sqe_image_id !== undefined, 
           'fa-exclamation-circle': image.master_sqe_image_id === undefined
-          }"></i>
+          }">
+      </i>
       <i 
         v-if="loadingArtefacts" 
         class="fa fa-spinner fa-spin fa-fw" 
         aria-hidden="true"
-        style="color: black"></i>
+        style="color: black">
+      </i>
     </div>
     <div class="children" v-show="open">
         <ul>
