@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img-with-progress v-if="fileName" :url="`${fileName}full/150,/0/default.jpg`"/>
+    <img-with-progress v-if="fileName" :url="`${fileName}full/150,/0/default.jpg`" type="img"/>
     <!-- <img v-if="fileName" :src="`${fileName}full/150,/0/default.jpg`" /> -->
     <div v-if="corpus.imageReferences.get(imageCatalogID) && corpus.imageReferences.get(imageCatalogID).artefacts.length > 0">
       <div v-for="artefactID in corpus.imageReferences.get(imageCatalogID).artefacts" :key="artefactID">
