@@ -49,7 +49,7 @@ export default {
     loadImage(imageUrl) {
       return new Promise((resolve, reject) => {
         /* istanbul ignore next */
-        this.$get(imageUrl, {
+        this.$get('https://www.qumranica.org/image-proxy?address=' + imageUrl, {
           onDownloadProgress: progressEvent => {
             /* istanbul ignore next */
             if (progressEvent.total) {
