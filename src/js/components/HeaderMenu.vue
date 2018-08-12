@@ -1,5 +1,5 @@
 <template>
-  <el-row class="header" type="flex" justify="space-between">
+  <el-row class="header" type="flex" justify="space-between" :dir="$i18n.str('Direction')">
     <el-col :span="8">
       <div>
           <span>SQE</span>
@@ -14,19 +14,20 @@
                     : $i18n.str('No Scroll Selected')}}</span>
       </div>
     </el-col>
-    <el-col :span="12">
+    <el-col :span="4">
       <div class="right">
-        <i 
-          v-show="working > 0" 
-          class="fa fa-spinner fa-spin fa-fw" 
-          aria-hidden="true"
-          style="color: white"></i>
-        <span><i class="fa fa-language" aria-hidden="true"></i></span>
-        <el-select class="langSelect" v-model="language" @change="languageChanged">
-          <el-option value="en">English</el-option>
-          <el-option value="de">Deutsche</el-option>
-          <el-option value="hb">עברית</el-option>
-        </el-select>
+        <el-dropdown @command="languageChanged">
+          <el-button type="primary">
+            <span><i class="fa fa-language" aria-hidden="true"></i></span>
+            {{language}}<i class="el-icon-arrow-down el-icon--right"></i>
+          </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="en">English</el-dropdown-item>
+            <el-dropdown-item command="de">Deutsche</el-dropdown-item>
+            <el-dropdown-item command="hb">עברית</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+       
       </div>
     </el-col>
 
@@ -70,7 +71,8 @@ export default {
       this.$store.commit('logout')
       this.$router.push({ name: 'login' })
     },
-    languageChanged() {
+    languageChanged(lan) {
+      this.language = lan
       this.setLanguage(this.language)
     },
   },

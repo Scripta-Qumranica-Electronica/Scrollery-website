@@ -1,5 +1,6 @@
 module.exports = {
   // Globals
+  Direction: 'ltr',
   Loading: 'Loading',
   Combinations: 'Combinations',
   Artifact: 'Artifact',

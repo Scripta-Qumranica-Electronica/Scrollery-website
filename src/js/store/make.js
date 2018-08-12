@@ -5,6 +5,7 @@ export default function(Vuex, sessionID = '') {
       userID: -1,
       username: '',
       language: 'en',
+      direction: 'ltr',
       languages: {},
       working: 0,
       lockedScrolls: {},
@@ -15,6 +16,7 @@ export default function(Vuex, sessionID = '') {
       userID: state => state.userID,
       username: state => state.username,
       language: state => state.language,
+      direction: state => state.direction,
       languages: state => state.languages,
       working: state => state.working,
       lockedScrolls: state => state.lockedScrolls,
@@ -49,6 +51,7 @@ export default function(Vuex, sessionID = '') {
       setLanguage(state, language) {
         window.localStorage.setItem('language', language)
         state.language = language
+        state.direction = 'ltr' // todo- set firection from i18 ??
       },
       loadLanguage(state, { key, data }) {
         state.languages[key] = data

@@ -1,5 +1,6 @@
 module.exports = {
   // Globals
+  Direction: 'rtl',
   Loading: 'טוען',
   Combinations: 'צירופים',
   Artifact: 'ממצא',
