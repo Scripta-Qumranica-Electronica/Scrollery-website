@@ -3,7 +3,8 @@
     class="single-image-pane-menu" 
     :gutter="1" 
     type="flex" 
-    align="middle">
+    align="middle"
+    :dir="$i18n.str('Direction')">
     <el-col :span="5">
       <el-select 
         class="image-select-entry" 
