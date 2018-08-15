@@ -58,7 +58,7 @@ export default {
           onDownloadProgress: progressEvent => {
             /* istanbul ignore next */
             if (progressEvent.total) {
-              this.progress = progressEvent.total / progressEvent.loaded
+              this.progress = progressEvent.loaded / progressEvent.total
             } else {
               this.progress = 1
             }

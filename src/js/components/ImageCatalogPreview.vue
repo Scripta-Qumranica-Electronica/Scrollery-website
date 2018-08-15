@@ -113,7 +113,7 @@ export default {
             /* istanbul ignore next */
             this.loadingArtefacts = false
             /* istanbul ignore next */
-            console.error(err)
+            if (err.data.error !== 'No results found.') console.error(err)
           }
         )
     },
