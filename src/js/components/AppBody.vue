@@ -42,6 +42,7 @@ import SingleImage from './SingleImage.vue'
 import Editor from './editor/Editor.vue'
 
 import Corpus from '~/models/Corpus.js'
+import { mapMutations } from 'vuex'
 
 export default {
   components: {
@@ -65,6 +66,12 @@ export default {
     },
   },
   created() {
+    // The imageProxy should perhaps be stored in and retrieved from the server.
+    // This is a proxy server hosted in Göttingen, it sanitizes and caches all
+    // image requests.  This allows us to always be working with SSL encrypted
+    // resources, and to force the proper CORS.
+    this.setImageProxy('https://www.qumranica.org/image-proxy?address=')
+
     // Create and populate the corpus model, with existing data
     // from the router.
     this.$store.commit('resetWorking')
@@ -138,6 +145,8 @@ export default {
       })
   },
   methods: {
+    ...mapMutations(['setImageProxy']),
+
     /**
      * This function triggers a router change, though it copies all
      * data from the old router to the new one.  This way we do not

@@ -23,6 +23,8 @@
  * There is a problem with CORS on the Göttingen iiif server,
  * so this doesn't work with the images of 4Q51 served from there.
  */
+import { mapGetters } from 'vuex'
+
 export default {
   props: {
     url: undefined,
@@ -45,11 +47,14 @@ export default {
         err => console.error(err)
       )
   },
+  computed: {
+    ...mapGetters(['imageProxy']),
+  },
   methods: {
     loadImage(imageUrl) {
       return new Promise((resolve, reject) => {
         /* istanbul ignore next */
-        this.$get('https://www.qumranica.org/image-proxy?address=' + imageUrl, {
+        this.$get(this.imageProxy + imageUrl, {
           onDownloadProgress: progressEvent => {
             /* istanbul ignore next */
             if (progressEvent.total) {

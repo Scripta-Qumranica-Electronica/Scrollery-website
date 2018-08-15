@@ -7,7 +7,7 @@
     :style="{transform: `scale(${scale})`}">
     <canvas
       class="maskCanvas"
-      :class="{pulse: !drawing}"
+      :class="{hidden: clip, pulse: !drawing}"
       ref="maskCanvas"
       :width="width"
       :height="height"
@@ -64,6 +64,7 @@ export default {
     drawMode: '',
     brushSize: 0,
     locked: true,
+    clip: false,
   },
   data() {
     return {
@@ -203,9 +204,13 @@ export default {
   opacity: 0.3;
 }
 .maskCanvas.pulse {
+  visibility: visible;
   opacity: 0.3;
   animation: pulsate 3s ease-out;
   animation-iteration-count: infinite;
+}
+.maskCanvas.hidden {
+  opacity: 0;
 }
 
 @keyframes pulsate {
