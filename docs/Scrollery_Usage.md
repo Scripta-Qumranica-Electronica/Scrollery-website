@@ -41,7 +41,7 @@ As you click on items, the relevant sub-items are loaded from the server.  So cl
 
 ![menu sub-items](media/Menu-subitems.png "Menu sub-items")
 
-The images dropdown list shows a little green check or red x icon on each image entry letting you know whether that image is available on the NLI image server or not.  We will soon add functionality that will display a thumbnail and some metadata when you hover over the image entry.
+The images dropdown list shows a little green check or red x icon on each image entry letting you know whether that image is available on the NLI image server or not.  A thumbnail and some metadata are displayed when you hover the mouse cursor over the image entry.
 
 Clicking on an image entry will open one final dropdown, which shows the artefacts that have been created in that image (there may be as many as 0 – ∞ artefacts for each image).
 
@@ -49,7 +49,7 @@ Clicking on an image entry will open one final dropdown, which shows the artefac
 
 As you might expect, clicking on a column, an image, or an artefact, will cause that item to be displayed in the relevant editing pane.  Beware that we do not have a progress indicator for loading images yet and they can take some time to load.
 
-Finally, any scroll that you are allowed to edit will have an "+ add artefact" menu selection (and soon an "+ add column" menu selection), that open a dialog box to let you do exactly what they promise (see the videos below).
+Finally, any scroll that you are allowed to edit will have a "+ add artefact" menu selection (and soon an "+ add column" menu selection), that open a dialog box to let you do exactly what they promise (see the videos below).
 
 ## Possible interactions
 
@@ -59,12 +59,12 @@ In the interest of time, I put together a few demo videos to display some of the
   <source src="media/Scrollery-Editing-2.mp4" type="video/mp4">
 Cannot play video in browser, <a href="media/Scrollery-Editing-2.mp4">click here to download</a>.
 </video>
-
+<br/>
 <video width="800" height="600" controls>
   <source src="media/Scrollery-Editing-3.mp4" type="video/mp4">
 Cannot play video in browser, <a href="media/Scrollery-Editing-3.mp4">click here to download</a>.
 </video>
-
+<br/>
 <video width="800" height="600" controls>
   <source src="media/Scrollery-Editing.mp4" type="video/mp4">
 Cannot play video in browser, <a href="media/Scrollery-Editing.mp4">click here to download</a>.

@@ -51,6 +51,7 @@
                                   undefined :
                                   corpus.artefacts.get($route.params.artID, $route.params.scrollVersionID).mask"
                         :locked="lock"
+                        :clip="clippingOn"
                         v-on:mask="setClipMask"
                         ref="currentArtCanvas">
       </artefact-canvas>
