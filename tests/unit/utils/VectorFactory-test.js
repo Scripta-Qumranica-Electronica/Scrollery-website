@@ -11,7 +11,7 @@ import {
   svgMatrixToDB,
   matrix6To16,
   matrix16To6,
-  clipCanvas,
+  clipCanvas
 } from '~/utils/VectorFactory.js'
 import * as polygons from '../../.utils/testing-data/polygons.js'
 
@@ -24,15 +24,15 @@ describe('VectorFactory.wktPolygonToSvg', () => {
     // setup initial state
     const point1 = {
       x: 1,
-      y: 1,
+      y: 1
     }
     const point2 = {
       x: 5,
-      y: 1,
+      y: 1
     }
     const point3 = {
       x: 1,
-      y: 5,
+      y: 5
     }
     const wktPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${
       point3.y
@@ -41,7 +41,7 @@ describe('VectorFactory.wktPolygonToSvg', () => {
       x: point1.x - point1.x,
       y: point1.y - point1.y,
       width: point2.x - point1.x,
-      height: point3.y - point1.y,
+      height: point3.y - point1.y
     }
     //define expected result
     const expectedSvgPolygon = `M${point1.x} ${point1.y}L${point2.x} ${point2.y}L${point3.x} ${
@@ -56,15 +56,15 @@ describe('VectorFactory.wktPolygonToSvg', () => {
     // setup initial state
     const point1 = {
       x: 1,
-      y: 1,
+      y: 1
     }
     const point2 = {
       x: 5,
-      y: 1,
+      y: 1
     }
     const point3 = {
       x: 1,
-      y: 5,
+      y: 5
     }
     const wktPolygon = `POLYGON((${point1.x} ${point1.y},${point2.x} ${point2.y},${point3.x} ${
       point3.y
@@ -73,7 +73,7 @@ describe('VectorFactory.wktPolygonToSvg', () => {
       x: point1.x - point1.x,
       y: point1.y - point1.y,
       width: point2.x - point1.x,
-      height: point3.y - point1.y,
+      height: point3.y - point1.y
     }
     //define expected result
     const expectedSvgPolygon = `M${point1.x} ${point1.y}L${point2.x} ${point2.y}L${point3.x} ${
@@ -105,7 +105,7 @@ describe('VectorFactory.wktPointToSvg', () => {
     //define expected result
     const pointObject = {
       x: 10,
-      y: 20,
+      y: 20
     }
 
     // assert expected value
@@ -131,7 +131,7 @@ describe('VectorFactory.wktParseRect', () => {
       x: xs,
       y: ys,
       width: xe - xs,
-      height: ye - ys,
+      height: ye - ys
     }
 
     // assert expected value
@@ -202,8 +202,8 @@ describe('VectorFactory.svgPolygonToGeoJSON', () => {
       type: 'Polygon',
       coordinates: [
         [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]],
-        [[1, 1], [1, 3], [3, 3], [3, 1], [1, 1]],
-      ],
+        [[1, 1], [1, 3], [3, 3], [3, 1], [1, 1]]
+      ]
     }
     // assert expected value
     expect(JSON.stringify(svgPolygonToGeoJSON(svg))).to.equal(JSON.stringify(geoJSON))
@@ -228,7 +228,7 @@ describe('VectorFactory.svgPolygonToClipper', () => {
     const svg = 'M0 0 10 0 10 10 0 10M1 1 1 3 3 3 3 1'
     const clipper = [
       [{ X: 0, Y: 0 }, { X: 10, Y: 0 }, { X: 10, Y: 10 }, { X: 0, Y: 10 }, { X: 0, Y: 0 }],
-      [{ X: 1, Y: 1 }, { X: 1, Y: 3 }, { X: 3, Y: 3 }, { X: 3, Y: 1 }, { X: 1, Y: 1 }],
+      [{ X: 1, Y: 1 }, { X: 1, Y: 3 }, { X: 3, Y: 3 }, { X: 3, Y: 1 }, { X: 1, Y: 1 }]
     ]
     // assert expected value
     expect(svgPolygonToClipper(svg)).to.deep.equal(clipper)
@@ -253,7 +253,7 @@ describe('VectorFactory.clipperToSVGPolygon', () => {
     const svg = 'M0 0L10 0L10 10L0 10L0 0M1 1L1 3L3 3L3 1L1 1'
     const clipper = [
       [{ X: 0, Y: 0 }, { X: 10, Y: 0 }, { X: 10, Y: 10 }, { X: 0, Y: 10 }, { X: 0, Y: 0 }],
-      [{ X: 1, Y: 1 }, { X: 1, Y: 3 }, { X: 3, Y: 3 }, { X: 3, Y: 1 }, { X: 1, Y: 1 }],
+      [{ X: 1, Y: 1 }, { X: 1, Y: 3 }, { X: 3, Y: 3 }, { X: 3, Y: 1 }, { X: 1, Y: 1 }]
     ]
     // assert expected value
     expect(clipperToSVGPolygon(clipper)).to.equal(svg)
@@ -264,7 +264,7 @@ describe('VectorFactory.clipperToSVGPolygon', () => {
     const svg = 'M0 0L10 0L10 10L0 10L0 0M1 1L1 3L3 3L3 1L1 1'
     const clipper = [
       [{ X: 0, Y: 0 }, { X: 10, Y: 0 }, { X: 10, Y: 10 }, { X: 0, Y: 10 }],
-      [{ X: 1, Y: 1 }, { X: 1, Y: 3 }, { X: 3, Y: 3 }, { X: 3, Y: 1 }],
+      [{ X: 1, Y: 1 }, { X: 1, Y: 3 }, { X: 3, Y: 3 }, { X: 3, Y: 1 }]
     ]
     // assert expected value
     expect(clipperToSVGPolygon(clipper)).to.equal(svg)
@@ -284,7 +284,7 @@ describe('VectorFactory.geoJSONPolygonToWKT', () => {
     // Setup the input and result
     const geoJSON = {
       type: 'Polygon',
-      coordinates: [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]],
+      coordinates: [[[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]]]
     }
     const wkt = 'POLYGON((0 0,0 1,1 1,1 0,0 0))'
     // assert expected value
@@ -296,7 +296,7 @@ describe('VectorFactory.geoJSONPolygonToWKT', () => {
     // Setup the input and result
     const geoJSON = {
       type: 'Polygon',
-      coordinates: [[[0, 0], [0, 1], [1, 1], [1, 0]]],
+      coordinates: [[[0, 0], [0, 1], [1, 1], [1, 0]]]
     }
     const wkt = 'POLYGON((0 0,0 1,1 1,1 0,0 0))'
     // assert expected value

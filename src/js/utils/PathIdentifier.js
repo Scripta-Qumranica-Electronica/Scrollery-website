@@ -10,17 +10,17 @@ export function pathIdentifier(path) {
   let pathType = undefined
   if (typeof path === 'string') {
     switch (path.substring(0, 1)) {
-      case 'M':
-        pathType = 'SVG'
-        break
-      case 'P':
-        pathType = 'WKT'
-        break
-      case '{':
-        pathType = testObjectForPath(JSON.parse(path))
-          ? 'GeoJSON String'
-          : new Error('Improperly formatted Javascript object')
-        break
+    case 'M':
+      pathType = 'SVG'
+      break
+    case 'P':
+      pathType = 'WKT'
+      break
+    case '{':
+      pathType = testObjectForPath(JSON.parse(path))
+        ? 'GeoJSON String'
+        : new Error('Improperly formatted Javascript object')
+      break
     }
   } else {
     pathType = testObjectForPath(path)

@@ -7,9 +7,9 @@ module.exports = {
   entry: path.join(__dirname, 'src', 'js', 'main.js'),
 
   output: {
-    path: path.join(__dirname, "dist"),
-    filename: "bundle.[name].js",
-    publicPath: "dist/",
+    path: path.join(__dirname, 'dist'),
+    filename: 'bundle.[name].js',
+    publicPath: 'dist/'
   },
 
   context: __dirname,
@@ -37,7 +37,7 @@ module.exports = {
                 resources: path.join(__dirname, 'src/sass/_variables.scss')
               }
             }
-          ],
+          ]
         }
       },
       {
@@ -77,22 +77,22 @@ module.exports = {
             }
           }
         ]
-      },
+      }
     ]
   },
 
   resolve: {
     alias: {
-      "vue": 'vue/dist/vue.js',
-      "@": path.join(__dirname),
-      "~": path.join(__dirname, "src", "js"),
-      "sass": path.join(__dirname, "src", "sass"),
-      "sass-vars$": path.join(__dirname, "src", "sass", "_variables.scss"),
-      "legacy": path.join(__dirname, "resources", "js")
+      'vue': 'vue/dist/vue.js',
+      '@': path.join(__dirname),
+      '~': path.join(__dirname, 'src', 'js'),
+      'sass': path.join(__dirname, 'src', 'sass'),
+      'sass-vars$': path.join(__dirname, 'src', 'sass', '_variables.scss'),
+      'legacy': path.join(__dirname, 'resources', 'js')
     }
   },
 
-  target: "web",
+  target: 'web',
 
   plugins: [
     new CleanWebpackPlugin(),
@@ -100,5 +100,5 @@ module.exports = {
       filename: 'styles.css',
       allChunks: true
     })
-  ],
+  ]
 }

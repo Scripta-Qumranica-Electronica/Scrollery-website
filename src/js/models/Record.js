@@ -14,7 +14,7 @@ function Record(defaults = {}, settings = {}) {
   function mergeDefaults(props) {
     return {
       ...cloneDeep(defaults),
-      ...props,
+      ...props
     }
   }
 
@@ -49,7 +49,7 @@ function Record(defaults = {}, settings = {}) {
       // the record is persisted if it's not new.
       const privates = {
         __persisted: Boolean(isPersisted || props.__persisted),
-        __uuid: props.__uuid || namespacedUuid(`${props.id || uuid()}`, BaseRecord.namespace()),
+        __uuid: props.__uuid || namespacedUuid(`${props.id || uuid()}`, BaseRecord.namespace())
       }
       Object.defineProperties(this, {
         __persisted: {
@@ -63,16 +63,16 @@ function Record(defaults = {}, settings = {}) {
 
             if (lastPersistedStated !== privates.__persisted) {
               this.emit('persisted-state-change', {
-                persisted: privates.__persisted,
+                persisted: privates.__persisted
               })
             }
           },
-          enumerable: true,
+          enumerable: true
         },
         __uuid: {
           value: privates.__uuid,
           writeable: false,
-          enumerable: true,
+          enumerable: true
         },
         changedProperties: {
           enumerable: false,
@@ -84,16 +84,16 @@ function Record(defaults = {}, settings = {}) {
            * @return {string[]}  an array of property names that have changed
            */
           value: function() {
-            var changes = []
-            for (let key in values) {
-              ;(function(k) {
+            const changes = []
+            for (const key in values) {
+              (function(k) {
                 if (values[k].original !== values[k].value) {
                   changes.push(k)
                 }
               })(key)
             }
             return changes
-          },
+          }
         },
         persisted: {
           enumerable: false,
@@ -113,13 +113,13 @@ function Record(defaults = {}, settings = {}) {
             delete propUpdates.__uuid
 
             // write properties onto the record
-            for (let prop in propUpdates) {
+            for (const prop in propUpdates) {
               this[prop] = propUpdates[prop]
             }
 
             // reset the original values to the current state now
             // the record has been persisted.
-            for (let prop in values) {
+            for (const prop in values) {
               if (values[prop].original !== this[prop]) {
                 values[prop].original = this[prop]
               }
@@ -130,15 +130,15 @@ function Record(defaults = {}, settings = {}) {
 
             // iterate through properties to find others that
             // have persisted methods, and pass them down.
-            for (let k in this) {
-              ;(function(key, property) {
+            for (const k in this) {
+              (function(key, property) {
                 if (propUpdates[key] && property && typeof property.persisted === 'function') {
                   property.persisted(propUpdates[key])
                 }
               }.call(this, k, this[k]))
             }
-          },
-        },
+          }
+        }
       })
       delete props.__uuid
       delete props.__persisted
@@ -148,13 +148,13 @@ function Record(defaults = {}, settings = {}) {
       props = mergeDefaults(props)
 
       // iterate through the properties
-      for (let key in props) {
+      for (const key in props) {
         // setup closures to preserve the key value as k in each
-        ;(function(k) {
+        (function(k) {
           // initialize the value to track the value
           values[k] = {
             original: props[k],
-            value: props[k],
+            value: props[k]
           }
 
           // initialize the prop definition
@@ -181,17 +181,17 @@ function Record(defaults = {}, settings = {}) {
               this.__persisted = value !== values[k].value ? false : this.__persisted
 
               // apply the value
-              var oldValue = values[k].value
+              const oldValue = values[k].value
               values[k].value = value
 
               // emit a change
               this.emit('change', {
                 propertyName: k,
                 newValue: value,
-                oldValue,
+                oldValue
               })
             },
-            enumerable: true,
+            enumerable: true
           }
         }.call(this, key))
       }
@@ -203,15 +203,15 @@ function Record(defaults = {}, settings = {}) {
       // Object.freeze(this)
 
       if (settings.propogate !== false) {
-        for (let k in this) {
-          ;(function(key, property) {
+        for (const k in this) {
+          (function(key, property) {
             if (property instanceof EventEmitter) {
               // emit upwards
               property.on('change', args => {
                 this.__persisted = property.isPersisted()
                 this.emit('change', {
                   propertyName: key,
-                  ...args,
+                  ...args
                 })
               })
             }
@@ -313,7 +313,7 @@ function Record(defaults = {}, settings = {}) {
      */
     toJS() {
       return {
-        ...this,
+        ...this
       }
     }
   }

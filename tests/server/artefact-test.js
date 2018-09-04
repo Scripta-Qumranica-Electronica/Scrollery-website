@@ -24,7 +24,7 @@ describe('get artefact data', () => {
         PASSWORD: 'asdf',
         SCROLLVERSION: 1,
         USER_NAME: 'test',
-        transaction: 'validateSession',
+        transaction: 'validateSession'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -55,7 +55,7 @@ describe('get artefact data', () => {
         SESSION_ID: session_id,
         image_catalog_id: image.image_catalog_id,
         user_id: 1,
-        transaction: 'getInstitutionArtefacts',
+        transaction: 'getInstitutionArtefacts'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -88,7 +88,7 @@ describe('get artefact data', () => {
         SESSION_ID: session_id,
         scroll_version_id: image.scroll_version_id,
         artefact_id: artefact_id,
-        transaction: 'getArtefactMask',
+        transaction: 'getArtefactMask'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -124,7 +124,7 @@ describe('get artefact data', () => {
       .send({
         SESSION_ID: session_id,
         scroll_version_id: image.scroll_version_id,
-        transaction: 'getScrollArtefacts',
+        transaction: 'getScrollArtefacts'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -180,7 +180,7 @@ describe('manipulate artefact data', () => {
       .send({
         SESSION_ID: session_id,
         scroll_version_id: image.scroll_version_id,
-        transaction: 'copyCombination',
+        transaction: 'copyCombination'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -215,7 +215,7 @@ describe('manipulate artefact data', () => {
         scroll_version_id: scroll_version_id,
         id_of_sqe_image: sqe_image_id,
         region_in_master_image: 'POLYGON((0 0,0 30,30 30,30 0,0 0),(5 5,5 10,10 10,10 5,5 5))',
-        transaction: 'addArtefact',
+        transaction: 'addArtefact'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -252,7 +252,7 @@ describe('manipulate artefact data', () => {
         artefact_id: artefact_id,
         id_of_sqe_image: sqe_image_id,
         region_in_master_image: region_in_master_image,
-        transaction: 'changeArtefactShape',
+        transaction: 'changeArtefactShape'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -294,7 +294,7 @@ describe('manipulate artefact data', () => {
         artefact_id: artefact_id,
         transform_matrix: transform_matrix,
         z_index: z_index,
-        transaction: 'changeArtefactPosition',
+        transaction: 'changeArtefactPosition'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -334,7 +334,7 @@ describe('manipulate artefact data', () => {
         scroll_version_id: scroll_version_id,
         artefact_id: artefact_id,
         name: name,
-        transaction: 'changeArtefactData',
+        transaction: 'changeArtefactData'
       })
       .expect('Content-Type', /json/)
       .expect(200)
@@ -372,7 +372,7 @@ describe('manipulate artefact data', () => {
         scroll_version_id: scroll_version_id,
         artefact_id: artefact_id,
         sqe_image_id: sqe_image_id,
-        transaction: 'removeArtefact',
+        transaction: 'removeArtefact'
       })
       .expect('Content-Type', /json/)
       .expect(200)

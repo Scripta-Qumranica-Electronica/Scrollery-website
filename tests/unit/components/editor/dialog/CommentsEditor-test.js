@@ -7,8 +7,8 @@ describe('CommentsEditor', () => {
   beforeEach(() => {
     wrapper = mount(CommentsEditor, {
       propsData: {
-        initialText: initialText,
-      },
+        initialText: initialText
+      }
     })
     vm = wrapper.vm
   })

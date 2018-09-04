@@ -123,7 +123,7 @@ export default class ItemList {
     if (key in this._items) {
       const updateItem = this.get(key)
       for (let i = 0, newDatum; (newDatum = newData[i]); i++) {
-        let index = updateItem[sublistName].indexOf(newDatum)
+        const index = updateItem[sublistName].indexOf(newDatum)
         if (index !== -1) {
           updateItem[sublistName].splice(index, 1)
         }
@@ -188,7 +188,9 @@ export default class ItemList {
   /* istanbul ignore next */
   populate(postData) {
     postData = Object.assign({}, this.defaultPostData, postData)
-    if (!postData) throw new TypeError(`No payload for POST request is available.`)
+    if (!postData) {
+      throw new TypeError('No payload for POST request is available.')
+    }
     return new Promise((resolve, reject) => {
       try {
         this.axios.post('resources/cgi-bin/scrollery-cgi.pl', postData).then(res => {
@@ -238,7 +240,7 @@ export default class ItemList {
           scroll_version_id: scroll_version_id,
           name: name,
           [this.idKey]: item_id,
-          transaction: transaction,
+          transaction: transaction
         }
         this.alterItemAtKey(item_id, { name: name }, scroll_version_id)
         this.axios
@@ -270,7 +272,9 @@ export default class ItemList {
     for (let i = 0, list; (list = this.connectedLists[i]); i++) {
       const key = payload[list.idKey]
       const scroll_version_id = list.relativeToScrollVersion ? payload.scroll_version_id : undefined
-      if (key !== undefined) list.addToItemSublist(key, this.listType, data, scroll_version_id)
+      if (key !== undefined) {
+        list.addToItemSublist(key, this.listType, data, scroll_version_id)
+      }
     }
   }
 

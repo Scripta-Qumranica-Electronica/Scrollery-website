@@ -72,9 +72,9 @@ export function wktPolygonToSvg(wkt, boundingRect) {
 export function wktPointToSvg(geoJSON) {
   return geoJSON.substring(0, 6) === 'POINT('
     ? {
-        x: parseFloat(geoJSON.split(' ')[0].replace('POINT(', '')),
-        y: parseFloat(geoJSON.split(' ')[1]),
-      }
+      x: parseFloat(geoJSON.split(' ')[0].replace('POINT(', '')),
+      y: parseFloat(geoJSON.split(' ')[1])
+    }
     : undefined
 }
 
@@ -297,8 +297,8 @@ export function dbMatrixToSVG(matrix) {
 export function svgMatrixToDB(matrix) {
   return Array.isArray(matrix) && matrix.length === 6
     ? `{"matrix": [[${matrix[0]},${matrix[2]},${matrix[4]}],[${matrix[1]},${matrix[3]},${
-        matrix[5]
-      }]]}`
+      matrix[5]
+    }]]}`
     : undefined
 }
 
@@ -310,23 +310,23 @@ export function svgMatrixToDB(matrix) {
 export function matrix6To16(matrix) {
   return Array.isArray(matrix) && matrix.length === 6
     ? [
-        matrix[0],
-        matrix[1],
-        0,
-        0,
-        matrix[2],
-        matrix[3],
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        matrix[4],
-        matrix[5],
-        0,
-        1,
-      ]
+      matrix[0],
+      matrix[1],
+      0,
+      0,
+      matrix[2],
+      matrix[3],
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      matrix[4],
+      matrix[5],
+      0,
+      1
+    ]
     : undefined
 }
 
@@ -349,7 +349,7 @@ export function matrix16To6(matrix) {
  */
 export function clipCanvas(canvas, svgClipPath, divisor) {
   divisor = divisor ? divisor : 1
-  let ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext('2d')
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.globalCompositeOperation = 'source-over'
   ctx.fillStyle = 'purple'

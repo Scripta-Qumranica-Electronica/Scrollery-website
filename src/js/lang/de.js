@@ -4,7 +4,6 @@ module.exports = {
   Combinations: 'Kombinationen',
   Artifact: 'Artefakt',
   Fragment: 'Fragment',
-  'Global.Default': 'ברירית מחדל',
 
   // Auth
   Logout: 'Abmelden',
@@ -28,4 +27,6 @@ module.exports = {
   'No Scroll Selected': 'Keine Schriftrolle ausgewählt',
   'Select Images': 'Bilder auswählen',
   Zoom: 'Zoom',
+  Image: 'Bild',
+  Text: 'Text'
 }

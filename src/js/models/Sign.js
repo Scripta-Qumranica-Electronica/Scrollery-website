@@ -17,7 +17,7 @@ const defaults = {
   // position in stream info
 
   // > peers
-  next_sign_ids: [],
+  next_sign_ids: []
 }
 
 /**

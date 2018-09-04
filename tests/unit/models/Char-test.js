@@ -12,8 +12,8 @@ const mockData = {
       attribute_name: 'sign_type',
       values: {
         attribute_value_id: 9,
-        attribute_value: 'BREAK',
-      },
+        attribute_value: 'BREAK'
+      }
     },
     {
       attribute_id: 2,
@@ -21,19 +21,19 @@ const mockData = {
       values: [
         {
           attribute_value_id: 10,
-          attribute_value: 'LINE_START',
+          attribute_value: 'LINE_START'
         },
         {
           attribute_value_id: 12,
-          attribute_value: 'COLUMN_START',
+          attribute_value: 'COLUMN_START'
         },
         {
           attribute_value_id: 14,
-          attribute_value: 'SCROLL_START',
-        },
-      ],
-    },
-  ],
+          attribute_value: 'SCROLL_START'
+        }
+      ]
+    }
+  ]
 }
 
 describe('Char', () => {
@@ -54,9 +54,9 @@ describe('Char', () => {
             attribute_name: 'before_each_name', // deduplicates on attribute_name, so use a distinct one for beforeEach
             attribute_id: attributeID++,
             attribute_value: 'some_value',
-            attribute_description: 'attribute description',
-          },
-        ],
+            attribute_description: 'attribute description'
+          }
+        ]
       })
     beforeEach(() => {
       char = new Char(attrs())
@@ -71,7 +71,7 @@ describe('Char', () => {
         attribute_name: 'some_name',
         attribute_id: attributeID++,
         attribute_value: 'some_value',
-        attribute_description: 'attribute description',
+        attribute_description: 'attribute description'
       })
       expect(char.attributes.length).to.equal(2)
     })
@@ -81,7 +81,7 @@ describe('Char', () => {
         attribute_name: 'some_name',
         attribute_id: attributeID++,
         attribute_value: 'some_value',
-        attribute_description: 'attribute description',
+        attribute_description: 'attribute description'
       })
       char.addAttribute(attribute)
       expect(char.attributes.length).to.equal(2)

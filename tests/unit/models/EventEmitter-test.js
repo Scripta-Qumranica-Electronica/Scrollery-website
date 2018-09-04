@@ -23,7 +23,7 @@ describe('EventEmitter', () => {
 
     it('should emit the event with arguments (but new object)', done => {
       const args = {
-        value: true,
+        value: true
       }
 
       // wire subscriber

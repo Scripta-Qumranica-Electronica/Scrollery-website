@@ -7,7 +7,7 @@ const defaults = {
   attribute_id: -1,
   attribute_name: '',
   name: '',
-  values: new AttributeValueList(),
+  values: new AttributeValueList()
 }
 
 export default class Attribute extends extendModel(defaults) {

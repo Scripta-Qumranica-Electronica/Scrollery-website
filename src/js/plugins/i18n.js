@@ -24,7 +24,7 @@ export default {
         str = data[key]
 
         // process vars
-        const re = /(\:(\w+)(\=[^\:]+)?\:)/
+        const re = /(:(\w+)(=[^:]+)?:)/
         let matches
         while ((matches = re.exec(str)) !== null) {
           str = str.replace(matches[0], args[matches[2]] || matches[3] || matches[2])
@@ -38,28 +38,28 @@ export default {
         /* istanbul ignore next */
         return new Promise(resolve => {
           switch (store.getters.language) {
-            case 'hb':
-              require(['~/lang/en.js', '~/lang/hb.js'], (en, hb) => {
-                store.commit('loadLanguage', { key: 'en', data: en })
-                store.commit('loadLanguage', { key: 'hb', data: hb })
-                resolve()
-              })
-              break
-            case 'de':
-              require(['~/lang/en.js', '~/lang/de'], (en, de) => {
-                store.commit('loadLanguage', { key: 'en', data: en })
-                store.commit('loadLanguage', { key: 'de', data: de })
-                resolve()
-              })
-              break
-            default:
-              require(['~/lang/en.js'], en => {
-                store.commit('loadLanguage', { key: 'en', data: en })
-                resolve()
-              })
+          case 'hb':
+            require(['~/lang/en.js', '~/lang/hb.js'], (en, hb) => {
+              store.commit('loadLanguage', { key: 'en', data: en })
+              store.commit('loadLanguage', { key: 'hb', data: hb })
+              resolve()
+            })
+            break
+          case 'de':
+            require(['~/lang/en.js', '~/lang/de'], (en, de) => {
+              store.commit('loadLanguage', { key: 'en', data: en })
+              store.commit('loadLanguage', { key: 'de', data: de })
+              resolve()
+            })
+            break
+          default:
+            require(['~/lang/en.js'], en => {
+              store.commit('loadLanguage', { key: 'en', data: en })
+              resolve()
+            })
           }
         })
-      },
+      }
     }
-  },
+  }
 }

@@ -13,8 +13,8 @@ describe('EditingDialog', () => {
       propsData: {
         line,
         sign: line.get(0),
-        dialogVisible: true,
-      },
+        dialogVisible: true
+      }
     })
     vm = wrapper.vm
   })

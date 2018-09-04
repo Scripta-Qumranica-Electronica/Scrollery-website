@@ -1,4 +1,9 @@
 .vstags
+.vscode
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
+
 .idea
 yarn-error.log
 node_modules
@@ -11,6 +16,3 @@ resources/cgi-bin/local
 resources/perl-libs
 resources/data-files
 resources/data-backup
-
-.vscode/
-!.vscode/tasks.json

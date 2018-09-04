@@ -18,10 +18,10 @@ describe('AppBody', () => {
             scrollVersionID: 324,
             colID: 123,
             imageID: 432,
-            artID: 657,
-          },
-        },
-      },
+            artID: 657
+          }
+        }
+      }
     })
     vm = wrapper.vm
   })

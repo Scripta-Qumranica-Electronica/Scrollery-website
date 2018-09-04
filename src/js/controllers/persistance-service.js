@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce'
 const base = {
   additions: {},
   deletions: {},
-  updates: {},
+  updates: {}
 }
 
 /**
@@ -23,7 +23,7 @@ export default class PersistanceService extends EventEmitter {
 
     // a function that will debounce persistance requests
     this.debouncedPersist = debounce(this._persist.bind(this), 400, {
-      trailing: true,
+      trailing: true
     })
   }
 
@@ -75,7 +75,7 @@ export default class PersistanceService extends EventEmitter {
       return this._queue()
     }
 
-    var q = this.queued
+    const q = this.queued
     if (
       q &&
       (Object.keys(q.additions).length ||
@@ -97,7 +97,7 @@ export default class PersistanceService extends EventEmitter {
 
           this.emit('persisted', {
             changes: onDeck,
-            res: res,
+            res: res
           })
         })
         .catch(res => {
@@ -118,16 +118,16 @@ export default class PersistanceService extends EventEmitter {
     this.queued = {
       additions: {
         ...this.queued.additions,
-        ...changes.additions,
+        ...changes.additions
       },
       deletions: {
         ...this.queued.deletions,
-        ...changes.deletions,
+        ...changes.deletions
       },
       updates: {
         ...this.queued.updates,
-        ...changes.updates,
-      },
+        ...changes.updates
+      }
     }
   }
 }

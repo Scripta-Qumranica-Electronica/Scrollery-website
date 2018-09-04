@@ -5,7 +5,7 @@ import AttributeList from '~/models/AttributeList.js'
 describe('Sign', () => {
   it('should be constructible', () => {
     let sign = new Sign({
-      sign_id: 'test',
+      sign_id: 'test'
     })
     expect(sign instanceof Sign).to.equal(true)
   })
@@ -15,10 +15,10 @@ describe('Sign', () => {
     beforeEach(() => {
       sign = new Sign({
         sign_id: 1,
-        next_sign_ids: [2],
+        next_sign_ids: [2]
       })
       next = new Sign({
-        sign_id: 2,
+        sign_id: 2
       })
     })
 
@@ -34,8 +34,8 @@ describe('Sign', () => {
       sign = new Sign({
         sign_id: 1,
         chars: {
-          sign_char: '·',
-        },
+          sign_char: '·'
+        }
       })
     })
 
@@ -50,7 +50,7 @@ describe('Sign', () => {
     it('should know about the varieties of whitespace', () => {
       ;[false, '', ' ', '&nbsp;', '·'].forEach(signChar => {
         sign = new Sign({
-          chars: [{ sign_char: signChar }],
+          chars: [{ sign_char: signChar }]
         })
         expect(sign.getMainChar().is_whitespace).to.equal(true)
       })
@@ -64,9 +64,9 @@ describe('Sign', () => {
           sign_id: 1,
           chars: [
             {
-              sign_char: '·',
-            },
-          ],
+              sign_char: '·'
+            }
+          ]
         }
       beforeEach(() => {
         sign = new Sign(attrs)
@@ -83,9 +83,9 @@ describe('Sign', () => {
           sign_id: 1,
           chars: [
             {
-              sign_char: 'א',
-            },
-          ],
+              sign_char: 'א'
+            }
+          ]
         }
       beforeEach(() => {
         sign = new Sign(attrs)
@@ -104,9 +104,9 @@ describe('Sign', () => {
           sign_id: 1,
           chars: [
             {
-              sign_char: '·',
-            },
-          ],
+              sign_char: '·'
+            }
+          ]
         }
       beforeEach(() => {
         sign = new Sign(attrs)
@@ -123,9 +123,9 @@ describe('Sign', () => {
           sign_id: 1,
           chars: [
             {
-              sign_char: 'א',
-            },
-          ],
+              sign_char: 'א'
+            }
+          ]
         }
       beforeEach(() => {
         sign = new Sign(attrs)

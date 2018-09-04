@@ -1,9 +1,11 @@
 class QueueAction {
   constructor(action, undo) {
-
     // assertions
     if (typeof action !== 'function' || typeof undo !== 'function') {
-      throw new TypeError('new QueueAction(action = function, undo = function) expects an action and undo function but got', arguments)
+      throw new TypeError(
+        'new QueueAction(action = function, undo = function) expects an action and undo function but got',
+        arguments
+      )
     }
 
     if (action === undo) {
@@ -18,23 +20,23 @@ class QueueAction {
 
   /**
    * Do the action
-   * 
+   *
    * @return {mixed} The response from the callback, if any
    */
   do() {
-    let res = this._do()
+    const res = this._do()
 
     if (res instanceof Promise) {
       this._promise = res
       res.then(() => {
         this._completed = true
-        return arguments;
+        return arguments
       })
     } else {
       this._completed = true
     }
 
-    return res;
+    return res
   }
 
   /**
@@ -56,7 +58,7 @@ class QueueAction {
 
   /**
    * Re-create this QueueAction
-   * 
+   *
    * @return {QueueAction} A new queue action that can be used to re-do this action
    */
   clone() {

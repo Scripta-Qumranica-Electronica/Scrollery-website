@@ -20,9 +20,9 @@ export default (Component, opt = {}) => {
     ...{
       store,
       localVue,
-      window,
+      window
     },
-    ...opt,
+    ...opt
   }
 
   return shallow(Component, args)
@@ -50,6 +50,6 @@ function storageMock() {
     key: function(i) {
       var keys = Object.keys(storage)
       return keys[i] || null
-    },
+    }
   }
 }

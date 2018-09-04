@@ -18,7 +18,7 @@ export default class Post {
       transformResponse: axios.defaults.transformResponse.concat(responseData => {
         responseData = Object.assign({}, responseData, { payload: payload })
         return responseData
-      }),
+      })
     })
 
     // make the AJAX request

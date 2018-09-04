@@ -29,40 +29,40 @@ class Line extends List {
 
     // Note: for the purpose of synchronization algorithm, it is important that the
     //       the whitespace char be a single char (rather than &nbsp; or something)
-    let diffs = diff(this.toString().replace(/\s/g, ' '), str.replace(/\s/g, ' '))
+    const diffs = diff(this.toString().replace(/\s/g, ' '), str.replace(/\s/g, ' '))
 
     let diffIndex = 0
     for (let i = 0, n = diffs.length; i < n; i++) {
       // each diff in the array takes this shape:
       // [code = 0, 1, -1, change = 'string difference']
-      let d = diffs[i]
+      const d = diffs[i]
       switch (d[0]) {
-        // no change, simply increment up our string index
-        case diff.EQUAL:
-          diffIndex = diffIndex + d[1].length
-          break
+      // no change, simply increment up our string index
+      case diff.EQUAL:
+        diffIndex = diffIndex + d[1].length
+        break
 
         // there's been (a) sign(s) inserted
-        case diff.INSERT:
-          d[1].split('').forEach(char => {
-            this.insert(
-              new Sign({
-                chars: [
-                  {
-                    sign_char: char,
-                  },
-                ],
-              }),
-              diffIndex
-            )
-            diffIndex++
-          })
-          break
+      case diff.INSERT:
+        d[1].split('').forEach(char => {
+          this.insert(
+            new Sign({
+              chars: [
+                {
+                  sign_char: char
+                }
+              ]
+            }),
+            diffIndex
+          )
+          diffIndex++
+        })
+        break
 
         // there's been a sign deleted
-        case diff.DELETE:
-          d[1].split('').forEach(() => this.delete(diffIndex))
-          break
+      case diff.DELETE:
+        d[1].split('').forEach(() => this.delete(diffIndex))
+        break
       }
     }
   }

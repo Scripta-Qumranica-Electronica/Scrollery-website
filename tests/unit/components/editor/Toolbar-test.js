@@ -13,9 +13,9 @@ const factory = () =>
   mount(Toolbar, {
     propsData: {
       state: editorStore({
-        str: key => key,
-      }),
-    },
+        str: key => key
+      })
+    }
   })
 
 describe('Toolbar.vue', () => {

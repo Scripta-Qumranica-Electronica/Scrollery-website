@@ -10,7 +10,7 @@ describe('login', () => {
         PASSWORD: 'asdf',
         SCROLLVERSION: 1,
         USER_NAME: 'test',
-        transaction: 'validateSession',
+        transaction: 'validateSession'
       })
       .expect('Content-Type', /json/)
       .expect(200)

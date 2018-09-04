@@ -1,7 +1,7 @@
 const { resolve } = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
-var proxy = require('express-http-proxy')
+const proxy = require('express-http-proxy')
 const app = express()
 
 // parse JSON bodies 

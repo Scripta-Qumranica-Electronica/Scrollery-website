@@ -12,7 +12,7 @@ module.exports = merge(common, {
   },
   plugins: [
     new Notify({
-      title: "SQE Webpack Build",
+      title: 'SQE Webpack Build',
       sound: false
     })
   ]

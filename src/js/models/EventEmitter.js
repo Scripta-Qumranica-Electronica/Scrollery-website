@@ -28,7 +28,7 @@ export default class EventEmitter {
         // of the all of the events
         // consider: deep clone args so that one handler cannot modify.
         // This should be fine if args are simple properties
-        ;(function(h) {
+        (function(h) {
           setTimeout(() => h({ ...args }))
         })(handler)
       }

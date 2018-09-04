@@ -13,7 +13,7 @@ describe('List', () => {
       list = new List(
         {
           id: 1,
-          name: 'test',
+          name: 'test'
         },
         [new Model(), new Model()]
       )
@@ -116,8 +116,8 @@ describe('List', () => {
       list.push(model)
       list.persisted({
         additions: {
-          [model.getUUID()]: true,
-        },
+          [model.getUUID()]: true
+        }
       })
       list.delete(0)
       expect(list.hasChanges()).to.equal(true)
@@ -133,8 +133,8 @@ describe('List', () => {
       // 1.b. persist
       list.persisted({
         additions: {
-          [model.getUUID()]: true,
-        },
+          [model.getUUID()]: true
+        }
       })
       expect(list.hasChanges()).to.equal(false)
 
@@ -145,8 +145,8 @@ describe('List', () => {
       // 2.b. persist
       list.persisted({
         deletions: {
-          [model.getUUID()]: true,
-        },
+          [model.getUUID()]: true
+        }
       })
       expect(list.hasChanges()).to.equal(false)
     })
@@ -156,8 +156,8 @@ describe('List', () => {
       list.push(model)
       list.persisted({
         additions: {
-          [model.getUUID()]: true,
-        },
+          [model.getUUID()]: true
+        }
       })
       model.name = 'new name'
       expect(list.hasChanges()).to.equal(true)
@@ -180,8 +180,8 @@ describe('List', () => {
       // mark everything persisted ... then do removal
       list.persisted({
         additions: {
-          [model.getUUID()]: true,
-        },
+          [model.getUUID()]: true
+        }
       })
 
       // remove an item that should be marked in the changes object

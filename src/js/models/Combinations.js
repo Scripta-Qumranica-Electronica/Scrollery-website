@@ -5,8 +5,8 @@ export default class Combinations extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
     idKey = idKey || 'scroll_version_id'
     const listType = 'combinations'
-    let connectedLists = []
-    let relativeToScrollVersion = false
+    const connectedLists = []
+    const relativeToScrollVersion = false
     defaultPostData = defaultPostData
       ? defaultPostData
       : { transaction: 'getCombs', user_id: corpus.user }
@@ -22,7 +22,7 @@ export default class Combinations extends ItemList {
   }
 
   /* istanbul ignore next */
-  updateName(item_id, name, scroll_version_id) {
+  updateName(item_id, name) {
     return super.updateName(item_id, name, undefined, 'changeCombinationName')
   }
 
@@ -30,7 +30,7 @@ export default class Combinations extends ItemList {
   cloneScroll(scroll_version_id) {
     const payload = {
       scroll_version_id: scroll_version_id,
-      transaction: 'copyCombination',
+      transaction: 'copyCombination'
     }
     return new Promise((resolve, reject) => {
       this.axios
@@ -59,7 +59,7 @@ export default class Combinations extends ItemList {
     return new Promise((resolve, reject) => {
       const postData = {
         transaction: 'removeCombination',
-        scroll_version_id: key,
+        scroll_version_id: key
       }
       try {
         this.axios.post('resources/cgi-bin/scrollery-cgi.pl', postData).then(res => {

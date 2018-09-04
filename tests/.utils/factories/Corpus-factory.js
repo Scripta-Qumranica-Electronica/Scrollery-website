@@ -40,7 +40,7 @@ const generateCorpus = () => {
         corpus.images._insertItem(
           new Image({
             sqe_image_id: sqe_image_id,
-            type: z % 4,
+            type: z % 4
           })
         )
         images.push(sqe_image_id)
@@ -50,7 +50,7 @@ const generateCorpus = () => {
         new Col({
           col_id: col_id,
           rois: artefactRois,
-          scroll_version_id: scroll_version_id,
+          scroll_version_id: scroll_version_id
         }),
         scroll_version_id
       )
@@ -62,7 +62,7 @@ const generateCorpus = () => {
           artefacts: [artefact_id],
           rois: artefactRois,
           images: images,
-          side: j % 2,
+          side: j % 2
         })
       )
       imageReferences.push(image_catalog_id)
@@ -72,7 +72,7 @@ const generateCorpus = () => {
           artefact_id: artefact_id,
           rois: artefactRois,
           scroll_version_id: scroll_version_id,
-          image_catalog_id: image_catalog_id,
+          image_catalog_id: image_catalog_id
         }),
         scroll_version_id
       )
@@ -85,7 +85,7 @@ const generateCorpus = () => {
         cols: cols,
         imageReferences: imageReferences,
         artefacts: artefacts,
-        rois: rois,
+        rois: rois
       })
     )
     console.log(corpus.combinations)

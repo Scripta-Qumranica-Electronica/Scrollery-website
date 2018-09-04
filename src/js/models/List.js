@@ -31,7 +31,7 @@ class List extends EventEmitter {
 
         // create a list-namespaced uid for the model
         __uuid: namespacedUuid(`${attributes.id || Date.now()}`, List.namespace()),
-        __persisted: isPersisted,
+        __persisted: isPersisted
       },
       attributes
     )
@@ -39,7 +39,7 @@ class List extends EventEmitter {
     this._items = []
     this.__changes = {
       additions: {},
-      deletions: {},
+      deletions: {}
     }
 
     this.on(['insert', 'push', 'splice'], ({ item, index }) => {
@@ -50,15 +50,15 @@ class List extends EventEmitter {
       item.on('change', this._itemChanged.bind(this, item))
 
       if (item instanceof List) {
-        item.on('delete', ({ item, index }) => this.emit('delete'))
-        item.on('addition', ({ item, index }) => this.emit('addition'))
+        item.on('delete', () => this.emit('delete'))
+        item.on('addition', () => this.emit('addition'))
       }
 
       this.emit('addition', { item, index })
       this.emit('change', {
         type: 'addition',
         item,
-        index,
+        index
       })
     })
 
@@ -68,7 +68,7 @@ class List extends EventEmitter {
     // add a length property that forwards to the `count` method
     Object.defineProperty(this, 'length', {
       get: () => this.count(),
-      writeable: false,
+      writeable: false
     })
   }
 
@@ -79,9 +79,9 @@ class List extends EventEmitter {
    * @param {Model}  item
    * @param {object} args
    */
-  _itemChanged(item, args) {
+  _itemChanged(item) {
     this.emit('change', {
-      item,
+      item
     })
   }
 
@@ -99,7 +99,7 @@ class List extends EventEmitter {
         }
         return acc
       }, {}),
-      ...this.__changes,
+      ...this.__changes
     }
   }
 
@@ -111,14 +111,14 @@ class List extends EventEmitter {
    */
   persisted(persistedMap = {}) {
     // remove each deleted item from the change set
-    for (let key in persistedMap.deletions) {
+    for (const key in persistedMap.deletions) {
       delete this.__changes.deletions[key]
     }
 
     // for each addition, if there's a corresponding property in the
     // additions map, call persisted on it and remove it from the
     // cahnge object
-    for (let key in persistedMap.additions) {
+    for (const key in persistedMap.additions) {
       if (this.__changes.additions[key]) {
         this.__changes.additions[key].persisted(persistedMap.additions[key])
       }
@@ -138,7 +138,7 @@ class List extends EventEmitter {
    * @instance
    */
   destroy() {
-    for (var i = 0, n = this._items.length; i < n; i++) {
+    for (let i = 0, n = this._items.length; i < n; i++) {
       this._items[i].destroy()
       delete this._items[i]
     }
@@ -253,7 +253,7 @@ class List extends EventEmitter {
 
     this.emit('insert', {
       index: newIndex,
-      item,
+      item
     })
 
     return newIndex
@@ -282,7 +282,7 @@ class List extends EventEmitter {
     const newIndex = this._items.length
     this.emit('push', {
       index: newIndex,
-      item,
+      item
     })
 
     return newIndex
@@ -346,7 +346,7 @@ class List extends EventEmitter {
    * @returns {List} A new list with the slice which is either the list or one created on the fly
    */
   sliceInto(start, count, target) {
-    let slice = this._items.splice(start, count)
+    const slice = this._items.splice(start, count)
 
     // use or create the new List, and insert the slice into it
     target = target || new this.constructor()
