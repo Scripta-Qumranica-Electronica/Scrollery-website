@@ -13,7 +13,7 @@ const defaults = {
   sign_char: '',
 
   // > attributes
-  attributes: new AttributeList()
+  attributes: new AttributeList(),
 }
 
 /**
@@ -27,7 +27,7 @@ const defaults = {
 export default class Char extends extendModel(defaults) {
   constructor(attrs, isPersisted) {
     if (!Array.isArray(attrs.attributes)) {
-      attrs.attributes = attrs.attributes ? [attrs.attributes] : []
+      attrs.attributes = attrs.attributes ? [attrs.attributes,] : []
     }
 
     // coerce attributes to the a List

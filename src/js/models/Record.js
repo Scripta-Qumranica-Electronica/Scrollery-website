@@ -14,7 +14,7 @@ function Record(defaults = {}, settings = {}) {
   function mergeDefaults(props) {
     return {
       ...cloneDeep(defaults),
-      ...props
+      ...props,
     }
   }
 
@@ -49,7 +49,7 @@ function Record(defaults = {}, settings = {}) {
       // the record is persisted if it's not new.
       const privates = {
         __persisted: Boolean(isPersisted || props.__persisted),
-        __uuid: props.__uuid || namespacedUuid(`${props.id || uuid()}`, BaseRecord.namespace())
+        __uuid: props.__uuid || namespacedUuid(`${props.id || uuid()}`, BaseRecord.namespace()),
       }
       Object.defineProperties(this, {
         __persisted: {
@@ -63,16 +63,16 @@ function Record(defaults = {}, settings = {}) {
 
             if (lastPersistedStated !== privates.__persisted) {
               this.emit('persisted-state-change', {
-                persisted: privates.__persisted
+                persisted: privates.__persisted,
               })
             }
           },
-          enumerable: true
+          enumerable: true,
         },
         __uuid: {
           value: privates.__uuid,
           writeable: false,
-          enumerable: true
+          enumerable: true,
         },
         changedProperties: {
           enumerable: false,
@@ -93,7 +93,7 @@ function Record(defaults = {}, settings = {}) {
               })(key)
             }
             return changes
-          }
+          },
         },
         persisted: {
           enumerable: false,
@@ -137,8 +137,8 @@ function Record(defaults = {}, settings = {}) {
                 }
               }.call(this, k, this[k]))
             }
-          }
-        }
+          },
+        },
       })
       delete props.__uuid
       delete props.__persisted
@@ -154,7 +154,7 @@ function Record(defaults = {}, settings = {}) {
           // initialize the value to track the value
           values[k] = {
             original: props[k],
-            value: props[k]
+            value: props[k],
           }
 
           // initialize the prop definition
@@ -188,10 +188,10 @@ function Record(defaults = {}, settings = {}) {
               this.emit('change', {
                 propertyName: k,
                 newValue: value,
-                oldValue
+                oldValue,
               })
             },
-            enumerable: true
+            enumerable: true,
           }
         }.call(this, key))
       }
@@ -211,7 +211,7 @@ function Record(defaults = {}, settings = {}) {
                 this.__persisted = property.isPersisted()
                 this.emit('change', {
                   propertyName: key,
-                  ...args
+                  ...args,
                 })
               })
             }
@@ -313,7 +313,7 @@ function Record(defaults = {}, settings = {}) {
      */
     toJS() {
       return {
-        ...this
+        ...this,
       }
     }
   }

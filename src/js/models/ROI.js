@@ -1,5 +1,5 @@
 import SvgPath from 'svgpath'
-import { wktPolygonToSvg, dbMatrixToSVG } from '~/utils/VectorFactory.js'
+import { wktPolygonToSvg, dbMatrixToSVG, } from '~/utils/VectorFactory.js'
 
 export default class ROI {
   constructor(record = {}) {

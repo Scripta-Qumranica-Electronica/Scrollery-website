@@ -17,7 +17,7 @@ const defaults = {
   // position in stream info
 
   // > peers
-  next_sign_ids: []
+  next_sign_ids: [],
 }
 
 /**
@@ -28,20 +28,20 @@ const defaults = {
  * @class
  * @extends Record
  */
-export default class Sign extends extendModel(defaults, { propogate: false }) {
+export default class Sign extends extendModel(defaults, { propogate: false, }) {
   constructor(attrs, isPersisted) {
     // When sign streams split, next_sign_ids is an array of all next signs
     // For consistency, we make this a single one
     attrs.next_sign_ids = attrs.next_sign_ids || []
     if (!Array.isArray(attrs.next_sign_ids)) {
-      attrs.next_sign_ids = [attrs.next_sign_ids]
+      attrs.next_sign_ids = [attrs.next_sign_ids,]
     }
 
     // A sign can have multiple characters. If there isn't an array,
     // coerace it to an array.
     attrs.chars = attrs.chars || []
     if (!Array.isArray(attrs.chars)) {
-      attrs.chars = [attrs.chars]
+      attrs.chars = [attrs.chars,]
     }
     attrs.chars = new CharList(
       {},

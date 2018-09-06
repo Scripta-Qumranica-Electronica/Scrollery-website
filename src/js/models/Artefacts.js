@@ -1,16 +1,16 @@
 import ItemList from './ItemList.js'
 import Artefact from './Artefact.js'
 import uuid from 'uuid/v1'
-import { pathIdentifier } from '~/utils/PathIdentifier.js'
-import { svgPolygonToWKT, geoJSONPolygonToWKT } from '~/utils/VectorFactory.js'
+import { pathIdentifier, } from '~/utils/PathIdentifier.js'
+import { svgPolygonToWKT, geoJSONPolygonToWKT, } from '~/utils/VectorFactory.js'
 
 export default class Artefacts extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
     idKey = idKey || 'artefact_id'
     const listType = 'artefacts'
-    const connectedLists = [corpus.combinations, corpus.imageReferences]
+    const connectedLists = [corpus.combinations, corpus.imageReferences,]
     const relativeToScrollVersion = true
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getArtOfImage' }
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getArtOfImage', }
     super(
       corpus,
       idKey,
@@ -24,12 +24,12 @@ export default class Artefacts extends ItemList {
 
   /* istanbul ignore next */
   updateArtefactShape(artefact_id, scroll_version_id, shape) {
-    shape = Array.isArray(shape) ? shape : [shape]
-    artefact_id = Array.isArray(artefact_id) ? artefact_id : [artefact_id]
-    scroll_version_id = Array.isArray(scroll_version_id) ? scroll_version_id : [scroll_version_id]
+    shape = Array.isArray(shape) ? shape : [shape,]
+    artefact_id = Array.isArray(artefact_id) ? artefact_id : [artefact_id,]
+    scroll_version_id = Array.isArray(scroll_version_id) ? scroll_version_id : [scroll_version_id,]
     return new Promise((resolve, reject) => {
       if (shape.length === artefact_id.length && shape.length === scroll_version_id.length) {
-        const payload = { requests: [], SESSION_ID: this.session_id }
+        const payload = { requests: [], SESSION_ID: this.session_id, }
         for (
           let index = 0, svgMask, currentArtefactID, currentScrollVersionID;
           (svgMask = shape[index]) &&
@@ -58,9 +58,9 @@ export default class Artefacts extends ItemList {
             scroll_version_id: currentScrollVersionID,
             image_catalog_id: this.get(currentArtefactID, currentScrollVersionID).image_catalog_id,
             id_of_sqe_image: this.get(currentArtefactID, currentScrollVersionID).id_of_sqe_image,
-            transaction: 'changeArtefactShape'
+            transaction: 'changeArtefactShape',
           })
-          this.alterItemAtKey(currentArtefactID, { mask: maskWKT }, currentScrollVersionID)
+          this.alterItemAtKey(currentArtefactID, { mask: maskWKT, }, currentScrollVersionID)
         }
         this.axios
           .post('resources/cgi-bin/scrollery-cgi.pl', payload)
@@ -92,7 +92,7 @@ export default class Artefacts extends ItemList {
       id_of_sqe_image: id_of_sqe_image,
       image_catalog_id: image_catalog_id,
       region_in_master_image: region_in_master_image,
-      transaction: 'addArtefact'
+      transaction: 'addArtefact',
     }
     return new Promise((resolve, reject) => {
       this.axios
@@ -106,7 +106,7 @@ export default class Artefacts extends ItemList {
                 artefact_id: res.data.returned_info,
                 transform_matrix: '{"matrix":[[1,0,0],[0,1,0]]}',
                 image_catalog_id: res.data.payload.image_catalog_id,
-                z_index: 0
+                z_index: 0,
               })
               .then(res => {
                 this.axios
@@ -115,13 +115,13 @@ export default class Artefacts extends ItemList {
                     scroll_version_id: res.data.payload.scroll_version_id,
                     artefact_id: res.data.payload.artefact_id,
                     image_catalog_id: res.data.payload.image_catalog_id,
-                    name: uuid()
+                    name: uuid(),
                   })
                   .then(res => {
                     resolve(
                       this.populate({
                         image_catalog_id: res.data.payload.image_catalog_id,
-                        scroll_version_id: res.data.payload.scroll_version_id
+                        scroll_version_id: res.data.payload.scroll_version_id,
                       })
                     )
                   })
@@ -144,7 +144,7 @@ export default class Artefacts extends ItemList {
       const postData = {
         transaction: 'removeArtefact',
         scroll_version_id: scroll_version_id,
-        artefact_id: key
+        artefact_id: key,
       }
       try {
         this.axios.post('resources/cgi-bin/scrollery-cgi.pl', postData).then(res => {

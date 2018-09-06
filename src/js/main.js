@@ -15,7 +15,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 
 // Router
 Vue.use(VueRouter)
-const router = new VueRouter({ routes })
+const router = new VueRouter({ routes, })
 
 // Store
 Vue.use(Vuex)
@@ -25,13 +25,13 @@ const store = makeStore(
 )
 
 // Localization
-Vue.use(i18n, { store })
+Vue.use(i18n, { store, })
 
 // element localization
 locale.use('en')
 
 // AJAX
-Vue.use(ajax, { store })
+Vue.use(ajax, { store, })
 
 // Element-ui
 Vue.use(ElementUI)
@@ -40,5 +40,5 @@ Vue.use(ElementUI)
 /* eslint no-unused-vars: "off" */
 const app = new Vue({
   router,
-  store
+  store,
 }).$mount('#app')

@@ -1,6 +1,6 @@
 export default {
-  install(Vue, { store }) {
-    const { languages } = store.getters
+  install(Vue, { store, }) {
+    const { languages, } = store.getters
 
     Vue.prototype.$i18n = {
       /**
@@ -39,27 +39,27 @@ export default {
         return new Promise(resolve => {
           switch (store.getters.language) {
           case 'hb':
-            require(['~/lang/en.js', '~/lang/hb.js'], (en, hb) => {
-              store.commit('loadLanguage', { key: 'en', data: en })
-              store.commit('loadLanguage', { key: 'hb', data: hb })
+            require(['~/lang/en.js', '~/lang/hb.js',], (en, hb) => {
+              store.commit('loadLanguage', { key: 'en', data: en, })
+              store.commit('loadLanguage', { key: 'hb', data: hb, })
               resolve()
             })
             break
           case 'de':
-            require(['~/lang/en.js', '~/lang/de'], (en, de) => {
-              store.commit('loadLanguage', { key: 'en', data: en })
-              store.commit('loadLanguage', { key: 'de', data: de })
+            require(['~/lang/en.js', '~/lang/de',], (en, de) => {
+              store.commit('loadLanguage', { key: 'en', data: en, })
+              store.commit('loadLanguage', { key: 'de', data: de, })
               resolve()
             })
             break
           default:
-            require(['~/lang/en.js'], en => {
-              store.commit('loadLanguage', { key: 'en', data: en })
+            require(['~/lang/en.js',], en => {
+              store.commit('loadLanguage', { key: 'en', data: en, })
               resolve()
             })
           }
         })
-      }
+      },
     }
-  }
+  },
 }

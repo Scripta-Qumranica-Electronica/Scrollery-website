@@ -1,7 +1,7 @@
 import Record from './Record'
 
 const baseDefaults = {
-  id: 0
+  id: 0,
 }
 
 /**
@@ -15,7 +15,7 @@ const makeModel = (defaultValues = {}) => {
    * @class
    * @extends Record
    */
-  class BaseModel extends Record({ ...baseDefaults, ...defaultValues }) {
+  class BaseModel extends Record({ ...baseDefaults, ...defaultValues, }) {
     /**
      * @public
      * @instance

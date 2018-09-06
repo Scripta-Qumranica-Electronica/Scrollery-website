@@ -29,7 +29,7 @@ export default class EventEmitter {
         // consider: deep clone args so that one handler cannot modify.
         // This should be fine if args are simple properties
         (function(h) {
-          setTimeout(() => h({ ...args }))
+          setTimeout(() => h({ ...args, }))
         })(handler)
       }
     }
@@ -49,7 +49,7 @@ export default class EventEmitter {
     }
 
     if (!Array.isArray(names)) {
-      names = [names]
+      names = [names,]
     }
 
     for (let i = 0, name; (name = names[i]); i++) {
@@ -75,7 +75,7 @@ export default class EventEmitter {
     }
 
     if (!Array.isArray(names)) {
-      names = [names]
+      names = [names,]
     }
 
     for (let i = 0, name; (name = names[i]); i++) {

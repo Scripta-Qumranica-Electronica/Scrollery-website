@@ -6,4 +6,5 @@ vendors/
 tests/
 src/js/utils/
 tools/
+coverage/
 webpack.*.js

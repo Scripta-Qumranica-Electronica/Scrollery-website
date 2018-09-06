@@ -5,7 +5,7 @@ const defaults = {
   attribute_value_description: '',
   attribute_numeric_value: -1,
   string_value: '',
-  type: ''
+  type: '',
 }
 
 export default class AttributeValue extends extendModel(defaults) {

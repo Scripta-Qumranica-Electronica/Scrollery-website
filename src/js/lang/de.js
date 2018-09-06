@@ -28,5 +28,5 @@ module.exports = {
   'Select Images': 'Bilder auswählen',
   Zoom: 'Zoom',
   Image: 'Bild',
-  Text: 'Text'
+  Text: 'Text',
 }

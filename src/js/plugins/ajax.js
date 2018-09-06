@@ -2,7 +2,7 @@ import axios from 'axios'
 
 export default {
   /* istanbul ignore next */
-  install(Vue, { store }) {
+  install(Vue, { store, }) {
     /* istanbul ignore next */
     Vue.prototype.$post = function(url, data = {}, opt = {}) {
       // Set SESSION_ID if available
@@ -22,14 +22,14 @@ export default {
       if (data.scroll_version_id) {
         opt = Object.assign({}, opt, {
           transformResponse: axios.defaults.transformResponse.concat(responseData => {
-            responseData = Object.assign({}, responseData, { payload: data })
+            responseData = Object.assign({}, responseData, { payload: data, })
             return responseData
-          })
+          }),
         })
       }
 
       // make the AJAX request
       return axios.post(url, data, opt)
     }
-  }
+  },
 }

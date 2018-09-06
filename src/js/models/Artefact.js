@@ -1,5 +1,5 @@
 import SvgPath from 'svgpath'
-import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG } from '~/utils/VectorFactory.js'
+import { wktPolygonToSvg, wktParseRect, dbMatrixToSVG, } from '~/utils/VectorFactory.js'
 
 export default class Artefact {
   constructor(record = {}) {

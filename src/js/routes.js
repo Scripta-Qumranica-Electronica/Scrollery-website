@@ -4,21 +4,21 @@ export default [
   {
     path: '/',
     redirect: {
-      name: 'login'
-    }
+      name: 'login',
+    },
   },
   {
     path: '/login',
     name: 'login',
-    component: Login
+    component: Login,
   },
   {
     path: '/workbench',
     name: 'workbench',
     component: () => {
       /* istanbul ignore next */
-      return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
-    }
+      return new Promise(resolve => require(['~/components/Workbench.vue',], resolve))
+    },
   },
   {
     path:
@@ -26,15 +26,15 @@ export default [
     name: 'workbenchAddress',
     component: () => {
       /* istanbul ignore next */
-      return new Promise(resolve => require(['~/components/Workbench.vue'], resolve))
-    }
+      return new Promise(resolve => require(['~/components/Workbench.vue',], resolve))
+    },
   },
 
   // 404 - keep at bottom
   {
     path: '*',
     redirect: {
-      name: 'login'
-    }
-  }
+      name: 'login',
+    },
+  },
 ]

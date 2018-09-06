@@ -22,12 +22,12 @@ class Column extends List {
     const changes = {
       additions: {},
       deletions: {},
-      updates: {}
+      updates: {},
     }
 
     if (this.hasChanges()) {
       this.forEach(line => {
-        const { additions, deletions, updates } = line.getChanges()
+        const { additions, deletions, updates, } = line.getChanges()
         Object.assign(changes.additions, additions || {})
         Object.assign(changes.deletions, deletions || {})
         Object.assign(changes.updates, updates || {})

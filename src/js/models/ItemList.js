@@ -35,7 +35,7 @@ export default class ItemList {
 
     const key = this._formatKey(item[this.idKey], scroll_version_id)
     if (!(key in this._items) || this.get(key) !== item) {
-      this._items = Object.assign({}, this._items, { [key]: item })
+      this._items = Object.assign({}, this._items, { [key]: item, })
       this._itemOrder.splice(position, 0, key)
     }
   }
@@ -61,7 +61,7 @@ export default class ItemList {
     key = this._formatKey(key, scroll_version_id)
     if (key in this._items) {
       const updatedItem = Object.assign({}, this.get(key), newData)
-      this._items = Object.assign({}, this._items, { [key]: updatedItem })
+      this._items = Object.assign({}, this._items, { [key]: updatedItem, })
     } else {
       throw new TypeError(`Item ${key} not found.`)
     }
@@ -86,7 +86,7 @@ export default class ItemList {
   addToItemSublist(key, sublistName, newData, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
     // Wrap newData in an array if it isn't already
-    newData = Array.isArray(newData) ? newData : [newData]
+    newData = Array.isArray(newData) ? newData : [newData,]
     if (key in this._items) {
       const updateItem = this.get(key)
       for (let i = 0, newDatum; (newDatum = newData[i]); i++) {
@@ -119,7 +119,7 @@ export default class ItemList {
   removeItemFromSublist(key, sublistName, newData, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
     // Wrap newData in an array if it isn't already
-    newData = Array.isArray(newData) ? newData : [newData]
+    newData = Array.isArray(newData) ? newData : [newData,]
     if (key in this._items) {
       const updateItem = this.get(key)
       for (let i = 0, newDatum; (newDatum = newData[i]); i++) {
@@ -240,21 +240,21 @@ export default class ItemList {
           scroll_version_id: scroll_version_id,
           name: name,
           [this.idKey]: item_id,
-          transaction: transaction
+          transaction: transaction,
         }
-        this.alterItemAtKey(item_id, { name: name }, scroll_version_id)
+        this.alterItemAtKey(item_id, { name: name, }, scroll_version_id)
         this.axios
           .post('resources/cgi-bin/scrollery-cgi.pl', payload)
           .then(res => {
             if (res.status === 200 && res.data) {
               resolve(res)
             } else {
-              this.alterItemAtKey(artefact_id, { name: oldName }, scroll_version_id)
+              this.alterItemAtKey(artefact_id, { name: oldName, }, scroll_version_id)
               reject(res)
             }
           })
           .catch(err => {
-            this.alterItemAtKey(artefact_id, { name: oldName }, scroll_version_id)
+            this.alterItemAtKey(artefact_id, { name: oldName, }, scroll_version_id)
             reject(err)
           })
       } else {
