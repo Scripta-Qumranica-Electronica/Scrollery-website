@@ -1,9 +1,8 @@
 import makeModel from '~/models/extendModel.js'
 
-const name = "test record name"
+const name = 'test record name'
 
 describe('model', () => {
-
   let Model
   beforeEach(() => {
     Model = makeModel({ name })
@@ -15,7 +14,7 @@ describe('model', () => {
   })
 
   it('should accept an id property', () => {
-    const model = new Model({id: 1})
+    const model = new Model({ id: 1 })
     expect(model.getID()).to.equal(1)
   })
 

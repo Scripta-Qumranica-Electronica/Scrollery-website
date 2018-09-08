@@ -28,7 +28,7 @@
 
 <script>
 // models
-import Sign from '~/models/Sign.js'
+import Sign from '~/models/-Sign.js'
 
 // components
 import AttribueSearch from './AttributeSearch.vue'

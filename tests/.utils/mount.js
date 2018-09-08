@@ -13,7 +13,7 @@ export default (Component, opt = {}) => {
   // i18n
   localVue.use(i18n, { store })
 
-  const window = {localStorage: storageMock()}
+  const window = { localStorage: storageMock() }
 
   // create args
   const args = {
@@ -50,6 +50,6 @@ function storageMock() {
     key: function(i) {
       var keys = Object.keys(storage)
       return keys[i] || null
-    }
-  };
+    },
+  }
 }

@@ -1,6 +1,6 @@
 import Composition from '~/models/Composition.js'
-import Column from '~/models/Column.js'
-import Line from '~/models/Line.js'
+import Column from '~/models/-Column.js'
+import Line from '~/models/-Line.js'
 
 describe('CompositionModel', () => {
   let text

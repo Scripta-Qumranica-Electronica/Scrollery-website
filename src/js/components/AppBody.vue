@@ -26,7 +26,7 @@
               :corpus="corpus"></single-image>
           </template>
           <template slot="paneR">
-            <editor class="pane-content"></editor>
+            <editor class="pane-content" :corpus="corpus"></editor>
           </template>
         </split-pane>
       </div>
@@ -259,7 +259,7 @@ export default {
 }
 
 .single-image-pane {
-  background: lightgreen;
+  background: cornflowerblue;
 }
 
 .combination-pane {

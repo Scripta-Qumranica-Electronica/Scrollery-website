@@ -40,6 +40,11 @@ export default class ItemList {
     }
   }
 
+  _insertItemAsNext(item, key) {
+    this._items = Object.assign({}, this._items, { [key]: item })
+    this._itemOrder.push(key)
+  }
+
   _replaceItem(item, scroll_version_id = undefined) {
     //This check is probably a waste of time
     if (!(item instanceof this.recordModel)) {

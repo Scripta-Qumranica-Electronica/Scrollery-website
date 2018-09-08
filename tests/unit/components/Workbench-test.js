@@ -9,7 +9,9 @@ describe('Workbench', () => {
       // provide stubs for all children
       stubs: Object.keys(Workbench.components),
       mocks: {
-        $post: function() { return $postPromise },
+        $post: function() {
+          return $postPromise
+        },
       },
     })
     vm = wrapper.vm
@@ -46,7 +48,6 @@ describe('Workbench', () => {
 
       // no routing event expected
       expect(vm.$router.replace.called).to.equal(false)
-
     })
   })
 })

@@ -1,10 +1,10 @@
-"use strict"
+'use strict'
 
 import { mount } from '@test'
 import ImageCatalogPreview from '~/components/ImageCatalogPreview.vue'
 import Corpus from '../../.utils/factories/Corpus-factory.js'
 
-describe("ImageCatalogPreview", function() {
+describe('ImageCatalogPreview', function() {
   let wrapper, vm
   const push = sinon.spy()
   const corpus = Corpus()
@@ -12,7 +12,7 @@ describe("ImageCatalogPreview", function() {
   const image = corpus.imageReferences.get(combination.imageReferences[0])
   beforeEach(() => push.reset())
 
-  describe("load preview", () => {
+  describe('load preview', () => {
     beforeEach(() => {
       wrapper = mount(ImageCatalogPreview, {
         propsData: {
@@ -23,7 +23,7 @@ describe("ImageCatalogPreview", function() {
       })
       vm = wrapper.vm
     })
-    
+
     it('displays something', () => {
       expect(wrapper.find('span').exists()).to.equal(true)
     })

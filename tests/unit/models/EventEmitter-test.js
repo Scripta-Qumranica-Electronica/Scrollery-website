@@ -1,21 +1,17 @@
 import EventEmitter from '~/models/EventEmitter.js'
 
 describe('EventEmitter', () => {
-
   let event
   beforeEach(() => {
     event = new EventEmitter()
   })
 
   describe('.prototype.emit', () => {
-
     it('should emit events using setTimeout to unblock event loop so all listeners are notified roughly at the same time', done => {
-      
       let async = false
 
       // wire subscriber
       event.on('event', () => {
-
         // if a setTimeout is used, then the boolean async flag should
         // get switched before this callback is fired
         done(async ? null : new Error('This should not be called before the test is finished'))
@@ -27,12 +23,11 @@ describe('EventEmitter', () => {
 
     it('should emit the event with arguments (but new object)', done => {
       const args = {
-        value: true
+        value: true,
       }
 
       // wire subscriber
       event.on('event', eventArgs => {
-
         // it will be a new object
         expect(eventArgs === args).to.equal(false)
 
@@ -64,7 +59,6 @@ describe('EventEmitter', () => {
   })
 
   describe('prototype.on', () => {
-
     it('should accept an array of event names with a single handler', done => {
       let count = 0
 
@@ -82,11 +76,9 @@ describe('EventEmitter', () => {
       event.emit('event1')
       event.emit('event2')
     })
-
   })
 
   describe('prototype.off', () => {
-
     it('should remove event listeners', done => {
       let count = 0
 
@@ -95,7 +87,6 @@ describe('EventEmitter', () => {
         if (count === 3) {
           done(new Error('this event handler should be removed before'))
         } else {
-
           // after the first run, remove the event listener
           // and re-trigger ... which should finish in handler2
           event.off('event', handler1)
@@ -108,7 +99,7 @@ describe('EventEmitter', () => {
           done()
         }
       }
-      
+
       // wire up event handlers
       event.on('event', handler1)
       event.on('event', handler2)
@@ -116,8 +107,5 @@ describe('EventEmitter', () => {
       // trigger the event to run once on each handler
       event.emit('event')
     })
-
   })
-
-
 })

@@ -6,8 +6,10 @@ export default class Combination {
     this.locked = ~~record.locked
     this.user_id = ~~record.user_id
     this.cols = record.cols || []
+    this.lines = record.lines || []
     this.imageReferences = record.imageReferences || []
     this.artefacts = record.artefacts || []
     this.rois = record.rois || []
+    this.initial_sign_id = record.initial_sign_id || undefined
   }
 }

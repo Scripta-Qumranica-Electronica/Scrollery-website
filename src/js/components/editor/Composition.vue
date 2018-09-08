@@ -1,13 +1,11 @@
 <template>
     <section class="editor">
       <column
-        v-for="(column, columnIndex) of columns"
-        :key="columnIndex + column.id"
         :state="state"
-        :column="column"
         :toolbar="toolbar"
         :messageBar="messageBar"
         @refresh="$emit('refresh')"
+        :corpus="corpus"
       />
     </section>
 </template>
@@ -33,10 +31,11 @@ export default {
     },
     toolbar: null,
     messageBar: null,
+    corpus: undefined,
   },
   computed: {
     columns() {
-      return this.text.items()
+      return undefined //this.text.items()
     },
   },
 }

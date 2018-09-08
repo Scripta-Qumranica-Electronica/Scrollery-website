@@ -11,6 +11,7 @@
           :toolbar="$refs.toolbar"
           @refresh="refresh"
           :messageBar="$refs.messageBar"
+          :corpus="corpus"
         />
         <message-bar ref="messageBar"></message-bar>
     </div>
@@ -19,9 +20,9 @@
 <script>
 import KEY_CODES from './key_codes.js'
 import CompositionModel from '~/models/Composition.js'
-import Line from '~/models/Line.js'
+import Line from '~/models/-Line.js'
 import Column from '~/models/Column.js'
-import Sign from '~/models/Sign.js'
+import Sign from '~/models/-Sign.js'
 
 // components
 import MessageBar from './MessageBar.vue'
@@ -39,6 +40,7 @@ export default {
   props: {
     colID: undefined,
     scrollVersionID: undefined,
+    corpus: undefined,
   },
   // TODO delete this?
   computed: {
@@ -173,10 +175,10 @@ export default {
         to.params.scrollVersionID !== from.params.scrollVersionID
       ) {
         if (to.params.colID !== '~' && to.params.colID > 0) {
-          this.text = new CompositionModel()
-          this.getText(to.params.scrollVersionID, to.params.colID)
+          // this.text = new CompositionModel()
+          // this.getText(to.params.scrollVersionID, to.params.colID)
         } else {
-          this.text = new CompositionModel()
+          // this.text = new CompositionModel()
         }
       }
     },

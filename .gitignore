@@ -1,6 +1,8 @@
 .vstags
 .vscode
+.c9
 .idea
+.pv
 yarn-error.log
 node_modules
 dist

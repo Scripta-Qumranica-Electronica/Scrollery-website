@@ -1,6 +1,6 @@
-import Sign from './Sign.js'
+import Sign from './-Sign.js'
 import List from './List.js'
-import Line from './Line.js'
+import Line from './-Line.js'
 
 /**
  * A column is the building block of a text.
