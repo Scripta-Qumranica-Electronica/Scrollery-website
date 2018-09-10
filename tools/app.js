@@ -3,6 +3,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 var proxy = require('express-http-proxy')
 const app = express()
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
 // parse JSON bodies 
 app.use(bodyParser.json({ type: 'application/json' }))

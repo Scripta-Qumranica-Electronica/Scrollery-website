@@ -4,7 +4,7 @@
     <!--  :key="`edit-col-${sign}`"-->
     <!--  :sign_id="sign"-->
     <!--  :corpus="corpus"/>-->
-    <span v-for="sign in columnSigns" :key="`edit-col-${sign}`">{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0]).char}}</span>
+    <span v-for="sign in columnSigns" :key="`edit-col-${sign}`">{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0], scroll_version_id).char}}</span>
   </div>
 </template>
 
@@ -35,12 +35,11 @@ export default {
         to.params.scrollVersionID !== from.params.scrollVersionID
       ) {
         if (to.params.colID !== '~' && to.params.colID > 0) {
-          this.columnSigns =
-            (this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
-              this.corpus.cols.get(this.col_id, this.scroll_version_id).signs) ||
-            []
           this.col_id = to.params.colID
           this.scroll_version_id = to.params.scrollVersionID
+          this.columnSigns =
+            this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
+            this.corpus.cols.get(this.col_id, this.scroll_version_id).signs
           this.corpus.signs
             .populate({
               col_id: to.params.colID,
@@ -49,9 +48,8 @@ export default {
             .then(
               res =>
                 (this.columnSigns =
-                  (this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
-                    this.corpus.cols.get(this.col_id, this.scroll_version_id).signs) ||
-                  [])
+                  this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
+                  this.corpus.cols.get(this.col_id, this.scroll_version_id).signs)
             )
             .catch(err => console.error(err))
         }

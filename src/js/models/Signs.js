@@ -117,14 +117,13 @@ export default class Signs extends ItemList {
         this.createSignChar(sign.chars, sign_id, scroll_version_id, l).then(
           ([signChars, line_sign_id, signCount, col_sign_id]) => {
             // Create sign
-            this.corpus.signs._insertItemAsNext(
-              new Sign({
-                sign_id: sign_id,
-                next_sign_ids: sign.next_sign_ids,
-                sign_chars: signChars,
-              }),
-              sign_id
-            )
+            this.corpus.signs._items[sign_id] = {
+              sign_id: ~~sign_id,
+              next_sign_ids: Array.isArray(sign.next_sign_ids)
+                ? sign.next_sign_ids
+                : [sign.next_sign_ids],
+              sign_chars: signChars || [],
+            }
             if (signCount === signs.length - 1) {
               console.log('processed line', count)
               resolve([line_sign_ids, line_sign_id, count, col_sign_id])
@@ -153,17 +152,15 @@ export default class Signs extends ItemList {
           const attribute_id = attribute.attribute_id
           signCharAttributes.push(attribute_id)
           // Create the attribute ...
-          this.corpus.signCharAttributes._insertItem(
-            new SignCharAttribute({
-              sign_char_attribute_id: attribute_id,
-              scroll_version_id: scroll_version_id,
-              sequence: attribute.sequence,
-              attribute_name: attribute.attribute_name,
-              attribute_values: attribute.values,
-              commentary_id: attribute.values.commentary_id,
-            }),
-            scroll_version_id
-          )
+          this.corpus.signCharAttributes._items[scroll_version_id + '-' + attribute_id] = {
+            sign_char_attribute_id: ~~attribute_id,
+            sequence: attribute.sequence || 0,
+            attribute_name: ~~attribute.attribute_name,
+            attribute_values: Array.isArray(attribute.values)
+              ? attribute.values
+              : [attribute.values],
+            commentary_id: ~~attribute.values.commentary_id || 0,
+          }
           for (
             let o = 0, value;
             (value = Array.isArray(attribute.values) ? attribute.values[o] : [attribute.values][o]);
@@ -179,15 +176,12 @@ export default class Signs extends ItemList {
           }
         }
         // Create signChar
-        this.corpus.signChars._insertItemAsNext(
-          new SignChar({
-            sign_char_id: char.sign_char_id,
-            is_variant: char.is_variant,
-            char: char.sign_char,
-            sign_char_attributes: signCharAttributes,
-          }),
-          char.sign_char_id
-        )
+        this.corpus.signChars._items[scroll_version_id + '-' + char.sign_char_id] = {
+          sign_char_id: ~~char.sign_char_id,
+          is_variant: ~~char.is_variant || 0,
+          char: char.sign_char,
+          sign_char_attributes: signCharAttributes || [],
+        }
       }
       resolve([signChars, line_sign_id, signCount, col_sign_id])
     })

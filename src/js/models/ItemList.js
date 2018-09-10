@@ -23,9 +23,9 @@ export default class ItemList {
 
   _insertItem(item, scroll_version_id = undefined, position = undefined) {
     //This check is probably a waste of time
-    if (!(item instanceof this.recordModel)) {
-      throw new TypeError(`Expected item to be an instance of ${this.recordModel.name}.`)
-    }
+    // if (!(item instanceof this.recordModel)) {
+    //   throw new TypeError(`Expected item to be an instance of ${this.recordModel.name}.`)
+    // }
 
     if (position === undefined) {
       position = this._itemOrder.length
