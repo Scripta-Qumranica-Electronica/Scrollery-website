@@ -43,7 +43,7 @@ import Editor from './editor/Editor.vue'
 
 import Corpus from '~/models/Corpus.js'
 import { mapMutations } from 'vuex'
-// import io from 'socket.io-client'
+import io from 'socket.io-client'
 
 export default {
   components: {
@@ -59,7 +59,7 @@ export default {
       mouseOver: false,
       corpus: Corpus,
       menuLoaded: false,
-      // socket : io('/socket')
+      socket: io('https://' + window.location.hostname + '/socket'),
     }
   },
   computed: {
