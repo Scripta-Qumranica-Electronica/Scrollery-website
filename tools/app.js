@@ -16,6 +16,7 @@ app.get('/', (req, res) => {
 
 // handle Perl requests
 app.post('/resources/cgi-bin/scrollery-cgi.pl', proxy('http://localhost:9080/resources/cgi-bin/scrollery-cgi.pl'))
+app.use('/socket', proxy('http://localhost:6333'))
 
 // expose the Express app instance
 module.exports = app

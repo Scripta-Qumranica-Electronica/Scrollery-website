@@ -1,5 +1,5 @@
 {
-  "name": "docker-yarn-socketio",
+  "name": "sqe-socketio",
   "version": "0.0.1",
   "description": "",
   "main": "app.js",
@@ -10,3 +10,4 @@
     "express": "^4.15.4",
     "socket.io": "^2.0.3"
   }
+}

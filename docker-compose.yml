@@ -32,7 +32,7 @@ services:
 
   sqe.websocket:
     build:
-      context: ./resources/socket.io
+      context: ./resources/socket
       dockerfile: Dockerfile
     container_name: SQE_WEBSOCKET
     expose:
@@ -40,7 +40,8 @@ services:
     ports:
       - "6333:6333"
     volumes:
-      - ./resources/socket.io:/workdir
+      - ./resources/socket:/socket
+    command: ["/usr/local/bin/node", "/socket/app.js"]
     networks:
       - sqe-dev
 
