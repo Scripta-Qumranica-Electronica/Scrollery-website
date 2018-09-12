@@ -1,10 +1,8 @@
 const { resolve } = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
-var proxy = require('express-http-proxy')
+const proxy = require('express-http-proxy')
 const app = express()
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
 
 // parse JSON bodies 
 app.use(bodyParser.json({ type: 'application/json' }))
@@ -16,7 +14,6 @@ app.get('/', (req, res) => {
 
 // handle Perl requests
 app.post('/resources/cgi-bin/scrollery-cgi.pl', proxy('http://localhost:9080/resources/cgi-bin/scrollery-cgi.pl'))
-app.use('/socket', proxy('http://localhost:6333'))
 
 // expose the Express app instance
 module.exports = app

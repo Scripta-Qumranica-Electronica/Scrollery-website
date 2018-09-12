@@ -1,6 +1,7 @@
 const app = require('./app.js');
 const webpack = require('webpack')
 const middleware = require('webpack-dev-middleware')
+const proxy = require('http-proxy-middleware')
 const conf = require('./../webpack.server.js')
 const compiler = webpack(conf)
 
@@ -16,6 +17,21 @@ app.get(/.*/, (req, res, next) => {
   }
 })
 
-app.listen(process.env.PORT || 9090, () =>
+// const wsProxy = proxy({
+//   target: 'http://localhost:6333', 
+//   changeOrigin: true,
+//   ws: true,
+//   router: {
+//     'localhost:3000' : 'http://localhost:6333'
+//   }
+// })
+
+const wsProxy = proxy('ws://localhost:6333')
+
+app.use('/socket.io', wsProxy)
+    
+const server = app.listen(process.env.PORT || 9090, () =>
   console.log(`SQE server listening on port ${process.env.PORT || 9090}!`)
 )
+
+server.on('upgrade', wsProxy.upgrade)
