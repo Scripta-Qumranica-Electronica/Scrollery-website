@@ -11,6 +11,8 @@ import ROIs from './ROIs.js'
 import Post from '~/utils/AxiosPostShim.js'
 // import ClipperLib from 'js-clipper/clipper'
 
+import io from 'socket.io-client'
+
 /**
  * A corpus is collection of all material objects in a collection and the data related to them..
  *
@@ -38,5 +40,13 @@ export default class Corpus {
     this.images = new Images(this)
     this.artefacts = new Artefacts(this)
     this.rois = new ROIs(this)
+    this.socket = io()
+    this.socket.on('message', function(msg) {
+      console.log(msg)
+    })
+  }
+
+  message(msg) {
+    this.socket.emit('message', msg)
   }
 }

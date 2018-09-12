@@ -136,6 +136,8 @@ export default {
     },
 
     selectCombination() {
+      this.corpus.message(`Someone selected scroll ${this.combination.scroll_version_id}.`)
+
       this.open = !this.open
       if (this.open) {
         this.setRouter()

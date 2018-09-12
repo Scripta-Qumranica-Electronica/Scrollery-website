@@ -58,7 +58,6 @@ export default {
       mouseOver: false,
       corpus: Corpus,
       menuLoaded: false,
-      socket: io(/*window.location.host, {path: '/socket/socket.io'}*/),
     }
   },
   computed: {
