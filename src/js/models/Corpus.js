@@ -41,12 +41,15 @@ export default class Corpus {
     this.artefacts = new Artefacts(this)
     this.rois = new ROIs(this)
     this.socket = io()
-    this.socket.on('message', function(msg) {
+    this.socket.on('message', msg => {
+      console.log(msg)
+    })
+    this.socket.on('scrollData', msg => {
       console.log(msg)
     })
   }
 
   message(msg) {
-    this.socket.emit('message', msg)
+    this.socket.emit('getScrolls', Object.assign({}, { SESSION_ID: this.session_id }, msg))
   }
 }

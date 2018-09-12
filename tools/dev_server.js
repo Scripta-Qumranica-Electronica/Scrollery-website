@@ -17,17 +17,14 @@ app.get(/.*/, (req, res, next) => {
   }
 })
 
-// const wsProxy = proxy({
-//   target: 'http://localhost:6333', 
-//   changeOrigin: true,
-//   ws: true,
-//   router: {
-//     'localhost:3000' : 'http://localhost:6333'
-//   }
-// })
-
+/**
+ * These two lines and the 'upgrade' below take care of proxying
+ * the websocket.  It seems that in development, socket.io
+ * is falling back to long polling, since the connection cannot
+ * be upgraded to ws.  I don't know how to fix this, but it does
+ * not seem to interfere with development usign socket.io.
+ */
 const wsProxy = proxy('ws://localhost:6333')
-
 app.use('/socket.io', wsProxy)
     
 const server = app.listen(process.env.PORT || 9090, () =>

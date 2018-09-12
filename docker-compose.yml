@@ -41,7 +41,7 @@ services:
       - "6333:6333"
     volumes:
       - ./resources/socket:/socket
-    command: ["/usr/local/bin/node", "/socket/app.js"]
+    command: ["/socket/node_modules/.bin/nodemon", "-L", "--watch", "/socket", "/socket/app.js"]
     networks:
       - sqe-dev
 
