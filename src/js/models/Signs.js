@@ -1,9 +1,4 @@
 import ItemList from './ItemList.js'
-import Sign from './Sign.js'
-import SignCharAttribute from './SignCharAttribute.js'
-import SignChar from './SignChar.js'
-import Line from './Line.js'
-import Col from './Col.js'
 
 export default class Signs extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
@@ -12,7 +7,17 @@ export default class Signs extends ItemList {
     const connectedLists = [corpus.cols]
     const relativeToScrollVersion = false
     defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getTextOfFragment' }
-    super(corpus, idKey, Sign, listType, connectedLists, relativeToScrollVersion, defaultPostData)
+    super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
+  }
+
+  formatRecord(record) {
+    return {
+      sign_id: ~~record.sign_id,
+      next_sign_ids: Array.isArray(record.next_sign_ids)
+        ? record.next_sign_ids
+        : [record.next_sign_ids],
+      sign_chars: record.sign_chars || [],
+    }
   }
 
   /* istanbul ignore next */
@@ -60,24 +65,24 @@ export default class Signs extends ItemList {
                       col_sign_id = returned_col_sign_id ? returned_col_sign_id : col_sign_id
                       col_sign_ids[count] = line_signs
                       this.corpus.lines._insertItem(
-                        new Line({
+                        {
                           name: line.line_name,
                           line_id: line.line_id,
                           scroll_version_id: scroll_version_id,
                           line_sign_id: line_sign_id,
                           signs: line_signs,
-                        }),
+                        },
                         scroll_version_id
                       )
                       if (count === col.lines.length - 1) {
                         this.corpus.cols._insertItem(
-                          new Col({
+                          {
                             name: col.fragment_name,
                             col_id: col.fragment_id,
                             scroll_version_id: scroll_version_id,
                             col_sign_id: col_sign_id,
                             signs: col_sign_ids.reduce((acc, val) => acc.concat(val), []),
-                          }),
+                          },
                           scroll_version_id
                         )
                         console.log('Sign stream process: ', window.performance.now() - process)
@@ -117,13 +122,11 @@ export default class Signs extends ItemList {
         this.createSignChar(sign.chars, sign_id, scroll_version_id, l).then(
           ([signChars, line_sign_id, signCount, col_sign_id]) => {
             // Create sign
-            this.corpus.signs._items[sign_id] = {
-              sign_id: ~~sign_id,
-              next_sign_ids: Array.isArray(sign.next_sign_ids)
-                ? sign.next_sign_ids
-                : [sign.next_sign_ids],
-              sign_chars: signChars || [],
-            }
+            this.corpus.signs._items[sign_id] = this.formatRecord({
+              sign_id: sign_id,
+              next_sign_ids: sign.next_sign_ids,
+              sign_chars: signChars,
+            })
             if (signCount === signs.length - 1) {
               console.log('processed line', count)
               resolve([line_sign_ids, line_sign_id, count, col_sign_id])
@@ -152,15 +155,15 @@ export default class Signs extends ItemList {
           const attribute_id = attribute.attribute_id
           signCharAttributes.push(attribute_id)
           // Create the attribute ...
-          this.corpus.signCharAttributes._items[scroll_version_id + '-' + attribute_id] = {
-            sign_char_attribute_id: ~~attribute_id,
-            sequence: attribute.sequence || 0,
-            attribute_name: ~~attribute.attribute_name,
-            attribute_values: Array.isArray(attribute.values)
-              ? attribute.values
-              : [attribute.values],
-            commentary_id: ~~attribute.values.commentary_id || 0,
-          }
+          this.corpus.signCharAttributes._items[
+            scroll_version_id + '-' + attribute_id
+          ] = this.corpus.signCharAttributes.formatRecord({
+            sign_char_attribute_id: attribute_id,
+            sequence: attribute.sequence,
+            attribute_name: attribute.attribute_name,
+            attribute_values: attribute.values,
+            commentary_id: attribute.values.commentary_id,
+          })
           for (
             let o = 0, value;
             (value = Array.isArray(attribute.values) ? attribute.values[o] : [attribute.values][o]);
@@ -176,12 +179,14 @@ export default class Signs extends ItemList {
           }
         }
         // Create signChar
-        this.corpus.signChars._items[scroll_version_id + '-' + char.sign_char_id] = {
-          sign_char_id: ~~char.sign_char_id,
-          is_variant: ~~char.is_variant || 0,
+        this.corpus.signChars._items[
+          scroll_version_id + '-' + char.sign_char_id
+        ] = this.corpus.signChars.formatRecord({
+          sign_char_id: char.sign_char_id,
+          is_variant: char.is_variant,
           char: char.sign_char,
-          sign_char_attributes: signCharAttributes || [],
-        }
+          sign_char_attributes: signCharAttributes,
+        })
       }
       resolve([signChars, line_sign_id, signCount, col_sign_id])
     })

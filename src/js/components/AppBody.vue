@@ -78,54 +78,54 @@ export default {
     this.$store.commit('addWorking')
 
     this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
-    this.corpus.combinations
-      .populate()
-      .then(res => {
-        // determine the locked scrolls
-        if (res && res.data && res.data.results) {
-          const scrolls = res.data.results
-          this.$store.commit(
-            'setLockedScrolls',
-            scrolls.reduce((hash, scrollVersion) => {
-              if (~~scrollVersion.locked) {
-                hash[scrollVersion.scroll_version_id] = true
-              }
-              return hash
-            }, {})
-          )
-        }
+    // this.corpus.combinations
+    //   .populate()
+    //   .then(res => {
+    //     // determine the locked scrolls
+    //     if (res && res.data && res.data.results) {
+    //       const scrolls = res.data.results
+    //       this.$store.commit(
+    //         'setLockedScrolls',
+    //         scrolls.reduce((hash, scrollVersion) => {
+    //           if (~~scrollVersion.locked) {
+    //             hash[scrollVersion.scroll_version_id] = true
+    //           }
+    //           return hash
+    //         }, {})
+    //       )
+    //     }
 
-        return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
-          ? this.corpus.cols.populate({
-              scroll_version_id: this.$route.params.scrollVersionID,
-              scroll_id: this.$route.params.scrollID,
-            })
-          : undefined
-      })
-      .then(res => {
-        return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
-          ? this.corpus.imageReferences.populate({
-              scroll_version_id: this.$route.params.scrollVersionID,
-              scroll_id: this.$route.params.scrollID,
-            })
-          : undefined
-      })
-      .then(res => {
-        return this.$route.params.imageID && this.$route.params.imageID !== '~'
-          ? this.corpus.artefacts.populate({
-              image_catalog_id: this.$route.params.imageID,
-              scroll_version_id: this.$route.params.scrollVersionID,
-            })
-          : undefined
-      })
-      .then(res => {
-        this.$store.commit('delWorking')
-        this.resetRouter()
-      })
-      .catch(err => {
-        this.$store.commit('delWorking')
-        console.error(err)
-      })
+    //     return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
+    //       ? this.corpus.cols.populate({
+    //           scroll_version_id: this.$route.params.scrollVersionID,
+    //           scroll_id: this.$route.params.scrollID,
+    //         })
+    //       : undefined
+    //   })
+    //   .then(res => {
+    //     return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
+    //       ? this.corpus.imageReferences.populate({
+    //           scroll_version_id: this.$route.params.scrollVersionID,
+    //           scroll_id: this.$route.params.scrollID,
+    //         })
+    //       : undefined
+    //   })
+    //   .then(res => {
+    //     return this.$route.params.imageID && this.$route.params.imageID !== '~'
+    //       ? this.corpus.artefacts.populate({
+    //           image_catalog_id: this.$route.params.imageID,
+    //           scroll_version_id: this.$route.params.scrollVersionID,
+    //         })
+    //       : undefined
+    //   })
+    //   .then(res => {
+    //     this.$store.commit('delWorking')
+    //     this.resetRouter()
+    //   })
+    //   .catch(err => {
+    //     this.$store.commit('delWorking')
+    //     console.error(err)
+    //   })
 
     this.$store.commit('addWorking')
     this.$post('resources/cgi-bin/scrollery-cgi.pl', {

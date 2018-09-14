@@ -1,8 +1,20 @@
+/**
+ * This is an abstact object used for the other data model/controllers.
+ * It has a subclassed ItemListOrdered, which maintains an array with the
+ * order of elements in the object.
+ *
+ * Note that elements in `_items` are now object literals.
+ * Originally we had used classes for each element, but this caused
+ * a dramatic performance hit with very large data sets. (15–20 seconds to
+ * add ~20,000 elements with Classes as opposed to ~40ms with onject
+ * literals.)  Perhaps there is a compromise, but we need to test any proposed
+ * strategy before implementation.
+ */
+
 export default class ItemList {
   constructor(
     corpus,
     idKey,
-    recordModel,
     listType,
     connectedLists,
     relativeToScrollVersion = false,
@@ -12,45 +24,26 @@ export default class ItemList {
     this.idKey = idKey
     this._hash = undefined
     this._items = {}
-    this._itemOrder = []
-    this.recordModel = recordModel
     this.listType = listType
     this.connectedLists = connectedLists
     this.relativeToScrollVersion = relativeToScrollVersion
     this.defaultPostData = defaultPostData
-    this.axios = this.corpus.axios
+    this.axios = this.corpus.axios // TODO remove this
+    this.socket = this.corpus.socket
   }
 
-  _insertItem(item, scroll_version_id = undefined, position = undefined) {
-    //This check is probably a waste of time
-    // if (!(item instanceof this.recordModel)) {
-    //   throw new TypeError(`Expected item to be an instance of ${this.recordModel.name}.`)
-    // }
+  formatRecord(input) {
+    return input
+  }
 
-    if (position === undefined) {
-      position = this._itemOrder.length
-    } else if (position > this._itemOrder.length) {
-      throw new TypeError(`Requested position exceeds length of array: ${this._itemOrder.length}.`)
-    }
-
+  _insertItem(item, scroll_version_id = undefined) {
     const key = this._formatKey(item[this.idKey], scroll_version_id)
     if (!(key in this._items) || this.get(key) !== item) {
       this._items = Object.assign({}, this._items, { [key]: item })
-      this._itemOrder.splice(position, 0, key)
     }
-  }
-
-  _insertItemAsNext(item, key) {
-    this._items = Object.assign({}, this._items, { [key]: item })
-    this._itemOrder.push(key)
   }
 
   _replaceItem(item, scroll_version_id = undefined) {
-    //This check is probably a waste of time
-    if (!(item instanceof this.recordModel)) {
-      throw new TypeError(`Expected item to be an instance of ${this.recordModel.name}.`)
-    }
-
     this.alterItemAtKey(item[this.idKey], item, scroll_version_id)
   }
 
@@ -142,13 +135,6 @@ export default class ItemList {
   /* istanbul ignore next */
   _removeItem(key, scroll_version_id = undefined) {
     key = this._formatKey(key, scroll_version_id)
-    const arrayIndex = this._itemOrder.indexOf(key)
-    if (arrayIndex !== -1) {
-      this._itemOrder.splice(arrayIndex, 1)
-    } else {
-      throw new TypeError(`Key ${key} does not exist in itemOrder Array.`)
-    }
-
     if (key in this._items) {
       delete this._items[key]
     } else {
@@ -180,14 +166,8 @@ export default class ItemList {
     return this._items[key] ? this._items[key] : undefined
   }
 
-  /* istanbul ignore next */
-  getIndexOfKey(key, scroll_version_id = undefined) {
-    key = this._formatKey(key, scroll_version_id)
-    return this._itemOrder.indexOf(key) !== -1 ? this._itemOrder.indexOf(key) : undefined
-  }
-
   keys() {
-    return this._itemOrder
+    return this._items.keys()
   }
 
   /* istanbul ignore next */
@@ -199,24 +179,17 @@ export default class ItemList {
         this.axios.post('resources/cgi-bin/scrollery-cgi.pl', postData).then(res => {
           if (res.data.results) {
             const temporaryList = {}
-            const temporaryOrder = []
             const scroll_version_id = res.data.payload.scroll_version_id
             for (let i = 0, record; (record = res.data.results[i]); i++) {
               const recordKey =
                 this.relativeToScrollVersion && scroll_version_id !== undefined
                   ? scroll_version_id + '-' + record[this.idKey]
                   : record[this.idKey]
-              record = new this.recordModel(record)
+              record = this.formatRecord(record)
               temporaryList[recordKey] = record
-              temporaryOrder.push(recordKey)
               this.propagateAddData(record[this.idKey], res.data.payload)
             }
             this._items = Object.assign({}, this._items, temporaryList)
-            for (let i = 0, newItem; (newItem = temporaryOrder[i]); i++) {
-              if (this._itemOrder.indexOf(newItem) === -1) {
-                this._itemOrder.push(newItem)
-              }
-            }
             resolve(res)
           } else {
             reject(res)
@@ -228,6 +201,31 @@ export default class ItemList {
     })
   }
 
+  /**
+   * This function should be run whenever a "populate"
+   * message is sent from the server.
+   */
+  /* istanbul ignore next */
+  processPopulate(message) {
+    if (message.results) {
+      const temporaryList = {}
+      const scroll_version_id = message.payload && message.payload.scroll_version_id
+      for (let i = 0, record; (record = message.results[i]); i++) {
+        const recordKey =
+          this.relativeToScrollVersion && scroll_version_id !== undefined
+            ? scroll_version_id + '-' + record[this.idKey]
+            : record[this.idKey]
+        record = this.formatRecord(record)
+        temporaryList[recordKey] = record
+        this.propagateAddData(record[this.idKey], message.payload)
+      }
+      this._items = Object.assign({}, this._items, temporaryList)
+    } else {
+      console.error('Could not process message:', message)
+    }
+  }
+
+  //  TODO This must be wrong.  Fix when you have time, or remove.
   /* istanbul ignore next */
   updateName(item_id, name, scroll_version_id, transaction) {
     return new Promise((resolve, reject) => {

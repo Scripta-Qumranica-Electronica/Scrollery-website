@@ -23,7 +23,7 @@
             :key="'svg-image-' + corpus.images.get(image).filename"
             class="clippedImg" 
             draggable="false" 
-            :xlink:href="imageProxy + corpus.images.get(image).getAddress() + 'full/pct:' + 100 / divisor + '/0/' + corpus.images.get(image).suffix"
+            :xlink:href="imageProxy + corpus.images.get(image).getAddress + 'full/pct:' + 100 / divisor + '/0/' + corpus.images.get(image).suffix"
             :width="width / divisor"
             :height="height / divisor"
             :opacity="imageSettings[image].opacity"

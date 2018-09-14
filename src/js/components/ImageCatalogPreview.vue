@@ -70,7 +70,7 @@ export default {
             /* istanbul ignore next */
             for (let i = 0, key; (key = filenames[i]); i++) {
               if (this.corpus.images.get(key).is_master) {
-                this.fileName = this.corpus.images.get(key).getAddress()
+                this.fileName = this.corpus.images.get(key).getAddress
               }
             }
           }

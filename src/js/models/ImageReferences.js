@@ -1,5 +1,5 @@
 import ItemList from './ItemList.js'
-import ImageReference from './ImageReference.js'
+// import ImageReference from './ImageReference.js'
 
 export default class ImageReferences extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
@@ -11,12 +11,27 @@ export default class ImageReferences extends ItemList {
     super(
       corpus,
       idKey,
-      ImageReference,
+      // ImageReference,
       listType,
       connectedLists,
       relativeToScrollVersion,
       defaultPostData
     )
+  }
+
+  formatRecord(record) {
+    return {
+      institution: record.institution,
+      lvl1: record.lvl1,
+      lvl2: record.lvl2,
+      side: ~~record.side,
+      image_catalog_id: ~~record.image_catalog_id,
+      scroll_version_id: ~~record.scroll_version_id,
+      master_sqe_image_id: ~~record.master_sqe_image_id || undefined,
+      images: record.images || [],
+      artefacts: record.artefacts || [],
+      rois: record.rois || [],
+    }
   }
 
   populate(postData) {

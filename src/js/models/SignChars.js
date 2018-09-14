@@ -1,5 +1,5 @@
 import ItemList from './ItemList.js'
-import SignChar from './SignChar.js'
+// import SignChar from './SignChar.js'
 
 export default class SignChars extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
@@ -11,12 +11,22 @@ export default class SignChars extends ItemList {
     super(
       corpus,
       idKey,
-      SignChar,
+      // SignChar,
       listType,
       connectedLists,
       relativeToScrollVersion,
       defaultPostData
     )
+  }
+
+  formatRecord(record) {
+    return {
+      sign_char_id: ~~record.sign_char_id,
+      is_variant: record.is_variant || 0,
+      char: record.char,
+      sign_char_attributes: record.sign_char_attributes || [],
+      rois: record.rois || [],
+    }
   }
 
   /* istanbul ignore next */

@@ -1,8 +1,15 @@
 import ItemList from './ItemList.js'
-import Artefact from './Artefact.js'
+// import Artefact from './Artefact.js'
 import uuid from 'uuid/v1'
+import SvgPath from 'svgpath'
 import { pathIdentifier } from '~/utils/PathIdentifier.js'
-import { svgPolygonToWKT, geoJSONPolygonToWKT } from '~/utils/VectorFactory.js'
+import {
+  svgPolygonToWKT,
+  geoJSONPolygonToWKT,
+  wktPolygonToSvg,
+  wktParseRect,
+  dbMatrixToSVG,
+} from '~/utils/VectorFactory.js'
 
 export default class Artefacts extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
@@ -14,12 +21,38 @@ export default class Artefacts extends ItemList {
     super(
       corpus,
       idKey,
-      Artefact,
+      // Artefact,
       listType,
       connectedLists,
       relativeToScrollVersion,
       defaultPostData
     )
+  }
+
+  formatRecord(record) {
+    return {
+      artefact_position_id: ~~record.artefact_position_id,
+      artefact_id: ~~record.artefact_id,
+      artefact_shape_id: ~~record.artefact_shape_id,
+      scroll_version_id: ~~record.scroll_version_id,
+      name: record.name,
+      side: ~~record.side,
+      mask: record.mask,
+      svgInCombination:
+        record.mask &&
+        record.rect &&
+        record.transform_matrix &&
+        SvgPath(wktPolygonToSvg(record.mask, wktParseRect(record.rect)))
+          .matrix(dbMatrixToSVG(record.transform_matrix))
+          .round()
+          .toString(),
+      transform_matrix: record.transform_matrix,
+      rect: record.rect,
+      image_catalog_id: ~~record.image_catalog_id,
+      id_of_sqe_image: ~~record.id_of_sqe_image,
+      catalog_side: ~~record.catalog_side,
+      rois: record.rois || [],
+    }
   }
 
   /* istanbul ignore next */

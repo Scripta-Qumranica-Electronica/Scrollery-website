@@ -1,14 +1,25 @@
-import ItemList from './ItemList.js'
-import Line from './Line.js'
+import ItemListOrdered from './ItemList.js'
+// import Line from './Line.js'
 
-export default class TextLines extends ItemList {
+export default class TextLines extends ItemListOrdered {
   constructor(corpus, idKey, defaultPostData = undefined) {
     idKey = idKey || 'line_id'
     const listType = 'lines'
     const connectedLists = [corpus.combinations]
     const relativeToScrollVersion = true
     defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getLineOfCol' }
-    super(corpus, idKey, Line, listType, connectedLists, relativeToScrollVersion, defaultPostData)
+    super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
+  }
+
+  formatRecord(record) {
+    return {
+      name: record.name,
+      line_id: ~~record.line_id,
+      scroll_version_id: ~~record.scroll_version_id,
+      line_sign_id: ~~record.line_sign_id,
+      signs: record.signs || [],
+      rois: record.rois || [],
+    }
   }
 
   /* istanbul ignore next */
