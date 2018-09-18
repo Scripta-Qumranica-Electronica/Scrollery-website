@@ -6,7 +6,7 @@
  * Note that elements in `_items` are now object literals.
  * Originally we had used classes for each element, but this caused
  * a dramatic performance hit with very large data sets. (15–20 seconds to
- * add ~20,000 elements with Classes as opposed to ~40ms with onject
+ * add ~20,000 elements with Classes as opposed to ~40ms with object
  * literals.)  Perhaps there is a compromise, but we need to test any proposed
  * strategy before implementation.
  */
@@ -180,37 +180,6 @@ export default class ItemList {
     return this._items.keys()
   }
 
-  /* istanbul ignore next */
-  populate(postData) {
-    postData = Object.assign({}, this.defaultPostData, postData)
-    if (!postData) throw new TypeError(`No payload for POST request is available.`)
-    return new Promise((resolve, reject) => {
-      try {
-        this.axios.post('resources/cgi-bin/scrollery-cgi.pl', postData).then(res => {
-          if (res.data.results) {
-            const temporaryList = {}
-            const scroll_version_id = res.data.payload.scroll_version_id
-            for (let i = 0, record; (record = res.data.results[i]); i++) {
-              const recordKey =
-                this.relativeToScrollVersion && scroll_version_id !== undefined
-                  ? scroll_version_id + '-' + record[this.idKey]
-                  : record[this.idKey]
-              record = this.formatRecord(record)
-              temporaryList[recordKey] = record
-              this.propagateAddData(record[this.idKey], res.data.payload)
-            }
-            this._items = Object.assign({}, this._items, temporaryList)
-            resolve(res)
-          } else {
-            reject(res)
-          }
-        })
-      } catch (err) {
-        reject(err)
-      }
-    })
-  }
-
   requestPopulate(message, transaction = undefined) {
     if (!transaction) transaction = this.defaultPostData.transaction
     return this.corpus.request(
@@ -225,7 +194,7 @@ export default class ItemList {
   }
 
   /**
-   * This function should be run whenever a "populate"
+   * This function should be run whenever a "requestPopulate"
    * message is sent from the server.
    */
   /* istanbul ignore next */
@@ -247,7 +216,7 @@ export default class ItemList {
         resolve(message)
       } else {
         console.error('Could not process message:', message)
-        resolve(false)
+        resolve(message)
       }
     })
   }

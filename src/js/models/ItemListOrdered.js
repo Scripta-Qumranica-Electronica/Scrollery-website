@@ -71,46 +71,8 @@ export default class ItemListOrdered extends ItemList {
     this._itemOrder.splice(index, howmany, item)
   }
 
-  /* istanbul ignore next */
-  populate(postData) {
-    postData = Object.assign({}, this.defaultPostData, postData)
-    if (!postData) throw new TypeError(`No payload for POST request is available.`)
-    return new Promise((resolve, reject) => {
-      try {
-        this.axios.post('resources/cgi-bin/scrollery-cgi.pl', postData).then(res => {
-          if (res.data.results) {
-            const temporaryList = {}
-            const temporaryOrder = []
-            const scroll_version_id = res.data.payload.scroll_version_id
-            for (let i = 0, record; (record = res.data.results[i]); i++) {
-              const recordKey =
-                this.relativeToScrollVersion && scroll_version_id !== undefined
-                  ? scroll_version_id + '-' + record[this.idKey]
-                  : record[this.idKey]
-              record = this.formatRecord(record)
-              temporaryList[recordKey] = record
-              temporaryOrder.push(recordKey)
-              this.propagateAddData(record[this.idKey], res.data.payload)
-            }
-            this._items = Object.assign({}, this._items, temporaryList)
-            for (let i = 0, newItem; (newItem = temporaryOrder[i]); i++) {
-              if (this._itemOrder.indexOf(newItem) === -1) {
-                this._itemOrder.push(newItem)
-              }
-            }
-            resolve(res)
-          } else {
-            reject(res)
-          }
-        })
-      } catch (err) {
-        reject(err)
-      }
-    })
-  }
-
   /**
-   * This function should be run whenever a "populate"
+   * This function should be run whenever a "requestPopulate"
    * message is sent from the server.
    */
   /* istanbul ignore next */

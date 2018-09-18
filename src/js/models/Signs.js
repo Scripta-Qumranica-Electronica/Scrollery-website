@@ -36,81 +36,6 @@ export default class Signs extends ItemList {
     })
   }
 
-  // populate(postData) {
-  //   const init = window.performance.now()
-  //   if (!postData) throw new TypeError(`No payload for POST request is available.`)
-  //   if (!Array.isArray(postData)) postData = [postData]
-  //   for (let i = 0, post; (post = postData[i]); i++)
-  //     postData[i] = Object.assign({}, this.defaultPostData, post)
-  //   return new Promise((resolve, reject) => {
-  //     try {
-  //       this.axios.post('resources/cgi-bin/scrollery-cgi.pl', { requests: postData }).then(res => {
-  //         if (res.data.replies) {
-  //           const process = window.performance.now()
-  //           for (
-  //             let i = 0, payload, reply;
-  //             (payload = res.data.payload.requests[i]) && (reply = res.data.replies[i]);
-  //             i++
-  //           ) {
-  //             // colTiming.push([window.performance.now()])
-  //             const scroll_version_id = payload.scroll_version_id
-  //             for (let j = 0, col; (col = reply.text[0].fragments[j]); j++) {
-  //               const col_id = col.fragment_id
-  //               let col_sign_id
-  //               const col_line_ids = [] //Could use propagateAddData, but this is probably faster
-  //               const col_sign_ids = new Array(col.lines.length) //Could use propagateAddData, but this is probably faster
-  //               for (let k = 0, line; (line = col.lines[k]); k++) {
-  //                 // lineTiming.push([window.performance.now()])
-  //                 const line_id = line.line_id
-  //                 let line_sign_id
-  //                 col_line_ids.push(line_id)
-  //                 const line_sign_ids = [] //Could use propagateAddData, but this is probably faster
-  //                 this.processLine(line.signs, scroll_version_id, k).then(
-  //                   ([line_signs, line_sign_id, count, returned_col_sign_id]) => {
-  //                     col_sign_id = returned_col_sign_id ? returned_col_sign_id : col_sign_id
-  //                     col_sign_ids[count] = line_signs
-  //                     this.corpus.lines._insertItem(
-  //                       {
-  //                         name: line.line_name,
-  //                         line_id: line.line_id,
-  //                         scroll_version_id: scroll_version_id,
-  //                         line_sign_id: line_sign_id,
-  //                         signs: line_signs,
-  //                       },
-  //                       scroll_version_id
-  //                     )
-  //                     if (count === col.lines.length - 1) {
-  //                       this.corpus.cols._insertItem(
-  //                         {
-  //                           name: col.fragment_name,
-  //                           col_id: col.fragment_id,
-  //                           scroll_version_id: scroll_version_id,
-  //                           col_sign_id: col_sign_id,
-  //                           signs: col_sign_ids.reduce((acc, val) => acc.concat(val), []),
-  //                         },
-  //                         scroll_version_id
-  //                       )
-  //                       console.log('Sign stream process: ', window.performance.now() - process)
-  //                     }
-  //                   }
-  //                 )
-  //               }
-  //             }
-  //             if (i === res.data.payload.requests.length - 1) {
-  //               console.log('Total: ', window.performance.now() - init)
-  //               resolve(res)
-  //             }
-  //           }
-  //         } else {
-  //           reject(res)
-  //         }
-  //       })
-  //     } catch (err) {
-  //       reject(err)
-  //     }
-  //   })
-  // }
-
   processPopulate(message) {
     const init = window.performance.now()
     return new Promise(resolve => {
@@ -123,7 +48,6 @@ export default class Signs extends ItemList {
           const col_line_ids = [] //Could use propagateAddData, but this is probably faster
           const col_sign_ids = new Array(col.lines.length) //Could use propagateAddData, but this is probably faster
           for (let k = 0, line; (line = col.lines[k]); k++) {
-            // lineTiming.push([window.performance.now()])
             const line_id = line.line_id
             let line_sign_id
             col_line_ids.push(line_id)
@@ -162,7 +86,7 @@ export default class Signs extends ItemList {
         console.log('Total: ', window.performance.now() - init)
         resolve(message)
       } else {
-        resolve(false)
+        resolve(message)
       }
     })
   }
@@ -173,7 +97,6 @@ export default class Signs extends ItemList {
     let line_sign_ids = []
     return new Promise((resolve, reject) => {
       for (let l = 0, sign; (sign = signs[l]); l++) {
-        // signTiming.push([window.performance.now()])
         const sign_id = sign.sign_id
         line_sign_ids.push(sign_id)
         let next_sign_ids = sign.next_sign_ids
@@ -203,7 +126,6 @@ export default class Signs extends ItemList {
       let signChars = [] //Could use propagateAddData, but this is probably faster
       let line_sign_id = undefined
       let col_sign_id = undefined
-      // signCharTiming.push([window.performance.now()])
       for (let m = 0, char; (char = Array.isArray(chars) ? chars[m] : [chars][m]); m++) {
         const sign_char_id = char.sign_char_id
         const signCharAttributes = [] //Could use propagateAddData, but this is probably faster
