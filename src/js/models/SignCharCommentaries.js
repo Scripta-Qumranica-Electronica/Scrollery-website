@@ -21,10 +21,10 @@ export default class SignCharCommentaries extends ItemList {
 
   formatRecord(record) {
     return {
-      sign_char_commentary_id: ~~record.sign_char_commentary_id,
-      sign_char_id: ~~record.sign_char_id,
-      attribute_id: ~~record.attribute_id,
-      scroll_version_id: ~~record.scroll_version_id,
+      sign_char_commentary_id: ~~record.sign_char_commentary_id, // Ensure positive integer with bitwise operator
+      sign_char_id: ~~record.sign_char_id, // Ensure positive integer with bitwise operator
+      attribute_id: ~~record.attribute_id, // Ensure positive integer with bitwise operator
+      scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
       commentary: record.commentary,
     }
   }

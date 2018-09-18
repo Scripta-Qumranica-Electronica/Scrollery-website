@@ -17,6 +17,11 @@ export default class ImageReferences extends ItemList {
       relativeToScrollVersion,
       defaultPostData
     )
+
+    // Setup socket.io listeners
+    this.socket.on('receiveImgOfComb', msg => {
+      this.corpus.response(this.processPopulate(msg))
+    })
   }
 
   formatRecord(record) {
@@ -24,16 +29,17 @@ export default class ImageReferences extends ItemList {
       institution: record.institution,
       lvl1: record.lvl1,
       lvl2: record.lvl2,
-      side: ~~record.side,
-      image_catalog_id: ~~record.image_catalog_id,
-      scroll_version_id: ~~record.scroll_version_id,
-      master_sqe_image_id: ~~record.master_sqe_image_id || undefined,
+      side: ~~record.side, // Ensure positive integer with bitwise operator
+      image_catalog_id: ~~record.image_catalog_id, // Ensure positive integer with bitwise operator
+      scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
+      master_sqe_image_id: ~~record.master_sqe_image_id || undefined, // Ensure positive integer with bitwise operator
       images: record.images || [],
       artefacts: record.artefacts || [],
       rois: record.rois || [],
     }
   }
 
+  // TODO remove this function
   populate(postData) {
     postData = Object.assign({}, this.defaultPostData, postData)
     if (postData.scroll_version_id === undefined) {

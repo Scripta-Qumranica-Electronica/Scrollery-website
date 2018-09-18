@@ -10,9 +10,14 @@ import Images from './Images.js'
 import Artefacts from './Artefacts.js'
 import ROIs from './ROIs.js'
 
+// Import transaction watcher
+import Transactions from './Transactions.js'
+
 // Import backend communication libraries.
 import Post from '~/utils/AxiosPostShim.js' // Remove this soon.
 import io from 'socket.io-client' // This will now be used instead
+
+import uuid from 'uuid/v1'
 
 // import ClipperLib from 'js-clipper/clipper'
 
@@ -43,6 +48,9 @@ export default class Corpus {
     this.axios = new Post(session_id)
     this.socket = io()
 
+    // This tracks status of socket.io requests
+    this.transactions = new Transactions(this)
+
     // These are the individual data objects.
     // They all receive an instance in this Corpus
     // object and interact with each other as
@@ -57,5 +65,20 @@ export default class Corpus {
     this.images = new Images(this)
     this.artefacts = new Artefacts(this)
     this.rois = new ROIs(this)
+  }
+
+  request(transaction, message) {
+    const transactionID = uuid()
+    this.transactions.startRequests(transactionID, transaction)
+    this.socket.emit(
+      transaction,
+      Object.assign({ SESSION_ID: this.session_id }, message, { transactionID: transactionID })
+    )
+    return transactionID
+  }
+  response(promise) {
+    promise.then(msg => {
+      if (msg) this.transactions.finishRequest(msg.payload.transactionID)
+    })
   }
 }

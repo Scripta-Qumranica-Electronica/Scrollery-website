@@ -4,7 +4,8 @@
     <!--  :key="`edit-col-${sign}`"-->
     <!--  :sign_id="sign"-->
     <!--  :corpus="corpus"/>-->
-    <span v-for="sign in columnSigns" :key="`edit-col-${sign}`">{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0], scroll_version_id).char}}</span>
+    <span v-for="sign in corpus.cols.get(col_id, scroll_version_id) ? corpus.cols.get(col_id, scroll_version_id).signs : []" 
+    :key="`edit-col-${sign}`">{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0], scroll_version_id).char}}</span>
   </div>
 </template>
 
@@ -20,7 +21,7 @@ export default {
     return {
       col_id: undefined,
       scroll_version_id: undefined,
-      columnSigns: [],
+      // columnSigns: [],
     }
   },
   props: {
@@ -37,20 +38,20 @@ export default {
         if (to.params.colID !== '~' && to.params.colID > 0) {
           this.col_id = to.params.colID
           this.scroll_version_id = to.params.scrollVersionID
-          this.columnSigns =
-            this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
-            this.corpus.cols.get(this.col_id, this.scroll_version_id).signs
+          // this.columnSigns =
+          //   this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
+          //   this.corpus.cols.get(this.col_id, this.scroll_version_id).signs
           this.corpus.signs
             .populate({
               col_id: to.params.colID,
               scroll_version_id: to.params.scrollVersionID,
             })
-            .then(
-              res =>
-                (this.columnSigns =
-                  this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
-                  this.corpus.cols.get(this.col_id, this.scroll_version_id).signs)
-            )
+            .then(res => {
+              console.log(this.col_id, this.scroll_version_id)
+              this.columnSigns =
+                this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
+                this.corpus.cols.get(this.col_id, this.scroll_version_id).signs
+            })
             .catch(err => console.error(err))
         }
       }

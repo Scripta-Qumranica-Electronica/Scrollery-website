@@ -22,8 +22,8 @@ export default class ROIs extends ItemList {
 
   formatRecord(record) {
     return {
-      sign_char_roi_id: ~~record.sign_char_roi_id,
-      sign_char_id: ~~record.sign_char_id,
+      sign_char_roi_id: ~~record.sign_char_roi_id, // Ensure positive integer with bitwise operator
+      sign_char_id: ~~record.sign_char_id, // Ensure positive integer with bitwise operator
       path: record.path,
       svgInCombination: SvgPath(wktPolygonToSvg(record.path))
         .matrix(dbMatrixToSVG(record.transform_matrix))

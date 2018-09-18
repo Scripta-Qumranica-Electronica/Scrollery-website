@@ -16,11 +16,22 @@
     </el-col>
     <el-col :span="12">
       <div class="right">
-        <i 
-          v-show="working > 0" 
-          class="fa fa-spinner fa-spin fa-fw" 
-          aria-hidden="true"
-          style="color: white"></i>
+        <el-popover
+          placement="bottom"
+          title="Transactions"
+          width="400"
+          trigger="hover">
+            <div v-for="id in transactions" :class="{'loading':  !corpus.transactions.requests[id].finished, 'loaded': corpus.transactions.requests[id].finished}">
+              <!--Let's make this prettier by using a custom Vue component here, maybe the user can even -->
+              <!--interact with it.-->
+              {{corpus.transactions.requests[id].transaction}} – {{corpus.transactions.requests[id].finished ? 'loaded' : 'loading...'}}
+            </div>
+          <i    slot="reference"
+                class="fa fa-list" 
+                :class="{ 'fa-spinner fa-spin fa-fw' : corpus.transactions.unfinished > 0}"
+                aria-hidden="true"
+                style="color: white"></i>
+        </el-popover>
         <span> {{ $i18n.str('User.LoggedInMessage', {name: username}) }}</span>
         <el-button size="mini" @click="onLogout">{{ $i18n.str('Logout') }}</el-button>
       </div>
@@ -46,6 +57,9 @@ export default {
 
   computed: {
     ...mapGetters(['username', 'working']),
+    transactions() {
+      return this.corpus.transactions.requestList.slice(0, 100)
+    },
   },
   methods: {
     ...mapMutations(['setSessionID', 'setUsername', 'setUserID']),
@@ -84,5 +98,13 @@ h3,
 span {
   color: #fff;
   line-height: calc(#{$header} - #{$spacer * 2});
+}
+
+div.loading {
+  color: blue;
+}
+
+div.loaded {
+  color: green;
 }
 </style>

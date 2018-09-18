@@ -115,28 +115,32 @@ export default class ItemListOrdered extends ItemList {
    */
   /* istanbul ignore next */
   processPopulate(message) {
-    if (message.results) {
-      const temporaryList = {}
-      const temporaryOrder = []
-      const scroll_version_id = message.payload && message.payload.scroll_version_id
-      for (let i = 0, record; (record = message.results[i]); i++) {
-        const recordKey =
-          this.relativeToScrollVersion && scroll_version_id !== undefined
-            ? scroll_version_id + '-' + record[this.idKey]
-            : record[this.idKey]
-        record = this.formatRecord(record)
-        temporaryList[recordKey] = record
-        temporaryOrder.push(recordKey)
-        this.propagateAddData(record[this.idKey], message.payload)
-      }
-      this._items = Object.assign({}, this._items, temporaryList)
-      for (let i = 0, newItem; (newItem = temporaryOrder[i]); i++) {
-        if (this._itemOrder.indexOf(newItem) === -1) {
-          this._itemOrder.push(newItem)
+    return new Promise(resolve => {
+      if (message.results) {
+        const temporaryList = {}
+        const temporaryOrder = []
+        const scroll_version_id = message.payload && message.payload.scroll_version_id
+        for (let i = 0, record; (record = message.results[i]); i++) {
+          const recordKey =
+            this.relativeToScrollVersion && scroll_version_id !== undefined
+              ? scroll_version_id + '-' + record[this.idKey]
+              : record[this.idKey]
+          record = this.formatRecord(record)
+          temporaryList[recordKey] = record
+          temporaryOrder.push(recordKey)
+          this.propagateAddData(record[this.idKey], message.payload)
         }
+        this._items = Object.assign({}, this._items, temporaryList)
+        for (let i = 0, newItem; (newItem = temporaryOrder[i]); i++) {
+          if (this._itemOrder.indexOf(newItem) === -1) {
+            this._itemOrder.push(newItem)
+          }
+        }
+        resolve(message)
+      } else {
+        console.error('Could not process message:', message)
+        resolve(false)
       }
-    } else {
-      console.error('Could not process message:', message)
-    }
+    })
   }
 }

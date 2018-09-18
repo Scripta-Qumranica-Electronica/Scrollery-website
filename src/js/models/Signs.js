@@ -12,7 +12,7 @@ export default class Signs extends ItemList {
 
   formatRecord(record) {
     return {
-      sign_id: ~~record.sign_id,
+      sign_id: ~~record.sign_id, // Ensure positive integer with bitwise operator
       next_sign_ids: Array.isArray(record.next_sign_ids)
         ? record.next_sign_ids
         : [record.next_sign_ids],

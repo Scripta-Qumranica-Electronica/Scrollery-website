@@ -32,6 +32,16 @@ export default class ItemList {
     this.socket = this.corpus.socket
   }
 
+  /**
+   * We had originally used object classes to format the items that
+   * go into _items, but this was quite expensive in Javascript.  So
+   * we have switched to using object literals.  Using the formatRecord
+   * function is a means to make that a bit safer.  Any item that
+   * you want to add to _items should always be run through formatRecord
+   * first, which will ensure that it has the expected attributes and
+   * corresponding value types.  Note that this function is overridden
+   * witha custom implementation in every subclass of ItemList.
+   */
   formatRecord(input) {
     return input
   }
@@ -201,28 +211,45 @@ export default class ItemList {
     })
   }
 
+  requestPopulate(message, transaction = undefined) {
+    if (!transaction) transaction = this.defaultPostData.transaction
+    return this.corpus.request(
+      transaction,
+      Object.assign(
+        {
+          user_id: this.corpus.user,
+        },
+        message
+      )
+    )
+  }
+
   /**
    * This function should be run whenever a "populate"
    * message is sent from the server.
    */
   /* istanbul ignore next */
   processPopulate(message) {
-    if (message.results) {
-      const temporaryList = {}
-      const scroll_version_id = message.payload && message.payload.scroll_version_id
-      for (let i = 0, record; (record = message.results[i]); i++) {
-        const recordKey =
-          this.relativeToScrollVersion && scroll_version_id !== undefined
-            ? scroll_version_id + '-' + record[this.idKey]
-            : record[this.idKey]
-        record = this.formatRecord(record)
-        temporaryList[recordKey] = record
-        this.propagateAddData(record[this.idKey], message.payload)
+    return new Promise(resolve => {
+      if (message.results) {
+        const temporaryList = {}
+        const scroll_version_id = message.payload && message.payload.scroll_version_id
+        for (let i = 0, record; (record = message.results[i]); i++) {
+          const recordKey =
+            this.relativeToScrollVersion && scroll_version_id !== undefined
+              ? scroll_version_id + '-' + record[this.idKey]
+              : record[this.idKey]
+          record = this.formatRecord(record)
+          temporaryList[recordKey] = record
+          this.propagateAddData(record[this.idKey], message.payload)
+        }
+        this._items = Object.assign({}, this._items, temporaryList)
+        resolve(message)
+      } else {
+        console.error('Could not process message:', message)
+        resolve(false)
       }
-      this._items = Object.assign({}, this._items, temporaryList)
-    } else {
-      console.error('Could not process message:', message)
-    }
+    })
   }
 
   //  TODO This must be wrong.  Fix when you have time, or remove.

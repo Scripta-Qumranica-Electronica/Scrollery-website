@@ -75,57 +75,47 @@ export default {
     // Create and populate the corpus model, with existing data
     // from the router.
     this.$store.commit('resetWorking')
-    this.$store.commit('addWorking')
 
     this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
-    // this.corpus.combinations
-    //   .populate()
-    //   .then(res => {
-    //     // determine the locked scrolls
-    //     if (res && res.data && res.data.results) {
-    //       const scrolls = res.data.results
-    //       this.$store.commit(
-    //         'setLockedScrolls',
-    //         scrolls.reduce((hash, scrollVersion) => {
-    //           if (~~scrollVersion.locked) {
-    //             hash[scrollVersion.scroll_version_id] = true
-    //           }
-    //           return hash
-    //         }, {})
-    //       )
-    //     }
+    // Setup the sockets to gather any initial data
+    this.corpus.socket.once('receiveCombs', msg => {
+      // Check if there is already a scroll_version_id in the route.
+      // If so, load up cols and imageRefs for it.
+      if (this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~') {
+        // Now listen for completed img requests
+        this.corpus.socket.once('receiveImgOfComb', msg => {
+          // Check for an image_catalog_id in the route.
+          // If it is there, load up the artefacts.
+          if (this.$route.params.imageID) {
+            // Now listen for completed artefact requests
+            this.corpus.socket.once('receiveArtOfImage', msg => {
+              this.resetRouter()
+            })
 
-    //     return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
-    //       ? this.corpus.cols.populate({
-    //           scroll_version_id: this.$route.params.scrollVersionID,
-    //           scroll_id: this.$route.params.scrollID,
-    //         })
-    //       : undefined
-    //   })
-    //   .then(res => {
-    //     return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
-    //       ? this.corpus.imageReferences.populate({
-    //           scroll_version_id: this.$route.params.scrollVersionID,
-    //           scroll_id: this.$route.params.scrollID,
-    //         })
-    //       : undefined
-    //   })
-    //   .then(res => {
-    //     return this.$route.params.imageID && this.$route.params.imageID !== '~'
-    //       ? this.corpus.artefacts.populate({
-    //           image_catalog_id: this.$route.params.imageID,
-    //           scroll_version_id: this.$route.params.scrollVersionID,
-    //         })
-    //       : undefined
-    //   })
-    //   .then(res => {
-    //     this.$store.commit('delWorking')
-    //     this.resetRouter()
-    //   })
-    //   .catch(err => {
-    //     this.$store.commit('delWorking')
-    //     console.error(err)
-    //   })
+            // Request artefacts
+            this.corpus.artefacts.requestPopulate({
+              image_catalog_id: this.$route.params.imageID,
+              scroll_version_id: this.$route.params.scrollVersionID,
+            })
+          } else {
+            this.resetRouter()
+          }
+        })
+
+        // Request the cols and the artefacts.
+        this.corpus.cols.requestPopulate({
+          scroll_version_id: this.$route.params.scrollVersionID,
+          scroll_id: this.$route.params.scrollID,
+        })
+        this.corpus.imageReferences.requestPopulate({
+          scroll_version_id: this.$route.params.scrollVersionID,
+          scroll_id: this.$route.params.scrollID,
+        })
+      }
+    })
+    // Grab the initial combination list and everything
+    // else will fall into place
+    this.corpus.combinations.requestPopulate()
 
     this.$store.commit('addWorking')
     this.$post('resources/cgi-bin/scrollery-cgi.pl', {

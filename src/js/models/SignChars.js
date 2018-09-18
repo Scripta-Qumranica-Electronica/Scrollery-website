@@ -21,7 +21,7 @@ export default class SignChars extends ItemList {
 
   formatRecord(record) {
     return {
-      sign_char_id: ~~record.sign_char_id,
+      sign_char_id: ~~record.sign_char_id, // Ensure positive integer with bitwise operator
       is_variant: record.is_variant || 0,
       char: record.char,
       sign_char_attributes: record.sign_char_attributes || [],

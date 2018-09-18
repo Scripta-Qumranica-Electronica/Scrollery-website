@@ -21,25 +21,18 @@ export default class Combinations extends ItemListOrdered {
     )
 
     // Setup socket.io listeners
-    this.socket.on('populateCombinations', msg => {
-      console.log('Processing list of combinations')
-      this.processPopulate(msg)
-    })
-
-    // Emit any initial requests
-    this.socket.emit('getAllCombinations', {
-      SESSION_ID: this.corpus.session_id,
-      user_id: this.corpus.user,
+    this.socket.on('receiveCombs', msg => {
+      this.corpus.response(this.processPopulate(msg))
     })
   }
 
   formatRecord(record) {
     return {
       name: record.name,
-      scroll_id: ~~record.scroll_id,
-      scroll_version_id: ~~record.scroll_version_id,
-      locked: ~~record.locked,
-      user_id: ~~record.user_id,
+      scroll_id: ~~record.scroll_id, // Ensure positive integer with bitwise operator
+      scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
+      locked: ~~record.locked, // Ensure positive integer with bitwise operator
+      user_id: ~~record.user_id, // Ensure positive integer with bitwise operator
       cols: record.cols || [],
       lines: record.lines || [],
       imageReferences: record.imageReferences || [],

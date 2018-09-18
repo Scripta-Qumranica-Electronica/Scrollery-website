@@ -82,7 +82,7 @@ export default {
       scrollVersionID: undefined,
       imageElements: [],
       selectedImageUrls: [],
-      filenames: [],
+      // filenames: [],
       masterImage: {},
       imageShrink: 2,
       artefact: undefined,
@@ -101,43 +101,28 @@ export default {
       fullscreen: false,
     }
   },
+  computed: {
+    filenames() {
+      const filenames = this.corpus.imageReferences.get(~~this.$route.params.imageID)
+        ? this.corpus.imageReferences.get(~~this.$route.params.imageID).images
+        : []
+      filenames.forEach(key => {
+        if (this.corpus.images.get(key).is_master) {
+          this.$set(this.imageSettings, key, { visible: true, opacity: 1.0 })
+          this.masterImage = this.corpus.images.get(key)
+        } else {
+          this.$set(this.imageSettings, key, { visible: false, opacity: 1.0 })
+        }
+      })
+      return filenames
+    },
+  },
   methods: {
     fetchImages(id) {
-      this.$store.commit('addWorking')
-      this.corpus.images
-        .populate({
-          scroll_version_id: this.$route.params.scrollVersionID,
-          image_catalog_id: id,
-        })
-        .then(res => {
-          this.$store.commit('delWorking')
-          this.filenames = this.corpus.imageReferences.get(id >>> 0).images
-          this.filenames.forEach(key => {
-            if (this.corpus.images.get(key).is_master) {
-              this.$set(this.imageSettings, key, { visible: true, opacity: 1.0 })
-              this.masterImage = this.corpus.images.get(key)
-            } else {
-              this.$set(this.imageSettings, key, { visible: false, opacity: 1.0 })
-            }
-          })
-          this.$store.commit('addWorking')
-          this.corpus.artefacts
-            .populate({
-              scroll_version_id: this.$route.params.scrollVersionID,
-              image_catalog_id: id,
-            })
-            .then(res1 => {
-              this.$store.commit('delWorking')
-            })
-            .catch(err => {
-              this.$store.commit('delWorking')
-              console.error(err)
-            })
-        })
-        .catch(err => {
-          this.$store.commit('delWorking')
-          console.error(err)
-        })
+      this.corpus.images.requestPopulate({
+        scroll_version_id: this.$route.params.scrollVersionID,
+        image_catalog_id: id,
+      })
     },
     setClipMask(svgMask) {
       this.corpus.artefacts.updateArtefactShape(

@@ -18,25 +18,22 @@ export default class Artefacts extends ItemList {
     const connectedLists = [corpus.combinations, corpus.imageReferences]
     const relativeToScrollVersion = true
     defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getArtOfImage' }
-    super(
-      corpus,
-      idKey,
-      // Artefact,
-      listType,
-      connectedLists,
-      relativeToScrollVersion,
-      defaultPostData
-    )
+    super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
+
+    // Setup socket.io listeners
+    this.socket.on('receiveArtOfImage', msg => {
+      this.corpus.response(this.processPopulate(msg))
+    })
   }
 
   formatRecord(record) {
     return {
-      artefact_position_id: ~~record.artefact_position_id,
-      artefact_id: ~~record.artefact_id,
-      artefact_shape_id: ~~record.artefact_shape_id,
-      scroll_version_id: ~~record.scroll_version_id,
+      artefact_position_id: ~~record.artefact_position_id, // Ensure positive integer with bitwise operator
+      artefact_id: ~~record.artefact_id, // Ensure positive integer with bitwise operator
+      artefact_shape_id: ~~record.artefact_shape_id, // Ensure positive integer with bitwise operator
+      scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
       name: record.name,
-      side: ~~record.side,
+      side: ~~record.side, // Ensure positive integer with bitwise operator
       mask: record.mask,
       svgInCombination:
         record.mask &&
@@ -48,9 +45,9 @@ export default class Artefacts extends ItemList {
           .toString(),
       transform_matrix: record.transform_matrix,
       rect: record.rect,
-      image_catalog_id: ~~record.image_catalog_id,
-      id_of_sqe_image: ~~record.id_of_sqe_image,
-      catalog_side: ~~record.catalog_side,
+      image_catalog_id: ~~record.image_catalog_id, // Ensure positive integer with bitwise operator
+      id_of_sqe_image: ~~record.id_of_sqe_image, // Ensure positive integer with bitwise operator
+      catalog_side: ~~record.catalog_side, // Ensure positive integer with bitwise operator
       rois: record.rois || [],
     }
   }

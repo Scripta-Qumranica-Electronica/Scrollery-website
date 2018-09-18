@@ -27,11 +27,11 @@
           'fa-exclamation-circle': image.master_sqe_image_id === undefined
           }">
       </i>
-      <i 
-        v-if="loadingArtefacts" 
-        class="fa fa-spinner fa-spin fa-fw" 
-        aria-hidden="true"
-        style="color: black">
+      <!--<i -->
+      <!--  v-if="image.artefacts.length === 0" -->
+      <!--  class="fa fa-spinner fa-spin fa-fw" -->
+      <!--  aria-hidden="true"-->
+      <!--  style="color: black">-->
       </i>
     </div>
     <div class="children" v-show="open">
@@ -98,22 +98,10 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        this.loadingArtefacts = true
-        this.corpus.artefacts
-          .populate({
-            image_catalog_id: this.image.image_catalog_id,
-            scroll_version_id: this.scrollVersionID,
-          })
-          .then(res => {
-            /* istanbul ignore next */
-            this.loadingArtefacts = false
-          })
-          .catch(err => {
-            /* istanbul ignore next */
-            this.loadingArtefacts = false
-            /* istanbul ignore next */
-            console.error(err)
-          })
+        this.corpus.artefacts.requestPopulate({
+          image_catalog_id: this.image.image_catalog_id,
+          scroll_version_id: this.scrollVersionID,
+        })
       }
     },
   },

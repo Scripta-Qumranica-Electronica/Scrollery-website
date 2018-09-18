@@ -14,9 +14,9 @@ export default class TextLines extends ItemListOrdered {
   formatRecord(record) {
     return {
       name: record.name,
-      line_id: ~~record.line_id,
-      scroll_version_id: ~~record.scroll_version_id,
-      line_sign_id: ~~record.line_sign_id,
+      line_id: ~~record.line_id, // Ensure positive integer with bitwise operator
+      scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
+      line_sign_id: ~~record.line_sign_id, // Ensure positive integer with bitwise operator
       signs: record.signs || [],
       rois: record.rois || [],
     }

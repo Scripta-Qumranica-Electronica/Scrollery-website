@@ -27,7 +27,7 @@
         <i class="fa" :class="{'fa-caret-right': !showColumns, 'fa-caret-down': showColumns}"></i>
         <span>columns</span>
         <i 
-          v-if="loadingColumns" 
+          v-if="combination.cols.length === 0" 
           class="fa fa-spinner fa-spin fa-fw" 
           aria-hidden="true"
           style="color: black"></i>
@@ -49,7 +49,7 @@
         <i class="fa" :class="{'fa-caret-right': !showImages, 'fa-caret-down': showImages}"></i>
         <span>images</span>
         <i 
-          v-if="loadingImages" 
+          v-if="combination.imageReferences.length === 0" 
           class="fa fa-spinner fa-spin fa-fw" 
           aria-hidden="true"
           style="color: black"></i>
@@ -103,9 +103,7 @@ export default {
   data() {
     return {
       open: false,
-      loadingColumns: false,
       showColumns: false,
-      loadingImages: false,
       showImages: false,
       addTitle: '',
       addType: '',
@@ -139,38 +137,14 @@ export default {
       this.open = !this.open
       if (this.open) {
         this.setRouter()
-        this.loadingColumns = true
-        this.corpus.cols
-          .populate({
-            scroll_version_id: this.combination.scroll_version_id,
-            scroll_id: this.combination.scroll_id,
-          })
-          .then(res => {
-            /* istanbul ignore next */
-            this.loadingColumns = false
-          })
-          .catch(err => {
-            /* istanbul ignore next */
-            this.loadingColumns = false
-            /* istanbul ignore next */
-            console.error(err)
-          })
-        this.loadingImages = true
-        this.corpus.imageReferences
-          .populate({
-            scroll_version_id: this.combination.scroll_version_id,
-            scroll_id: this.combination.scroll_id,
-          })
-          .then(res => {
-            /* istanbul ignore next */
-            this.loadingImages = false
-          })
-          .catch(err => {
-            /* istanbul ignore next */
-            this.loadingImages = false
-            /* istanbul ignore next */
-            console.error(err)
-          })
+        this.corpus.cols.requestPopulate({
+          scroll_version_id: this.combination.scroll_version_id,
+          scroll_id: this.combination.scroll_id,
+        })
+        this.corpus.imageReferences.requestPopulate({
+          scroll_version_id: this.combination.scroll_version_id,
+          scroll_id: this.combination.scroll_id,
+        })
       }
     },
 

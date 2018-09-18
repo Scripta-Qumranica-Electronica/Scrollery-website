@@ -9,16 +9,21 @@ export default class Cols extends ItemListOrdered {
     const relativeToScrollVersion = true
     defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getColOfComb' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
+
+    // Setup socket.io listeners
+    this.socket.on('receiveColOfComb', msg => {
+      this.corpus.response(this.processPopulate(msg))
+    })
   }
 
   formatRecord(record) {
     return {
       name: record.name,
-      col_id: ~~record.col_id,
-      scroll_version_id: ~~record.scroll_version_id,
+      col_id: ~~record.col_id, // Ensure positive integer with bitwise operator
+      scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
       lines: record.lines || [],
       rois: record.rois || [],
-      col_sign_id: ~~record.col_sign_id,
+      col_sign_id: ~~record.col_sign_id, // Ensure positive integer with bitwise operator
       signs: record.signs || [],
     }
   }

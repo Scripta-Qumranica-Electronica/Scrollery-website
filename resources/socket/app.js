@@ -13,5 +13,6 @@ const loadSocket = (io) => {
 loadSocket(io)
 
 http.listen(PORT, function(){
+  console.log(new Date())
   console.log(`listening on *:${PORT}`)
 })

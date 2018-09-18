@@ -21,14 +21,14 @@ export default class SignCharAttributes extends ItemList {
 
   formatRecord(record) {
     return {
-      sign_char_attribute_id: ~~record.sign_char_attribute_id,
-      scroll_version_id: ~~record.scroll_version_id,
-      sequence: ~~record.sequence || 0,
+      sign_char_attribute_id: ~~record.sign_char_attribute_id, // Ensure positive integer with bitwise operator
+      scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
+      sequence: ~~record.sequence || 0, // Ensure positive integer with bitwise operator
       attribute_name: record.attribute_name,
       attribute_values: Array.isArray(record.attribute_values)
         ? record.attribute_values
         : [record.attribute_values],
-      commentary_id: ~~record.commentary_id || 0,
+      commentary_id: ~~record.commentary_id || 0, // Ensure positive integer with bitwise operator
     }
   }
 
