@@ -41,18 +41,22 @@ export default {
           // this.columnSigns =
           //   this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
           //   this.corpus.cols.get(this.col_id, this.scroll_version_id).signs
-          this.corpus.signs
-            .populate({
-              col_id: to.params.colID,
-              scroll_version_id: to.params.scrollVersionID,
-            })
-            .then(res => {
-              console.log(this.col_id, this.scroll_version_id)
-              this.columnSigns =
-                this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
-                this.corpus.cols.get(this.col_id, this.scroll_version_id).signs
-            })
-            .catch(err => console.error(err))
+          this.corpus.signs.requestPopulate({
+            col_id: to.params.colID,
+            scroll_version_id: to.params.scrollVersionID,
+          })
+          // this.corpus.signs
+          //   .populate({
+          //     col_id: to.params.colID,
+          //     scroll_version_id: to.params.scrollVersionID,
+          //   })
+          //   .then(res => {
+          //     console.log(this.col_id, this.scroll_version_id)
+          //     this.columnSigns =
+          //       this.corpus.cols.get(this.col_id, this.scroll_version_id) &&
+          //       this.corpus.cols.get(this.col_id, this.scroll_version_id).signs
+          //   })
+          //   .catch(err => console.error(err))
         }
       }
     },
