@@ -1,33 +1,101 @@
 <template>
-  <div class="editor-column">
-    <!--<sign v-for="sign in columnSigns"-->
-    <!--  :key="`edit-col-${sign}`"-->
-    <!--  :sign_id="sign"-->
-    <!--  :corpus="corpus"/>-->
-    <span v-for="sign in corpus.cols.get(col_id, scroll_version_id) ? corpus.cols.get(col_id, scroll_version_id).signs : []" 
-    :key="`edit-col-${sign}`">{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0], scroll_version_id).char}}</span>
+  <div @mouseenter="active = true" @mouseleave="active = false">
+    
+    <div class="editor-column" v-if="corpus.cols.get(col_id, scroll_version_id) && corpus.cols.get(col_id, scroll_version_id).col_sign_id">
+      <div>{{corpus.cols.get(col_id, scroll_version_id).name}}</div>
+      <div v-for="line in lineList(corpus.cols.get(col_id, scroll_version_id).col_sign_id)">
+        <span>line {{corpus.lines.get(line, scroll_version_id).name}}</span>
+        <span 
+        v-for="sign in signList(corpus.lines.get(line, scroll_version_id).line_sign_id)"
+        :class="`sign ${signClass(sign)} ${active && currentSign === sign ? 'in-focus' : ''}`"
+        @click="currentSign = sign"
+        @blur=""
+        >{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0], scroll_version_id).char}}</span>
+      </div>
+    </div>
+    
   </div>
 </template>
 
 <script>
-// models
-import Sign from './Sign.vue'
-
 export default {
-  components: {
-    sign: Sign,
-  },
+  components: {},
   data() {
     return {
       col_id: undefined,
       scroll_version_id: undefined,
+      currentSign: undefined,
+      active: false,
     }
   },
   props: {
     corpus: undefined,
   },
-  computed: {},
-  methods: {},
+  computed: {
+    signClass() {
+      return sign =>
+        []
+          .concat(
+            ...this.corpus.signChars
+              .get(this.corpus.signs.get(sign).sign_chars[0], this.scroll_version_id)
+              .sign_char_attributes.map(
+                a => this.corpus.signCharAttributes.get(a, this.scroll_version_id).attribute_values
+              )
+          )
+          .join(' ')
+    },
+  },
+  created() {
+    window.addEventListener('keydown', e => {
+      if (this.active && this.currentSign) {
+        if (e.key === 'ArrowLeft') {
+          this.currentSign =
+            this.corpus.signs.get(this.currentSign).next_sign_ids[0] || this.currentSign
+        }
+        if (e.key === 'ArrowRight') {
+          let firstSign = this.corpus.cols.get(this.col_id, this.scroll_version_id).col_sign_id
+          if (this.corpus.signs.get(firstSign).next_sign_ids[0] === this.currentSign) {
+            this.currentSign = this.corpus.signs.get(firstSign).next_sign_ids[0]
+          } else {
+            while ((firstSign = this.corpus.signs.get(firstSign).next_sign_ids[0])) {
+              if (this.corpus.signs.get(firstSign).next_sign_ids[0] === this.currentSign) {
+                this.currentSign = firstSign
+                break
+              }
+            }
+          }
+        }
+      }
+    })
+  },
+  methods: {
+    lineList(sign) {
+      let lines = []
+      if (this.corpus.signs.get(sign) && this.corpus.signs.get(sign).line_id) {
+        lines.push(this.corpus.signs.get(sign).line_id)
+        while (
+          (sign = this.corpus.signs.get(sign).next_sign_ids[0]) &&
+          !this.corpus.signs.get(sign).col_id
+        ) {
+          if (this.corpus.signs.get(sign).line_id) lines.push(this.corpus.signs.get(sign).line_id)
+        }
+      }
+      return lines
+    },
+    signList(sign) {
+      let signs = []
+      if (this.corpus.signs.get(sign)) {
+        signs.push(sign)
+        while (
+          (sign = this.corpus.signs.get(sign).next_sign_ids[0]) &&
+          !this.corpus.signs.get(sign).line_id
+        ) {
+          signs.push(sign)
+        }
+      }
+      return signs
+    },
+  },
   watch: {
     $route(to, from) {
       if (
@@ -50,46 +118,108 @@ export default {
 
 <style lang="scss">
 @import '~sass-vars';
+div.editor-column {
+  direction: rtl;
+  overflow: auto;
+}
+
+span.sign {
+  border-right: 2px solid transparent;
+  margin-left: -2px;
+}
+
+span.sign.in-focus {
+  -webkit-animation: 1s blink step-end infinite;
+  -moz-animation: 1s blink step-end infinite;
+  -ms-animation: 1s blink step-end infinite;
+  -o-animation: 1s blink step-end infinite;
+  animation: 1s blink step-end infinite;
+}
+
+@keyframes "blink" {
+  from,
+  to {
+    border-right: 2px solid black;
+  }
+  50% {
+    border-right: 2px solid transparent;
+  }
+}
+
+@-moz-keyframes blink {
+  from,
+  to {
+    border-right: 2px solid black;
+  }
+  50% {
+    border-right: 2px solid transparent;
+  }
+}
+
+@-webkit-keyframes "blink" {
+  from,
+  to {
+    border-right: 2px solid black;
+  }
+  50% {
+    border-right: 2px solid transparent;
+  }
+}
+
+@-ms-keyframes "blink" {
+  from,
+  to {
+    border-right: 2px solid black;
+  }
+  50% {
+    border-right: 2px solid transparent;
+  }
+}
+
+@-o-keyframes "blink" {
+  from,
+  to {
+    border-right: 2px solid black;
+  }
+  50% {
+    border-right: 2px solid transparent;
+  }
+}
 
 /* here are all the CSS directives for sign attributes */
-span.is_reconstructed_TRUE {
-  color: grey;
+
+/*Space character*/
+span.\32 {
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+span.\32 0 {
+  color: white;
   /* cursor does not show properly when using outline font */
-  // text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-  // padding-left: 2px;
-  // padding-right: 2px;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  margin-right: 1px;
 }
 
-span.readability_INCOMPLETE_AND_NOT_CLEAR {
+span.\31 9 {
   color: blue;
 }
 
-span.readability_INCOMPLETE_AND_NOT_CLEAR:after {
-  content: '֯';
-  color: blue;
-}
-
-.readability_INCOMPLETE_BUT_CLEAR {
+span.\31 8 {
   color: red;
 }
 
-.readability_INCOMPLETE_BUT_CLEAR:after {
-  content: 'ׄ';
-  color: red;
-}
-
-span.relative_position_ABOVE_LINE {
+span.\33 4 {
+  font-size: small;
   vertical-align: super;
 }
 
-span.relative_position_BELOW_LINE {
+span.\33 5 {
+  font-size: small;
   vertical-align: sub;
 }
 
-div.hide-reconstructed-text p span.is_reconstructed_TRUE {
+div.hide-reconstructed-text p span.\32 0 {
   opacity: 0;
-}
-.sign:hover {
-  background: blue;
 }
 </style>

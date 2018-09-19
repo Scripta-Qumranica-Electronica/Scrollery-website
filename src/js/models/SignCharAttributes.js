@@ -8,15 +8,7 @@ export default class SignCharAttributes extends ItemList {
     const connectedLists = [corpus.signchars]
     const relativeToScrollVersion = true
     defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getAttributeOfSignChar' }
-    super(
-      corpus,
-      idKey,
-      // SignCharAttribute,
-      listType,
-      connectedLists,
-      relativeToScrollVersion,
-      defaultPostData
-    )
+    super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
   }
 
   formatRecord(record) {
@@ -24,7 +16,7 @@ export default class SignCharAttributes extends ItemList {
       sign_char_attribute_id: ~~record.sign_char_attribute_id, // Ensure positive integer with bitwise operator
       scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
       sequence: ~~record.sequence || 0, // Ensure positive integer with bitwise operator
-      attribute_name: record.attribute_name,
+      // attribute_name: record.attribute_name,
       attribute_values: Array.isArray(record.attribute_values)
         ? record.attribute_values
         : [record.attribute_values],

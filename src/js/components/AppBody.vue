@@ -117,6 +117,8 @@ export default {
     // else will fall into place
     this.corpus.combinations.requestPopulate()
 
+    // TODO: work attributes into the corpus model.
+    // Change to socket.io
     this.$store.commit('addWorking')
     this.$post('resources/cgi-bin/scrollery-cgi.pl', {
       transaction: 'getListOfAttributes',

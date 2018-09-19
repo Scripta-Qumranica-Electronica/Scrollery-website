@@ -69,7 +69,7 @@ export default class ItemList {
     key = this._formatKey(key, scroll_version_id)
     if (key in this._items) {
       const updatedItem = Object.assign({}, this.get(key), newData)
-      this._items = Object.assign({}, this._items, { [key]: updatedItem })
+      this._items = Object.assign({}, this._items, { [key]: updatedItem }) // Test further to see if this is really necessary
     } else {
       throw new TypeError(`Item ${key} not found.`)
     }

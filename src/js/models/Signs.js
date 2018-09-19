@@ -17,6 +17,10 @@ export default class Signs extends ItemList {
 
   formatRecord(record) {
     return {
+      // Note that the sign processing function below
+      // will also add a property col_id and line_id
+      // if a sign is linked to a column start or
+      // line start sign_char_attribute.
       sign_id: ~~record.sign_id, // Ensure positive integer with bitwise operator
       next_sign_ids: Array.isArray(record.next_sign_ids)
         ? record.next_sign_ids
@@ -66,6 +70,7 @@ export default class Signs extends ItemList {
                   },
                   scroll_version_id
                 )
+                this.corpus.signs.alterItemAtKey(line_sign_id, { line_id: line.line_id })
                 if (count === col.lines.length - 1) {
                   this.corpus.cols._insertItem(
                     {
@@ -77,6 +82,7 @@ export default class Signs extends ItemList {
                     },
                     scroll_version_id
                   )
+                  this.corpus.signs.alterItemAtKey(col_sign_id, { col_id: col.fragment_id })
                   console.log('Sign stream process: ', window.performance.now() - process)
                 }
               }
@@ -104,13 +110,15 @@ export default class Signs extends ItemList {
 
         // Create signChar
         this.createSignChar(sign.chars, sign_id, scroll_version_id, l).then(
-          ([signChars, line_sign_id, signCount, col_sign_id]) => {
+          ([signChars, returned_line_sign_id, signCount, returned_col_sign_id]) => {
             // Create sign
             this.corpus.signs._items[sign_id] = this.formatRecord({
               sign_id: sign_id,
               next_sign_ids: sign.next_sign_ids,
               sign_chars: signChars,
             })
+            if (returned_line_sign_id) line_sign_id = returned_line_sign_id
+            if (returned_col_sign_id) col_sign_id = returned_col_sign_id
             if (signCount === signs.length - 1) {
               console.log('processed line', count)
               resolve([line_sign_ids, line_sign_id, count, col_sign_id])
@@ -135,23 +143,15 @@ export default class Signs extends ItemList {
           (attribute = Array.isArray(char.attributes) ? char.attributes[n] : [char.attributes][n]);
           n++
         ) {
-          const attribute_id = attribute.attribute_id
-          signCharAttributes.push(attribute_id)
-          // Create the attribute ...
-          this.corpus.signCharAttributes._items[
-            scroll_version_id + '-' + attribute_id
-          ] = this.corpus.signCharAttributes.formatRecord({
-            sign_char_attribute_id: attribute_id,
-            sequence: attribute.sequence,
-            attribute_name: attribute.attribute_name,
-            attribute_values: attribute.values,
-            commentary_id: attribute.values.commentary_id,
-          })
+          const sign_char_attribute_id = attribute.sign_char_attribute_id
+          signCharAttributes.push(sign_char_attribute_id)
+          let signCharAttributeValues = []
           for (
             let o = 0, value;
             (value = Array.isArray(attribute.values) ? attribute.values[o] : [attribute.values][o]);
             o++
           ) {
+            signCharAttributeValues.push(value.attribute_value_id)
             if (value.attribute_value_id === 10) {
               // new line character
               line_sign_id = sign_id
@@ -160,6 +160,16 @@ export default class Signs extends ItemList {
               col_sign_id = sign_id
             }
           }
+          // Create the attribute ...
+          this.corpus.signCharAttributes._items[
+            `${scroll_version_id}-${sign_char_attribute_id}`
+          ] = this.corpus.signCharAttributes.formatRecord({
+            scroll_version_id: scroll_version_id,
+            sign_char_attribute_id: sign_char_attribute_id,
+            sequence: attribute.sequence,
+            attribute_values: signCharAttributeValues,
+            commentary_id: attribute.values.commentary_id,
+          })
         }
         // Create signChar
         this.corpus.signChars._items[
