@@ -7,9 +7,10 @@
       <span>{{corpus.lines.get(line, scroll_version_id).name}}</span>
       <span 
       v-for="sign in signList(corpus.lines.get(line, scroll_version_id).line_sign_id)"
-      :class="`sign ${signClass(sign)} ${active && currentSign === sign ? 'in-focus' : ''} ${corpus.combinations.get(scroll_version_id).locked === 0 ? 'unlocked' : ''}`"
-      @click="currentSign = sign"
-      >{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0], scroll_version_id).char}}</span>
+      :class="`sign ${signClass(sign)} ${active && startSign === sign ? 'in-focus' : ''} ${corpus.combinations.get(scroll_version_id).locked === 0 ? 'unlocked' : ''}`"
+      @mousedown="startSign = sign; signRange = undefined"
+      @mouseup="range(sign)"
+      >{{corpus.signChars.get(corpus.signs.get(sign).sign_char_ids[0], scroll_version_id).char}}</span>
     </div>
     
     <!--Note: I though something like this would walk the list in the template.-->
@@ -17,7 +18,7 @@
     <!--sign_ids and it is really slow.-->
     <!--<div v-if="corpus.cols.get(col_id, scroll_version_id) && (sign_id = corpus.cols.get(col_id, scroll_version_id).col_sign_id)">-->
     <!--  <span v-for="sign_id in corpus.signs.get(sign_id).next_sign_ids[0]"-->
-    <!--  @click="currentSign = sign_id"-->
+    <!--  @click="startSign = sign_id"-->
     <!--  >{{sign_id}}, </span>-->
     <!--</div>-->
   </div>
@@ -30,7 +31,8 @@ export default {
     return {
       col_id: undefined,
       scroll_version_id: undefined,
-      currentSign: undefined,
+      startSign: undefined,
+      signRange: undefined,
       currentLine: undefined,
       active: false,
     }
@@ -43,7 +45,7 @@ export default {
       return sign => {
         let cssString = [].concat(
           ...this.corpus.signChars
-            .get(this.corpus.signs.get(sign).sign_chars[0], this.scroll_version_id)
+            .get(this.corpus.signs.get(sign).sign_char_ids[0], this.scroll_version_id)
             .sign_char_attributes.map(
               a => this.corpus.signCharAttributes.get(a, this.scroll_version_id).attribute_values
             )
@@ -57,50 +59,50 @@ export default {
     window.addEventListener('keydown', e => {
       if (
         this.active &&
-        this.currentSign &&
+        this.startSign &&
         this.corpus.combinations.get(this.scroll_version_id).locked === 0
       ) {
         if (e.key === 'ArrowLeft') {
           let { line_id, sign_id } = this.corpus.signs.nextSignLetter(
-            this.currentSign,
+            this.startSign,
             this.scroll_version_id,
             this.col_id,
             this.currentLine
           )
-          this.currentSign = sign_id
+          this.startSign = sign_id
           this.currentLine = line_id
         }
 
         if (e.key === 'ArrowRight') {
           let { line_id, sign_id } = this.corpus.signs.prevSignLetterInCol(
-            this.currentSign,
+            this.startSign,
             this.scroll_version_id,
             this.col_id,
             this.currentLine
           )
-          this.currentSign = sign_id
+          this.startSign = sign_id
           this.currentLine = line_id
         }
 
         if (e.key === 'ArrowDown') {
           let { line_id, sign_id } = this.corpus.signs.getSignInNextLine(
-            this.currentSign,
+            this.startSign,
             this.scroll_version_id,
             this.col_id,
             this.currentLine
           )
-          this.currentSign = sign_id
+          this.startSign = sign_id
           this.currentLine = line_id
         }
 
         if (e.key === 'ArrowUp') {
           let { line_id, sign_id } = this.corpus.signs.getSignInPrevLine(
-            this.currentSign,
+            this.startSign,
             this.scroll_version_id,
             this.col_id,
             this.currentLine
           )
-          this.currentSign = sign_id
+          this.startSign = sign_id
           this.currentLine = line_id
         }
 
@@ -115,7 +117,7 @@ export default {
         if (e.key === 'Backspace') {
           // Do nothing or something wonderful!!!
           const signToDelete = this.corpus.signs.prevSignInCol(
-            this.currentSign,
+            this.startSign,
             this.scroll_version_id,
             this.col_id,
             this.currentLine
@@ -127,12 +129,27 @@ export default {
             this.currentLine
           )
         } else {
-          if (e.key.length === 1) console.log(this.currentSign, e.key)
+          if (e.key.length === 1) {
+            this.corpus.signs.addSignBefore(
+              this.startSign,
+              e.key,
+              this.scroll_version_id,
+              this.col_id,
+              this.currentLine
+            )
+          }
         }
       }
     })
   },
   methods: {
+    range(sign) {
+      // here we will calculate all signs between two,
+      // this can be used to select a bunch of signs and
+      // delete them, or replace them.
+      this.signRange = [this.startSign, sign]
+      console.log(this.signRange)
+    },
     lineList(sign) {
       let lines = []
       if (this.corpus.signs.get(sign) && this.corpus.signs.get(sign).line_id) {
@@ -254,9 +271,8 @@ span.sign.unlocked.in-focus {
 /* here are all the CSS directives for sign attributes */
 
 /*Space character*/
-span.\32 {
-  padding-left: 3px;
-  padding-right: 3px;
+span.\32:after {
+  content: ' ';
 }
 
 /*span.\39:after {*/

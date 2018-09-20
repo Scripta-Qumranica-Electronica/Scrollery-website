@@ -1,4 +1,5 @@
 import ItemList from './ItemList.js'
+import uuid from 'uuid/v1'
 
 export default class Signs extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
@@ -17,6 +18,10 @@ export default class Signs extends ItemList {
     this.socket.on('finishRemoveSigns', msg => {
       this.corpus.response(this.finishDeleteSign(msg))
     })
+
+    this.socket.on('finishAddSigns', msg => {
+      this.corpus.response(this.finishAddSign(msg))
+    })
   }
 
   formatRecord(record) {
@@ -29,7 +34,7 @@ export default class Signs extends ItemList {
       next_sign_ids: Array.isArray(record.next_sign_ids)
         ? record.next_sign_ids
         : [record.next_sign_ids],
-      sign_chars: record.sign_chars || [],
+      sign_char_ids: record.sign_char_ids || [],
     }
   }
 
@@ -59,7 +64,6 @@ export default class Signs extends ItemList {
 
   finishDeleteSign(msg) {
     return new Promise(resolve => {
-      console.log(msg)
       const results = msg[0]
       for (const key of Object.keys(results)) {
         if (results[key] === 'deleted') {
@@ -80,9 +84,86 @@ export default class Signs extends ItemList {
           next_sign_ids.push(nextSign.sign_id)
           this.alterItemAtKey(prevSign.sign_id, { next_sign_ids: next_sign_ids })
           this.removeItem(~~key)
+          // I should remove the sign_char_ids and connected sign_char_attributes
         }
       }
+      resolve(msg)
+    })
+  }
 
+  addSignBefore(sign, char, scroll_version_id, col_id, line_id) {
+    let prevSign = this.prevSignInCol(sign, scroll_version_id, col_id, line_id)
+    let unique = uuid()
+    this.corpus.signChars._insertItem(
+      {
+        sign_char_id: unique,
+        is_variant: 0,
+        char: char,
+        sign_char_attributes: [],
+        rois: [],
+      },
+      scroll_version_id
+    )
+    this._insertItem({
+      sign_id: unique,
+      next_sign_ids: this.get(prevSign.sign_id).next_sign_ids,
+      sign_char_ids: [unique],
+    })
+    this.alterItemAtKey(prevSign.sign_id, { next_sign_ids: [unique] })
+    return this.corpus.request('addSigns', {
+      scroll_version_id: scroll_version_id,
+      col_id: col_id,
+      line_id: line_id,
+      signs: [
+        {
+          previous_sign_id: prevSign.sign_id,
+          sign: char,
+          uuid: unique,
+          next_sign_id: sign,
+        },
+      ],
+    })
+  }
+
+  finishAddSign(msg) {
+    return new Promise(resolve => {
+      const results = msg[0]
+      for (const key of Object.keys(results)) {
+        let prevID, nextID, char
+        for (let i = 0, sign; (sign = msg.payload.signs[i]); i++) {
+          if (sign.uuid === key) {
+            prevID = sign.previous_sign_id
+            nextID = sign.next_sign_id
+            char = sign.sign
+          }
+        }
+        this.corpus.signChars._insertItem(
+          {
+            sign_char_id: ~~results[key],
+            is_variant: 0,
+            char: char,
+            sign_char_attributes: [],
+            rois: [],
+          },
+          msg.payload.scroll_version_id
+        )
+        this._insertItem({
+          sign_id: ~~results[key],
+          next_sign_ids: [nextID],
+          sign_char_ids: [~~results[key]],
+        })
+        if (this.get(prevID) && this.get(nextID)) {
+          this.alterItemAtKey(prevID, { next_sign_ids: [~~results[key]] })
+          this.corpus.signChars.removeItem(key, msg.payload.scroll_version_id)
+          this.removeItem(key)
+        } else {
+          // Concurrent changes were made, reload the whole column
+          this.requestPopulate({
+            scroll_version_id: msg.payload.scroll_version_id,
+            col_id: msg.payload.col_id,
+          })
+        }
+      }
       resolve(msg)
     })
   }
@@ -177,7 +258,7 @@ export default class Signs extends ItemList {
             this._items[sign_id] = this.formatRecord({
               sign_id: sign_id,
               next_sign_ids: sign.next_sign_ids,
-              sign_chars: signChars,
+              sign_char_ids: signChars,
             })
             if (returned_line_sign_id) line_sign_id = returned_line_sign_id
             if (returned_col_sign_id) col_sign_id = returned_col_sign_id
@@ -346,7 +427,7 @@ export default class Signs extends ItemList {
       []
         .concat(
           ...this.corpus.signChars
-            .get(this.get(sign).sign_chars[0], scroll_version_id)
+            .get(this.get(sign).sign_char_ids[0], scroll_version_id)
             .sign_char_attributes.map(
               a => this.corpus.signCharAttributes.get(a, scroll_version_id).attribute_values
             )
@@ -405,7 +486,7 @@ export default class Signs extends ItemList {
       []
         .concat(
           ...this.corpus.signChars
-            .get(this.get(sign).sign_chars[0], scroll_version_id)
+            .get(this.get(sign).sign_char_ids[0], scroll_version_id)
             .sign_char_attributes.map(
               a => this.corpus.signCharAttributes.get(a, scroll_version_id).attribute_values
             )
