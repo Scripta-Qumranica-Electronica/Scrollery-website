@@ -1,7 +1,7 @@
 <template>
   <div @mouseenter="active = true" @mouseleave="active = false"
   class="editor-column" v-if="corpus.cols.get(col_id, scroll_version_id) && corpus.cols.get(col_id, scroll_version_id).col_sign_id">
-    <div>{{corpus.cols.get(col_id, scroll_version_id).name}}</div>
+    <p>{{corpus.cols.get(col_id, scroll_version_id).name}}</p>
     <div v-for="line in lineList(corpus.cols.get(col_id, scroll_version_id).col_sign_id)"
     @click="currentLine = line">
       <span>{{corpus.lines.get(line, scroll_version_id).name}}</span>
@@ -58,46 +58,49 @@ export default {
     window.addEventListener('keydown', e => {
       if (this.active && this.currentSign) {
         if (e.key === 'ArrowLeft') {
-          this.currentSign = this.corpus.signs.get(
-            this.corpus.signs.get(this.currentSign).next_sign_ids[0]
+          let { line_id, sign_id } = this.corpus.signs.nextSignLetter(
+            this.currentSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
           )
-            ? this.corpus.signs.get(this.currentSign).next_sign_ids[0]
-            : this.currentSign
-          if (
-            []
-              .concat(
-                ...this.corpus.signChars
-                  .get(
-                    this.corpus.signs.get(this.currentSign).sign_chars[0],
-                    this.scroll_version_id
-                  )
-                  .sign_char_attributes.map(
-                    a =>
-                      this.corpus.signCharAttributes.get(a, this.scroll_version_id).attribute_values
-                  )
-              )
-              .indexOf(10) > -1
-          ) {
-            this.currentSign = this.corpus.signs.get(
-              this.corpus.signs.get(this.currentSign).next_sign_ids[0]
-            )
-              ? this.corpus.signs.get(this.currentSign).next_sign_ids[0]
-              : this.currentSign
-          }
+          this.currentSign = sign_id
+          this.currentLine = line_id
         }
 
         if (e.key === 'ArrowRight') {
-          let firstSign = this.corpus.cols.get(this.col_id, this.scroll_version_id).col_sign_id
-          if (this.corpus.signs.get(firstSign).next_sign_ids[0] === this.currentSign) {
-            this.currentSign = this.corpus.signs.get(firstSign).next_sign_ids[0]
-          } else {
-            while ((firstSign = this.corpus.signs.get(firstSign).next_sign_ids[0])) {
-              if (this.corpus.signs.get(firstSign).next_sign_ids[0] === this.currentSign) {
-                this.currentSign = firstSign
-                break
-              }
-            }
-          }
+          let { line_id, sign_id } = this.corpus.signs.prevSignLetterInCol(
+            this.currentSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+          this.currentSign = sign_id
+          this.currentLine = line_id
+        }
+
+        if (e.key === 'ArrowDown') {
+          let { line_id, sign_id } = this.corpus.signs.getSignInNextLine(
+            this.currentSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+          console.log(line_id, sign_id)
+          this.currentSign = sign_id
+          this.currentLine = line_id
+        }
+
+        if (e.key === 'ArrowUp') {
+          let { line_id, sign_id } = this.corpus.signs.getSignInPrevLine(
+            this.currentSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+          console.log(line_id, sign_id)
+          this.currentSign = sign_id
+          this.currentLine = line_id
         }
       }
     })
@@ -240,16 +243,16 @@ span.\32 0 {
   margin-right: 1px;
 }
 
-.IS_RECONSTRUCTED_FALSE + .\32 0:before {
-  content: '[';
-  color: initial;
-  text-shadow: initial;
-  margin-right: initial;
-}
+/*.IS_RECONSTRUCTED_FALSE + .\32 0:before {*/
+/*  content: '[';*/
+/*  color: initial;*/
+/*  text-shadow: initial;*/
+/*  margin-right: initial;*/
+/*}*/
 
-span.\32 0 + .IS_RECONSTRUCTED_FALSE:before {
-  content: ']';
-}
+/*span.\32 0 + .IS_RECONSTRUCTED_FALSE:before {*/
+/*  content: ']';*/
+/*}*/
 
 span.\31 0 {
   margin-left: 1em;

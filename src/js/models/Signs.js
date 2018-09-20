@@ -184,4 +184,177 @@ export default class Signs extends ItemList {
       resolve([signChars, line_sign_id, signCount, col_sign_id])
     })
   }
+
+  /**
+   * The following are a suite of signstream search functions.
+   * They follow only the default stream now.  We should perhaps
+   * add a reference system to track when the user is not following
+   * the defaul stream (i.e., sign.next_sign_id[0])
+   */
+
+  /**
+   * Get the next letter.
+   *
+   * The function returns an object with the line_id that
+   * the next letter sign_id belongs to.
+   */
+  nextSignLetter(sign, scroll_version_id, col_id, line_id = undefined) {
+    if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
+    let sign_id = this.get(this.get(sign).next_sign_ids[0]) ? this.get(sign).next_sign_ids[0] : sign
+    if (this.signIsLineStart(sign_id, scroll_version_id)) {
+      line_id = this.get(sign_id).line_id
+      sign_id = this.get(this.get(sign_id).next_sign_ids[0])
+        ? this.get(sign_id).next_sign_ids[0]
+        : sign
+    }
+    return { line_id: line_id, sign_id: sign_id }
+  }
+
+  /**
+   * Get the previous letter.
+   *
+   * You have to provide a col_id that you know is linked to the sign.
+   * You can also provide a line_id to make the search faster.
+   * This returns both the previous sign id and the last line_id
+   * in an Object.
+   */
+  prevSignLetterInCol(sign, scroll_version_id, col_id, line_id = undefined) {
+    if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
+    let sign_id = this.corpus.lines.get(line_id, scroll_version_id).line_sign_id
+    let reply = undefined
+    if (this.get(sign_id).next_sign_ids[0] === sign) {
+      // We are at the beginning of a line, grab the previous one
+      reply = this.prevLineID(line_id, col_id, scroll_version_id)
+    } else {
+      while ((sign_id = this.get(sign_id).next_sign_ids[0])) {
+        if (this.get(sign_id).next_sign_ids[0] === sign) {
+          // Let's check for line start and skip over them.
+          if (this.signIsLineStart(sign_id, scroll_version_id))
+            reply = this.prevLineID(line_id, col_id, scroll_version_id)
+          else reply = { line_id: line_id, sign_id: sign_id }
+          break
+        }
+      }
+    }
+    return reply
+  }
+
+  signIsLineStart(sign, scroll_version_id) {
+    return (
+      []
+        .concat(
+          ...this.corpus.signChars
+            .get(this.get(sign).sign_chars[0], scroll_version_id)
+            .sign_char_attributes.map(
+              a => this.corpus.signCharAttributes.get(a, scroll_version_id).attribute_values
+            )
+        )
+        .indexOf(10) > -1
+    )
+  }
+
+  lineFromSignID(sign_id, col_id, scroll_version_id) {
+    let line_id = undefined
+    let sign =
+      this.corpus.cols.get(col_id, scroll_version_id) &&
+      this.corpus.cols.get(col_id, scroll_version_id).col_sign_id
+    if (sign) {
+      while ((sign = this.get(sign).next_sign_ids[0])) {
+        if (this.get(sign).line_id) {
+          line_id = this.get(sign).line_id
+        }
+        if (sign === sign_id) break
+      }
+    }
+    return line_id
+  }
+
+  prevLineID(line_id, col_id, scroll_version_id) {
+    let prev_line_sign_id =
+      this.corpus.cols.get(col_id, scroll_version_id) &&
+      this.corpus.cols.get(col_id, scroll_version_id).col_sign_id
+    let nextSign = prev_line_sign_id
+    let prev_line_id = this.get(prev_line_sign_id).line_id
+    if (prev_line_sign_id && prev_line_id !== line_id) {
+      while ((nextSign = this.get(nextSign).next_sign_ids[0])) {
+        if (this.get(nextSign).line_id) {
+          if (line_id === this.get(nextSign).line_id) break
+          prev_line_id = this.get(nextSign).line_id
+        }
+        prev_line_sign_id = nextSign
+      }
+    }
+    return { line_id: prev_line_id, sign_id: prev_line_sign_id }
+  }
+
+  nextLineID(line_id, col_id, scroll_version_id) {
+    let sign_id = this.corpus.lines.get(line_id, scroll_version_id).line_sign_id
+    while ((sign_id = this.get(sign_id).next_sign_ids[0])) {
+      if (this.signIsLineStart(sign_id, scroll_version_id)) {
+        line_id = this.get(sign_id).line_id
+        break
+      }
+    }
+    return { line_id: line_id, sign_id: sign_id }
+  }
+
+  signIsLineStart(sign, scroll_version_id) {
+    return (
+      []
+        .concat(
+          ...this.corpus.signChars
+            .get(this.get(sign).sign_chars[0], scroll_version_id)
+            .sign_char_attributes.map(
+              a => this.corpus.signCharAttributes.get(a, scroll_version_id).attribute_values
+            )
+        )
+        .indexOf(10) > -1
+    )
+  }
+
+  signPosInLine(sign, scroll_version_id, col_id, line_id = undefined) {
+    if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
+    let firstSign = this.corpus.lines.get(line_id, scroll_version_id).line_sign_id
+    let charCount = 0
+    do {
+      if (firstSign === sign) break
+      charCount += 1
+    } while ((firstSign = this.get(firstSign).next_sign_ids[0]))
+    return charCount
+  }
+
+  getSignInPrevLine(sign, scroll_version_id, col_id, line_id = undefined) {
+    if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
+    let pos = this.signPosInLine(sign, scroll_version_id, col_id, line_id)
+    let prevLine = this.prevLineID(line_id, col_id, scroll_version_id)
+    return {
+      line_id: prevLine.line_id,
+      sign_id: this.signAtPosInLine(scroll_version_id, prevLine.line_id, pos),
+    }
+  }
+
+  getSignInNextLine(sign, scroll_version_id, col_id, line_id = undefined) {
+    if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
+    let pos = this.signPosInLine(sign, scroll_version_id, col_id, line_id)
+    let nextLine = this.nextLineID(line_id, col_id, scroll_version_id)
+    return {
+      line_id: nextLine.line_id,
+      sign_id: this.signAtPosInLine(scroll_version_id, nextLine.line_id, pos),
+    }
+  }
+
+  signAtPosInLine(scroll_version_id, line_id, pos) {
+    let sign_id = this.corpus.lines.get(line_id, scroll_version_id).line_sign_id
+    let count = 0
+    while (count < pos) {
+      if (
+        this.get(this.get(sign_id).next_sign_ids[0]) &&
+        !this.get(this.get(sign_id).next_sign_ids[0]).line_id &&
+        !(sign_id = this.get(sign_id).next_sign_ids[0])
+      )
+        break
+      count += 1
+    }
+    return sign_id
+  }
 }
