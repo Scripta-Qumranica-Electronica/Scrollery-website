@@ -1,19 +1,26 @@
 <template>
-  <div @mouseenter="active = true" @mouseleave="active = false">
-    
-    <div class="editor-column" v-if="corpus.cols.get(col_id, scroll_version_id) && corpus.cols.get(col_id, scroll_version_id).col_sign_id">
-      <div>{{corpus.cols.get(col_id, scroll_version_id).name}}</div>
-      <div v-for="line in lineList(corpus.cols.get(col_id, scroll_version_id).col_sign_id)">
-        <span>line {{corpus.lines.get(line, scroll_version_id).name}}</span>
-        <span 
-        v-for="sign in signList(corpus.lines.get(line, scroll_version_id).line_sign_id)"
-        :class="`sign ${signClass(sign)} ${active && currentSign === sign ? 'in-focus' : ''}`"
-        @click="currentSign = sign"
-        @blur=""
-        >{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0], scroll_version_id).char}}</span>
-      </div>
+  <div @mouseenter="active = true" @mouseleave="active = false"
+  class="editor-column" v-if="corpus.cols.get(col_id, scroll_version_id) && corpus.cols.get(col_id, scroll_version_id).col_sign_id">
+    <div>{{corpus.cols.get(col_id, scroll_version_id).name}}</div>
+    <div v-for="line in lineList(corpus.cols.get(col_id, scroll_version_id).col_sign_id)"
+    @click="currentLine = line">
+      <span>{{corpus.lines.get(line, scroll_version_id).name}}</span>
+      <span 
+      v-for="sign in signList(corpus.lines.get(line, scroll_version_id).line_sign_id)"
+      :class="`sign ${signClass(sign)} 
+      ${active && currentSign === sign ? 'in-focus' : ''}`"
+      @click="currentSign = sign"
+      >{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0], scroll_version_id).char}}</span>
     </div>
     
+    <!--Note: I though something like this would walk the list in the template.-->
+    <!--It does seem to walk the linked-list, but does not return the proper-->
+    <!--sign_ids and it is really slow.-->
+    <!--<div v-if="corpus.cols.get(col_id, scroll_version_id) && (sign_id = corpus.cols.get(col_id, scroll_version_id).col_sign_id)">-->
+    <!--  <span v-for="sign_id in corpus.signs.get(sign_id).next_sign_ids[0]"-->
+    <!--  @click="currentSign = sign_id"-->
+    <!--  >{{sign_id}}, </span>-->
+    <!--</div>-->
   </div>
 </template>
 
@@ -25,6 +32,7 @@ export default {
       col_id: undefined,
       scroll_version_id: undefined,
       currentSign: undefined,
+      currentLine: undefined,
       active: false,
     }
   },
@@ -33,25 +41,51 @@ export default {
   },
   computed: {
     signClass() {
-      return sign =>
-        []
-          .concat(
-            ...this.corpus.signChars
-              .get(this.corpus.signs.get(sign).sign_chars[0], this.scroll_version_id)
-              .sign_char_attributes.map(
-                a => this.corpus.signCharAttributes.get(a, this.scroll_version_id).attribute_values
-              )
-          )
-          .join(' ')
+      return sign => {
+        let cssString = [].concat(
+          ...this.corpus.signChars
+            .get(this.corpus.signs.get(sign).sign_chars[0], this.scroll_version_id)
+            .sign_char_attributes.map(
+              a => this.corpus.signCharAttributes.get(a, this.scroll_version_id).attribute_values
+            )
+        )
+        if (cssString.indexOf(20) === -1) cssString.push('IS_RECONSTRUCTED_FALSE')
+        return cssString.join(' ')
+      }
     },
   },
   created() {
     window.addEventListener('keydown', e => {
       if (this.active && this.currentSign) {
         if (e.key === 'ArrowLeft') {
-          this.currentSign =
-            this.corpus.signs.get(this.currentSign).next_sign_ids[0] || this.currentSign
+          this.currentSign = this.corpus.signs.get(
+            this.corpus.signs.get(this.currentSign).next_sign_ids[0]
+          )
+            ? this.corpus.signs.get(this.currentSign).next_sign_ids[0]
+            : this.currentSign
+          if (
+            []
+              .concat(
+                ...this.corpus.signChars
+                  .get(
+                    this.corpus.signs.get(this.currentSign).sign_chars[0],
+                    this.scroll_version_id
+                  )
+                  .sign_char_attributes.map(
+                    a =>
+                      this.corpus.signCharAttributes.get(a, this.scroll_version_id).attribute_values
+                  )
+              )
+              .indexOf(10) > -1
+          ) {
+            this.currentSign = this.corpus.signs.get(
+              this.corpus.signs.get(this.currentSign).next_sign_ids[0]
+            )
+              ? this.corpus.signs.get(this.currentSign).next_sign_ids[0]
+              : this.currentSign
+          }
         }
+
         if (e.key === 'ArrowRight') {
           let firstSign = this.corpus.cols.get(this.col_id, this.scroll_version_id).col_sign_id
           if (this.corpus.signs.get(firstSign).next_sign_ids[0] === this.currentSign) {
@@ -121,6 +155,7 @@ export default {
 div.editor-column {
   direction: rtl;
   overflow: auto;
+  height: 100%;
 }
 
 span.sign {
@@ -194,11 +229,30 @@ span.\32 {
   padding-right: 3px;
 }
 
+/*span.\39:after {*/
+/*  content: '|';*/
+/*}*/
+
 span.\32 0 {
   color: white;
   /* cursor does not show properly when using outline font */
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
   margin-right: 1px;
+}
+
+.IS_RECONSTRUCTED_FALSE + .\32 0:before {
+  content: '[';
+  color: initial;
+  text-shadow: initial;
+  margin-right: initial;
+}
+
+span.\32 0 + .IS_RECONSTRUCTED_FALSE:before {
+  content: ']';
+}
+
+span.\31 0 {
+  margin-left: 1em;
 }
 
 span.\31 9 {
