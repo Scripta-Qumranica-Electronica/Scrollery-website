@@ -7,8 +7,7 @@
       <span>{{corpus.lines.get(line, scroll_version_id).name}}</span>
       <span 
       v-for="sign in signList(corpus.lines.get(line, scroll_version_id).line_sign_id)"
-      :class="`sign ${signClass(sign)} 
-      ${active && currentSign === sign ? 'in-focus' : ''}`"
+      :class="`sign ${signClass(sign)} ${active && currentSign === sign ? 'in-focus' : ''} ${corpus.combinations.get(scroll_version_id).locked === 0 ? 'unlocked' : ''}`"
       @click="currentSign = sign"
       >{{corpus.signChars.get(corpus.signs.get(sign).sign_chars[0], scroll_version_id).char}}</span>
     </div>
@@ -56,7 +55,11 @@ export default {
   },
   created() {
     window.addEventListener('keydown', e => {
-      if (this.active && this.currentSign) {
+      if (
+        this.active &&
+        this.currentSign &&
+        this.corpus.combinations.get(this.scroll_version_id).locked === 0
+      ) {
         if (e.key === 'ArrowLeft') {
           let { line_id, sign_id } = this.corpus.signs.nextSignLetter(
             this.currentSign,
@@ -86,7 +89,6 @@ export default {
             this.col_id,
             this.currentLine
           )
-          console.log(line_id, sign_id)
           this.currentSign = sign_id
           this.currentLine = line_id
         }
@@ -98,9 +100,34 @@ export default {
             this.col_id,
             this.currentLine
           )
-          console.log(line_id, sign_id)
           this.currentSign = sign_id
           this.currentLine = line_id
+        }
+
+        if (e.key === 'Meta') {
+          // Do nothing or something wonderful!!!
+        }
+
+        if (e.key === 'Shift') {
+          // Do nothing or something wonderful!!!
+        }
+
+        if (e.key === 'Backspace') {
+          // Do nothing or something wonderful!!!
+          const signToDelete = this.corpus.signs.prevSignInCol(
+            this.currentSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+          this.corpus.signs.deleteSign(
+            signToDelete.sign_id,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+        } else {
+          if (e.key.length === 1) console.log(this.currentSign, e.key)
         }
       }
     })
@@ -166,7 +193,7 @@ span.sign {
   margin-left: -2px;
 }
 
-span.sign.in-focus {
+span.sign.unlocked.in-focus {
   -webkit-animation: 1s blink step-end infinite;
   -moz-animation: 1s blink step-end infinite;
   -ms-animation: 1s blink step-end infinite;

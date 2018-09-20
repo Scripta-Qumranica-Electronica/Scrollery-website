@@ -24,7 +24,7 @@ export default class Cols extends ItemListOrdered {
       lines: record.lines || [],
       rois: record.rois || [],
       col_sign_id: ~~record.col_sign_id, // Ensure positive integer with bitwise operator
-      signs: record.signs || [],
+      sign_ids: record.signs || [],
     }
   }
 

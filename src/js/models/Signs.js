@@ -4,7 +4,7 @@ export default class Signs extends ItemList {
   constructor(corpus, idKey, defaultPostData = undefined) {
     idKey = idKey || 'sign_id'
     const listType = 'sign_ids'
-    const connectedLists = [corpus.cols]
+    const connectedLists = []
     const relativeToScrollVersion = false
     defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getTextOfFragment' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
@@ -12,6 +12,10 @@ export default class Signs extends ItemList {
     // Setup socket.io listeners
     this.socket.on('receiveTextOfFragment', msg => {
       this.corpus.response(this.processPopulate(msg))
+    })
+
+    this.socket.on('finishRemoveSigns', msg => {
+      this.corpus.response(this.finishDeleteSign(msg))
     })
   }
 
@@ -40,6 +44,64 @@ export default class Signs extends ItemList {
     })
   }
 
+  /**
+   * The following functions are for database mutation.
+   */
+
+  deleteSign(sign, scroll_version_id, col_id, line_id) {
+    return this.corpus.request('removeSigns', {
+      scroll_version_id: scroll_version_id,
+      col_id: col_id,
+      line_id: line_id,
+      sign_id: [sign],
+    })
+  }
+
+  finishDeleteSign(msg) {
+    return new Promise(resolve => {
+      console.log(msg)
+      const results = msg[0]
+      for (const key of Object.keys(results)) {
+        if (results[key] === 'deleted') {
+          const prevSign = this.prevSignInCol(
+            ~~key,
+            ~~msg.payload.scroll_version_id,
+            ~~msg.payload.col_id,
+            ~~msg.payload.line_id
+          )
+          const nextSign = this.nextSign(
+            key,
+            ~~msg.payload.scroll_version_id,
+            ~~msg.payload.col_id,
+            ~~msg.payload.line_id
+          )
+          const next_sign_ids = this.get(prevSign.sign_id).next_sign_ids
+          next_sign_ids.splice(next_sign_ids.indexOf(~~key), 1)
+          next_sign_ids.push(nextSign.sign_id)
+          this.alterItemAtKey(prevSign.sign_id, { next_sign_ids: next_sign_ids })
+          this.removeItem(~~key)
+        }
+      }
+
+      resolve(msg)
+    })
+  }
+
+  addSignAfter(sign, scroll_version_id, col_id, line_id) {
+    // this.removeItem(sign)
+    const prevSign = this.prevSignInCol(sign, scroll_version_id, col_id, line_id)
+    const nextSign = this.nextSign(sign, scroll_version_id, col_id, line_id)
+    const next_sign_ids = this.get(prevSign.sign_id).next_sign_ids
+    next_sign_ids.splice(next_sign_ids.indexOf(sign), 1)
+    next_sign_ids.push(nextSign.sign_id)
+    this.alterItemAtKey(prevSign.sign_id, { next_sign_ids: next_sign_ids })
+  }
+
+  /**
+   * The following functions are used to request and
+   * process data from the database.
+   */
+
   processPopulate(message) {
     const init = window.performance.now()
     return new Promise(resolve => {
@@ -56,7 +118,7 @@ export default class Signs extends ItemList {
             let line_sign_id
             col_line_ids.push(line_id)
             const line_sign_ids = [] //Could use propagateAddData, but this is probably faster
-            this.processLine(line.signs, scroll_version_id, k).then(
+            this.processLine(line.signs, scroll_version_id, k, col_id, line_id).then(
               ([line_signs, line_sign_id, count, returned_col_sign_id]) => {
                 col_sign_id = returned_col_sign_id ? returned_col_sign_id : col_sign_id
                 col_sign_ids[count] = line_signs
@@ -97,7 +159,7 @@ export default class Signs extends ItemList {
     })
   }
 
-  processLine(signs, scroll_version_id, count) {
+  processLine(signs, scroll_version_id, count, col_id, line_id) {
     let col_sign_id = undefined
     let line_sign_id = undefined
     let line_sign_ids = []
@@ -112,7 +174,7 @@ export default class Signs extends ItemList {
         this.createSignChar(sign.chars, sign_id, scroll_version_id, l).then(
           ([signChars, returned_line_sign_id, signCount, returned_col_sign_id]) => {
             // Create sign
-            this.corpus.signs._items[sign_id] = this.formatRecord({
+            this._items[sign_id] = this.formatRecord({
               sign_id: sign_id,
               next_sign_ids: sign.next_sign_ids,
               sign_chars: signChars,
@@ -193,7 +255,21 @@ export default class Signs extends ItemList {
    */
 
   /**
-   * Get the next letter.
+   * Get the next sign.
+   *
+   * The function returns an object with the line_id that
+   * the next letter sign_id belongs to.
+   */
+  nextSign(sign, scroll_version_id, col_id, line_id = undefined) {
+    if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
+    let sign_id = this.get(this.get(sign).next_sign_ids[0])
+      ? this.get(sign).next_sign_ids[0]
+      : undefined
+    return { line_id: line_id, sign_id: sign_id }
+  }
+
+  /**
+   * Get the next letter, ignore anchor signs for lines.
    *
    * The function returns an object with the line_id that
    * the next letter sign_id belongs to.
@@ -211,12 +287,38 @@ export default class Signs extends ItemList {
   }
 
   /**
-   * Get the previous letter.
+   * Get the previous sign.
    *
    * You have to provide a col_id that you know is linked to the sign.
    * You can also provide a line_id to make the search faster.
    * This returns both the previous sign id and the last line_id
    * in an Object.
+   */
+  prevSignInCol(sign, scroll_version_id, col_id, line_id = undefined) {
+    if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
+    let sign_id = this.corpus.lines.get(line_id, scroll_version_id).line_sign_id
+    let reply = undefined
+    if (this.get(sign_id).next_sign_ids[0] === sign) {
+      // We are at the beginning of a line, grab the previous one
+      reply = this.prevLineID(line_id, col_id, scroll_version_id)
+    } else {
+      while ((sign_id = this.get(sign_id).next_sign_ids[0])) {
+        if (this.get(sign_id).next_sign_ids[0] === sign) {
+          reply = { line_id: line_id, sign_id: sign_id }
+          break
+        }
+      }
+    }
+    return reply
+  }
+
+  /**
+   * Get the previous letter, ignore anchor signs for lines.
+   *
+   * You have to provide a col_id that you know is linked to the sign.
+   * You can also provide a line_id to make the search faster.
+   * This returns both the previous sign id and the last line_id
+   * in an Object.  Note that it skips signs that link to line_ids!
    */
   prevSignLetterInCol(sign, scroll_version_id, col_id, line_id = undefined) {
     if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
