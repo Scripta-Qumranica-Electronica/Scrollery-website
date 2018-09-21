@@ -2,7 +2,7 @@
     <section class="editor">
       <column
         :state="state"
-        :toolbar="toolbar"
+        :toolbarDialogVisible="toolbarDialogVisible"
         :messageBar="messageBar"
         @refresh="$emit('refresh')"
         :corpus="corpus"
@@ -32,6 +32,7 @@ export default {
     toolbar: null,
     messageBar: null,
     corpus: undefined,
+    toolbarDialogVisible: undefined,
   },
   computed: {
     columns() {

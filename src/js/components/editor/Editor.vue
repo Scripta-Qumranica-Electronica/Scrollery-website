@@ -2,14 +2,15 @@
     <div class="text-pane" :class='{fullscreen}'>
         <toolbar
           :state="state"
+          :corpus="corpus"
           ref="toolbar"
           @fullscreen="toggleFullScreen"
+          @open-sign-editor="toolbarDialogVisible = !toolbarDialogVisible"
         />
         <composition
           :text="text"
           :state="state"
-          :toolbar="$refs.toolbar"
-          @refresh="refresh"
+          :toolbarDialogVisible="toolbarDialogVisible"
           :messageBar="$refs.messageBar"
           :corpus="corpus"
         />
@@ -64,6 +65,8 @@ export default {
        * @type {Store} A Vuex store for the editor component tree
        */
       state: editorStore(this.$i18n),
+
+      toolbarDialogVisible: false,
     }
   },
   methods: {
@@ -167,6 +170,10 @@ export default {
     toggleFullScreen() {
       this.fullscreen = !this.fullscreen
     },
+
+    // toggleDialog() {
+    //   this.toolbarDialogVisible = !this.toolbarDialogVisible
+    // }
   },
   watch: {
     $route(to, from) {

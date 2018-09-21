@@ -9,7 +9,7 @@ export default $i18n => {
 
   return new Store({
     state: {
-      locked: true,
+      locked: true, // Don't use this, use the data models
       showReconstructedText: true,
       font: SBLHebrew,
       fonts: {

@@ -95,7 +95,7 @@ export default {
      * @type {array.<Sign>}
      */
     signs() {
-      return this.line ? this.line.items() : []
+      return //this.line ? this.line.items() : []
     },
 
     /**
@@ -103,7 +103,7 @@ export default {
      * @type {string}
      */
     signText() {
-      return this.sign ? this.sign.toDOMString() : ''
+      return //this.sign ? this.sign.toDOMString() : ''
     },
 
     /**
@@ -111,7 +111,7 @@ export default {
      * @type {number}
      */
     signIndex() {
-      return this.line && this.sign ? this.line.findIndex(this.sign) : -1
+      return //this.line && this.sign ? this.line.findIndex(this.sign) : -1
     },
   },
   methods: {

@@ -173,7 +173,7 @@ export default class Signs extends ItemList {
       {
         sign_char_id: unique,
         is_variant: 0,
-        char: char,
+        char: char === ' ' ? '' : char,
         sign_char_attributes: [],
         rois: [],
       },

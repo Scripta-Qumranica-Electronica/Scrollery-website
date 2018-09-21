@@ -1,7 +1,13 @@
 <template>
-  <div @mouseenter="active = true" @mouseleave="active = false"
-  class="editor-column" v-if="corpus.cols.get(col_id, scroll_version_id) && corpus.cols.get(col_id, scroll_version_id).col_sign_id">
-    <p>{{corpus.cols.get(col_id, scroll_version_id).name}}</p>
+  <div @mouseenter="active = true" 
+  @mouseleave="active = false"
+  class="editor-column" 
+  :class="[
+        state.getters.font ? state.getters.font.class : `text-sbl-hebrew`,
+        state.getters.showReconstructedText ? '' : 'hide-reconstructed-text'
+      ]"
+  v-if="corpus.cols.get(col_id, scroll_version_id) && corpus.cols.get(col_id, scroll_version_id).col_sign_id">
+    <p class="col">{{corpus.cols.get(col_id, scroll_version_id).name}}</p>
     <div v-for="line in lineList(corpus.cols.get(col_id, scroll_version_id).col_sign_id)"
     @click="currentLine = line">
       <span>{{corpus.lines.get(line, scroll_version_id).name}}</span>
@@ -13,7 +19,14 @@
       >{{corpus.signChars.get(corpus.signs.getSignChar(sign), scroll_version_id).char}}</span>
     </div>
     
-    <!--Note: I though something like this would walk the list in the template.-->
+    <editing-dialog
+      :line="currentLine"
+      :sign="startSign"
+      :dialogVisible="is_locked && toolbarDialogVisible !== dialogVisible"
+      @close="dialogVisible = !dialogVisible"
+    />
+    
+    <!--Note: I thought something like this would walk the list in the template.-->
     <!--It does seem to walk the linked-list, but does not return the proper-->
     <!--sign_ids and it is really slow.-->
     <!--<div v-if="corpus.cols.get(col_id, scroll_version_id) && (sign_id = corpus.cols.get(col_id, scroll_version_id).col_sign_id)">-->
@@ -25,8 +38,12 @@
 </template>
 
 <script>
+import EditingDialog from './dialog/EditingDialog.vue'
+
 export default {
-  components: {},
+  components: {
+    'editing-dialog': EditingDialog,
+  },
   data() {
     return {
       col_id: undefined,
@@ -35,12 +52,23 @@ export default {
       signRange: undefined,
       currentLine: undefined,
       active: false,
+      dialogVisible: false,
     }
   },
   props: {
     corpus: undefined,
+    state: {
+      required: true,
+    },
+    toolbarDialogVisible: undefined,
   },
   computed: {
+    is_locked() {
+      return this.corpus.combinations.get(this.$route.params.scrollVersionID) &&
+        this.corpus.combinations.get(this.$route.params.scrollVersionID).locked
+        ? false
+        : true
+    },
     signClass() {
       return sign => {
         let cssString = [].concat(
@@ -58,9 +86,12 @@ export default {
   created() {
     window.addEventListener('keydown', e => {
       if (
+        // Don't allow changes to locked scrolls.
+        this.is_locked &&
+        // Don't allow more changes when changes are being processed.
+        this.corpus.transactions.unfinished === 0 &&
         this.active &&
-        this.startSign &&
-        this.corpus.combinations.get(this.scroll_version_id).locked === 0
+        this.startSign
       ) {
         if (e.key === 'ArrowLeft') {
           let { line_id, sign_id } = this.corpus.signs.nextSignLetter(
@@ -150,6 +181,7 @@ export default {
       this.signRange = this.corpus.signs.getSignRange(this.startSign, sign)
       if (this.signRange) console.log(this.signRange)
     },
+
     lineList(sign) {
       let lines = []
       if (this.corpus.signs.get(sign) && this.corpus.signs.get(sign).line_id) {
@@ -163,6 +195,7 @@ export default {
       }
       return lines
     },
+
     signList(sign) {
       let signs = []
       if (this.corpus.signs.get(sign)) {
@@ -319,7 +352,12 @@ span.\33 5 {
   vertical-align: sub;
 }
 
-div.hide-reconstructed-text p span.\32 0 {
+div.hide-reconstructed-text span.\32 0 {
   opacity: 0;
+}
+
+p.col {
+  text-align: center;
+  font-weight: bold;
 }
 </style>
