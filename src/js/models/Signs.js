@@ -38,6 +38,11 @@ export default class Signs extends ItemList {
     }
   }
 
+  /**
+   * This return the sign_char that is NOT marked
+   * as a variant.
+   */
+
   getSignChar(sign, scroll_version_id) {
     let signChar = undefined
     if (this._items[sign].sign_char_ids.length === 1) {
@@ -53,6 +58,12 @@ export default class Signs extends ItemList {
     return signChar
   }
 
+  /**
+   * This returns the next sign_id.  It checks if
+   * we have selected a sign other than the default
+   * next_sign_id[0].
+   */
+
   getNextSign(sign) {
     let nextSign = undefined
     if (this._items[sign].selectedNextSign) {
@@ -61,6 +72,45 @@ export default class Signs extends ItemList {
       nextSign = this._items[sign].next_sign_ids[0]
     }
     return nextSign
+  }
+
+  /**
+   * This method returns both the list of sign_ids in
+   * a range, and a list of complete line_ids in that range.
+   */
+
+  getSignRange(firstSign, secondSign) {
+    let signList = []
+    let lineList = []
+    let currentLine = undefined
+    let currentSign = firstSign
+    let finished = false
+    do {
+      signList.push(currentSign)
+      if (this.get(currentSign).line_id) {
+        if (!currentLine) currentLine = this.get(currentSign).line_id
+        else if (currentLine !== this.get(currentSign).line_id) lineList.push(currentLine)
+      }
+      if (currentSign === secondSign) finished = true
+      // Maybe we help shorten this process, by checking if we entered a new scroll_version_id?
+    } while (!finished && (currentSign = this.getNextSign(currentSign)))
+    if (!finished) {
+      console.log('go in reverse.')
+      signList = []
+      lineList = []
+      currentLine = undefined
+      currentSign = secondSign
+      finished = false
+      do {
+        signList.push(currentSign)
+        if (this.get(currentSign).line_id) {
+          if (!currentLine) currentLine = this.get(currentSign).line_id
+          else if (currentLine !== this.get(currentSign).line_id) lineList.push(currentLine)
+        }
+        if (currentSign === firstSign) finished = true
+      } while (!finished && (currentSign = this.getNextSign(currentSign)))
+    }
+    return finished ? { sign_ids: signList, line_ids: lineList } : undefined
   }
 
   /* istanbul ignore next */

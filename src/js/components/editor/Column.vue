@@ -9,7 +9,7 @@
       v-for="sign in signList(corpus.lines.get(line, scroll_version_id).line_sign_id)"
       :class="`sign ${signClass(sign)} ${active && startSign === sign ? 'in-focus' : ''} ${corpus.combinations.get(scroll_version_id).locked === 0 ? 'unlocked' : ''}`"
       @mousedown="startSign = sign; signRange = undefined"
-      @mouseup="range(sign)"
+      @mouseup="(startSign !== sign) && range(sign)"
       >{{corpus.signChars.get(corpus.signs.getSignChar(sign), scroll_version_id).char}}</span>
     </div>
     
@@ -147,8 +147,8 @@ export default {
       // here we will calculate all signs between two,
       // this can be used to select a bunch of signs and
       // delete them, or replace them.
-      this.signRange = [this.startSign, sign]
-      console.log(this.signRange)
+      this.signRange = this.corpus.signs.getSignRange(this.startSign, sign)
+      if (this.signRange) console.log(this.signRange)
     },
     lineList(sign) {
       let lines = []
