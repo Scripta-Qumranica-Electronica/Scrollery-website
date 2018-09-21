@@ -319,6 +319,9 @@ span.\32 0 {
   margin-right: 1px;
 }
 
+/*The following two css blocks add brackets*/
+/*around reconstructed text.*/
+
 /*.IS_RECONSTRUCTED_FALSE + .\32 0:before {*/
 /*  content: '[';*/
 /*  color: initial;*/

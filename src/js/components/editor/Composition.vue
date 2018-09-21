@@ -1,10 +1,10 @@
+<!--Do we really need this at all?-->
 <template>
     <section class="editor">
       <column
         :state="state"
         :toolbarDialogVisible="toolbarDialogVisible"
         :messageBar="messageBar"
-        @refresh="$emit('refresh')"
         :corpus="corpus"
       />
     </section>
