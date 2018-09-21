@@ -1,4 +1,5 @@
 // Import discrete data model/controllers
+import SignCharAttributeList from './SignCharAttributeList.js'
 import Combinations from './Combinations.js'
 import ImageReferences from './ImageReferences.js'
 import Cols from './Cols.js'
@@ -55,6 +56,7 @@ export default class Corpus {
     // They all receive an instance in this Corpus
     // object and interact with each other as
     // data objects/controllers.
+    this.signCharAttributeList = new SignCharAttributeList(this)
     this.combinations = new Combinations(this)
     this.imageReferences = new ImageReferences(this)
     this.cols = new Cols(this)

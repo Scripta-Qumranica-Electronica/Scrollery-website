@@ -117,6 +117,9 @@ export default {
     // else will fall into place
     this.corpus.combinations.requestPopulate()
 
+    // Grab the initial list of attributes
+    this.corpus.signCharAttributeList.requestPopulate()
+
     // TODO: work attributes into the corpus model.
     // Change to socket.io
     this.$store.commit('addWorking')

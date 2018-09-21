@@ -65,7 +65,8 @@ sub processCGI {
 		getTextOfFragment => \&getTextOfFragment,
 		getListOfAttributes => \&getListOfAttributes,
     changeColName => \&changeColName,
-    changeCombinationName => \&changeCombinationName
+    changeCombinationName => \&changeCombinationName,
+    getListOfAttributes => \&getListOfAttributes
 	);
 	my $json_post = $cgi->{CGIDATA};
 
@@ -1036,6 +1037,27 @@ sub changeCombinationName() {
 	$cgi->change_scroll_name($json_post->{name});
   print '{"name":"' . $json_post->{name} . 
     '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
+}
+
+sub getListOfAttributes() {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my $getAttrsQuery = <<'MYSQL';
+SELECT	attribute.attribute_id, 
+				attribute_value_id, 
+				string_value AS attribute_value_name,
+				attribute_value.description AS attribute_value_description, 
+				attribute.name AS attribute_name, 
+				attribute.description AS attribute_description, 
+				type
+FROM attribute_value
+JOIN attribute USING(attribute_id)
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getAttrsQuery) or die
+			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+	$sql->execute();
+
+	readResults($sql, $key, $lastItem);
+	return;
 }
 
 processCGI();

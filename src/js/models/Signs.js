@@ -38,6 +38,23 @@ export default class Signs extends ItemList {
     }
   }
 
+  getSignChar(sign, scroll_version_id) {
+    let signChar = undefined
+    if (this._items[sign].sign_char_ids.length === 1) {
+      signChar = this._items[sign].sign_char_ids[0]
+    } else if (this._items[sign].selectedSignChar) {
+      signChar = this._items[sign].selectedSignChar
+    } else {
+      for (let i = 0, char; (char = this._items[sign].sign_char_ids[i]); i++) {
+        if (!this.corpus.signChars.get(char, ~~scroll_version_id).is_variant) {
+          signChar = char
+          break
+        }
+      }
+    }
+    return signChar
+  }
+
   /* istanbul ignore next */
   removeItem(key, scroll_version_id = undefined) {
     /**
