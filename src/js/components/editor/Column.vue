@@ -10,7 +10,7 @@
       :class="`sign ${signClass(sign)} ${active && startSign === sign ? 'in-focus' : ''} ${corpus.combinations.get(scroll_version_id).locked === 0 ? 'unlocked' : ''}`"
       @mousedown="startSign = sign; signRange = undefined"
       @mouseup="range(sign)"
-      >{{corpus.signChars.get(corpus.signs.get(sign).sign_char_ids[0], scroll_version_id).char}}</span>
+      >{{corpus.signChars.get(corpus.signs.getSignChar(sign), scroll_version_id).char}}</span>
     </div>
     
     <!--Note: I though something like this would walk the list in the template.-->
@@ -45,7 +45,7 @@ export default {
       return sign => {
         let cssString = [].concat(
           ...this.corpus.signChars
-            .get(this.corpus.signs.get(sign).sign_char_ids[0], this.scroll_version_id)
+            .get(this.corpus.signs.getSignChar(sign), this.scroll_version_id)
             .sign_char_attributes.map(
               a => this.corpus.signCharAttributes.get(a, this.scroll_version_id).attribute_values
             )
@@ -155,7 +155,7 @@ export default {
       if (this.corpus.signs.get(sign) && this.corpus.signs.get(sign).line_id) {
         lines.push(this.corpus.signs.get(sign).line_id)
         while (
-          (sign = this.corpus.signs.get(sign).next_sign_ids[0]) &&
+          (sign = this.corpus.signs.getNextSign(sign)) &&
           !this.corpus.signs.get(sign).col_id
         ) {
           if (this.corpus.signs.get(sign).line_id) lines.push(this.corpus.signs.get(sign).line_id)
@@ -168,7 +168,7 @@ export default {
       if (this.corpus.signs.get(sign)) {
         signs.push(sign)
         while (
-          (sign = this.corpus.signs.get(sign).next_sign_ids[0]) &&
+          (sign = this.corpus.signs.getNextSign(sign)) &&
           !this.corpus.signs.get(sign).line_id
         ) {
           signs.push(sign)

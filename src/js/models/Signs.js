@@ -42,8 +42,6 @@ export default class Signs extends ItemList {
     let signChar = undefined
     if (this._items[sign].sign_char_ids.length === 1) {
       signChar = this._items[sign].sign_char_ids[0]
-    } else if (this._items[sign].selectedSignChar) {
-      signChar = this._items[sign].selectedSignChar
     } else {
       for (let i = 0, char; (char = this._items[sign].sign_char_ids[i]); i++) {
         if (!this.corpus.signChars.get(char, ~~scroll_version_id).is_variant) {
@@ -53,6 +51,16 @@ export default class Signs extends ItemList {
       }
     }
     return signChar
+  }
+
+  getNextSign(sign) {
+    let nextSign = undefined
+    if (this._items[sign].selectedNextSign) {
+      nextSign = this._items[sign].selectedNextSign
+    } else {
+      nextSign = this._items[sign].next_sign_ids[0]
+    }
+    return nextSign
   }
 
   /* istanbul ignore next */
@@ -360,9 +368,7 @@ export default class Signs extends ItemList {
    */
   nextSign(sign, scroll_version_id, col_id, line_id = undefined) {
     if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
-    let sign_id = this.get(this.get(sign).next_sign_ids[0])
-      ? this.get(sign).next_sign_ids[0]
-      : undefined
+    let sign_id = this.get(this.getNextSign(sign)) ? this.getNextSign(sign) : undefined
     return { line_id: line_id, sign_id: sign_id }
   }
 
@@ -374,7 +380,7 @@ export default class Signs extends ItemList {
    */
   nextSignLetter(sign, scroll_version_id, col_id, line_id = undefined) {
     if (!line_id) line_id = this.lineFromSignID(sign, col_id, scroll_version_id)
-    let sign_id = this.get(this.get(sign).next_sign_ids[0]) ? this.get(sign).next_sign_ids[0] : sign
+    let sign_id = this.get(this.getNextSign(sign)) ? this.getNextSign(sign) : sign
     if (this.signIsLineStart(sign_id, scroll_version_id)) {
       line_id = this.get(sign_id).line_id
       sign_id = this.get(this.get(sign_id).next_sign_ids[0])
@@ -459,7 +465,7 @@ export default class Signs extends ItemList {
       this.corpus.cols.get(col_id, scroll_version_id) &&
       this.corpus.cols.get(col_id, scroll_version_id).col_sign_id
     if (sign) {
-      while ((sign = this.get(sign).next_sign_ids[0])) {
+      while ((sign = this.getNextSign(sign))) {
         if (this.get(sign).line_id) {
           line_id = this.get(sign).line_id
         }
