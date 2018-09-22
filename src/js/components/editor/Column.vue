@@ -93,6 +93,8 @@ export default {
         this.is_locked &&
         // Don't allow more changes when changes are being processed.
         this.corpus.transactions.unfinished === 0 &&
+        // Don't allow changes when the editor dialog is open.
+        this.toolbarDialogVisible === this.dialogVisible &&
         this.active &&
         this.startSign
       ) {

@@ -15,9 +15,11 @@
 
 <script>
 export default {
+  props: {
+    corpus: undefined,
+  },
   data() {
     return {
-      allAttributes: [],
       attribute: '',
     }
   },
@@ -30,7 +32,9 @@ export default {
      */
     search(queryString, cb) {
       const re = new RegExp(queryString, 'i')
-      cb(this.allAttributes.filter(({ name }) => re.test(name)))
+      cb(
+        this.corpus.signCharAttributeList._items.filter(({ k }) => re.test(k.attribute_value_name))
+      )
     },
 
     /**

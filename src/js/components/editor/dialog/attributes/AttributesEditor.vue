@@ -1,6 +1,7 @@
 <template>
   <section>
     <attribute-search
+      :corpus="corpus"
       @add-attribute="addNewAttribute"
     />
     <table class="attributes-table">
@@ -27,9 +28,6 @@
 </template>
 
 <script>
-// models
-import Sign from '~/models/-Sign.js'
-
 // components
 import AttribueSearch from './AttributeSearch.vue'
 import Attribute from './Attribute.vue'
@@ -40,9 +38,8 @@ export default {
     'attribute-search': AttribueSearch,
   },
   props: {
-    sign: {
-      type: Sign,
-    },
+    sign: undefined,
+    corpus: undefined,
   },
   data() {
     return {
@@ -73,16 +70,8 @@ export default {
       this.$emit('selectAttribute', attribute)
     },
   },
-  watch: {
-    sign() {
-      this.attributes = this.sign ? this.sign.getMainChar().attributes.items() : []
-    },
-  },
-  mounted() {
-    if (this.sign) {
-      this.attributes = this.sign.getMainChar().attributes.items()
-    }
-  },
+  watch: {},
+  mounted() {},
 }
 </script>
 

@@ -44,7 +44,7 @@
     <el-tabs v-model="activeName">
       <el-tab-pane label="Sign Attributes" name="attributes">
         <tab>
-          <!--<attributes-editor :sign="sign" @selectAttribute="selectAttribute" @refresh="$emit('refresh')"></attributes-editor>-->
+          <attributes-editor :corpus="corpus" :sign="sign" @selectAttribute="selectAttribute" @refresh="$emit('refresh')"></attributes-editor>
         </tab>
       </el-tab-pane>
       <el-tab-pane label="ROI" title="Regions of Interest" name="roi">
