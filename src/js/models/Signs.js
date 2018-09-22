@@ -407,7 +407,7 @@ export default class Signs extends ItemList {
    * The following are a suite of signstream search functions.
    * They follow only the default stream now.  We should perhaps
    * add a reference system to track when the user is not following
-   * the defaul stream (i.e., sign.next_sign_id[0])
+   * the defaul stream.
    */
 
   /**
@@ -507,6 +507,15 @@ export default class Signs extends ItemList {
         )
         .indexOf(10) > -1
     )
+  }
+
+  lineSigns(line_id, scroll_version_id) {
+    let signs = []
+    let sign = this.corpus.lines.get(line_id, scroll_version_id).line_sign_id
+    do {
+      signs.push(sign)
+    } while ((sign = this.getNextSign(sign)) && !this.get(sign).line_id)
+    return signs
   }
 
   lineFromSignID(sign_id, col_id, scroll_version_id) {

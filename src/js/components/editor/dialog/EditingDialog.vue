@@ -1,24 +1,32 @@
 <template>
-  <el-dialog :visible="dialogVisible" width="90vw" height="90vh" class="editor-dialog" @close="$emit('close')">
+  <el-dialog :visible="dialogVisible" width="90vw" height="90vh" class="editor-dialog" @close="$emit('close')" dir="ltr">
     <template slot="title">
       <span>Editor</span>
       <i 
-        v-show="working > 0" 
+        v-show="corpus.transactions > 0" 
         class="fa fa-spinner fa-spin fa-fw" 
         aria-hidden="true"
         style="color: black"></i>
     </template>
 
+    <div dir="rtl">
+      <p>
+        <span v-if="selectedSignChar" class="large-sign">{{corpus.signChars.get(corpus.signs.getSignChar(selectedSignChar), scroll_version_id).char}}</span>
+      </p>
+    </div>
+    
     <!-- Display the sign in context of the line -->
     <div class="line-subheader">
       <div class="sign text-sbl-hebrew" dir="rtl">
-        <span v-html="signText"></span>
-      </div>
-      <div class="line text-sbl-hebrew" dir="rtl">
-          <span v-for="s in signs" class="line-sign" :class='signCSS(s)' @click="changeSign(s)" :key="s.sign_id + '-ed-dialog'">{{ s.isWhitespace() ? '·' : s.toDOMString() }}</span>
+        <span 
+        v-if="line && scroll_version_id"
+        v-for="sign_id in corpus.signs.lineSigns(line, scroll_version_id)"
+        :class="`editor sign ${signClass(sign_id)} ${selectedSignChar === sign_id ? 'selected' : ''}`"
+        @click="selectedSignChar = sign_id"
+        >{{corpus.signChars.get(corpus.signs.getSignChar(sign_id), scroll_version_id).char}}</span>
       </div>
     </div>
-
+    
     <!-- Comments -->
     <div 
       v-show="selectAttribute && selectedSignChar" 
@@ -36,7 +44,7 @@
     <el-tabs v-model="activeName">
       <el-tab-pane label="Sign Attributes" name="attributes">
         <tab>
-          <attributes-editor :sign="sign" @selectAttribute="selectAttribute" @refresh="$emit('refresh')"></attributes-editor>
+          <!--<attributes-editor :sign="sign" @selectAttribute="selectAttribute" @refresh="$emit('refresh')"></attributes-editor>-->
         </tab>
       </el-tab-pane>
       <el-tab-pane label="ROI" title="Regions of Interest" name="roi">
@@ -54,7 +62,6 @@
 
 <script>
 // components
-import { mapGetters } from 'vuex'
 import Tab from './Tab.vue'
 import AttributesEditor from './attributes/AttributesEditor.vue'
 import CommentsEditor from './CommentsEditor.vue'
@@ -69,60 +76,37 @@ export default {
     'comments-editor': CommentsEditor,
   },
   props: {
-    dialogVisible: {
-      default: false,
-    },
-    line: {
-      default: null,
-    },
-    sign: {
-      default: null,
-    },
+    dialogVisible: false,
+    line: undefined,
+    sign: undefined,
+    scroll_version_id: undefined,
+    corpus: undefined,
   },
   data() {
     return {
       activeName: 'attributes',
       selectedAttribute: undefined,
-      selectedSignChar: undefined,
+      selectedSignChar: this.sign,
       selectedCommentary: undefined,
       currentComment: '',
     }
   },
   computed: {
-    ...mapGetters(['working']),
-
-    /**
-     * @type {array.<Sign>}
-     */
-    signs() {
-      return //this.line ? this.line.items() : []
-    },
-
-    /**
-     * The current sign as a DOM string
-     * @type {string}
-     */
-    signText() {
-      return //this.sign ? this.sign.toDOMString() : ''
-    },
-
-    /**
-     * The signs in the line
-     * @type {number}
-     */
-    signIndex() {
-      return //this.line && this.sign ? this.line.findIndex(this.sign) : -1
+    signClass() {
+      return sign => {
+        let cssString = [].concat(
+          ...this.corpus.signChars
+            .get(this.corpus.signs.getSignChar(sign), this.scroll_version_id)
+            .sign_char_attributes.map(
+              a => this.corpus.signCharAttributes.get(a, this.scroll_version_id).attribute_values
+            )
+        )
+        if (cssString.indexOf(20) === -1) cssString.push('IS_RECONSTRUCTED_FALSE')
+        return cssString.join(' ')
+      }
     },
   },
   methods: {
-    /**
-     * @param {Sign} sign  the sign to switch to
-     */
-    changeSign(sign) {
-      this.selectedAttribute = undefined
-      this.selectedSignChar = undefined
-      this.$emit('change-sign', sign)
-    },
     selectAttribute(attribute) {
       if (attribute >= 0) {
         this.selectedAttribute = attribute
@@ -303,11 +287,29 @@ export default {
   }
 }
 
+span.large-sign {
+  font-size: 40px;
+  /*border: 2px solid;*/
+}
+
+/*Don't indent these signs.*/
+span.\31 0 {
+  margin-left: initial;
+}
+
 .comments-editor {
   height: 20vh;
   min-height: 200px;
 
   /* needed to clear tabs */
   margin-bottom: 40px;
+}
+
+span.editor.sign:hover {
+  border-bottom: 2px solid gray;
+}
+
+span.editor.sign.selected {
+  border-bottom: 2px solid black;
 }
 </style>

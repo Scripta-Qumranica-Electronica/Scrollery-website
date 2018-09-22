@@ -42,6 +42,16 @@
   font-family: '4Q418', 'SBL Hebrew', serif;
 }
 
+// Hand of 4Q51
+@font-face {
+  font-family: '4Q52';
+  src: url(../../assets/fonts/4Q51.woff);
+}
+
+.text-4Q51 {
+  font-family: '4Q51', 'SBL Hebrew', serif;
+}
+
 // Hand of 4Q503
 @font-face {
   font-family: '4Q503';

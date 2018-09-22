@@ -20,8 +20,11 @@
     </div>
     
     <editing-dialog
+      v-if="currentLine"
       :line="currentLine"
       :sign="startSign"
+      :corpus="corpus"
+      :scroll_version_id="~~scroll_version_id"
       :dialogVisible="is_locked && toolbarDialogVisible !== dialogVisible"
       @close="dialogVisible = !dialogVisible"
     />
@@ -241,6 +244,7 @@ div.editor-column {
 span.sign {
   border-right: 2px solid transparent;
   margin-left: -2px;
+  color: black;
 }
 
 span.sign.unlocked.in-focus {

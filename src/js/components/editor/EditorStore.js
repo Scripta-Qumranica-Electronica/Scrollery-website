@@ -33,6 +33,11 @@ export default $i18n => {
           class: 'text-4Q418',
           label: `${$i18n.str('Editor.HandOf')} 4Q418`,
         },
+        '4Q51': {
+          name: '4Q51',
+          class: 'text-4Q51',
+          label: `${$i18n.str('Editor.HandOf')} 4Q51`,
+        },
         '4Q503': {
           name: '4Q503',
           class: 'text-4Q503',
