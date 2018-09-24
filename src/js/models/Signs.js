@@ -354,22 +354,21 @@ export default class Signs extends ItemList {
       let col_sign_id = undefined
       for (let m = 0, char; (char = Array.isArray(chars) ? chars[m] : [chars][m]); m++) {
         const sign_char_id = char.sign_char_id
-        const signCharAttributes = [] //Could use propagateAddData, but this is probably faster
+        let signCharAttributeValues = []
         signChars.push(sign_char_id)
         for (
           let n = 0, attribute;
           (attribute = Array.isArray(char.attributes) ? char.attributes[n] : [char.attributes][n]);
           n++
         ) {
-          const sign_char_attribute_id = attribute.sign_char_attribute_id
-          signCharAttributes.push(sign_char_attribute_id)
-          let signCharAttributeValues = []
+          // TODO: get the commentary id's here, then only put a 'comment'
+          // key in signCharAttributeValues if a comment actually exists.
           for (
             let o = 0, value;
             (value = Array.isArray(attribute.values) ? attribute.values[o] : [attribute.values][o]);
             o++
           ) {
-            signCharAttributeValues.push(value.attribute_value_id)
+            signCharAttributeValues.push({ value: value.attribute_value_id, comment: undefined })
             if (value.attribute_value_id === 10) {
               // new line character
               line_sign_id = sign_id
@@ -378,16 +377,6 @@ export default class Signs extends ItemList {
               col_sign_id = sign_id
             }
           }
-          // Create the attribute ...
-          this.corpus.signCharAttributes._items[
-            `${scroll_version_id}-${sign_char_attribute_id}`
-          ] = this.corpus.signCharAttributes.formatRecord({
-            scroll_version_id: scroll_version_id,
-            sign_char_attribute_id: sign_char_attribute_id,
-            sequence: attribute.sequence,
-            attribute_values: signCharAttributeValues,
-            commentary_id: attribute.values.commentary_id,
-          })
         }
         // Create signChar
         this.corpus.signChars._items[
@@ -396,7 +385,7 @@ export default class Signs extends ItemList {
           sign_char_id: char.sign_char_id,
           is_variant: char.is_variant,
           char: char.sign_char,
-          sign_char_attributes: signCharAttributes,
+          attribute_values: signCharAttributeValues,
         })
       }
       resolve([signChars, line_sign_id, signCount, col_sign_id])

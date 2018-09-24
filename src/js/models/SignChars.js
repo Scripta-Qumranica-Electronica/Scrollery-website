@@ -8,15 +8,7 @@ export default class SignChars extends ItemList {
     const connectedLists = [corpus.signs]
     const relativeToScrollVersion = false
     defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getCharofSign' }
-    super(
-      corpus,
-      idKey,
-      // SignChar,
-      listType,
-      connectedLists,
-      relativeToScrollVersion,
-      defaultPostData
-    )
+    super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
   }
 
   formatRecord(record) {
@@ -24,7 +16,11 @@ export default class SignChars extends ItemList {
       sign_char_id: ~~record.sign_char_id, // Ensure positive integer with bitwise operator
       is_variant: record.is_variant || 0,
       char: record.char,
-      sign_char_attributes: record.sign_char_attributes || [],
+      // We don't bother sending the attribute value from the server if it is 1.
+      // So if the length of attribute_values === 0, the assign a single attribute
+      // with a value of 1.
+      attribute_values:
+        record.attribute_values.length === 0 ? [{ value: 1 }] : record.attribute_values,
       rois: record.rois || [],
     }
   }

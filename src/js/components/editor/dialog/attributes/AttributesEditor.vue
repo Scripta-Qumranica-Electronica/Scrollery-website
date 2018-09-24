@@ -2,7 +2,7 @@
   <section>
     <attribute-search
       :corpus="corpus"
-      @add-attribute="addNewAttribute"
+      :sign_id="sign"
     />
     <table class="attributes-table">
       <thead>
@@ -13,14 +13,11 @@
         <th>Actions</th>
       </thead>
       <tbody>
-        <attribute-row v-for="attribute in attributes"
-          :key="attribute.getUUID()"
-          :attribute="attribute"
-          :sign="sign"
+        <attribute-row v-for="attribute in corpus.signChars.get(corpus.signs.getSignChar(sign, scroll_version_id), scroll_version_id).attribute_values"
+          :corpus="corpus"
+          :attribute_value="attribute"
+          :sign_id="sign"
           :class="selectedAttribute === attribute.attribute_id ? 'selected-char-attribute' : ''"
-          @delete-attribute="deleteAttribute(attribute.getUUID())"
-          @selectAttribute="selectAttribute"
-          @refresh="$emit('refresh')"
         />
       </tbody>
     </table>
@@ -30,16 +27,17 @@
 <script>
 // components
 import AttribueSearch from './AttributeSearch.vue'
-import Attribute from './Attribute.vue'
+import AttributeRow from './AttributeRow.vue'
 
 export default {
   components: {
-    'attribute-row': Attribute,
+    'attribute-row': AttributeRow,
     'attribute-search': AttribueSearch,
   },
   props: {
     sign: undefined,
     corpus: undefined,
+    scroll_version_id: undefined,
   },
   data() {
     return {

@@ -1,12 +1,14 @@
 <template>
   <div class="attribute-search">
     <el-autocomplete
+    <!--  class="attribute-input"-->
+    <el-autocomplete
       class="attribute-input"
       v-model="attribute"
-      placeholder="seach attributes"
       value-key="name"
-      :fetch-suggestions="search"
+      :fetch-suggestions="querySearch"
       :clearable="true"
+      placeholder="seach attributes"
       @select="handleSelect"
     />
   </div>
@@ -17,6 +19,7 @@
 export default {
   props: {
     corpus: undefined,
+    sign_id: undefined,
   },
   data() {
     return {
@@ -32,9 +35,26 @@ export default {
      */
     search(queryString, cb) {
       const re = new RegExp(queryString, 'i')
-      cb(
-        this.corpus.signCharAttributeList._items.filter(({ k }) => re.test(k.attribute_value_name))
-      )
+      cb(['one', 'two', 'three'])
+      // cb(this.corpus.signCharAttributeList._items.filter(({ k }) => re.test(k.attribute_value_name)))
+    },
+
+    querySearch(queryString, cb) {
+      var links = []
+      for (const key in this.corpus.signCharAttributeList._items) {
+        links.push({
+          key: key,
+          name: this.corpus.signCharAttributeList.get(key).attribute_value_name,
+        })
+      }
+      var results = queryString ? links.filter(this.createFilter(queryString)) : links
+      // call callback function to return suggestions
+      cb(results)
+    },
+    createFilter(queryString) {
+      return link => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+      }
     },
 
     /**
@@ -42,10 +62,11 @@ export default {
      *
      * @todo implement
      */
-    handleSelect({ name }) {
-      const attribute = this.$store.getters.attributes[name]
+    handleSelect({ key, name }) {
+      console.log(key, name, this.sign_id)
+      // const attribute = this.$store.getters.attributes[name]
 
-      this.$emit('add-attribute', attribute)
+      // this.$emit('add-attribute', attribute)
     },
   },
   mounted() {

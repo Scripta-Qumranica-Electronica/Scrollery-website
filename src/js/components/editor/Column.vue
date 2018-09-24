@@ -77,9 +77,7 @@ export default {
         let cssString = [].concat(
           ...this.corpus.signChars
             .get(this.corpus.signs.getSignChar(sign), this.scroll_version_id)
-            .sign_char_attributes.map(
-              a => this.corpus.signCharAttributes.get(a, this.scroll_version_id).attribute_values
-            )
+            .attribute_values.map(a => a.value)
         )
         if (cssString.indexOf(20) === -1) cssString.push('IS_RECONSTRUCTED_FALSE')
         return cssString.join(' ')

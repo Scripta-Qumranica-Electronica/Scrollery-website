@@ -6,7 +6,7 @@ import Cols from './Cols.js'
 import Lines from './Lines.js'
 import Signs from './Signs.js'
 import SignChars from './SignChars.js'
-import SignCharAttributes from './SignCharAttributes.js'
+// import SignCharAttributes from './SignCharAttributes.js'
 import Images from './Images.js'
 import Artefacts from './Artefacts.js'
 import ROIs from './ROIs.js'
@@ -63,7 +63,7 @@ export default class Corpus {
     this.lines = new Lines(this)
     this.signs = new Signs(this)
     this.signChars = new SignChars(this)
-    this.signCharAttributes = new SignCharAttributes(this)
+    // this.signCharAttributes = new SignCharAttributes(this)
     this.images = new Images(this)
     this.artefacts = new Artefacts(this)
     this.rois = new ROIs(this)
