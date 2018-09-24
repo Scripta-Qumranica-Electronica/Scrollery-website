@@ -13,7 +13,9 @@
         <th>Actions</th>
       </thead>
       <tbody>
-        <attribute-row v-for="attribute in corpus.signChars.get(corpus.signs.getSignChar(sign, scroll_version_id), scroll_version_id).attribute_values"
+        <attribute-row 
+          v-for="attribute in corpus.signChars.get(corpus.signs.getSignChar(sign, scroll_version_id), scroll_version_id).attribute_values"
+          :key="`attribute-${attribute}`"
           :corpus="corpus"
           :attribute_value="attribute"
           :sign_id="sign"
