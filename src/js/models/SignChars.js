@@ -13,6 +13,10 @@ export default class SignChars extends ItemList {
     this.socket.on('finishAddSignAttribute', msg => {
       this.corpus.response(this.finishAddSignAttribute(msg))
     })
+
+    this.socket.on('finishRemoveSignAttribute', msg => {
+      this.corpus.response(this.finishRemoveSignAttribute(msg))
+    })
   }
 
   formatRecord(record) {
@@ -39,7 +43,7 @@ export default class SignChars extends ItemList {
     })
   }
 
-  addAttribute(
+  addSignAttribute(
     sign_char_id,
     scroll_version_id,
     attribute_value_id,
@@ -79,6 +83,50 @@ export default class SignChars extends ItemList {
                   { attribute_values: updatedSignCharAttrs },
                   msg.payload.scroll_version_id
                 )
+              }
+            }
+          }
+        }
+      }
+      resolve(msg)
+    })
+  }
+
+  removeSignAttribute(sign_char_id, scroll_version_id, attribute_value_id) {
+    this.corpus.request('removeSignAttribute', {
+      scroll_version_id: scroll_version_id,
+      signs: [
+        {
+          sign_char_id: sign_char_id,
+          attributes: [
+            {
+              sign_char_attribute_id: attribute_value_id,
+            },
+          ],
+        },
+      ],
+    })
+  }
+
+  finishRemoveSignAttribute(msg) {
+    return new Promise(resolve => {
+      const results = msg[0]
+      for (let i = 0, sign; (sign = msg.results[i]); i++) {
+        for (let sign_char_id in sign) {
+          for (let j = 0, attribute; (attribute = sign[sign_char_id][j]); j++) {
+            for (let attr_key in attribute) {
+              if (attribute[attr_key] === 'deleted') {
+                const updatedSignCharAttrs = this.get(sign_char_id, msg.payload.scroll_version_id)
+                  .attribute_values
+                if (updatedSignCharAttrs) {
+                  const delAttribute = updatedSignCharAttrs.find(x => x.value === attr_key)
+                  delAttribute.splice(updatedSignCharAttrs.indexOf(delAttribute), 1)
+                  this.alterItemAtKey(
+                    sign_char_id,
+                    { attribute_values: updatedSignCharAttrs },
+                    msg.payload.scroll_version_id
+                  )
+                }
               }
             }
           }

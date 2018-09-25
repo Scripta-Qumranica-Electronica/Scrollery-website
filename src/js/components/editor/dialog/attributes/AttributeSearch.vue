@@ -34,12 +34,6 @@ export default {
      * @param {string} queryString the input to search by
      * @param {function} cb        A callback to call with the results
      */
-    search(queryString, cb) {
-      const re = new RegExp(queryString, 'i')
-      cb(['one', 'two', 'three'])
-      // cb(this.corpus.signCharAttributeList._items.filter(({ k }) => re.test(k.attribute_value_name)))
-    },
-
     querySearch(queryString, cb) {
       var links = []
       for (const key in this.corpus.signCharAttributeList._items) {
@@ -53,6 +47,7 @@ export default {
       // call callback function to return suggestions
       cb(results)
     },
+
     createFilter(queryString) {
       return link => {
         return link.name.toLowerCase().indexOf(queryString.toLowerCase()) > -1
@@ -62,11 +57,10 @@ export default {
     /**
      * The user has selected an existing attribute
      *
-     * @todo implement
      */
     handleSelect({ key, name }) {
       console.log(key, name, this.sign_id)
-      this.corpus.signChars.addAttribute(this.sign_char_id, this.scroll_version_id, key)
+      this.corpus.signChars.addSignAttribute(this.sign_char_id, this.scroll_version_id, key)
     },
   },
 }
