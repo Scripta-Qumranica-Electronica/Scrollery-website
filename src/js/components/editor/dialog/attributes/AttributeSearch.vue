@@ -19,7 +19,8 @@
 export default {
   props: {
     corpus: undefined,
-    sign_id: undefined,
+    sign_char_id: undefined,
+    scroll_version_id: undefined,
   },
   data() {
     return {
@@ -44,7 +45,8 @@ export default {
       for (const key in this.corpus.signCharAttributeList._items) {
         links.push({
           key: key,
-          name: this.corpus.signCharAttributeList.get(key).attribute_value_name,
+          name: `${this.corpus.signCharAttributeList.get(key).attribute_name}: 
+          ${this.corpus.signCharAttributeList.get(key).attribute_value_name}`,
         })
       }
       var results = queryString ? links.filter(this.createFilter(queryString)) : links
@@ -53,7 +55,7 @@ export default {
     },
     createFilter(queryString) {
       return link => {
-        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) > -1
       }
     },
 
@@ -64,18 +66,8 @@ export default {
      */
     handleSelect({ key, name }) {
       console.log(key, name, this.sign_id)
-      // const attribute = this.$store.getters.attributes[name]
-
-      // this.$emit('add-attribute', attribute)
+      this.corpus.signChars.addAttribute(this.sign_char_id, this.scroll_version_id, key)
     },
-  },
-  mounted() {
-    const list = []
-    for (let name in this.$store.getters.attributes) {
-      list.push({ name })
-    }
-
-    this.allAttributes = list
   },
 }
 </script>

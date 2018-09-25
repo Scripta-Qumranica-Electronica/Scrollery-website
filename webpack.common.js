@@ -78,6 +78,21 @@ module.exports = {
           }
         ]
       },
+      {
+        test: /\.(png|xml|ico|svg|webmanifest)$/,
+        include: [
+            path.resolve(__dirname, "assets/favicon")
+        ],
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              outputPath: './assets/favicon',
+              publicPath: './assets/favicon/'
+            }
+          }
+        ]
+      },
     ]
   },
 

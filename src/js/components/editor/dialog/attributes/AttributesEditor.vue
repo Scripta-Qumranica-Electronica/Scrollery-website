@@ -2,7 +2,8 @@
   <section>
     <attribute-search
       :corpus="corpus"
-      :sign_id="sign"
+      :sign_char_id="corpus.signChars.get(corpus.signs.getSignChar(sign, scroll_version_id), scroll_version_id).sign_char_id"
+      :scroll_version_id="scroll_version_id"
     />
     <table class="attributes-table">
       <thead>
@@ -15,10 +16,11 @@
       <tbody>
         <attribute-row 
           v-for="attribute in corpus.signChars.get(corpus.signs.getSignChar(sign, scroll_version_id), scroll_version_id).attribute_values"
-          :key="`attribute-${attribute}`"
+          :key="`attribute-${attribute.value}`"
           :corpus="corpus"
           :attribute_value="attribute"
-          :sign_id="sign"
+          :sign_char_id="corpus.signs.getSignChar(sign, scroll_version_id)"
+          :scroll_version_id="scroll_version_id"
           :class="selectedAttribute === attribute.attribute_id ? 'selected-char-attribute' : ''"
         />
       </tbody>
