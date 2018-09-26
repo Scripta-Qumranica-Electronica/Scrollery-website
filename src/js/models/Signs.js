@@ -159,7 +159,7 @@ export default class Signs extends ItemList {
           next_sign_ids.push(nextSign.sign_id)
           this.alterItemAtKey(prevSign.sign_id, { next_sign_ids: next_sign_ids })
           this.removeItem(~~key)
-          // I should remove the sign_char_ids and connected sign_char_attributes
+          // I should remove the sign_char_ids and connected attribute_values
         }
       }
       resolve(msg)
@@ -174,7 +174,7 @@ export default class Signs extends ItemList {
         sign_char_id: unique,
         is_variant: 0,
         char: char === ' ' ? '' : char,
-        sign_char_attributes: [],
+        attribute_values: [],
         rois: [],
       },
       scroll_version_id
@@ -213,13 +213,13 @@ export default class Signs extends ItemList {
           }
         }
         this.corpus.signChars._insertItem(
-          {
+          this.corpus.signChars.formatRecord({
             sign_char_id: ~~results[key],
             is_variant: 0,
             char: char,
-            sign_char_attributes: [],
+            attribute_values: [],
             rois: [],
-          },
+          }),
           msg.payload.scroll_version_id
         )
         this._insertItem({
@@ -488,20 +488,6 @@ export default class Signs extends ItemList {
     return reply
   }
 
-  signIsLineStart(sign, scroll_version_id) {
-    return (
-      []
-        .concat(
-          ...this.corpus.signChars
-            .get(this.get(sign).sign_char_ids[0], scroll_version_id)
-            .sign_char_attributes.map(
-              a => this.corpus.signCharAttributes.get(a, scroll_version_id).attribute_values
-            )
-        )
-        .indexOf(10) > -1
-    )
-  }
-
   lineSigns(line_id, scroll_version_id) {
     let signs = []
     let sign = this.corpus.lines.get(line_id, scroll_version_id).line_sign_id
@@ -562,9 +548,7 @@ export default class Signs extends ItemList {
         .concat(
           ...this.corpus.signChars
             .get(this.get(sign).sign_char_ids[0], scroll_version_id)
-            .sign_char_attributes.map(
-              a => this.corpus.signCharAttributes.get(a, scroll_version_id).attribute_values
-            )
+            .attribute_values.map(a => a.value)
         )
         .indexOf(10) > -1
     )

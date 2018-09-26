@@ -162,7 +162,6 @@ const listeners = {
   removeSignAttribute: (io, socket) => {
     const transaction = 'removeSignAttribute'
     socket.on(transaction, (data) => {
-      console.log(data)
       axios.post(sqeAPI, Object.assign({}, {transaction: transaction}, data))
         .then(res => {
           io.to(data.scroll_version_id).emit('finishRemoveSignAttribute', copyRequest(data, res.data, transaction))
