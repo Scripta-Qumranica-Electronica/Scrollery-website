@@ -74,10 +74,14 @@ export default class SignChars extends ItemList {
         for (let sign_char_id in sign) {
           for (let j = 0, attribute; (attribute = sign[sign_char_id][j]); j++) {
             for (let attr_key in attribute) {
-              const updatedSignCharAttrs = this.get(sign_char_id, msg.payload.scroll_version_id)
-                .attribute_values
+              const updatedSignCharAttrs =
+                this.get(sign_char_id, msg.payload.scroll_version_id) &&
+                this.get(sign_char_id, msg.payload.scroll_version_id).attribute_values
               if (updatedSignCharAttrs) {
-                updatedSignCharAttrs.push({ value: attribute[attr_key].attribute_value })
+                updatedSignCharAttrs.push({
+                  value: attribute[attr_key].attribute_value,
+                  sign_char_attribute_id: ~~attr_key,
+                })
                 this.alterItemAtKey(
                   sign_char_id,
                   { attribute_values: updatedSignCharAttrs },
@@ -115,18 +119,21 @@ export default class SignChars extends ItemList {
           for (let j = 0, attribute; (attribute = sign[sign_char_id][j]); j++) {
             for (let attr_key in attribute) {
               if (attribute[attr_key] === 'deleted') {
-                const updatedSignCharAttrs = this.get(sign_char_id, msg.payload.scroll_version_id)
-                  .attribute_values
+                const updatedSignCharAttrs =
+                  this.get(sign_char_id, msg.payload.scroll_version_id) &&
+                  this.get(sign_char_id, msg.payload.scroll_version_id).attribute_values
                 if (updatedSignCharAttrs) {
                   const delAttribute = updatedSignCharAttrs.find(
                     x => x.sign_char_attribute_id === ~~attr_key
                   )
-                  updatedSignCharAttrs.splice(updatedSignCharAttrs.indexOf(delAttribute), 1)
-                  this.alterItemAtKey(
-                    sign_char_id,
-                    { attribute_values: updatedSignCharAttrs },
-                    msg.payload.scroll_version_id
-                  )
+                  if (delAttribute) {
+                    updatedSignCharAttrs.splice(updatedSignCharAttrs.indexOf(delAttribute), 1)
+                    this.alterItemAtKey(
+                      sign_char_id,
+                      { attribute_values: updatedSignCharAttrs },
+                      msg.payload.scroll_version_id
+                    )
+                  }
                 }
               }
             }
