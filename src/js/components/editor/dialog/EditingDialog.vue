@@ -11,7 +11,9 @@
 
     <div dir="rtl">
       <p>
-        <span v-if="selectedSignChar" class="large-sign">{{corpus.signChars.get(corpus.signs.getSignChar(selectedSignChar), scroll_version_id).char}}</span>
+        <span v-if="selectedSignChar && 
+          corpus.signChars.get(corpus.signs.getSignChar(selectedSignChar), scroll_version_id)" 
+          class="large-sign">{{corpus.signChars.get(corpus.signs.getSignChar(selectedSignChar), scroll_version_id).char}}</span>
       </p>
     </div>
     
@@ -215,27 +217,6 @@ export default {
             reject(err)
           })
       })
-    },
-
-    signCSS(sign) {
-      let cssClasses = []
-      for (let i = 0, char; (char = sign.chars.items()[i]); i++) {
-        for (let n = 0, attr; (attr = char.attributes.items()[n]); n++) {
-          for (let z = 0, value; (value = attr.values.items()[z]); z++) {
-            cssClasses.push(
-              `${attr.attribute_name}_${
-                value.attribute_numeric_value === -1
-                  ? value.attribute_value
-                  : value.attribute_numeric_value
-              }`
-            )
-          }
-        }
-      }
-      if (sign.getID() === this.sign.getID()) {
-        cssClasses.push('edited-sign')
-      }
-      return cssClasses
     },
   },
 }

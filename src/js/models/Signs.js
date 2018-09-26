@@ -45,7 +45,7 @@ export default class Signs extends ItemList {
 
   getSignChar(sign, scroll_version_id) {
     let signChar = undefined
-    if (this._items[sign].sign_char_ids.length === 1) {
+    if (this._items[sign] && this._items[sign].sign_char_ids.length === 1) {
       signChar = this._items[sign].sign_char_ids[0]
     } else {
       for (let i = 0, char; (char = this._items[sign].sign_char_ids[i]); i++) {
@@ -172,9 +172,12 @@ export default class Signs extends ItemList {
     this.corpus.signChars._insertItem(
       {
         sign_char_id: unique,
+        sign_id: unique,
         is_variant: 0,
         char: char === ' ' ? '' : char,
-        attribute_values: [],
+        attribute_values: this.corpus.signChars
+          .get(this.getSignChar(prevSign.sign_id, scroll_version_id), scroll_version_id)
+          .attribute_values.filter(x => x.value === 18 || x.value === 19 || x.value === 20), // Copy only reconstructed or damaged.
         rois: [],
       },
       scroll_version_id
@@ -200,6 +203,10 @@ export default class Signs extends ItemList {
     })
   }
 
+  // TODO: The SQE_API does not return the new sign_char_id corresponding to
+  // the newly created sign.  For this reason, we cannot change the attributes
+  // of newly added signs.  The SQE_API should be fixed to provide both the
+  // sign_id and the sign_char_id of the newly added sign.
   finishAddSign(msg) {
     return new Promise(resolve => {
       const results = msg[0]
@@ -217,7 +224,12 @@ export default class Signs extends ItemList {
             sign_char_id: ~~results[key],
             is_variant: 0,
             char: char,
-            attribute_values: [],
+            attribute_values: this.corpus.signChars
+              .get(
+                this.getSignChar(prevID, msg.payload.scroll_version_id),
+                msg.payload.scroll_version_id
+              )
+              .attribute_values.filter(x => x.value === 18 || x.value === 19 || x.value === 20), // Copy only reconstructed or damaged.
             rois: [],
           }),
           msg.payload.scroll_version_id
@@ -229,8 +241,9 @@ export default class Signs extends ItemList {
         })
         if (this.get(prevID) && this.get(nextID)) {
           this.alterItemAtKey(prevID, { next_sign_ids: [~~results[key]] })
-          this.corpus.signChars.removeItem(key, msg.payload.scroll_version_id)
-          this.removeItem(key)
+          if (this.corpus.signChars.get(key, msg.payload.scroll_version_id))
+            this.corpus.signChars.removeItem(key, msg.payload.scroll_version_id)
+          if (this.get(key)) this.removeItem(key)
         } else {
           // Concurrent changes were made, reload the whole column
           this.requestPopulate({
