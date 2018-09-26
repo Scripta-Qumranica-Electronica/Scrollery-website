@@ -12,7 +12,6 @@
 
 <script>
 import MessageBar from './MessageBar.vue'
-import Composition from '~/models/Composition.js'
 import Column from './Column.vue'
 
 export default {
@@ -21,11 +20,6 @@ export default {
     'message-bar': MessageBar,
   },
   props: {
-    text: {
-      default() {
-        return new Composition()
-      },
-    },
     state: {
       required: true,
     },
@@ -34,11 +28,7 @@ export default {
     corpus: undefined,
     toolbarDialogVisible: undefined,
   },
-  computed: {
-    columns() {
-      return undefined //this.text.items()
-    },
-  },
+  computed: {},
 }
 </script>
 

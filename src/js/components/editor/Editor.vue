@@ -8,7 +8,6 @@
           @open-sign-editor="toolbarDialogVisible = !toolbarDialogVisible"
         />
         <composition
-          :text="text"
           :state="state"
           :toolbarDialogVisible="toolbarDialogVisible"
           :messageBar="$refs.messageBar"
@@ -20,22 +19,18 @@
 
 <script>
 import KEY_CODES from './key_codes.js'
-import CompositionModel from '~/models/Composition.js'
-import Line from '~/models/-Line.js'
-import Column from '~/models/Column.js'
-import Sign from '~/models/-Sign.js'
 
 // components
 import MessageBar from './MessageBar.vue'
-import Composition from './Composition.vue'
 import Toolbar from './Toolbar.vue'
+import Composition from './Composition.vue'
 
 import editorStore from './EditorStore.js'
 
 export default {
   components: {
-    composition: Composition,
     toolbar: Toolbar,
+    composition: Composition,
     'message-bar': MessageBar,
   },
   props: {
@@ -57,11 +52,6 @@ export default {
       fullscreen: false,
 
       /**
-       * @type {Composition} A text model for display in the editor (can have multiple cols)
-       */
-      text: new CompositionModel(),
-
-      /**
        * @type {Store} A Vuex store for the editor component tree
        */
       state: editorStore(this.$i18n),
@@ -76,93 +66,93 @@ export default {
      * @param {string} scrollVersionID The scroll ID
      * @param {string} colID           The Column ID
      */
-    getText(scrollVersionID, colID) {
-      // todo: empty existing columns
-      this.state.commit('setLocked', this.$store.getters.isScrollLocked(scrollVersionID))
-      this.$refs.messageBar.close()
+    // getText(scrollVersionID, colID) {
+    //   // todo: empty existing columns
+    //   this.state.commit('setLocked', this.$store.getters.isScrollLocked(scrollVersionID))
+    //   this.$refs.messageBar.close()
 
-      this.$post('resources/cgi-bin/scrollery-cgi.pl', {
-        transaction: 'getTextOfFragment',
-        scroll_version_id: scrollVersionID,
-        col_id: colID,
-      })
-        .then(res => {
-          if (res.status === 200 && res.data) {
-            // reset the composition
-            this.text = new CompositionModel()
-            const persisted = true
+    //   this.$post('resources/cgi-bin/scrollery-cgi.pl', {
+    //     transaction: 'getTextOfFragment',
+    //     scroll_version_id: scrollVersionID,
+    //     col_id: colID,
+    //   })
+    //     .then(res => {
+    //       if (res.status === 200 && res.data) {
+    //         // reset the composition
+    //         this.text = new CompositionModel()
+    //         const persisted = true
 
-            const scroll = res.data.text[0]
-            const column = scroll.fragments[0]
+    //         const scroll = res.data.text[0]
+    //         const column = scroll.fragments[0]
 
-            // iterate through each line and add it to a lines array
-            const lines = []
-            for (let i = 0, line; (line = column.lines[i]); i++) {
-              // iterate through each sign in the line and add it to the
-              // the line model
-              let signs = []
-              for (let j = 0, rawSign; (rawSign = line.signs[j]); j++) {
-                signs.push(new Sign(rawSign, persisted))
-              }
+    //         // iterate through each line and add it to a lines array
+    //         const lines = []
+    //         for (let i = 0, line; (line = column.lines[i]); i++) {
+    //           // iterate through each sign in the line and add it to the
+    //           // the line model
+    //           let signs = []
+    //           for (let j = 0, rawSign; (rawSign = line.signs[j]); j++) {
+    //             signs.push(new Sign(rawSign, persisted))
+    //           }
 
-              lines.push(
-                new Line(
-                  {
-                    id: ~~line.line_id,
-                    name: line.line_name,
-                  },
-                  signs,
-                  persisted
-                )
-              )
-            }
+    //           lines.push(
+    //             new Line(
+    //               {
+    //                 id: ~~line.line_id,
+    //                 name: line.line_name,
+    //               },
+    //               signs,
+    //               persisted
+    //             )
+    //           )
+    //         }
 
-            // finally insert new column into the text.
-            this.text.insert(
-              new Column(
-                {
-                  id: ~~column.fragment_id,
-                  name: column.fragment_name,
-                },
-                lines,
-                persisted
-              )
-            )
-          } else {
-            throw new Error('Unable to retrieve text data')
-          }
+    //         // finally insert new column into the text.
+    //         this.text.insert(
+    //           new Column(
+    //             {
+    //               id: ~~column.fragment_id,
+    //               name: column.fragment_name,
+    //             },
+    //             lines,
+    //             persisted
+    //           )
+    //         )
+    //       } else {
+    //         throw new Error('Unable to retrieve text data')
+    //       }
 
-          // Show a message to the user if the user cannot edit:
-          if (this.state.getters.locked) {
-            this.$refs.messageBar.flash(
-              'Clone this scroll from the menu in order to make changes in your own version.',
-              {
-                keepOpen: true,
-              }
-            )
-          }
-        })
-        .catch(err => {
-          // TODO: handle err
-          console.error(err)
-        })
-    },
+    //       // Show a message to the user if the user cannot edit:
+    //       if (this.state.getters.locked) {
+    //         this.$refs.messageBar.flash(
+    //           'Clone this scroll from the menu in order to make changes in your own version.',
+    //           {
+    //             keepOpen: true,
+    //           }
+    //         )
+    //       }
+    //     })
+    //     .catch(err => {
+    //       // TODO: handle err
+    //       console.error(err)
+    //     })
+    // },
 
     /**
      * Refresh the editor from the server
      */
-    refresh() {
-      // reset the UI
-      this.text = new CompositionModel()
+    // refresh() {
+    //   // reset the UI
+    //   this.text = new CompositionModel()
 
-      // get the new model from the server
-      const col_id = this.$route.params.colID
-      if (col_id !== '~' && col_id > 0) {
-        this.getText(this.$route.params.scrollVersionID, col_id)
-      } else if (this.colID !== undefined && this.scrollVersionID !== undefined) {
-        this.getText(this.scrollVersionID, this.colID)
-      }
-    },
+    //   // get the new model from the server
+    //   const col_id = this.$route.params.colID
+    //   if (col_id !== '~' && col_id > 0) {
+    //     this.getText(this.$route.params.scrollVersionID, col_id)
+    //   } else if (this.colID !== undefined && this.scrollVersionID !== undefined) {
+    //     this.getText(this.scrollVersionID, this.colID)
+    //   }
+    // },
 
     /**
      * Show the editor in full screen mode
@@ -176,19 +166,19 @@ export default {
     // }
   },
   watch: {
-    $route(to, from) {
-      if (
-        to.params.colID !== from.params.colID ||
-        to.params.scrollVersionID !== from.params.scrollVersionID
-      ) {
-        if (to.params.colID !== '~' && to.params.colID > 0) {
-          // this.text = new CompositionModel()
-          // this.getText(to.params.scrollVersionID, to.params.colID)
-        } else {
-          // this.text = new CompositionModel()
-        }
-      }
-    },
+    // $route(to, from) {
+    //   if (
+    //     to.params.colID !== from.params.colID ||
+    //     to.params.scrollVersionID !== from.params.scrollVersionID
+    //   ) {
+    //     if (to.params.colID !== '~' && to.params.colID > 0) {
+    //       // this.text = new CompositionModel()
+    //       // this.getText(to.params.scrollVersionID, to.params.colID)
+    //     } else {
+    //       // this.text = new CompositionModel()
+    //     }
+    //   }
+    // },
   },
 }
 </script>
