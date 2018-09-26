@@ -14,3 +14,4 @@ resources/cgi-bin/local
 resources/perl-libs
 resources/data-files
 resources/data-backup
+resources/socket/node_modules
