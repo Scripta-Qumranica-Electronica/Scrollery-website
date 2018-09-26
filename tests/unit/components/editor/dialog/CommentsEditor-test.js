@@ -1,4 +1,4 @@
-import { mount } from '@test'
+import { mount } from '@test/'
 import CommentsEditor from '~/components/editor/dialog/CommentsEditor.vue'
 
 describe('CommentsEditor', () => {

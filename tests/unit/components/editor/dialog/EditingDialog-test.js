@@ -1,6 +1,5 @@
 import { mount, factory } from '@test'
 
-import Sign from '~/models/Sign.js'
 import Tab from '~/components/editor/dialog/Tab.vue'
 import EditingDialog from '~/components/editor/dialog/EditingDialog.vue'
 

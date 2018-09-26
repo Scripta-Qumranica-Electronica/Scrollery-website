@@ -1,9 +1,7 @@
 import { mount, factory } from '@test'
 import ColumnComponent from '~/components/editor/Column.vue'
-import Column from '~/models/Column.js'
 import editorStore from '~/components/editor/EditorStore.js'
 
-import select from '~/utils/DOMSelection.js'
 import KEY_CODES from '~/components/editor/key_codes.js'
 
 /**

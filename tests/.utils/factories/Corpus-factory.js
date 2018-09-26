@@ -1,10 +1,4 @@
 import Corpus from '~/models/Corpus.js'
-import Combination from './Combination-factory.js'
-import ImageReference from './ImageReference-factory.js'
-import Image from './Image-factory.js'
-import Col from './Col-factory.js'
-import Artefact from './Artefact-factory.js'
-import ROI from './ROI-factory.js'
 import faker from 'faker'
 
 const generateCorpus = () => {
@@ -34,11 +28,11 @@ const generateCorpus = () => {
         const sign_char_roi_id = faker.random.number(1000000)
         const sqe_image_id = faker.random.number(1000000)
 
-        corpus.rois._insertItem(new ROI({ sign_char_roi_id: sign_char_roi_id }), scroll_version_id)
+        corpus.rois._insertItem(corpus.rois.formatRecord({ sign_char_roi_id: sign_char_roi_id }), scroll_version_id)
         rois.push(sign_char_roi_id)
         artefactRois.push(sign_char_roi_id)
         corpus.images._insertItem(
-          new Image({
+          corpus.images.formatRecord({
             sqe_image_id: sqe_image_id,
             type: z % 4,
           })
@@ -47,7 +41,7 @@ const generateCorpus = () => {
       }
 
       corpus.cols._insertItem(
-        new Col({
+        corpus.cols.formatRecord({
           col_id: col_id,
           rois: artefactRois,
           scroll_version_id: scroll_version_id,
@@ -57,7 +51,7 @@ const generateCorpus = () => {
       cols.push(col_id)
 
       corpus.imageReferences._insertItem(
-        new ImageReference({
+        corpus.imageReferences.formatRecord({
           image_catalog_id: image_catalog_id,
           artefacts: [artefact_id],
           rois: artefactRois,
@@ -68,7 +62,7 @@ const generateCorpus = () => {
       imageReferences.push(image_catalog_id)
 
       corpus.artefacts._insertItem(
-        new Artefact({
+        corpus.artefacts.formatRecord({
           artefact_id: artefact_id,
           rois: artefactRois,
           scroll_version_id: scroll_version_id,
@@ -80,7 +74,7 @@ const generateCorpus = () => {
     }
 
     corpus.combinations._insertItem(
-      new Combination({
+      corpus.combinations.formatRecord({
         scroll_version_id: scroll_version_id,
         cols: cols,
         imageReferences: imageReferences,
