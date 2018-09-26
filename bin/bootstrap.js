@@ -141,7 +141,7 @@ if (versions.dependencies["Data-files"]) {
 
 console.log(chalk.green('✓ Successfully checked out the proper Data-files branch/tag.'))
 
-console.log('Installing websocket dependencies with yarn...')
+console.log(chalk.blue('Installing websocket dependencies with yarn...'))
 cmd = spawnSync(yarn, ['--pure-lockfile'], { encoding : 'utf8', cwd: './resources/socket', stdio: [null, process.stdout, process.stderr] })
 if (cmd.status !== 0) {
     console.log('✗ Installation of websocket dependencies failed.')
