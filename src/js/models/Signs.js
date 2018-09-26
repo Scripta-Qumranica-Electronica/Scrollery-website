@@ -368,7 +368,11 @@ export default class Signs extends ItemList {
             (value = Array.isArray(attribute.values) ? attribute.values[o] : [attribute.values][o]);
             o++
           ) {
-            signCharAttributeValues.push({ value: value.attribute_value_id, comment: undefined })
+            signCharAttributeValues.push({
+              value: value.attribute_value_id,
+              sign_char_attribute_id: ~~attribute.sign_char_attribute_id,
+              comment: undefined,
+            })
             if (value.attribute_value_id === 10) {
               // new line character
               line_sign_id = sign_id
