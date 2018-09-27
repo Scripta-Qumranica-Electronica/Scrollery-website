@@ -74,11 +74,16 @@ export default {
     },
     signClass() {
       return sign => {
-        let cssString = [].concat(
-          ...this.corpus.signChars
-            .get(this.corpus.signs.getSignChar(sign), this.scroll_version_id)
-            .attribute_values.map(a => a.value)
+        let cssString = this.corpus.signChars.get(
+          this.corpus.signs.getSignChar(sign),
+          this.scroll_version_id
         )
+          ? [].concat(
+              ...this.corpus.signChars
+                .get(this.corpus.signs.getSignChar(sign), this.scroll_version_id)
+                .attribute_values.map(a => a.value)
+            )
+          : []
         if (cssString.indexOf(20) === -1) cssString.push('IS_RECONSTRUCTED_FALSE')
         return cssString.join(' ')
       }

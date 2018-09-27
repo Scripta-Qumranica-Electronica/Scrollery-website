@@ -11,7 +11,7 @@
 
     <div dir="rtl">
       <p>
-        <span v-if="selectedSignChar && 
+        <span v-if="selectedSignChar && corpus.signs.get(selectedSignChar) &&
           corpus.signChars.get(corpus.signs.getSignChar(selectedSignChar), scroll_version_id)" 
           class="large-sign">{{corpus.signChars.get(corpus.signs.getSignChar(selectedSignChar), scroll_version_id).char}}</span>
       </p>
@@ -48,7 +48,7 @@
         <tab>
           <attributes-editor 
             :corpus="corpus" 
-            :sign="selectedSignChar" 
+            :sign="corpus.signs.get(selectedSignChar) ? selectedSignChar : undefined" 
             :scroll_version_id="scroll_version_id"/>>
         </tab>
       </el-tab-pane>
@@ -99,11 +99,16 @@ export default {
   computed: {
     signClass() {
       return sign => {
-        let cssString = [].concat(
-          ...this.corpus.signChars
-            .get(this.corpus.signs.getSignChar(sign), this.scroll_version_id)
-            .attribute_values.map(a => a.value)
+        let cssString = this.corpus.signChars.get(
+          this.corpus.signs.getSignChar(sign),
+          this.scroll_version_id
         )
+          ? [].concat(
+              ...this.corpus.signChars
+                .get(this.corpus.signs.getSignChar(sign), this.scroll_version_id)
+                .attribute_values.map(a => a.value)
+            )
+          : []
         if (cssString.indexOf(20) === -1) cssString.push('IS_RECONSTRUCTED_FALSE')
         return cssString.join(' ')
       }

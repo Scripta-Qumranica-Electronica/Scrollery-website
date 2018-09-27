@@ -166,6 +166,12 @@ export default class Signs extends ItemList {
     })
   }
 
+  /**TODO: we should be able to add attributes along with the sign, since we
+   * cannot add, for instance, spaces. This needs some implementation in the
+   * SQE_API.  Also, since no sign_char_id is returned with the creation of
+   * the new sign, we need to refresh the whole list to get the sign_char_id.
+   */
+
   addSignBefore(sign, char, scroll_version_id, col_id, line_id) {
     let prevSign = this.prevSignInCol(sign, scroll_version_id, col_id, line_id)
     let unique = uuid()
@@ -197,6 +203,7 @@ export default class Signs extends ItemList {
           previous_sign_id: prevSign.sign_id,
           sign: char,
           uuid: unique,
+          attribute_value_ids: 0, // Set attribute for a space.
           next_sign_id: sign,
         },
       ],
@@ -221,7 +228,7 @@ export default class Signs extends ItemList {
         }
         this.corpus.signChars._insertItem(
           this.corpus.signChars.formatRecord({
-            sign_char_id: ~~results[key],
+            sign_char_id: ~~results[key].sign_char_id,
             is_variant: 0,
             char: char,
             attribute_values: this.corpus.signChars
@@ -235,12 +242,13 @@ export default class Signs extends ItemList {
           msg.payload.scroll_version_id
         )
         this._insertItem({
-          sign_id: ~~results[key],
+          sign_id: ~~results[key].sign_id,
           next_sign_ids: [nextID],
-          sign_char_ids: [~~results[key]],
+          sign_char_ids: [~~results[key].sign_char_id],
         })
         if (this.get(prevID) && this.get(nextID)) {
-          this.alterItemAtKey(prevID, { next_sign_ids: [~~results[key]] })
+          this.alterItemAtKey(prevID, { next_sign_ids: [~~results[key].sign_id] })
+
           if (this.corpus.signChars.get(key, msg.payload.scroll_version_id))
             this.corpus.signChars.removeItem(key, msg.payload.scroll_version_id)
           if (this.get(key)) this.removeItem(key)

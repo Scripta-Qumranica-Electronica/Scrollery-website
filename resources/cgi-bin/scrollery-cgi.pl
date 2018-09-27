@@ -738,7 +738,28 @@ sub addSigns() {
 			$prev_sign_id = $sign->{previous_sign_id};
 		}
 		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $next_sign_id);
-		print "\"$sign->{uuid}\":$prev_sign_id";
+		print "\"$sign->{uuid}\":{\"sign_id\":$prev_sign_id";
+		
+		# Now let's grab the new sign_char_id as well.
+		my $signCharQuery = <<'MYSQL';
+		SELECT sign_char_id
+		FROM sign_char
+		WHERE sign_id = ?
+MYSQL
+		my $sql = $cgi->dbh->prepare_cached($signCharQuery) or die
+				",\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+		$sql->execute($prev_sign_id);
+		while (my $result = $sql->fetchrow_hashref){
+     #  	my $new_id = $cgi->set_sign_char_attribute(
+					# $result->{sign_char_id}, 
+					# $sign->{attribute_value_ids});
+				print ",\"sign_char_id\":$result->{sign_char_id}}";
+					
+				# if ($sign->{attribute_value_ids} > 0) {
+				# }
+	    }
+		 	
+		
 		if ($counter != $repeatLength) {
 			print "},{";
 			$counter++;
@@ -999,22 +1020,6 @@ sub getTextOfFragment() {
 	print "{";
 	$cgi->get_text_of_fragment($json_post->{col_id}, 'SQE_Format::JSON');
 	print "}";
-}
-
-sub getListOfAttributes() {
-	my ($cgi, $json_post) = @_;
-	my $query = <<'MYSQL';
-	SELECT attribute.attribute_id, name, type, attribute.description AS attribute_description,
-		attribute_value_id, string_value, attribute_value.description AS attribute_value_description
-	FROM attribute
-	JOIN attribute_value USING(attribute_id)
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($query) or die
-		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute();
-
-	readResults($sql);
-	return;
 }
 
 # This seems to run without error, but the relevant data
