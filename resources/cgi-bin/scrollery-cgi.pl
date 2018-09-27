@@ -737,7 +737,11 @@ sub addSigns() {
 		if ($counter == 1) {
 			$prev_sign_id = $sign->{previous_sign_id};
 		}
-		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $next_sign_id);
+		if (scalar @{$sign->{attribute_value_ids}} > 0) {
+			$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $next_sign_id, @{$sign->{attribute_value_ids}});
+		} else {
+			$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $next_sign_id);
+		}
 		print "\"$sign->{uuid}\":{\"sign_id\":$prev_sign_id";
 		
 		# Now let's grab the new sign_char_id as well.
@@ -750,14 +754,14 @@ MYSQL
 				",\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
 		$sql->execute($prev_sign_id);
 		while (my $result = $sql->fetchrow_hashref){
-     #  	my $new_id = $cgi->set_sign_char_attribute(
-					# $result->{sign_char_id}, 
-					# $sign->{attribute_value_ids});
-				print ",\"sign_char_id\":$result->{sign_char_id}}";
-					
-				# if ($sign->{attribute_value_ids} > 0) {
-				# }
-	    }
+			my $new_id = $result->{sign_char_id};
+			# if ($sign->{attribute_value_ids} > 1) {
+   #  		my $attr_id = $cgi->set_sign_char_attribute(
+			# 		$new_id, 
+			# 		$sign->{attribute_value_ids});
+			# }
+			print ",\"sign_char_id\":$new_id}";
+    }
 		 	
 		
 		if ($counter != $repeatLength) {

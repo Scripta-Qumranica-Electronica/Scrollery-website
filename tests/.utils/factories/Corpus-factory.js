@@ -28,7 +28,10 @@ const generateCorpus = () => {
         const sign_char_roi_id = faker.random.number(1000000)
         const sqe_image_id = faker.random.number(1000000)
 
-        corpus.rois._insertItem(corpus.rois.formatRecord({ sign_char_roi_id: sign_char_roi_id }), scroll_version_id)
+        corpus.rois._insertItem(
+          corpus.rois.formatRecord({ sign_char_roi_id: sign_char_roi_id }),
+          scroll_version_id
+        )
         rois.push(sign_char_roi_id)
         artefactRois.push(sign_char_roi_id)
         corpus.images._insertItem(

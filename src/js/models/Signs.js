@@ -201,9 +201,9 @@ export default class Signs extends ItemList {
       signs: [
         {
           previous_sign_id: prevSign.sign_id,
-          sign: char,
+          sign: char === ' ' ? '' : char,
           uuid: unique,
-          attribute_value_ids: 0, // Set attribute for a space.
+          attribute_value_ids: char === ' ' ? [2] : [], // Set attribute for a space or letter.
           next_sign_id: sign,
         },
       ],
@@ -218,25 +218,30 @@ export default class Signs extends ItemList {
     return new Promise(resolve => {
       const results = msg[0]
       for (const key of Object.keys(results)) {
-        let prevID, nextID, char
+        let prevID, nextID, char, attrs
         for (let i = 0, sign; (sign = msg.payload.signs[i]); i++) {
           if (sign.uuid === key) {
             prevID = sign.previous_sign_id
             nextID = sign.next_sign_id
             char = sign.sign
+            attrs = sign.attribute_value_ids.filter(x => x !== 1).map(x => {
+              return { value: x }
+            })
           }
         }
+        const currentAttrValues = this.corpus.signChars
+          .get(
+            this.getSignChar(prevID, msg.payload.scroll_version_id),
+            msg.payload.scroll_version_id
+          )
+          .attribute_values.filter(x => x.value === 18 || x.value === 19 || x.value === 20)
+        currentAttrValues.push(...attrs)
         this.corpus.signChars._insertItem(
           this.corpus.signChars.formatRecord({
             sign_char_id: ~~results[key].sign_char_id,
             is_variant: 0,
             char: char,
-            attribute_values: this.corpus.signChars
-              .get(
-                this.getSignChar(prevID, msg.payload.scroll_version_id),
-                msg.payload.scroll_version_id
-              )
-              .attribute_values.filter(x => x.value === 18 || x.value === 19 || x.value === 20), // Copy only reconstructed or damaged.
+            attribute_values: currentAttrValues, // Copy only reconstructed or damaged.
             rois: [],
           }),
           msg.payload.scroll_version_id
