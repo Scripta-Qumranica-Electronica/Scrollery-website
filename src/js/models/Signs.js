@@ -210,10 +210,10 @@ export default class Signs extends ItemList {
     })
   }
 
-  // TODO: The SQE_API does not return the new sign_char_id corresponding to
+  // TODO: The SQE_API does not return the new sign_char_attribute_id corresponding to
   // the newly created sign.  For this reason, we cannot change the attributes
   // of newly added signs.  The SQE_API should be fixed to provide both the
-  // sign_id and the sign_char_id of the newly added sign.
+  // sign_id, the sign_char_id, and the sign_char_attribute_ids of the newly added sign.
   finishAddSign(msg) {
     return new Promise(resolve => {
       const results = msg[0]

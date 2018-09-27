@@ -753,6 +753,8 @@ MYSQL
 		my $sql = $cgi->dbh->prepare_cached($signCharQuery) or die
 				",\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
 		$sql->execute($prev_sign_id);
+		
+		#TODO: we need to also grab all sign_char_attribute_ids as an array.
 		while (my $result = $sql->fetchrow_hashref){
 			my $new_id = $result->{sign_char_id};
 			# if ($sign->{attribute_value_ids} > 1) {
