@@ -7,7 +7,7 @@ export default class Signs extends ItemList {
     const listType = 'sign_ids'
     const connectedLists = []
     const relativeToScrollVersion = false
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getTextOfFragment' }
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'requestTextOfFragment' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
 
     // Setup socket.io listeners

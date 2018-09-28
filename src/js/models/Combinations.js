@@ -9,16 +9,8 @@ export default class Combinations extends ItemListOrdered {
     let relativeToScrollVersion = false
     defaultPostData = defaultPostData
       ? defaultPostData
-      : { transaction: 'getCombs', user_id: corpus.user }
-    super(
-      corpus,
-      idKey,
-      // Combination,
-      listType,
-      connectedLists,
-      relativeToScrollVersion,
-      defaultPostData
-    )
+      : { transaction: 'requestCombs', user_id: corpus.user }
+    super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
 
     // Setup socket.io listeners
     this.socket.on('receiveCombs', msg => {

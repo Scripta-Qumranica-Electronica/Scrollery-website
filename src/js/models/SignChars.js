@@ -7,7 +7,7 @@ export default class SignChars extends ItemList {
     const listType = 'sign_char_ids'
     const connectedLists = [corpus.signs]
     const relativeToScrollVersion = false
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getCharofSign' }
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'requestCharofSign' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
 
     this.socket.on('finishAddSignAttribute', msg => {

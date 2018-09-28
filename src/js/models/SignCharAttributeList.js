@@ -6,7 +6,7 @@ export default class SignCharAttributeList extends ItemList {
     const listType = 'attribute_value_ids'
     const connectedLists = []
     const relativeToScrollVersion = false
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getListOfAttributes' }
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'requestListOfAttributes' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
 
     // Setup socket.io listeners

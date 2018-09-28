@@ -21,16 +21,16 @@ sub processCGI {
 
 	my %actions = (
 		validateSession => \&validateSession,
-		getCombs => \&getCombs,
+		requestCombs => \&requestCombs,
     getImages => \&getImages,
-		getArtOfComb => \&getArtOfComb,
-		getArtOfImage => \&getArtOfImage,
-		getImgOfComb => \&getImgOfComb,
-		getColOfComb => \&getColOfComb,
+		requestArtOfComb => \&requestArtOfComb,
+		requestArtOfImage => \&requestArtOfImage,
+		requestImgOfComb => \&requestImgOfComb,
+		requestColOfComb => \&requestColOfComb,
 		getSignStreamOfColumn => \&getSignStreamOfColumn,
 		getSignStreamOfFrag => \&getSignStreamOfFrag,
 		getImagesOfFragment => \&getImagesOfFragment,
-		imagesOfInstFragments => \&imagesOfInstFragments,
+		requestImagesOfInstFragments => \&requestImagesOfInstFragments,
 		getInstitutionArtefacts => \&getInstitutionArtefacts,
 		getScrollWidth => \&getScrollWidth,
 		getScrollHeight => \&getScrollHeight,
@@ -60,13 +60,12 @@ sub processCGI {
     getSignCharAttributeCommentary => \& getSignCharAttributeCommentary,
 		addRoiToScroll => \&addRoiToScroll,
 		removeROI => \&removeROI,
-		getRoiOfCol => \&getRoiOfCol,
+		requestRoiOfCol => \&requestRoiOfCol,
 		getRoisOfCombination => \&getRoisOfCombination,
-		getTextOfFragment => \&getTextOfFragment,
-		getListOfAttributes => \&getListOfAttributes,
+		requestTextOfFragment => \&requestTextOfFragment,
     changeColName => \&changeColName,
     changeCombinationName => \&changeCombinationName,
-    getListOfAttributes => \&getListOfAttributes
+    requestListOfAttributes => \&requestListOfAttributes
 	);
 	my $json_post = $cgi->{CGIDATA};
 
@@ -158,7 +157,7 @@ sub validateSession {
 	return;
 }
 
-sub getCombs {
+sub requestCombs {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getCombsQuery = <<'MYSQL';
 SELECT DISTINCT 
@@ -207,7 +206,7 @@ MYSQL
 	return;
 }
 
-sub getArtOfComb {
+sub requestArtOfComb {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT artefact.artefact_id AS artefact_id,
@@ -268,7 +267,7 @@ MYSQL
 	return;
 }
 
-sub getImgOfComb {
+sub requestImgOfComb {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
@@ -299,7 +298,7 @@ MYSQL
 	return;
 }
 
-sub getColOfComb {
+sub requestColOfComb {
 	my ($cgi, $json_post) = @_;
   my $cols = $cgi->get_cols_for_scrollversion($json_post->{scroll_version_id});
   print "{\"results\":$cols}";
@@ -418,7 +417,7 @@ MYSQL
 	return;
 }
 
-sub imagesOfInstFragments {
+sub requestImagesOfInstFragments {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getInstitutionFragmentsQuery = <<'MYSQL';
 SELECT DISTINCT	SQE_image.sqe_image_id,
@@ -961,7 +960,7 @@ sub removeROI() {
 	$cgi->remove_roi($json_post->{sign_char_roi_id});
 }
 
-sub getRoiOfCol() {
+sub requestRoiOfCol() {
 	my ($cgi, $json_post) = @_;
 
 	my $sqlQuery = <<'MYSQL';
@@ -1020,7 +1019,7 @@ MYSQL
 	return;
 }
 
-sub getTextOfFragment() {
+sub requestTextOfFragment() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
 	print "{";
@@ -1050,7 +1049,7 @@ sub changeCombinationName() {
     '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
 }
 
-sub getListOfAttributes() {
+sub requestListOfAttributes() {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getAttrsQuery = <<'MYSQL';
 SELECT	attribute.attribute_id, 

@@ -7,7 +7,7 @@ export default class ImageReferences extends ItemList {
     const listType = 'imageReferences'
     const connectedLists = [corpus.combinations]
     const relativeToScrollVersion = false
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getImgOfComb' }
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'requestImgOfComb' }
     super(
       corpus,
       idKey,

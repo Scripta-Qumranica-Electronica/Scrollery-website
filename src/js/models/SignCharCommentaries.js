@@ -7,7 +7,9 @@ export default class SignCharCommentaries extends ItemList {
     const listType = 'sign_char_commentary_ids'
     const connectedLists = [corpus.signchars]
     const relativeToScrollVersion = true
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getCommentaryOfSignChar' }
+    defaultPostData = defaultPostData
+      ? defaultPostData
+      : { transaction: 'requestCommentaryOfSignChar' }
     super(
       corpus,
       idKey,

@@ -7,7 +7,9 @@ export default class SignCharAttributes extends ItemList {
     const listType = 'sign_char_attribute_ids'
     const connectedLists = [corpus.signchars]
     const relativeToScrollVersion = true
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getAttributeOfSignChar' }
+    defaultPostData = defaultPostData
+      ? defaultPostData
+      : { transaction: 'requestAttributeOfSignChar' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
   }
 

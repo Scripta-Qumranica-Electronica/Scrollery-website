@@ -16,7 +16,7 @@ export default class ROIs extends ItemList {
       corpus.signchars,
     ]
     const relativeToScrollVersion = true
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getRoiOfCol' }
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'requestRoiOfCol' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
   }
 

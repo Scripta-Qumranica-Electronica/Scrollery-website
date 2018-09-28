@@ -7,7 +7,7 @@ export default class Cols extends ItemListOrdered {
     const listType = 'cols'
     const connectedLists = [corpus.combinations]
     const relativeToScrollVersion = true
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getColOfComb' }
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'requestColOfComb' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
 
     // Setup socket.io listeners

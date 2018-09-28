@@ -7,7 +7,9 @@ export default class Images extends ItemList {
     const listType = 'images'
     const connectedLists = [corpus.imageReferences]
     const relativeToScrollVersion = false
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'imagesOfInstFragments' }
+    defaultPostData = defaultPostData
+      ? defaultPostData
+      : { transaction: 'requestImagesOfInstFragments' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
 
     // Setup socket.io listeners

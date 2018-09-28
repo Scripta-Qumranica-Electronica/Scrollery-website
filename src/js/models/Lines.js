@@ -7,7 +7,7 @@ export default class TextLines extends ItemListOrdered {
     const listType = 'lines'
     const connectedLists = [corpus.combinations]
     const relativeToScrollVersion = true
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getLineOfCol' }
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'requestLineOfCol' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
   }
 
