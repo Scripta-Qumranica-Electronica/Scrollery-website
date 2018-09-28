@@ -232,9 +232,9 @@ MYSQL
 	return;
 }
 
-sub getArtOfImage {
+sub requestArtOfImage {
 	my ($cgi, $json_post) = @_;
-	my $getArtOfImageQuery = <<'MYSQL';
+	my $requestArtOfImageQuery = <<'MYSQL';
 SELECT DISTINCT	artefact_position.artefact_position_id AS artefact_position_id,
 				artefact_shape.artefact_shape_id AS artefact_shape_id,
 				artefact_position.artefact_id AS artefact_id,
@@ -259,7 +259,7 @@ WHERE SQE_image.image_catalog_id = ?
 			AND artefact_position_owner.scroll_version_id = ?
       AND artefact_data_owner.scroll_version_id = ?
 MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
+	my $sql = $cgi->dbh->prepare_cached($requestArtOfImageQuery) or die
 		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
 	$sql->execute($json_post->{image_catalog_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 

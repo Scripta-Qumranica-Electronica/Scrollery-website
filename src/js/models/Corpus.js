@@ -77,6 +77,7 @@ export default class Corpus {
     )
     return transactionID
   }
+
   response(promise) {
     promise.then(msg => {
       if (msg) this.transactions.finishRequest(msg.payload.transactionID)

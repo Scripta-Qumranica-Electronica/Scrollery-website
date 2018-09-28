@@ -17,7 +17,7 @@ export default class Artefacts extends ItemList {
     const listType = 'artefacts'
     const connectedLists = [corpus.combinations, corpus.imageReferences]
     const relativeToScrollVersion = true
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getArtOfImage' }
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'requestArtOfImage' }
     super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
 
     // Setup socket.io listeners

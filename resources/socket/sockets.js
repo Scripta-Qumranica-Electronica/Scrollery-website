@@ -60,10 +60,10 @@ module.exports = {
            * Load up the regular getters.
            */
           for (let i = 0, getter; (getter = getters[i]); i++) {
-            socket.on(`get${getter}`, (data) => {
-              axios.post(sqeAPI, Object.assign({}, {transaction: `get${getter}`}, data))
+            socket.on(`request${getter}`, (data) => {
+              axios.post(sqeAPI, Object.assign({}, {transaction: `request${getter}`}, data))
                 .then(res => {
-                  socket.emit(`return{getter}`, copyRequest(data, res.data, `get${getter}`))
+                  socket.emit(`receive${getter}`, copyRequest(data, res.data, `request${getter}`))
                 })
                 .catch(err => console.error(err))
             })
@@ -75,16 +75,16 @@ module.exports = {
            * currently consuming.
            */
           for (let i = 0, registeredGetter; (registeredGetter = registeredGetters[i]); i++) {
-            socket.on(`get${registeredGetter}`, (data) => {
+            socket.on(`request${registeredGetter}`, (data) => {
               // We make sure this socket is only registered to
               // the room with this scroll_version_id.
               if(!socket.rooms[data.scroll_version_id]){
                 socket.leaveAll()
                 socket.join(data.scroll_version_id)
               }
-              axios.post(sqeAPI, Object.assign({}, {transaction: `get${registeredGetter}`}, data))
+              axios.post(sqeAPI, Object.assign({}, {transaction: `request${registeredGetter}`}, data))
                 .then(res => {
-                  socket.emit(`receive{getter}`, copyRequest(data, res.data, `get${registeredGetter}`))
+                  socket.emit(`receive${registeredGetter}`, copyRequest(data, res.data, `request${registeredGetter}`))
                 })
                 .catch(err => console.error(err))
             })
