@@ -25,7 +25,7 @@
         v-for="sign_id in corpus.signs.lineSigns(line, scroll_version_id)"
         :class="`editor sign ${signClass(sign_id)} ${selectedSignChar === sign_id ? 'selected' : ''}`"
         @click="selectedSignChar = sign_id"
-        >{{corpus.signChars.get(corpus.signs.getSignChar(sign_id), scroll_version_id).char}}</span>
+        >{{corpus.signChars.get(corpus.signs.getSignChar(sign_id, scroll_version_id), scroll_version_id).char}}</span>
       </div>
     </div>
     

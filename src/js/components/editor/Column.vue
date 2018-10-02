@@ -250,8 +250,8 @@ div.editor-column {
 }
 
 span.sign {
-  border-right: 2px solid transparent;
-  margin-left: -2px;
+  border-right: 1px solid transparent;
+  margin-left: -1px;
   color: black;
 }
 
@@ -266,50 +266,50 @@ span.sign.unlocked.in-focus {
 @keyframes "blink" {
   from,
   to {
-    border-right: 2px solid black;
+    border-right: 1px solid black;
   }
   50% {
-    border-right: 2px solid transparent;
+    border-right: 1px solid transparent;
   }
 }
 
 @-moz-keyframes blink {
   from,
   to {
-    border-right: 2px solid black;
+    border-right: 1px solid black;
   }
   50% {
-    border-right: 2px solid transparent;
+    border-right: 1px solid transparent;
   }
 }
 
 @-webkit-keyframes "blink" {
   from,
   to {
-    border-right: 2px solid black;
+    border-right: 1px solid black;
   }
   50% {
-    border-right: 2px solid transparent;
+    border-right: 1px solid transparent;
   }
 }
 
 @-ms-keyframes "blink" {
   from,
   to {
-    border-right: 2px solid black;
+    border-right: 1px solid black;
   }
   50% {
-    border-right: 2px solid transparent;
+    border-right: 1px solid transparent;
   }
 }
 
 @-o-keyframes "blink" {
   from,
   to {
-    border-right: 2px solid black;
+    border-right: 1px solid black;
   }
   50% {
-    border-right: 2px solid transparent;
+    border-right: 1px solid transparent;
   }
 }
 
@@ -334,16 +334,16 @@ span.\32 0 {
 /*The following two css blocks add brackets*/
 /*around reconstructed text.*/
 
-/*.IS_RECONSTRUCTED_FALSE + .\32 0:before {*/
-/*  content: '[';*/
-/*  color: initial;*/
-/*  text-shadow: initial;*/
-/*  margin-right: initial;*/
-/*}*/
+// .IS_RECONSTRUCTED_FALSE + .\32 0:before {
+//   content: '[';
+//   color: initial;
+//   text-shadow: initial;
+//   margin-right: initial;
+// }
 
-/*span.\32 0 + .IS_RECONSTRUCTED_FALSE:before {*/
-/*  content: ']';*/
-/*}*/
+// span.\32 0 + .IS_RECONSTRUCTED_FALSE:before {
+//   content: ']';
+// }
 
 span.\31 0 {
   margin-left: 1em;
