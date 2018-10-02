@@ -16,7 +16,7 @@
       :class="`sign ${signClass(sign)} ${active && startSign === sign ? 'in-focus' : ''} ${corpus.combinations.get(scroll_version_id).locked === 0 ? 'unlocked' : ''}`"
       @mousedown="startSign = sign; signRange = undefined"
       @mouseup="(startSign !== sign) && range(sign)"
-      >{{corpus.signChars.get(corpus.signs.getSignChar(sign), scroll_version_id).char}}</span>
+      >{{corpus.signChars.get(corpus.signs.getSignChar(sign, scroll_version_id), scroll_version_id).char}}</span>
     </div>
     
     <editing-dialog
@@ -75,12 +75,15 @@ export default {
     signClass() {
       return sign => {
         let cssString = this.corpus.signChars.get(
-          this.corpus.signs.getSignChar(sign),
+          this.corpus.signs.getSignChar(sign, this.scroll_version_id),
           this.scroll_version_id
         )
           ? [].concat(
               ...this.corpus.signChars
-                .get(this.corpus.signs.getSignChar(sign), this.scroll_version_id)
+                .get(
+                  this.corpus.signs.getSignChar(sign, this.scroll_version_id),
+                  this.scroll_version_id
+                )
                 .attribute_values.map(a => a.value)
             )
           : []

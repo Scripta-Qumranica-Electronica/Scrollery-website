@@ -13,7 +13,7 @@
       <p>
         <span v-if="selectedSignChar && corpus.signs.get(selectedSignChar) &&
           corpus.signChars.get(corpus.signs.getSignChar(selectedSignChar), scroll_version_id)" 
-          class="large-sign">{{corpus.signChars.get(corpus.signs.getSignChar(selectedSignChar), scroll_version_id).char}}</span>
+          class="large-sign">{{corpus.signChars.get(corpus.signs.getSignChar(selectedSignChar, scroll_version_id), scroll_version_id).char}}</span>
       </p>
     </div>
     
@@ -100,12 +100,15 @@ export default {
     signClass() {
       return sign => {
         let cssString = this.corpus.signChars.get(
-          this.corpus.signs.getSignChar(sign),
+          this.corpus.signs.getSignChar(sign, this.scroll_version_id),
           this.scroll_version_id
         )
           ? [].concat(
               ...this.corpus.signChars
-                .get(this.corpus.signs.getSignChar(sign), this.scroll_version_id)
+                .get(
+                  this.corpus.signs.getSignChar(sign, this.scroll_version_id),
+                  this.scroll_version_id
+                )
                 .attribute_values.map(a => a.value)
             )
           : []

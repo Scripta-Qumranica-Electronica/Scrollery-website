@@ -6,7 +6,6 @@
       title="Image Preview"
       width="200"
       trigger="hover"
-      :disabled="!hovered"
       :openDelay="500"
       v-on:show="hovered = true">
         <image-catalog-preview 
@@ -32,7 +31,7 @@
       <!--  class="fa fa-spinner fa-spin fa-fw" -->
       <!--  aria-hidden="true"-->
       <!--  style="color: black">-->
-      </i>
+      <!-- </i> -->
     </div>
     <div class="children" v-show="open">
         <ul>
