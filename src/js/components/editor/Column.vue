@@ -94,6 +94,17 @@ export default {
   },
   created() {
     window.addEventListener('keydown', e => {
+      function getNextSign() {
+        let { line_id, sign_id } = this.corpus.signs.nextSignLetter(
+          this.startSign,
+          this.scroll_version_id,
+          this.col_id,
+          this.currentLine
+        )
+
+        return { line_id, sign_id }
+      }
+
       if (
         // Don't allow changes to locked scrolls.
         this.is_locked &&
@@ -170,6 +181,27 @@ export default {
             this.col_id,
             this.currentLine
           )
+        } else if (e.key === 'Delete') {
+          // Find the next sign, which is going to be the current sign after the deletion
+          const { next_line_id, next_sign_id } = this.corpus.signs.nextSignLetter(
+            this.startSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+
+          // Delete the current sign
+          this.corpus.signs.deleteSign(
+            this.startSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+
+          this.startSign = next_sign_id
+          this.line_id = next_line_id
+
+          // Set the current sign to the previously-next-sign
         } else {
           if (e.key.length === 1) {
             this.corpus.signs.addSignBefore(
