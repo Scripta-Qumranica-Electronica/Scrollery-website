@@ -11,7 +11,7 @@ const props = attrs =>
       image_catalog_id: faker.random.number(1000000),
       images: [],
       artefacts: [],
-      rois: []
+      rois: [],
     },
     attrs
   )

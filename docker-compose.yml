@@ -30,6 +30,21 @@ services:
     networks:
       - sqe-dev
 
+  sqe.websocket:
+    build:
+      context: ./resources/socket
+      dockerfile: Dockerfile
+    container_name: SQE_WEBSOCKET
+    expose:
+      - "6333"
+    ports:
+      - "6333:6333"
+    volumes:
+      - ./resources/socket:/socket
+    command: ["/socket/node_modules/.bin/nodemon", "-L", "--watch", "/socket", "/socket/app.js"]
+    networks:
+      - sqe-dev
+
 # volumes:
 #   resources/data-backup:
 #   resources/cgi-bin:

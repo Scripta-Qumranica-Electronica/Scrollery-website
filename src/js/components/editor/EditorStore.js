@@ -9,7 +9,7 @@ export default $i18n => {
 
   return new Store({
     state: {
-      locked: true,
+      locked: true, // Don't use this, use the data models
       showReconstructedText: true,
       font: SBLHebrew,
       fonts: {
@@ -32,6 +32,11 @@ export default $i18n => {
           name: '4Q418',
           class: 'text-4Q418',
           label: `${$i18n.str('Editor.HandOf')} 4Q418`,
+        },
+        '4Q51': {
+          name: '4Q51',
+          class: 'text-4Q51',
+          label: `${$i18n.str('Editor.HandOf')} 4Q51`,
         },
         '4Q503': {
           name: '4Q503',

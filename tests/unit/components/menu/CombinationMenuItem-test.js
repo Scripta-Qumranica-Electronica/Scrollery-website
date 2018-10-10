@@ -23,10 +23,10 @@ describe('CombinationMenuItem', function() {
           $route: {
             params: {
               scrollID: 20,
-              scrollVersionID: 324
-            }
-          }
-        }
+              scrollVersionID: 324,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })
@@ -67,10 +67,10 @@ describe('CombinationMenuItem', function() {
           $route: {
             params: {
               scrollID: combination.scroll_id,
-              scrollVersionID: combination.scroll_version_id
-            }
-          }
-        }
+              scrollVersionID: combination.scroll_version_id,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })
@@ -134,10 +134,10 @@ describe('CombinationMenuItem', function() {
           $route: {
             params: {
               scrollID: combination.scroll_id,
-              scrollVersionID: 10000001
-            }
-          }
-        }
+              scrollVersionID: 10000001,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })

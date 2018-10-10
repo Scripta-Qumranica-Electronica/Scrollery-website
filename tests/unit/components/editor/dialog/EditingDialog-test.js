@@ -1,6 +1,5 @@
 import { mount, factory } from '@test'
 
-import Sign from '~/models/Sign.js'
 import Tab from '~/components/editor/dialog/Tab.vue'
 import EditingDialog from '~/components/editor/dialog/EditingDialog.vue'
 
@@ -13,8 +12,8 @@ describe('EditingDialog', () => {
       propsData: {
         line,
         sign: line.get(0),
-        dialogVisible: true
-      }
+        dialogVisible: true,
+      },
     })
     vm = wrapper.vm
   })

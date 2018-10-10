@@ -1,9 +1,7 @@
 import { mount, factory } from '@test'
 import ColumnComponent from '~/components/editor/Column.vue'
-import Column from '~/models/Column.js'
 import editorStore from '~/components/editor/EditorStore.js'
 
-import select from '~/utils/DOMSelection.js'
 import KEY_CODES from '~/components/editor/key_codes.js'
 
 /**
@@ -24,9 +22,9 @@ const columnFactory = () => {
       // route is accessed during mount. Just need a simple
       // stub of the $route global to avoid hard errors.
       $route: {
-        params: {}
-      }
-    }
+        params: {},
+      },
+    },
   })
 }
 

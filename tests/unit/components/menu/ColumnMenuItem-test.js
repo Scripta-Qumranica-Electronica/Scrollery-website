@@ -18,7 +18,7 @@ describe('ColumnMenuItem', function() {
           scrollID: combination.scroll_id,
           scrollVersionID: combination.scroll_version_id,
           column: column,
-          corpus: corpus
+          corpus: corpus,
         },
         mocks: {
           $router: { push },
@@ -26,10 +26,10 @@ describe('ColumnMenuItem', function() {
             params: {
               scrollID: 10000001,
               scrollVersionID: 10000001,
-              colID: 10000001
-            }
-          }
-        }
+              colID: 10000001,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })
@@ -52,7 +52,7 @@ describe('ColumnMenuItem', function() {
           scrollID: combination.scroll_id,
           scrollVersionID: combination.scroll_version_id,
           column: column,
-          corpus: corpus
+          corpus: corpus,
         },
         mocks: {
           $router: { push },
@@ -60,10 +60,10 @@ describe('ColumnMenuItem', function() {
             params: {
               scrollID: combination.scroll_id,
               scrollVersionID: 10000001,
-              colID: 10000001
-            }
-          }
-        }
+              colID: 10000001,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })
@@ -86,7 +86,7 @@ describe('ColumnMenuItem', function() {
           scrollID: combination.scroll_id,
           scrollVersionID: combination.scroll_version_id,
           column: column,
-          corpus: corpus
+          corpus: corpus,
         },
         mocks: {
           $router: { push },
@@ -94,10 +94,10 @@ describe('ColumnMenuItem', function() {
             params: {
               scrollID: combination.scroll_id,
               scrollVersionID: 10000001,
-              colID: column.col_id
-            }
-          }
-        }
+              colID: column.col_id,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })
@@ -120,7 +120,7 @@ describe('ColumnMenuItem', function() {
           scrollID: combination.scroll_id,
           scrollVersionID: combination.scroll_version_id,
           column: column,
-          corpus: corpus
+          corpus: corpus,
         },
         mocks: {
           $router: { push },
@@ -128,10 +128,10 @@ describe('ColumnMenuItem', function() {
             params: {
               scrollID: combination.scroll_id,
               scrollVersionID: combination.scroll_version_id,
-              colID: 10000001
-            }
-          }
-        }
+              colID: 10000001,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })
@@ -154,7 +154,7 @@ describe('ColumnMenuItem', function() {
           scrollID: combination.scroll_id,
           scrollVersionID: combination.scroll_version_id,
           column: column,
-          corpus: corpus
+          corpus: corpus,
         },
         mocks: {
           $router: { push },
@@ -162,10 +162,10 @@ describe('ColumnMenuItem', function() {
             params: {
               scrollID: combination.scroll_id,
               scrollVersionID: combination.scroll_version_id,
-              colID: column.col_id
-            }
-          }
-        }
+              colID: column.col_id,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })

@@ -1,6 +1,7 @@
 const app = require('./app.js')
 const webpack = require('webpack')
 const middleware = require('webpack-dev-middleware')
+const proxy = require('http-proxy-middleware')
 const conf = require('./../webpack.server.js')
 const compiler = webpack(conf)
 
@@ -16,6 +17,18 @@ app.get(/.*/, (req, res, next) => {
   }
 })
 
-app.listen(process.env.PORT || 9090, () =>
+/**
+ * These two lines and the 'upgrade' below take care of proxying
+ * the websocket.  It seems that in development, socket.io
+ * is falling back to long polling, since the connection cannot
+ * be upgraded to ws.  I don't know how to fix this, but it does
+ * not seem to interfere with development usign socket.io.
+ */
+const wsProxy = proxy('ws://localhost:6333')
+app.use('/socket.io', wsProxy)
+    
+const server = app.listen(process.env.PORT || 9090, () =>
   console.log(`SQE server listening on port ${process.env.PORT || 9090}!`)
 )
+
+server.on('upgrade', wsProxy.upgrade)

@@ -1,12 +1,14 @@
 <template>
   <div class="attribute-search">
     <el-autocomplete
+    <!--  class="attribute-input"-->
+    <el-autocomplete
       class="attribute-input"
       v-model="attribute"
-      placeholder="seach attributes"
       value-key="name"
-      :fetch-suggestions="search"
+      :fetch-suggestions="querySearch"
       :clearable="true"
+      placeholder="seach attributes"
       @select="handleSelect"
     />
   </div>
@@ -15,9 +17,13 @@
 
 <script>
 export default {
+  props: {
+    corpus: undefined,
+    sign_char_id: undefined,
+    scroll_version_id: undefined,
+  },
   data() {
     return {
-      allAttributes: [],
       attribute: '',
     }
   },
@@ -28,29 +34,34 @@ export default {
      * @param {string} queryString the input to search by
      * @param {function} cb        A callback to call with the results
      */
-    search(queryString, cb) {
-      const re = new RegExp(queryString, 'i')
-      cb(this.allAttributes.filter(({ name }) => re.test(name)))
+    querySearch(queryString, cb) {
+      var links = []
+      for (const key in this.corpus.signCharAttributeList._items) {
+        links.push({
+          key: key,
+          name: `${this.corpus.signCharAttributeList.get(key).attribute_name}: 
+          ${this.corpus.signCharAttributeList.get(key).attribute_value_name}`,
+        })
+      }
+      var results = queryString ? links.filter(this.createFilter(queryString)) : links
+      // call callback function to return suggestions
+      cb(results)
+    },
+
+    createFilter(queryString) {
+      return link => {
+        return link.name.toLowerCase().indexOf(queryString.toLowerCase()) > -1
+      }
     },
 
     /**
      * The user has selected an existing attribute
      *
-     * @todo implement
      */
-    handleSelect({ name }) {
-      const attribute = this.$store.getters.attributes[name]
-
-      this.$emit('add-attribute', attribute)
+    handleSelect({ key, name }) {
+      console.log(key, name, this.sign_id)
+      this.corpus.signChars.addSignAttribute(this.sign_char_id, this.scroll_version_id, key)
     },
-  },
-  mounted() {
-    const list = []
-    for (let name in this.$store.getters.attributes) {
-      list.push({ name })
-    }
-
-    this.allAttributes = list
   },
 }
 </script>

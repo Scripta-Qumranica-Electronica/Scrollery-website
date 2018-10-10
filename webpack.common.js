@@ -72,8 +72,23 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              outputPath: 'fonts',
-              publicPath: 'fonts/'
+              outputPath: 'dist/assets/fonts',
+              publicPath: 'dist/assets/fonts/'
+            }
+          }
+        ]
+      },
+      {
+        test: /\.(png|xml|ico|svg|webmanifest)$/,
+        include: [
+            path.resolve(__dirname, "assets/favicon")
+        ],
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              outputPath: './assets/favicon',
+              publicPath: './assets/favicon/'
             }
           }
         ]

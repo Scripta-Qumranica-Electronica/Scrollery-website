@@ -27,10 +27,10 @@ describe('ImageMenuItem', function() {
             params: {
               scrollID: 20,
               scrollVersionID: 324,
-              imageID: 23
-            }
-          }
-        }
+              imageID: 23,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })
@@ -65,10 +65,10 @@ describe('ImageMenuItem', function() {
             params: {
               scrollID: combination.scroll_id,
               scrollVersionID: 324,
-              imageID: 23
-            }
-          }
-        }
+              imageID: 23,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })
@@ -100,10 +100,10 @@ describe('ImageMenuItem', function() {
             params: {
               scrollID: combination.scroll_id,
               scrollVersionID: combination.scroll_version_id,
-              imageID: 23
-            }
-          }
-        }
+              imageID: 23,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })
@@ -135,10 +135,10 @@ describe('ImageMenuItem', function() {
             params: {
               scrollID: combination.scroll_id,
               scrollVersionID: combination.scroll_version_id,
-              imageID: image.image_catalog_id
-            }
-          }
-        }
+              imageID: image.image_catalog_id,
+            },
+          },
+        },
       })
       vm = wrapper.vm
     })

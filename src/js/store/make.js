@@ -10,6 +10,7 @@ export default function(Vuex, sessionID = '') {
       working: 0,
       lockedScrolls: {},
       signAttributeList: {},
+      imageProxy: '',
     },
     getters: {
       sessionID: state => state.sessionID,
@@ -25,6 +26,7 @@ export default function(Vuex, sessionID = '') {
       },
       attributes: state => state.signAttributeList,
       cannonicalAttribute: state => name => state.signAttributeList[name],
+      imageProxy: state => state.imageProxy,
     },
     mutations: {
       logout(state) {
@@ -90,6 +92,9 @@ export default function(Vuex, sessionID = '') {
             })
           }
         })
+      },
+      setImageProxy(state, imageProxy) {
+        state.imageProxy = imageProxy
       },
     },
   })

@@ -1,4 +1,4 @@
-import { mount } from '@test'
+import { mount } from '@test/'
 import CommentsEditor from '~/components/editor/dialog/CommentsEditor.vue'
 
 describe('CommentsEditor', () => {
@@ -7,8 +7,8 @@ describe('CommentsEditor', () => {
   beforeEach(() => {
     wrapper = mount(CommentsEditor, {
       propsData: {
-        initialText: initialText
-      }
+        initialText: initialText,
+      },
     })
     vm = wrapper.vm
   })

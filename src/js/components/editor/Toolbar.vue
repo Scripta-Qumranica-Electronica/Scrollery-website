@@ -3,11 +3,11 @@
     <div class="toolbar-item float-left">
       <i 
         class="fa locked-icon" 
-        :class="{'fa-lock': state.getters.locked, 'fa-unlock': !state.getters.locked}" 
-        :style="{color: state.getters.locked ? 'red' : 'green'}"
+        :class="{'fa-lock': !is_locked, 'fa-unlock': is_locked}" 
+        :style="{color: !is_locked ? 'red' : 'green'}"
       ></i>
     </div>
-    <div class="inline toolbar-right" v-show="!state.getters.locked">
+    <div class="inline toolbar-right">
       <button id="editor-fullscreen" class="inline toolbar-item toolbar-button" @click="$emit('open-sign-editor')">
           Open Sign Editor
       </button>
@@ -37,12 +37,19 @@ import { Store } from 'vuex'
 
 export default {
   props: {
+    corpus: undefined,
     state: {
       type: Store,
       required: true,
     },
   },
   computed: {
+    is_locked() {
+      return this.corpus.combinations.get(this.$route.params.scrollVersionID) &&
+        this.corpus.combinations.get(this.$route.params.scrollVersionID).locked
+        ? false
+        : true
+    },
     /**
      * @type {object} an object representing the current font in use
      */

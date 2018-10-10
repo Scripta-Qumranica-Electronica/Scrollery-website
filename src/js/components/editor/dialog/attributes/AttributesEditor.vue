@@ -1,7 +1,9 @@
 <template>
   <section>
     <attribute-search
-      @add-attribute="addNewAttribute"
+      :corpus="corpus"
+      :sign_char_id="corpus.signChars.get(corpus.signs.getSignChar(sign, scroll_version_id), scroll_version_id).sign_char_id"
+      :scroll_version_id="scroll_version_id"
     />
     <table class="attributes-table">
       <thead>
@@ -12,14 +14,15 @@
         <th>Actions</th>
       </thead>
       <tbody>
-        <attribute-row v-for="attribute in attributes"
-          :key="attribute.getUUID()"
-          :attribute="attribute"
-          :sign="sign"
+        <attribute-row 
+          v-for="attribute in corpus.signChars.get(corpus.signs.getSignChar(sign, scroll_version_id), scroll_version_id).attribute_values"
+          :key="`attribute-${attribute.value}`"
+          :corpus="corpus"
+          :attribute_value="attribute.value"
+          :sign_char_attribute_id="attribute.sign_char_attribute_id"
+          :sign_char_id="corpus.signs.getSignChar(sign, scroll_version_id)"
+          :scroll_version_id="scroll_version_id"
           :class="selectedAttribute === attribute.attribute_id ? 'selected-char-attribute' : ''"
-          @delete-attribute="deleteAttribute(attribute.getUUID())"
-          @selectAttribute="selectAttribute"
-          @refresh="$emit('refresh')"
         />
       </tbody>
     </table>
@@ -27,22 +30,19 @@
 </template>
 
 <script>
-// models
-import Sign from '~/models/Sign.js'
-
 // components
 import AttribueSearch from './AttributeSearch.vue'
-import Attribute from './Attribute.vue'
+import AttributeRow from './AttributeRow.vue'
 
 export default {
   components: {
-    'attribute-row': Attribute,
+    'attribute-row': AttributeRow,
     'attribute-search': AttribueSearch,
   },
   props: {
-    sign: {
-      type: Sign,
-    },
+    sign: undefined,
+    corpus: undefined,
+    scroll_version_id: undefined,
   },
   data() {
     return {
@@ -73,16 +73,8 @@ export default {
       this.$emit('selectAttribute', attribute)
     },
   },
-  watch: {
-    sign() {
-      this.attributes = this.sign ? this.sign.getMainChar().attributes.items() : []
-    },
-  },
-  mounted() {
-    if (this.sign) {
-      this.attributes = this.sign.getMainChar().attributes.items()
-    }
-  },
+  watch: {},
+  mounted() {},
 }
 </script>
 

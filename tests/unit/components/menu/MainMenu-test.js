@@ -13,8 +13,8 @@ describe('MainMenu', function() {
       propsData: {
         corpus: corpus,
         open: true,
-        keepOpen: true
-      }
+        keepOpen: true,
+      },
     })
     vm = wrapper.vm
   })

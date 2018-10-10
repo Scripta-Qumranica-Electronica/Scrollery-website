@@ -21,16 +21,16 @@ sub processCGI {
 
 	my %actions = (
 		validateSession => \&validateSession,
-		getCombs => \&getCombs,
+		requestCombs => \&requestCombs,
     getImages => \&getImages,
-		getArtOfComb => \&getArtOfComb,
-		getArtOfImage => \&getArtOfImage,
-		getImgOfComb => \&getImgOfComb,
-		getColOfComb => \&getColOfComb,
+		requestArtOfComb => \&requestArtOfComb,
+		requestArtOfImage => \&requestArtOfImage,
+		requestImgOfComb => \&requestImgOfComb,
+		requestColOfComb => \&requestColOfComb,
 		getSignStreamOfColumn => \&getSignStreamOfColumn,
 		getSignStreamOfFrag => \&getSignStreamOfFrag,
 		getImagesOfFragment => \&getImagesOfFragment,
-		imagesOfInstFragments => \&imagesOfInstFragments,
+		requestImagesOfInstFragments => \&requestImagesOfInstFragments,
 		getInstitutionArtefacts => \&getInstitutionArtefacts,
 		getScrollWidth => \&getScrollWidth,
 		getScrollHeight => \&getScrollHeight,
@@ -60,12 +60,12 @@ sub processCGI {
     getSignCharAttributeCommentary => \& getSignCharAttributeCommentary,
 		addRoiToScroll => \&addRoiToScroll,
 		removeROI => \&removeROI,
-		getRoiOfCol => \&getRoiOfCol,
+		requestRoiOfCol => \&requestRoiOfCol,
 		getRoisOfCombination => \&getRoisOfCombination,
-		getTextOfFragment => \&getTextOfFragment,
-		getListOfAttributes => \&getListOfAttributes,
+		requestTextOfFragment => \&requestTextOfFragment,
     changeColName => \&changeColName,
-    changeCombinationName => \&changeCombinationName
+    changeCombinationName => \&changeCombinationName,
+    requestListOfAttributes => \&requestListOfAttributes
 	);
 	my $json_post = $cgi->{CGIDATA};
 
@@ -157,7 +157,7 @@ sub validateSession {
 	return;
 }
 
-sub getCombs {
+sub requestCombs {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getCombsQuery = <<'MYSQL';
 SELECT DISTINCT 
@@ -206,7 +206,7 @@ MYSQL
 	return;
 }
 
-sub getArtOfComb {
+sub requestArtOfComb {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT artefact.artefact_id AS artefact_id,
@@ -232,9 +232,9 @@ MYSQL
 	return;
 }
 
-sub getArtOfImage {
+sub requestArtOfImage {
 	my ($cgi, $json_post) = @_;
-	my $getArtOfImageQuery = <<'MYSQL';
+	my $requestArtOfImageQuery = <<'MYSQL';
 SELECT DISTINCT	artefact_position.artefact_position_id AS artefact_position_id,
 				artefact_shape.artefact_shape_id AS artefact_shape_id,
 				artefact_position.artefact_id AS artefact_id,
@@ -259,7 +259,7 @@ WHERE SQE_image.image_catalog_id = ?
 			AND artefact_position_owner.scroll_version_id = ?
       AND artefact_data_owner.scroll_version_id = ?
 MYSQL
-	my $sql = $cgi->dbh->prepare_cached($getArtOfImageQuery) or die
+	my $sql = $cgi->dbh->prepare_cached($requestArtOfImageQuery) or die
 		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
 	$sql->execute($json_post->{image_catalog_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id}, $json_post->{scroll_version_id});
 
@@ -267,7 +267,7 @@ MYSQL
 	return;
 }
 
-sub getImgOfComb {
+sub requestImgOfComb {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getColOfCombQuery = <<'MYSQL';
 SELECT DISTINCT image_catalog.catalog_number_1 AS lvl1,
@@ -284,7 +284,7 @@ FROM image_catalog
   JOIN scroll_version USING(scroll_version_group_id)
   LEFT JOIN SQE_image USING(image_catalog_id)
   LEFT JOIN artefact_shape ON artefact_shape.id_of_sqe_image = SQE_image.sqe_image_id
-  JOIN artefact_shape_owner USING(artefact_shape_id)
+  LEFT JOIN artefact_shape_owner USING(artefact_shape_id)
 WHERE (scroll_version.scroll_version_id = ?
   OR artefact_shape_owner.scroll_version_id = ?)
   AND (SQE_image.is_master = 1 OR SQE_image.is_master IS NULL) 
@@ -298,7 +298,7 @@ MYSQL
 	return;
 }
 
-sub getColOfComb {
+sub requestColOfComb {
 	my ($cgi, $json_post) = @_;
   my $cols = $cgi->get_cols_for_scrollversion($json_post->{scroll_version_id});
   print "{\"results\":$cols}";
@@ -417,7 +417,7 @@ MYSQL
 	return;
 }
 
-sub imagesOfInstFragments {
+sub requestImagesOfInstFragments {
 	my ($cgi, $json_post, $key, $lastItem) = @_;
 	my $getInstitutionFragmentsQuery = <<'MYSQL';
 SELECT DISTINCT	SQE_image.sqe_image_id,
@@ -736,8 +736,35 @@ sub addSigns() {
 		if ($counter == 1) {
 			$prev_sign_id = $sign->{previous_sign_id};
 		}
-		$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $next_sign_id);
-		print "\"$sign->{uuid}\":$prev_sign_id";
+		if (scalar @{$sign->{attribute_value_ids}} > 0) {
+			$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $next_sign_id, @{$sign->{attribute_value_ids}});
+		} else {
+			$prev_sign_id = $cgi->insert_sign($sign->{sign}, $prev_sign_id, $next_sign_id);
+		}
+		print "\"$sign->{uuid}\":{\"sign_id\":$prev_sign_id";
+		
+		# Now let's grab the new sign_char_id as well.
+		my $signCharQuery = <<'MYSQL';
+		SELECT sign_char_id
+		FROM sign_char
+		WHERE sign_id = ?
+MYSQL
+		my $sql = $cgi->dbh->prepare_cached($signCharQuery) or die
+				",\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+		$sql->execute($prev_sign_id);
+		
+		#TODO: we need to also grab all sign_char_attribute_ids as an array.
+		while (my $result = $sql->fetchrow_hashref){
+			my $new_id = $result->{sign_char_id};
+			# if ($sign->{attribute_value_ids} > 1) {
+   #  		my $attr_id = $cgi->set_sign_char_attribute(
+			# 		$new_id, 
+			# 		$sign->{attribute_value_ids});
+			# }
+			print ",\"sign_char_id\":$new_id}";
+    }
+		 	
+		
 		if ($counter != $repeatLength) {
 			print "},{";
 			$counter++;
@@ -933,7 +960,7 @@ sub removeROI() {
 	$cgi->remove_roi($json_post->{sign_char_roi_id});
 }
 
-sub getRoiOfCol() {
+sub requestRoiOfCol() {
 	my ($cgi, $json_post) = @_;
 
 	my $sqlQuery = <<'MYSQL';
@@ -992,28 +1019,12 @@ MYSQL
 	return;
 }
 
-sub getTextOfFragment() {
+sub requestTextOfFragment() {
 	my ($cgi, $json_post) = @_;
 	$cgi->set_scrollversion($json_post->{scroll_version_id});
 	print "{";
 	$cgi->get_text_of_fragment($json_post->{col_id}, 'SQE_Format::JSON');
 	print "}";
-}
-
-sub getListOfAttributes() {
-	my ($cgi, $json_post) = @_;
-	my $query = <<'MYSQL';
-	SELECT attribute.attribute_id, name, type, attribute.description AS attribute_description,
-		attribute_value_id, string_value, attribute_value.description AS attribute_value_description
-	FROM attribute
-	JOIN attribute_value USING(attribute_id)
-MYSQL
-	my $sql = $cgi->dbh->prepare_cached($query) or die
-		"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
-	$sql->execute();
-
-	readResults($sql);
-	return;
 }
 
 # This seems to run without error, but the relevant data
@@ -1036,6 +1047,27 @@ sub changeCombinationName() {
 	$cgi->change_scroll_name($json_post->{name});
   print '{"name":"' . $json_post->{name} . 
     '","scroll_version_id":' . $json_post->{scroll_version_id} . '}';
+}
+
+sub requestListOfAttributes() {
+	my ($cgi, $json_post, $key, $lastItem) = @_;
+	my $getAttrsQuery = <<'MYSQL';
+SELECT	attribute.attribute_id, 
+				attribute_value_id, 
+				string_value AS attribute_value_name,
+				attribute_value.description AS attribute_value_description, 
+				attribute.name AS attribute_name, 
+				attribute.description AS attribute_description, 
+				type
+FROM attribute_value
+JOIN attribute USING(attribute_id)
+MYSQL
+	my $sql = $cgi->dbh->prepare_cached($getAttrsQuery) or die
+			"{\"Couldn't prepare statement\":\"" . $cgi->dbh->errstr . "\"}";
+	$sql->execute();
+
+	readResults($sql, $key, $lastItem);
+	return;
 }
 
 processCGI();

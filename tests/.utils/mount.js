@@ -50,6 +50,6 @@ function storageMock() {
     key: function(i) {
       var keys = Object.keys(storage)
       return keys[i] || null
-    }
+    },
   }
 }

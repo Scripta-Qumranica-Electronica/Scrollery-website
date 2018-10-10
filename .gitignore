@@ -1,10 +1,8 @@
 .vstags
 .vscode
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/settings.json
-
+.c9
 .idea
+.pv
 yarn-error.log
 node_modules
 dist
@@ -16,3 +14,4 @@ resources/cgi-bin/local
 resources/perl-libs
 resources/data-files
 resources/data-backup
+resources/socket/node_modules

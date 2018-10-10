@@ -11,8 +11,8 @@ describe('Workbench', () => {
       mocks: {
         $post: function() {
           return $postPromise
-        }
-      }
+        },
+      },
     })
     vm = wrapper.vm
   })

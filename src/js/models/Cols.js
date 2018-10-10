@@ -1,14 +1,31 @@
-import ItemList from './ItemList.js'
-import Col from './Col.js'
+import ItemListOrdered from './ItemListOrdered.js'
+// import Col from './Col.js'
 
-export default class Cols extends ItemList {
+export default class Cols extends ItemListOrdered {
   constructor(corpus, idKey, defaultPostData = undefined) {
     idKey = idKey || 'col_id'
     const listType = 'cols'
     const connectedLists = [corpus.combinations,]
     const relativeToScrollVersion = true
-    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'getColOfComb', }
-    super(corpus, idKey, Col, listType, connectedLists, relativeToScrollVersion, defaultPostData)
+    defaultPostData = defaultPostData ? defaultPostData : { transaction: 'requestColOfComb' }
+    super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
+
+    // Setup socket.io listeners
+    this.socket.on('receiveColOfComb', msg => {
+      this.corpus.response(this.processPopulate(msg))
+    })
+  }
+
+  formatRecord(record) {
+    return {
+      name: record.name,
+      col_id: ~~record.col_id, // Ensure positive integer with bitwise operator
+      scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
+      lines: record.lines || [],
+      rois: record.rois || [],
+      col_sign_id: ~~record.col_sign_id, // Ensure positive integer with bitwise operator
+      sign_ids: record.signs || [],
+    }
   }
 
   /* istanbul ignore next */

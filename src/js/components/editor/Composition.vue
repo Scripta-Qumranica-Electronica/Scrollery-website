@@ -1,20 +1,17 @@
+<!--Do we really need this at all?-->
 <template>
     <section class="editor">
       <column
-        v-for="(column, columnIndex) of columns"
-        :key="columnIndex + column.id"
         :state="state"
-        :column="column"
-        :toolbar="toolbar"
+        :toolbarDialogVisible="toolbarDialogVisible"
         :messageBar="messageBar"
-        @refresh="$emit('refresh')"
+        :corpus="corpus"
       />
     </section>
 </template>
 
 <script>
 import MessageBar from './MessageBar.vue'
-import Composition from '~/models/Composition.js'
 import Column from './Column.vue'
 
 export default {
@@ -23,22 +20,15 @@ export default {
     'message-bar': MessageBar,
   },
   props: {
-    text: {
-      default() {
-        return new Composition()
-      },
-    },
     state: {
       required: true,
     },
     toolbar: null,
     messageBar: null,
+    corpus: undefined,
+    toolbarDialogVisible: undefined,
   },
-  computed: {
-    columns() {
-      return this.text.items()
-    },
-  },
+  computed: {},
 }
 </script>
 

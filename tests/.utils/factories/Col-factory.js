@@ -6,7 +6,7 @@ const props = attrs =>
     {
       col_id: faker.random.number(1000000),
       name: faker.random.word(),
-      rois: []
+      rois: [],
     },
     attrs
   )

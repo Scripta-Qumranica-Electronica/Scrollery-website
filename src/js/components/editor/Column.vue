@@ -1,50 +1,47 @@
 <template>
-  <div class="editor-column">
-    <div
-      class="text-col inline"
-      :class="[
+  <div @mouseenter="active = true" 
+  @mouseleave="active = false"
+  class="editor-column" 
+  :class="[
         state.getters.font ? state.getters.font.class : `text-sbl-hebrew`,
         state.getters.showReconstructedText ? '' : 'hide-reconstructed-text'
       ]"
-      dir="rtl" 
-      :contenteditable="isEditable"
-      ref="colNode"
-      @scroll="handleColScroll"
-      @keydown="onKeydown" 
-      @input="onInput"
-      @paste="onPaste"
-      @copy="onCopy"
-      @cut="onCut"
-      v-html="colHtmlString"
-    >
-    </div><div class="line-number-col inline" ref="lineNode" :style="lineNodeStyle">
-        <p class="line-number" v-for="(line, lineIndex) of column.items()" :key="line.id">{{ lineIndex + 1 }}</p>
+  v-if="corpus.cols.get(col_id, scroll_version_id) && corpus.cols.get(col_id, scroll_version_id).col_sign_id">
+    <p class="col">{{corpus.cols.get(col_id, scroll_version_id).name}}</p>
+    <div v-for="line in lineList(corpus.cols.get(col_id, scroll_version_id).col_sign_id)"
+    @click="currentLine = line">
+      <span>{{corpus.lines.get(line, scroll_version_id).name}}</span>
+      <span 
+      v-for="sign in signList(corpus.lines.get(line, scroll_version_id).line_sign_id)"
+      :class="`sign ${signClass(sign)} ${active && startSign === sign ? 'in-focus' : ''} ${corpus.combinations.get(scroll_version_id).locked === 0 ? 'unlocked' : ''}`"
+      @mousedown="startSign = sign; signRange = undefined"
+      @mouseup="(startSign !== sign) && range(sign)"
+      >{{corpus.signChars.get(corpus.signs.getSignChar(sign, scroll_version_id), scroll_version_id).char}}</span>
     </div>
+    
     <editing-dialog
-      :line="dialogLine"
-      :sign="dialogSign"
-      :dialogVisible="dialogVisible"
-      @close="onDialogClosed"
-      @refresh="$emit('refresh')"
-      @change-sign="onDialogChangeSign"
+      v-if="currentLine"
+      :line="currentLine"
+      :sign="startSign"
+      :corpus="corpus"
+      :scroll_version_id="~~scroll_version_id"
+      :dialogVisible="is_locked && toolbarDialogVisible !== dialogVisible"
+      @close="dialogVisible = !dialogVisible"
     />
+    
+    <!--Note: I thought something like this would walk the list in the template.-->
+    <!--It does seem to walk the linked-list, but does not return the proper-->
+    <!--sign_ids and it is really slow.-->
+    <!--<div v-if="corpus.cols.get(col_id, scroll_version_id) && (sign_id = corpus.cols.get(col_id, scroll_version_id).col_sign_id)">-->
+    <!--  <span v-for="sign_id in corpus.signs.get(sign_id).next_sign_ids[0]"-->
+    <!--  @click="startSign = sign_id"-->
+    <!--  >{{sign_id}}, </span>-->
+    <!--</div>-->
   </div>
 </template>
 
 <script>
-import throttle from 'lodash/throttle'
-import KEYS from './key_codes.js'
-
-// components
 import EditingDialog from './dialog/EditingDialog.vue'
-
-// controllers
-import ColumnPersistanceService from '~/controllers/column-persistance-service.js'
-
-// models
-import Column from '~/models/Column.js'
-import Line from '~/models/Line.js'
-import Sign from '~/models/Sign.js'
 
 export default {
   components: {
@@ -52,381 +49,240 @@ export default {
   },
   data() {
     return {
-      colHtmlString: '',
-
-      // props that will be passed into the editor dialog
-      dialogSign: null,
-      dialogLine: null,
+      col_id: undefined,
+      scroll_version_id: undefined,
+      startSign: undefined,
+      signRange: undefined,
+      currentLine: undefined,
+      active: false,
       dialogVisible: false,
-
-      // handles column scrolling
-      // to keep the lineNode and colNode in sync
-      handleColScroll: () => {
-        if (!this.scrollHandled) {
-          this.scrollHandled = true
-          requestAnimationFrame(() => {
-            this.$refs.lineNode.scrollTop = this.$refs.colNode.scrollTop
-            this.scrollHandled = false
-          })
-        }
-      },
     }
   },
   props: {
-    column: {
-      required: true,
-      type: Column,
-    },
+    corpus: undefined,
     state: {
       required: true,
     },
-    messageBar: null,
-    toolbar: null,
+    toolbarDialogVisible: undefined,
   },
   computed: {
-    isEditable() {
-      return !this.state.getters.locked
+    is_locked() {
+      return this.corpus.combinations.get(this.$route.params.scrollVersionID) &&
+        this.corpus.combinations.get(this.$route.params.scrollVersionID).locked
+        ? false
+        : true
     },
-    lineNodeStyle() {
-      return {
-        height: this.$refs.colNode ? this.$refs.colNode.scrollHeight : '100%',
+    signClass() {
+      return sign => {
+        let cssString = this.corpus.signChars.get(
+          this.corpus.signs.getSignChar(sign, this.scroll_version_id),
+          this.scroll_version_id
+        )
+          ? [].concat(
+              ...this.corpus.signChars
+                .get(
+                  this.corpus.signs.getSignChar(sign, this.scroll_version_id),
+                  this.scroll_version_id
+                )
+                .attribute_values.map(a => a.value)
+            )
+          : []
+        if (cssString.indexOf(20) === -1) cssString.push('IS_RECONSTRUCTED_FALSE')
+        return cssString.join(' ')
       }
     },
+  },
+  created() {
+    window.addEventListener('keydown', e => {
+      // function getNextSign() {
+      //   let { line_id, sign_id } = this.corpus.signs.nextSignLetter(
+      //     this.startSign,
+      //     this.scroll_version_id,
+      //     this.col_id,
+      //     this.currentLine
+      //   )
+
+      //   return { line_id, sign_id }
+      // }
+
+      if (
+        // Don't allow changes to locked scrolls.
+        this.is_locked &&
+        // Don't allow more changes when changes are being processed.
+        this.corpus.transactions.unfinished === 0 &&
+        // Don't allow changes when the editor dialog is open.
+        this.toolbarDialogVisible === this.dialogVisible &&
+        this.active &&
+        this.startSign
+      ) {
+        if (e.key === 'ArrowLeft') {
+          this.goLeft()
+        }
+
+        if (e.key === 'ArrowRight') {
+          let { line_id, sign_id } = this.corpus.signs.prevSignLetterInCol(
+            this.startSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+          this.startSign = sign_id
+          this.currentLine = line_id
+        }
+
+        if (e.key === 'ArrowDown') {
+          let { line_id, sign_id } = this.corpus.signs.getSignInNextLine(
+            this.startSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+          this.startSign = sign_id
+          this.currentLine = line_id
+        }
+
+        if (e.key === 'ArrowUp') {
+          let { line_id, sign_id } = this.corpus.signs.getSignInPrevLine(
+            this.startSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+          this.startSign = sign_id
+          this.currentLine = line_id
+        }
+
+        if (e.key === 'Meta') {
+          // Do nothing or something wonderful!!!
+        }
+
+        if (e.key === 'Shift') {
+          // Do nothing or something wonderful!!!
+        }
+
+        if (e.key === 'Backspace') {
+          this.deletePrevSign()
+        } else if (e.key === 'Delete') {
+          // GO left, and then delete one sign
+          var noLastSign = this.goLeft()
+          if (noLastSign) {
+            this.deletePrevSign()
+          }
+          // // Find the next sign, which is going to be the current sign after the deletion
+          // const { next_line_id, next_sign_id } = this.getNextSign()
+  
+          // // Delete the current sign
+          // this.corpus.signs.deleteSign(
+          //   this.startSign,
+          //   this.scroll_version_id,
+          //   this.col_id,
+          //   this.currentLine
+          // )
+
+          // this.startSign = next_sign_id
+          // this.line_id = next_line_id
+
+          // Set the current sign to the previously-next-sign
+        } else {
+          if (e.key.length === 1) {
+            this.corpus.signs.addSignBefore(
+              this.startSign,
+              e.key,
+              this.scroll_version_id,
+              this.col_id,
+              this.currentLine
+            )
+          }
+        }
+      }
+    })
   },
   methods: {
-    /**
-     * The converse of reset. Synchronize the column model to the current DOM column
-     *
-     * @param {HTMLElement} colNode  the DOM element corresponding to this column
-     */
-    synchronize(colNode) {
-      // first, gather up the target represenation from the DOM
-      let target = []
-      for (let i = 0, n = colNode.children.length; i < n; i++) {
-        let child = colNode.children[i]
-        target.push({
-          id: child.dataset.lineId,
-          text: child.innerText,
-        })
-      }
-      // second, apply to the column model
-      this.column.synchronizeTo(target)
+    getNextSign() {
+      let { line_id, sign_id } = this.corpus.signs.nextSignLetter(
+          this.startSign,
+          this.scroll_version_id,
+          this.col_id,
+          this.currentLine
+        )
+      return { line_id, sign_id }
     },
 
-    /**
-     * For contenteditable divs, the only place we can stop input ... is before keyup
-     *
-     * Thus, we can intercept some events here, and stub in our own if need be.
-     */
-    onKeydown(e) {
-      if (e.metaKey) {
-        this.processMetaInput(e)
-      }
+    goLeft() {
+      let {sign_id, line_id} = this.getNextSign();
+
+      var signFlag = this.startSign !== sign_id
+      this.startSign = sign_id
+      this.currentLine = line_id
+      
+      return signFlag
+    }, 
+
+    deletePrevSign() {
+      const signToDelete = this.corpus.signs.prevSignInCol(
+            this.startSign,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
+          this.corpus.signs.deleteSign(
+            signToDelete.sign_id,
+            this.scroll_version_id,
+            this.col_id,
+            this.currentLine
+          )
     },
 
-    /**
-     * Handle meta-key inputs (exact meta key varies by OS. Thes are usually hot keys,
-     *
-     * OS:
-     *  - mac: CMD + key
-     *  - windows: ctl + key
-     *
-     * @param {KeyboardEvent} e triggered event
-     */
-    processMetaInput(e) {
-      switch (e.keyCode) {
-        /* disallowed actions */
-        case KEYS.ALPHA.I: // meta + i = italic
-        case KEYS.ALPHA.B: // meta + b = bold
-          e.preventDefault()
-          break
-
-        case KEYS.ALPHA.O: // meta + o = open dialog
-          this.openDialog(e)
-          break
-      }
+    range(sign) {
+      // here we will calculate all signs between two,
+      // this can be used to select a bunch of signs and
+      // delete them, or replace them.
+      this.signRange = this.corpus.signs.getSignRange(this.startSign, sign)
+      if (this.signRange) console.log(this.signRange)
     },
 
-    /**
-     * Synchronizes the model with a new line
-     *
-     * @param {KeyboardEvent} e triggered event
-     */
-    insertLineAtSelection(e, { line, node }) {
-      // whereas the line model still reflects the previous state
-      // the node should be the newly inserted bit.
-      let newLine = this.column.splitLine(line, line.length - node.innerText.length)
-
-      // update the lineId on the DOM for next use
-      node.dataset.lineId = newLine.getID()
-    },
-
-    /**
-     * @param {InputEvent} e
-     */
-    signsChanged(e, { line, node }) {
-      // synchronize the line > DOM
-      line.synchronizeTo(node.innerText)
-    },
-
-    /**
-     * @param {InputEvent} e
-     */
-    signsRemoved(e, { line, node }) {
-      // determine if the lines are the same as the count of <p> elements
-      // if not, then a line was deleted/merged into
-      if (node.parentElement.children.length !== this.column.length) {
-        this.synchronize(node.parentElement)
-      } else {
-        // this was a simple removal of a sign, we can handle that
-        // via a signsChanged to diff the DOM
-        this.signsChanged(e, { line, node })
-      }
-    },
-
-    /**
-     * @param {KeyboardEvent} e triggered event
-     */
-    onCut(e) {
-      this.onCopy(e)
-      document.execCommand('delete', true)
-      this.synchronize(this.$refs.colNode)
-    },
-
-    /**
-     * @param {KeyboardEvent} e triggered event
-     */
-    onCopy(e) {
-      // override default copy behavior
-      e.preventDefault()
-
-      // grab the document selection
-      const { focusOffset, anchorOffset, type } = document.getSelection()
-
-      // the user hasn't selected any text. ignore
-      if (type === 'Caret') {
-        return
-      }
-
-      const { line, node } = this.getSelection()
-      let transfer = {
-        text: '',
-        signs: [],
-      }
-      let startOffset = focusOffset < anchorOffset ? focusOffset : anchorOffset
-      let end = focusOffset > anchorOffset ? focusOffset : anchorOffset
-      for (let offset = startOffset; offset < end; offset++) {
-        let sign = line.get(offset)
-        transfer.text = transfer.text + sign.toString()
-        transfer.signs.push(sign)
-      }
-
-      e.clipboardData.setData('text/plain', JSON.stringify(transfer))
-    },
-
-    /**
-     * @param {KeyboardEvent} e triggered event
-     */
-    onPaste(e) {
-      e.preventDefault()
-
-      let text = e.clipboardData.getData('text/plain')
-
-      // If the string matches this pattern [{ ... }], we most likely have a stringified JSON array,
-      // in which case, the user is copying from another place in the editor
-      if (/^\{/.test(text) && /\}$/.test(text)) {
-        try {
-          const transferData = JSON.parse(text)
-          text = transferData.text
-
-          // TODO for later
-          // transferData.sign contains a stringified copy of the signs that contains
-          // their attributes and chars and whatnot.
-        } catch (err) {
-          this.messageBar.flash('Paste attempt could not be processed.', {
-            type: 'error',
-          })
+    lineList(sign) {
+      let lines = []
+      if (this.corpus.signs.get(sign) && this.corpus.signs.get(sign).line_id) {
+        lines.push(this.corpus.signs.get(sign).line_id)
+        while (
+          (sign = this.corpus.signs.getNextSign(sign)) &&
+          !this.corpus.signs.get(sign).col_id
+        ) {
+          if (this.corpus.signs.get(sign).line_id) lines.push(this.corpus.signs.get(sign).line_id)
         }
       }
-
-      document.execCommand('insertText', true, text)
-
-      // let sel = document.getSelection()
-      // let range = sel.getRangeAt(0)
-      // range.deleteContents()
-      // range.insertNode(document.createTextNode(text))
+      return lines
     },
 
-    /**
-     * @param {InputEvent} e triggered event
-     */
-    onInput(e) {
-      switch (e.inputType) {
-        case 'insertParagraph': // inserted block/paragraph
-        case 'deleteContentBackward': // deleted content. Could be line or single char
-        case 'insertText': // inserted chars
-        case 'historyUndo': // ctl-z undo
-        case 'historyRedo': // ctl-y redo
-          this.synchronize(this.$refs.colNode)
-          break
-
-        // for now, just log out what we're missing
-        default:
-          console.log('unhandle input event', e)
-          this.$emit('warning', {
-            message: 'An unhandle input event was received.',
-          })
-      }
-    },
-
-    /**
-     * Convenience method for retrieving the selected DOM node and corresponding models
-     *
-     * @returns {object} with this shape: {
-     *  line: {Line} the line model, where applicable
-     *  node: {HtmlElement} the DOM element corresponding to the line
-     * }
-     */
-    getSelection() {
-      const selection = document.getSelection()
-
-      // safeguard to ensure a workable DOM element is available
-      return !selection || !selection.anchorNode
-        ? {}
-        : this.getLineParent(selection.anchorNode, null, selection)
-    },
-
-    /**
-     * A recursive method
-     *
-     * @param {Node} domNode        a dom node to find the correlated parent
-     * @param {Node} init           the initial dom node (usually selection.anchorNode)
-     * @param {Selection} selection The full selection object
-     *
-     * @returns {object} An object containing the initial dom node, line model, sign model,
-     */
-    getLineParent(domNode, init, selection) {
-      if (domNode.tagName === 'P' && domNode.dataset && domNode.dataset.lineId !== undefined) {
-        // determine the line ID from the HTML dataset
-        const id = Number(domNode.dataset.lineId)
-
-        // find the line model
-        const line = this.column.find(line => line.id === id)
-        return {
-          init,
-          line: line || null,
-          sign: line ? line.get(selection.focusOffset) : null,
-          node: domNode,
-          selection,
+    signList(sign) {
+      let signs = []
+      if (this.corpus.signs.get(sign)) {
+        signs.push(sign)
+        while (
+          (sign = this.corpus.signs.getNextSign(sign)) &&
+          !this.corpus.signs.get(sign).line_id
+        ) {
+          signs.push(sign)
         }
       }
-
-      // recurse up the DOM
-      return domNode.parentElement
-        ? this.getLineParent(domNode.parentElement, init || domNode, selection)
-        : null
+      return signs
     },
-
-    /**
-     * Attemps to open the dialog
-     *
-     * @param {KeyboardEvent} [e] triggered event
-     */
-    openDialog(e) {
-      // prevent whatever action got us here.
-      // custom logic will take over
-      e && e.preventDefault()
-
-      const { line, sign, selection } = this.getSelection()
-
-      // todo: show UI error
-      if (!line || !sign) {
-        console.error('Unable to open dialog. Something has broken')
-        return
-      }
-
-      this.dialogLine = line
-      this.dialogSign = sign
-      this.dialogVisible = true
-
-      // disengage the persistance service so the dialog can handle
-      // all changes to signs
-      this.persistanceService.disengage()
-    },
-
-    /**
-     * Handle when the editing dialog is closed
-     *
-     * @param {mixed} args  The event args
-     */
-    onDialogClosed() {
-      this.$emit('refresh')
-      this.dialogLine = null
-      this.dialogSign = null
-      this.dialogVisible = false
-
-      // re-engage the persistance service so the dialog can handle
-      this.persistanceService.engage()
-
-      // TODO: reset selection to previous point
-    },
-
-    /**
-     * Handle when the changes it's sign
-     *
-     * @param {Sign} sign  The event args
-     */
-    onDialogChangeSign(sign) {
-      this.dialogSign = sign
-    },
-
-    wireToolbarEvents() {
-      this.toolbar.$on('open-sign-editor', () => {
-        try {
-          !this.dialogVisible && this.openDialog()
-        } catch (err) {
-          /* swallow */
-        }
-      })
-    },
-  },
-  mounted() {
-    if (this.toolbar) {
-      this.wireToolbarEvents()
-    }
-
-    this.persistanceService = new ColumnPersistanceService(
-      this.column,
-      this.$route.params.scrollVersionID,
-      this.$store.getters.sessionID
-    )
-    this.persistanceService.on('error', () => {
-      this.messageBar.flash('An error occurred attempting to save your changes.', {
-        type: 'error',
-        actionText: 'refresh data? (strongly suggested)',
-        keepOpen: true,
-        actionCallback: () => {
-          this.$emit('refresh')
-          this.messageBar.close()
-        },
-      })
-    })
-
-    this.persistanceService.on('persisted', () => {
-      this.messageBar.flash('All changes saved!', {
-        type: 'success',
-      })
-    })
-
-    setTimeout(() => this.persistanceService.engage(), 200)
-
-    this.colHtmlString = this.column.toDOMString()
   },
   watch: {
-    toolbar(toolbar) {
-      if (toolbar && (!this._wiredToolbar || toolbar !== this._wiredToolbar)) {
-        this._wiredToolbar = toolbar
-        this.wireToolbarEvents()
+    $route(to, from) {
+      if (
+        to.params.colID !== from.params.colID ||
+        to.params.scrollVersionID !== from.params.scrollVersionID
+      ) {
+        if (to.params.colID !== '~' && to.params.colID > 0) {
+          this.col_id = to.params.colID
+          this.scroll_version_id = to.params.scrollVersionID
+          this.corpus.signs.requestPopulate({
+            col_id: to.params.colID,
+            scroll_version_id: to.params.scrollVersionID,
+          })
+        }
       }
     },
   },
@@ -435,124 +291,136 @@ export default {
 
 <style lang="scss">
 @import '~sass-vars';
-
-.editor-column {
-  position: relative;
-  width: 100%;
+div.editor-column {
+  direction: rtl;
+  overflow: auto;
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
+}
 
-  & p:first-child {
-    padding-top: 7px;
+span.sign {
+  border-right: 1px solid transparent;
+  margin-left: -1px;
+  color: black;
+}
+
+span.sign.unlocked.in-focus {
+  -webkit-animation: 1s blink step-end infinite;
+  -moz-animation: 1s blink step-end infinite;
+  -ms-animation: 1s blink step-end infinite;
+  -o-animation: 1s blink step-end infinite;
+  animation: 1s blink step-end infinite;
+}
+
+@keyframes "blink" {
+  from,
+  to {
+    border-right: 1px solid black;
   }
-
-  & .text-col p,
-  & .line-number-col p {
-    margin: 0;
-    line-height: 1.25;
-    height: 37px;
-  }
-
-  &::-webkit-scrollbar {
-    display: none;
+  50% {
+    border-right: 1px solid transparent;
   }
 }
 
-.text-col {
-  height: 100%;
-  width: calc(100% - 35px);
-  overflow-x: scroll;
-
-  &:focus {
-    outline: 0 solid transparent;
+@-moz-keyframes blink {
+  from,
+  to {
+    border-right: 1px solid black;
   }
-
-  & p {
-    white-space: nowrap;
-    padding: 0 7px;
-
-    &:hover {
-      background-color: rgba($ltOrange, 0.1);
-    }
+  50% {
+    border-right: 1px solid transparent;
   }
 }
 
-.line-number-col {
-  vertical-align: top;
-  overflow: hidden;
-  width: 35px;
-  height: 100%;
-  line-height: 1.25;
-  background-color: $dkTan;
-  color: #fff;
-  text-align: left;
-  font-weight: 400;
-
-  & .line-number {
-    padding: 0 5px;
+@-webkit-keyframes "blink" {
+  from,
+  to {
+    border-right: 1px solid black;
   }
+  50% {
+    border-right: 1px solid transparent;
+  }
+}
 
-  /* account for the scrollbar in the colNode */
-  & .line-number:last-of-type {
-    padding-bottom: 20px;
+@-ms-keyframes "blink" {
+  from,
+  to {
+    border-right: 1px solid black;
+  }
+  50% {
+    border-right: 1px solid transparent;
+  }
+}
+
+@-o-keyframes "blink" {
+  from,
+  to {
+    border-right: 1px solid black;
+  }
+  50% {
+    border-right: 1px solid transparent;
   }
 }
 
 /* here are all the CSS directives for sign attributes */
-span.is_reconstructed_TRUE {
-  color: grey;
+
+/*Space character*/
+span.\32:after {
+  content: ' ';
+}
+
+/*span.\39:after {*/
+/*  content: '|';*/
+/*}*/
+
+span.\32 0 {
+  color: white;
   /* cursor does not show properly when using outline font */
-  // text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-  // padding-left: 2px;
-  // padding-right: 2px;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  margin-right: 1px;
 }
 
-/* using :before selectors causes UI problems with contenteditable */
-/* need more time to find a fix */
-// .is_reconstructed_FALSE + .is_reconstructed_TRUE:before {
+/*The following two css blocks add brackets*/
+/*around reconstructed text.*/
+
+// .IS_RECONSTRUCTED_FALSE + .\32 0:before {
 //   content: '[';
-//   color: black;
-//   // text-shadow: initial;
+//   color: initial;
+//   text-shadow: initial;
+//   margin-right: initial;
 // }
 
-// .is_reconstructed_TRUE + .is_reconstructed_FALSE:before {
+// span.\32 0 + .IS_RECONSTRUCTED_FALSE:before {
 //   content: ']';
-//   color: black;
 // }
 
-span.readability_INCOMPLETE_AND_NOT_CLEAR {
+span.\31 0 {
+  margin-left: 1em;
+}
+
+span.\31 9 {
   color: blue;
 }
 
-span.readability_INCOMPLETE_AND_NOT_CLEAR:after {
-  content: '֯';
-  color: blue;
-}
-
-.readability_INCOMPLETE_BUT_CLEAR {
+span.\31 8 {
   color: red;
 }
 
-.readability_INCOMPLETE_BUT_CLEAR:after {
-  content: 'ׄ';
-  color: red;
-}
-
-span.relative_position_ABOVE_LINE {
+span.\33 4 {
+  font-size: small;
   vertical-align: super;
 }
 
-span.relative_position_BELOW_LINE {
+span.\33 5 {
+  font-size: small;
   vertical-align: sub;
 }
 
-// span.sign_type_SPACE {
-//   padding-left: 2pt;
-//   padding-right: 2pt;
-// }
-
-div.hide-reconstructed-text p span.is_reconstructed_TRUE {
+div.hide-reconstructed-text span.\32 0 {
   opacity: 0;
+}
+
+p.col {
+  text-align: center;
+  font-weight: bold;
 }
 </style>

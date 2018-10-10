@@ -26,7 +26,7 @@
               :corpus="corpus"></single-image>
           </template>
           <template slot="paneR">
-            <editor class="pane-content"></editor>
+            <editor class="pane-content" :corpus="corpus"></editor>
           </template>
         </split-pane>
       </div>
@@ -42,6 +42,7 @@ import SingleImage from './SingleImage.vue'
 import Editor from './editor/Editor.vue'
 
 import Corpus from '~/models/Corpus.js'
+import { mapMutations } from 'vuex'
 
 export default {
   components: {
@@ -65,61 +66,62 @@ export default {
     },
   },
   created() {
+    // The imageProxy should perhaps be stored in and retrieved from the server.
+    // This is a proxy server hosted in Göttingen, it sanitizes and caches all
+    // image requests.  This allows us to always be working with SSL encrypted
+    // resources, and to force the proper CORS.
+    this.setImageProxy('https://www.qumranica.org/image-proxy?address=')
+
     // Create and populate the corpus model, with existing data
     // from the router.
     this.$store.commit('resetWorking')
-    this.$store.commit('addWorking')
 
     this.corpus = new Corpus(this.$store.state.userID, this.$store.state.sessionID)
-    this.corpus.combinations
-      .populate()
-      .then(res => {
-        // determine the locked scrolls
-        if (res && res.data && res.data.results) {
-          const scrolls = res.data.results
-          this.$store.commit(
-            'setLockedScrolls',
-            scrolls.reduce((hash, scrollVersion) => {
-              if (~~scrollVersion.locked) {
-                hash[scrollVersion.scroll_version_id] = true
-              }
-              return hash
-            }, {})
-          )
-        }
+    // Setup the sockets to gather any initial data
+    this.corpus.socket.once('receiveCombs', msg => {
+      // Check if there is already a scroll_version_id in the route.
+      // If so, load up cols and imageRefs for it.
+      if (this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~') {
+        // Now listen for completed img requests
+        this.corpus.socket.once('receiveImgOfComb', msg => {
+          // Check for an image_catalog_id in the route.
+          // If it is there, load up the artefacts.
+          if (this.$route.params.imageID) {
+            // Now listen for completed artefact requests
+            this.corpus.socket.once('receiveArtOfImage', msg => {
+              this.resetRouter()
+            })
 
-        return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
-          ? this.corpus.cols.populate({
-              scroll_version_id: this.$route.params.scrollVersionID,
-              scroll_id: this.$route.params.scrollID,
-            })
-          : undefined
-      })
-      .then(res => {
-        return this.$route.params.scrollVersionID && this.$route.params.scrollVersionID !== '~'
-          ? this.corpus.imageReferences.populate({
-              scroll_version_id: this.$route.params.scrollVersionID,
-              scroll_id: this.$route.params.scrollID,
-            })
-          : undefined
-      })
-      .then(res => {
-        return this.$route.params.imageID && this.$route.params.imageID !== '~'
-          ? this.corpus.artefacts.populate({
+            // Request artefacts
+            this.corpus.artefacts.requestPopulate({
               image_catalog_id: this.$route.params.imageID,
               scroll_version_id: this.$route.params.scrollVersionID,
             })
-          : undefined
-      })
-      .then(res => {
-        this.$store.commit('delWorking')
-        this.resetRouter()
-      })
-      .catch(err => {
-        this.$store.commit('delWorking')
-        console.error(err)
-      })
+          } else {
+            this.resetRouter()
+          }
+        })
 
+        // Request the cols and the artefacts.
+        this.corpus.cols.requestPopulate({
+          scroll_version_id: this.$route.params.scrollVersionID,
+          scroll_id: this.$route.params.scrollID,
+        })
+        this.corpus.imageReferences.requestPopulate({
+          scroll_version_id: this.$route.params.scrollVersionID,
+          scroll_id: this.$route.params.scrollID,
+        })
+      }
+    })
+    // Grab the initial combination list and everything
+    // else will fall into place
+    this.corpus.combinations.requestPopulate()
+
+    // Grab the initial list of attributes
+    this.corpus.signCharAttributeList.requestPopulate()
+
+    // TODO: work attributes into the corpus model.
+    // Change to socket.io
     this.$store.commit('addWorking')
     this.$post('resources/cgi-bin/scrollery-cgi.pl', {
       transaction: 'getListOfAttributes',
@@ -138,6 +140,8 @@ export default {
       })
   },
   methods: {
+    ...mapMutations(['setImageProxy']),
+
     /**
      * This function triggers a router change, though it copies all
      * data from the old router to the new one.  This way we do not
@@ -250,7 +254,7 @@ export default {
 }
 
 .single-image-pane {
-  background: lightgreen;
+  background: cornflowerblue;
 }
 
 .combination-pane {

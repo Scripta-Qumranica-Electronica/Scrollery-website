@@ -12,7 +12,7 @@ const plain = props =>
       cols: [],
       imageReferences: [],
       artefacts: [],
-      rois: []
+      rois: [],
     },
     props
   )

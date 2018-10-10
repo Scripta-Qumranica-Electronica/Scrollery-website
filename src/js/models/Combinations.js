@@ -1,7 +1,7 @@
-import ItemList from './ItemList.js'
-import Combination from './Combination.js'
+import ItemListOrdered from './ItemListOrdered.js'
+// import Combination from './Combination.js'
 
-export default class Combinations extends ItemList {
+export default class Combinations extends ItemListOrdered {
   constructor(corpus, idKey, defaultPostData = undefined) {
     idKey = idKey || 'scroll_version_id'
     const listType = 'combinations'
@@ -9,16 +9,29 @@ export default class Combinations extends ItemList {
     const relativeToScrollVersion = false
     defaultPostData = defaultPostData
       ? defaultPostData
-      : { transaction: 'getCombs', user_id: corpus.user, }
-    super(
-      corpus,
-      idKey,
-      Combination,
-      listType,
-      connectedLists,
-      relativeToScrollVersion,
-      defaultPostData
-    )
+      : { transaction: 'requestCombs', user_id: corpus.user }
+    super(corpus, idKey, listType, connectedLists, relativeToScrollVersion, defaultPostData)
+
+    // Setup socket.io listeners
+    this.socket.on('receiveCombs', msg => {
+      this.corpus.response(this.processPopulate(msg))
+    })
+  }
+
+  formatRecord(record) {
+    return {
+      name: record.name,
+      scroll_id: ~~record.scroll_id, // Ensure positive integer with bitwise operator
+      scroll_version_id: ~~record.scroll_version_id, // Ensure positive integer with bitwise operator
+      locked: ~~record.locked, // Ensure positive integer with bitwise operator
+      user_id: ~~record.user_id, // Ensure positive integer with bitwise operator
+      cols: record.cols || [],
+      lines: record.lines || [],
+      imageReferences: record.imageReferences || [],
+      artefacts: record.artefacts || [],
+      rois: record.rois || [],
+      initial_sign_id: record.initial_sign_id || undefined,
+    }
   }
 
   /* istanbul ignore next */
@@ -37,11 +50,6 @@ export default class Combinations extends ItemList {
         .post('resources/cgi-bin/scrollery-cgi.pl', payload)
         .then(res => {
           if (res.status === 200 && res.data && res.data.scroll_data) {
-            // We can store hashes for the returned data
-            // in the future, so we can avoid unnecessary
-            // data transmission.
-            // this._hash = res.data.hash
-
             const scroll_data = res.data.scroll_data.results[0]
             this._insertItem(new this.recordModel(scroll_data), undefined, 0)
             resolve(res)
