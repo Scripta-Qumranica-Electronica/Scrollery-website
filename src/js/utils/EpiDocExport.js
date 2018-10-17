@@ -28,7 +28,9 @@ export function parseColumnToEpiDoc(corpus, scroll_version_id, col_id) {
           <sourceDesc>
             <msDesc>
               <msIdentifier>
-                <repository>Leon Levy Dead Sea Scrolls Digital Library</repository>
+                <repository>
+                  <!-- Need IAA Metadata for this -->
+                </repository>
                 <idno>
                   <!-- We don't know this yet, since it may be more than one plate and/or fragment -->
                 </idno>
