@@ -12,6 +12,7 @@ services:
       - "3307:3306"
     volumes:
       - ./resources/data-backup:/tmp/backup
+      - sqe-mariadb:/var/lib/mysql
     networks:
       - sqe-dev
 
@@ -45,7 +46,8 @@ services:
     networks:
       - sqe-dev
 
-# volumes:
+volumes:
+  sqe-mariadb:
 #   resources/data-backup:
 #   resources/cgi-bin:
 #   resources/perl-libs:

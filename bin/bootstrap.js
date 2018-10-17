@@ -44,6 +44,19 @@ if (commandExists('docker')) {
 }
 console.log(chalk.green('✓ All necessary dependencies are installed.'))
 
+console.log(chalk.blue('Removing old docker containers'))
+cmd = spawnSync('docker-compose', ['down'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] });
+
+cmd = spawnSync('docker', ['volume', 'ls', '--filter', 'name=scrollery-website_sqe-mariadb', '--quiet'], { encoding : 'utf8', cwd: './', stdio: 'pipe' });
+if (cmd.stdout.indexOf('scrollery') !== -1) {
+  console.log(chalk.blue('Removing old docker volume'));
+  cmd = spawnSync('docker', ['volume', 'rm', 'scrollery-website_sqe-mariadb'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] });
+  if(cmd.status !== 0) {
+    console.log(chalk.red('✗ Failed to remove docker volume scrollery-website_sqe-mariadb'));
+    process.exit(1);
+  }
+}
+
 console.log(chalk.blue(`Loading SQE_DB_API, version ${versions.dependencies.SQE_DB_API}...`))
 console.log(chalk.blue('Checking for perl-libs repository.'))
 if (fs.existsSync("./resources/perl-libs/.git")) {
