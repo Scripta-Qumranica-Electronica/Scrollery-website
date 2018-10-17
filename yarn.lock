@@ -4831,6 +4831,11 @@ js-clipper@^1.0.1:
   resolved "https://registry.yarnpkg.com/js-clipper/-/js-clipper-1.0.1.tgz#4d6b07434a4408e7c129e32201ce66d21474ed21"
   integrity sha1-TWsHQ0pECOfBKeMiAc5m0hR07SE=
 
+js-file-download@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/js-file-download/-/js-file-download-0.4.4.tgz#51ffa5d421fc5fc25c9d1a724255a7184e4dc92b"
+  integrity sha512-lH75hwOMBkIDqIyAWgSYwkMa+YkBu/ATJf2rEXnC1TmHCCHmLNG/NFhZ6R4tipnH2v0EvLOhGlARc0vyS1j0mA==
+
 "js-tokens@^3.0.0 || ^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
@@ -7403,6 +7408,11 @@ prettier@^1.12.0, prettier@^1.7.0:
   version "1.14.3"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.14.3.tgz#90238dd4c0684b7edce5f83b0fb7328e48bd0895"
   integrity sha512-qZDVnCrnpsRJJq5nSsiHCE3BYMED2OtsI+cmzIzF1QIfqm5ALf8tEJcO27zV1gKNKRPdhjO0dNWnrzssDQ1tFg==
+
+pretty-data@^0.40.0:
+  version "0.40.0"
+  resolved "https://registry.yarnpkg.com/pretty-data/-/pretty-data-0.40.0.tgz#572aa8ea23467467ab94b6b5266a6fd9c8fddd72"
+  integrity sha1-Vyqo6iNGdGerlLa1Jmpv2cj93XI=
 
 pretty-format@^23.6.0:
   version "23.6.0"

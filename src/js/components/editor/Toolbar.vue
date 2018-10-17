@@ -38,6 +38,7 @@
 <script>
 import { Store } from 'vuex'
 import { parseColumnToEpiDoc } from '~/utils/EpiDocExport.js'
+import fileDownload from 'js-file-download'
 
 export default {
   props: {
@@ -85,7 +86,12 @@ export default {
     downloadEpiDoc() {
       parseColumnToEpiDoc(this.corpus, this.$route.params.scrollVersionID, this.$route.params.colID)
         .then(epiDocString => {
-          console.log(epiDocString)
+          const fileName = `${
+            this.corpus.combinations.get(this.$route.params.scrollVersionID).name
+          }-${this.$route.params.scrollVersionID}-${
+            this.corpus.cols.get(this.$route.params.colID, this.$route.params.scrollVersionID).name
+          }.xml`
+          fileDownload(epiDocString, fileName)
         })
         .catch(error => console.error(error))
     },
