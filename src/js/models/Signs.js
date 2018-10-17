@@ -615,7 +615,7 @@ export default class Signs extends ItemList {
       UPPER_MARGIN: 39,
       LOWER_MARGIN: 40,
     }
-    const numType = signTypes(type)
+    const numType = signTypes[type]
     return (
       []
         .concat(
