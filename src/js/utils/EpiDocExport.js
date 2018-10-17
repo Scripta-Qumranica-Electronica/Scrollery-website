@@ -1,5 +1,3 @@
-import { pd } from 'pretty-data'
-
 /**
  *
  * This function receives a col_id, grabs the first sign
@@ -11,91 +9,91 @@ export function parseColumnToEpiDoc(corpus, scroll_version_id, col_id) {
   return new Promise((resolve, reject) => {
     // Set all the header information
     let epidocString = `<?xml version="1.0" encoding="UTF-8"?>
-    <?xml-model href="http://www.stoa.org/epidoc/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
-    <?xml-model href="http://www.stoa.org/epidoc/schema/latest/tei-epidoc.rng" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-    <TEI xmlns="http://www.tei-c.org/ns/1.0" xml:space="preserve" xml:lang="en">
-      <teiHeader>
-        <fileDesc>
-          <titleStmt>
-            <title>${corpus.combinations.get(scroll_version_id).name}</title>
-          </titleStmt>
-          <publicationStmt>
-            <authority>
+<?xml-model href="http://www.stoa.org/epidoc/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.stoa.org/epidoc/schema/latest/tei-epidoc.rng" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:space="preserve" xml:lang="en">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>${corpus.combinations.get(scroll_version_id).name}</title>
+      </titleStmt>
+      <publicationStmt>
+        <authority>
+          <!-- Need IAA Metadata for this -->
+        </authority>
+        <idno type="filename">${corpus.combinations.get(scroll_version_id).name}</idno>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc>
+          <msIdentifier>
+            <repository>
               <!-- Need IAA Metadata for this -->
-            </authority>
-            <idno type="filename">${corpus.combinations.get(scroll_version_id).name}</idno>
-          </publicationStmt>
-          <sourceDesc>
-            <msDesc>
-              <msIdentifier>
-                <repository>
-                  <!-- Need IAA Metadata for this -->
-                </repository>
-                <idno>
-                  <!-- We don't know this yet, since it may be more than one plate and/or fragment -->
-                </idno>
-              </msIdentifier>
-              <physDesc>
-                <objectDesc>
-                  <supportDesc>
-                    <!-- Similar to information at beginning of DJD entry -->
-                    <!-- Do we get this from IAA? -->
-                    <support>Scroll of <material>parchment</material>
-                      and
-                      <objectType /> information,
-                      <dimensions />, etc.)
-                    </support>
-                  </supportDesc>
-                  <layoutDesc>
-                    <!-- How much to provide here -->
-                    <layout>description of text field/campus</layout>
-                  </layoutDesc>
-                </objectDesc>
-                <handDesc>
-                  <!-- It might be nice to include the description of the hand here -->
-                  <handNote>
-                    <!-- Need IAA Metadata for this -->
-                  </handNote>
-                </handDesc>
-              </physDesc>
-              <history>
-                <origin>
-                  <origPlace>
-                    <!-- Need IAA Metadata for this -->
-                  </origPlace>
-                  <origDate>
-                    <!-- Need IAA Metadata for this -->
-                  </origDate>
-                </origin>
-                <provenance type="purchased">
-                  <!-- Need IAA Metadata for this -->
-                </provenance>
-    
-                <provenance type="observed">
-                  <!-- Need IAA Metadata for this -->
-                </provenance>
-              </history>
-            </msDesc>
-          </sourceDesc>
-        </fileDesc>
-      </teiHeader>
-      <facsimile>
-        <graphic url="photograph of text or monument" />
-      </facsimile>
-      <text>
-        <body>`
+            </repository>
+            <idno>
+              <!-- We don't know this yet, since it may be more than one plate and/or fragment -->
+            </idno>
+          </msIdentifier>
+          <physDesc>
+            <objectDesc>
+              <supportDesc>
+                <!-- Similar to information at beginning of DJD entry -->
+                <!-- Do we get this from IAA? -->
+                <support>Scroll of <material>parchment</material>
+                  and
+                  <objectType /> information,
+                  <dimensions />, etc.)
+                </support>
+              </supportDesc>
+              <layoutDesc>
+                <!-- How much to provide here -->
+                <layout>description of text field/campus</layout>
+              </layoutDesc>
+            </objectDesc>
+            <handDesc>
+              <!-- It might be nice to include the description of the hand here -->
+              <handNote>
+                <!-- Need IAA Metadata for this -->
+              </handNote>
+            </handDesc>
+          </physDesc>
+          <history>
+            <origin>
+              <origPlace>
+                <!-- Need IAA Metadata for this -->
+              </origPlace>
+              <origDate>
+                <!-- Need IAA Metadata for this -->
+              </origDate>
+            </origin>
+            <provenance type="purchased">
+              <!-- Need IAA Metadata for this -->
+            </provenance>
+
+            <provenance type="observed">
+              <!-- Need IAA Metadata for this -->
+            </provenance>
+          </history>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <facsimile>
+    <graphic url="photograph of text or monument" />
+  </facsimile>
+  <text>
+    <body>\n`
     let currentSign_id = corpus.cols.get(col_id, scroll_version_id).col_sign_id
     let done = false
     do {
       // Check for column start
       if (corpus.signs.signIs('COLUMN_START', currentSign_id, scroll_version_id))
-        epidocString += `<div type="textpart" subtype="column" n="${
+        epidocString += `      <div type="textpart" subtype="column" n="${
           corpus.cols.get(col_id, scroll_version_id).name
         }"><ab>`
 
       // Check for line start
       if (corpus.signs.signIs('LINE_START', currentSign_id, scroll_version_id))
-        epidocString += `<lb n="${
+        epidocString += `\n        <lb n="${
           corpus.lines.get(corpus.signs.get(currentSign_id).line_id, scroll_version_id).name
         }"/>`
 
@@ -199,15 +197,13 @@ export function parseColumnToEpiDoc(corpus, scroll_version_id, col_id) {
 
       // Check for column end, and finish
       if (corpus.signs.signIs('COLUMN_END', currentSign_id, scroll_version_id)) {
-        epidocString += '</ab></div>'
+        epidocString += '\n      </ab></div>\n'
         done = true
       }
     } while ((currentSign_id = corpus.signs.getNextSign(currentSign_id)) && !done)
 
     // Add closing tags
-    epidocString += '</body></text></TEI>'
-    // Pretty print it
-    epidocString = pd.xml(epidocString)
+    epidocString += '    </body>\n  </text>\n</TEI>'
 
     // Add better check that we have <column></column>,
     // and if not add </column>, or return error for broken string.

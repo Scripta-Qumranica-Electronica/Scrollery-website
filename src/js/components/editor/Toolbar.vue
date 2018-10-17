@@ -7,7 +7,8 @@
         :style="{color: !is_locked ? 'red' : 'green'}"
       ></i>
     </div>
-    <div class="toolbar-item float-left">
+    <div v-show="$route.params.scrollVersionID !== '~' && $route.params.colID !== '~'" 
+      class="toolbar-item float-left">
       <el-button type="primary" size="mini" @click="downloadEpiDoc">Download EpiDoc</el-button>
     </div>
     <div class="inline toolbar-right">
