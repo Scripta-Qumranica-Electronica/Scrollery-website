@@ -83,13 +83,11 @@ export default {
     },
 
     downloadEpiDoc() {
-      parseColumnToEpiDoc(
-        this.corpus,
-        this.$route.params.scrollVersionID,
-        this.$route.params.colID
-      ).then(epiDocString => {
-        console.log(epiDocString)
-      })
+      parseColumnToEpiDoc(this.corpus, this.$route.params.scrollVersionID, this.$route.params.colID)
+        .then(epiDocString => {
+          console.log(epiDocString)
+        })
+        .catch(error => console.error(error))
     },
   },
 }

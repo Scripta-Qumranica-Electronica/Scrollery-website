@@ -58,6 +58,14 @@ export default class Signs extends ItemList {
     return signChar
   }
 
+  getSignAttributes(sign, scroll_version_id) {
+    return [].concat(
+      ...this.corpus.signChars
+        .get(this.get(sign).sign_char_ids[0], scroll_version_id)
+        .attribute_values.map(a => a.value)
+    )
+  }
+
   /**
    * This returns the next sign_id.  It checks if
    * we have selected a sign other than the default
@@ -615,7 +623,7 @@ export default class Signs extends ItemList {
       UPPER_MARGIN: 39,
       LOWER_MARGIN: 40,
     }
-    const numType = signTypes[type]
+    const numType = signTypes[type] // = signTypes.LOWER_MARGIN
     return (
       []
         .concat(
