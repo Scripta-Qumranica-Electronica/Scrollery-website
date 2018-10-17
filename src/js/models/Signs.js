@@ -569,6 +569,53 @@ export default class Signs extends ItemList {
   }
 
   signIsLineStart(sign, scroll_version_id) {
+    return this.signIs('LINE_START', sign, scroll_version_id)
+  }
+
+  signIs(type, sign, scroll_version_id) {
+    const signTypes = {
+      LETTER: 1,
+      SPACE: 2,
+      POSSIBLE_VACAT: 3,
+      VACAT: 4,
+      DAMAGE: 5,
+      BLANK_LINE: 6,
+      PARAGRAPH_MARKER: 7,
+      LACUNA: 8,
+      BREAK: 9,
+      LINE_START: 10,
+      LINE_END: 11,
+      COLUMN_START: 12,
+      COLUMN_END: 13,
+      SCROLL_START: 14,
+      SCROLL_END: 15,
+      NULL: 16,
+      TRUE: 17,
+      INCOMPLETE_BUT_CLEAR: 18,
+      INCOMPLETE_AND_NOT_CLEAR: 19,
+      TRUE: 20,
+      CONJECTURE: 21,
+      SHOULD_BE_ADDED: 22,
+      SHOULD_BE_DELETED: 23,
+      OVERWRITTEN: 24,
+      HORIZONTAL_LINE: 25,
+      DIAGONAL_LEFT_LINE: 26,
+      DIAGONAL_RIGHT_LINE: 27,
+      DOT_BELOW: 28,
+      DOT_ABOVE: 29,
+      LINE_BELOW: 30,
+      LINE_ABOVE: 31,
+      BOXED: 32,
+      ERASED: 33,
+      ABOVE_LINE: 34,
+      BELOW_LINE: 35,
+      LEFT_MARGIN: 36,
+      RIGHT_MARGIN: 37,
+      MARGIN: 38,
+      UPPER_MARGIN: 39,
+      LOWER_MARGIN: 40,
+    }
+    const numType = signTypes(type)
     return (
       []
         .concat(
@@ -576,7 +623,7 @@ export default class Signs extends ItemList {
             .get(this.get(sign).sign_char_ids[0], scroll_version_id)
             .attribute_values.map(a => a.value)
         )
-        .indexOf(10) > -1
+        .indexOf(numType) > -1
     )
   }
 

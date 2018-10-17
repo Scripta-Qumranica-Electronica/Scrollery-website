@@ -7,6 +7,9 @@
         :style="{color: !is_locked ? 'red' : 'green'}"
       ></i>
     </div>
+    <div class="toolbar-item float-left">
+      <el-button type="primary" size="mini" @click="downloadEpiDoc">Download EpiDoc</el-button>
+    </div>
     <div class="inline toolbar-right">
       <button id="editor-fullscreen" class="inline toolbar-item toolbar-button" @click="$emit('open-sign-editor')">
           Open Sign Editor
@@ -34,6 +37,7 @@
 
 <script>
 import { Store } from 'vuex'
+import { parseColumnToEpiDoc } from '~/utils/EpiDocExport.js'
 
 export default {
   props: {
@@ -76,6 +80,16 @@ export default {
      */
     onFontChange(font) {
       this.state.commit('setFont', font)
+    },
+
+    downloadEpiDoc() {
+      parseColumnToEpiDoc(
+        this.corpus,
+        this.$route.params.scrollVersionID,
+        this.$route.params.colID
+      ).then(epiDocString => {
+        console.log(epiDocString)
+      })
     },
   },
 }
