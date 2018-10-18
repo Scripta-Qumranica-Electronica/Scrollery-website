@@ -19,6 +19,7 @@ try {
   // to build the test context. If it does, then this catches it and gives
   // something intelligible.
   /* istanbul ignore next */
+  console.error('Test failed real badly', e);
   describe('test compilation', () => {
     it('should not throw an error', () => {
       expect(e).to.equal(null)

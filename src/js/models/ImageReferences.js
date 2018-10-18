@@ -45,6 +45,7 @@ export default class ImageReferences extends ItemList {
     if (postData.scroll_version_id === undefined) {
       postData = Object.assign({}, postData, { transaction: 'getImages', })
     }
+    debugger;
     return super.populate(postData)
   }
 
