@@ -195,8 +195,7 @@ describe('Login', function() {
 
   describe('validate login', () => {
     it('should fail if an empty response from server', done => {
-      vm
-        .validateLogin()
+      vm.validateLogin()
         .then(() => {
           done(new Error('test case expected failed promise, but succeeded'))
         })
@@ -207,8 +206,7 @@ describe('Login', function() {
     })
 
     it('should reject the promise if the response contains an error message', done => {
-      vm
-        .validateLogin({ data: { error: true } })
+      vm.validateLogin({ data: { error: true } })
         .then(() => {
           done(new Error('test case expected failed promise, but succeeded'))
         })
@@ -226,8 +224,7 @@ describe('Login', function() {
         },
       }
 
-      vm
-        .validateLogin(partialData)
+      vm.validateLogin(partialData)
         .then(() => {
           done(new Error('test case expected failed promise, but succeeded'))
         })
@@ -256,8 +253,7 @@ describe('Login', function() {
         },
       }
 
-      vm
-        .validateLogin(res)
+      vm.validateLogin(res)
         .then(() => {
           // ensure that i18n is attempted to load
           expect($i18nLoadStub.called).to.equal(true)
