@@ -153,20 +153,29 @@ export function parseColumnToEpiDoc(corpus, scroll_version_id, col_id) {
       // milestone value in the attribute key/value pair, e.g.:
       // {element: '', attribute: 'milestone/'}.
       const sqeToEpiDocAttr = {
+        3: { attribute: 'space' },
+        4: { attribute: 'space' },
+        6: { element: 'space', attribute: 'dim="horizontal" extent="1" unit="line"' },
         9: { element: 'gap' },
         18: { element: 'damage' },
-        19: { element: 'unclear', attribute: 'reason=”illegible”' },
+        19: { element: 'unclear', attribute: 'reason="illegible"' },
         20: { element: 'supplied', attribute: 'reason="lost"' },
-        33: { element: 'del', attribute: 'rend=”erasure”' },
+        33: { element: 'del', attribute: 'rend="erasure"' },
+        34: { element: 'hi', attribute: 'rend="superscript"' },
+        35: { element: 'hi', attribute: 'rend="subscript"' },
       }
 
       const attributes = corpus.signs.getSignAttributes(currentSign_id, scroll_version_id)
 
       for (let i = 0, attr; (attr = attributes[i]); i++) {
         if (sqeToEpiDocAttr[attr]) {
-          epidocString += `<${sqeToEpiDocAttr[attr].element}${
-            sqeToEpiDocAttr[attr].attribute ? ' ' + sqeToEpiDocAttr[attr].attribute : ''
-          }>`
+          if (sqeToEpiDocAttr[attr].element) {
+            epidocString += `<${sqeToEpiDocAttr[attr].element}${
+              sqeToEpiDocAttr[attr].attribute ? ' ' + sqeToEpiDocAttr[attr].attribute : ''
+            }>`
+          } else {
+            epidocString += `<${sqeToEpiDocAttr[attr].attribute}/>`
+          }
         }
       }
 

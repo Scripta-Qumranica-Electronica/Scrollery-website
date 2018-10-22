@@ -92,7 +92,7 @@ export default {
           }-${this.$route.params.scrollVersionID}-${
             this.corpus.cols.get(this.$route.params.colID, this.$route.params.scrollVersionID).name
           }.xml`
-          fileDownload(epiDocString, fileName)
+          fileDownload(new Blob([epiDocString]), fileName)
         })
         .catch(error => console.error(error))
     },
