@@ -3,7 +3,6 @@
   "description": "Scripta Qumranica Electronica - Digital Tools for the Dead Sea Scrolls",
   "version": "0.1.1",
   "scripts": {
-    "prepush": "node bin/git-prepush.js",
     "start": "node ./tools/dev_server.js",
     "bootstrap": "node ./server-env/bin/bootstrap.js",
     "reset:db": "docker exec -i SQE_Database /tmp/import-database.sh"
