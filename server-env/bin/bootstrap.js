@@ -44,6 +44,9 @@ if (commandExists('docker')) {
 }
 console.log(chalk.green('✓ All necessary dependencies are installed.'))
 
+// Moving to the server-env directory, where all the Docker files are located
+process.chdir('./server-env')
+
 console.log(chalk.blue('Removing old docker containers'))
 cmd = spawnSync('docker-compose', ['down'], { encoding : 'utf8', cwd: './', stdio: [null, process.stdout, process.stderr] });
 

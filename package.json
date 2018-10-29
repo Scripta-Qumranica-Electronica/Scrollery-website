@@ -4,21 +4,9 @@
   "version": "0.1.1",
   "scripts": {
     "prepush": "node bin/git-prepush.js",
-    "prettier": "prettier --config ./.prettierrc.yml --write ./{tests,gstsrc}/**/*.{js,vue}",
-    "dev": "webpack --config webpack.dev.js",
-    "prod": "webpack --config webpack.prod.js",
     "start": "node ./tools/dev_server.js",
-    "bootstrap": "node ./bin/bootstrap.js",
-    "bootstrap:min": "node ./bin/bootstrap-min.js",
-    "backup:db": "node ./resources/data-files/database-backup.js",
-    "reset:db": "docker exec -i SQE_Database /tmp/import-database.sh",
-    "test": "karma start --config karma.conf.js",
-    "test:chrome": "karma start --config karma.conf.js --browsers=Chrome",
-    "ci": "npm run test:travis && npm run ci:server",
-    "ci:server": "mocha ./tests/server/**/*-test.js --timeout=15000",
-    "test:server": "mocha ./tests/server/**/*-test.js --watch --timeout=15000",
-    "test:travis": "cross-env BABEL_ENV=test ./node_modules/.bin/karma start --single-run --config karma.conf.js --browsers=Chrome,Firefox",
-    "posttest:travis": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "bootstrap": "node ./server-env/bin/bootstrap.js",
+    "reset:db": "docker exec -i SQE_Database /tmp/import-database.sh"
   },
   "lint-staged": {
     "src/**/*.(js|vue)": [
