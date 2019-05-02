@@ -2,6 +2,9 @@
 # Scrollery-website
 This is a development space for the website of the project [Scripta Qumranica Electronica (SQE)](https://qumranica.org).  It is currently being actively developed and we hope that hosting it here will streamline the process of further development.
 
+# OBSOLETE
+This project is no longer being mainteined. It's been replaced by the ScrollEditor project.
+
 ## Information
 
 For setup instructions, [see here](./docs/SETUP.md).  If you already have Node, Docker, and Git, just clone the project and then run `yarn run bootstrap`; it's that simple.
