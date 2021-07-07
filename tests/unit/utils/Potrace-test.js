@@ -22,8 +22,9 @@ describe('Potrace.trace', () => {
     trace(testCanvas, 1)
       .then(resolve => {
         expect(resolve).to.equal(path)
+        done()
       })
-      .finally(done())
+      .catch(done)
   })
 
   it('should return an SVG path for a canvas with a circle', done => {
@@ -42,8 +43,9 @@ describe('Potrace.trace', () => {
     trace(testCanvas, 1)
       .then(resolve => {
         expect(resolve).to.equal(path)
+        done()
       })
-      .finally(done())
+      .catch(done)
   })
 
   it('should return an error for a blank canvas', done => {
@@ -51,8 +53,9 @@ describe('Potrace.trace', () => {
     const error = Error('Canvas is blank!')
     trace(testCanvas, 1)
       .then(resolve => {
-        expect(resolve).to.deep.equal(error)
+        expect(resolve.message).to.equal(error.message)
+        done()
       })
-      .finally(done())
+      .catch(done)
   })
 })
